@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Stepper } from "@/components/ui/Stepper";
 import { useBookingForm } from "@/hooks/useBookingForm";
+import type { MonthCalendarData } from "@/hooks/useMonthCalendar";
 import { dayLabel, euro, firstName, unitTitle } from "@/lib/format";
 import type { ChefCard } from "@/lib/types";
 
@@ -16,13 +17,15 @@ type Props = {
   chef: ChefCard;
   initialOfferId?: string;
   initialAddress?: Place | null;
+  /** The current month's days, already loaded by the page. */
+  initialCalendar?: MonthCalendarData;
   onClose?: () => void;
   /** Bleed the sticky footer to the panel edges (map panel) or keep it inside (profile page). */
   bleed?: boolean;
 };
 
-export function BookingForm({ chef, initialOfferId, initialAddress, onClose, bleed = false }: Props) {
-  const form = useBookingForm(chef, { initialOfferId, initialAddress });
+export function BookingForm({ chef, initialOfferId, initialAddress, initialCalendar, onClose, bleed = false }: Props) {
+  const form = useBookingForm(chef, { initialOfferId, initialAddress, initialCalendar });
   const { offer, calendar, contact } = form;
   const chefFirst = firstName(chef.name);
 

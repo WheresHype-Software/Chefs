@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { MobileBookingBar } from "@/components/booking/MobileBookingBar";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { CANCELLATION_LABEL, getChefProfile } from "@/lib/data";
+import { CANCELLATION_LABEL, getChefProfile, getMonthCalendar } from "@/lib/data";
 import { firstName, fromPrice, initials, MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel } from "@/lib/format";
 import { Photo } from "@/components/ui/Photo";
 
@@ -42,6 +42,15 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
   const { oferta } = await searchParams;
   const chef = await getChefProfile(slug);
   if (!chef) notFound();
+  // The current month comes with the page so the booking calendar shows at once; other months
+  // load from /api/calendar. If this fails, the calendar fetches it itself.
+  const today = new Date();
+  const initialCalendar = await getMonthCalendar(chef.id, today.getFullYear(), today.getMonth())
+    .then((calendar) => ({ year: today.getFullYear(), month: today.getMonth(), calendar }))
+    .catch((err) => {
+      console.error("[chef page] calendar:", err);
+      return undefined;
+    });
 
   const photos = chef.gallery.length ? chef.gallery : [{ url: null, caption: "Fotografia" }];
   const tier = tierLabel(chef.tier, chef.isNew, chef.reviewCount, chef.rating);
@@ -273,7 +282,12 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
             <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
           </div>
           {bookable ? (
-            <BookingForm key={`${chef.id}:${oferta ?? ""}`} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
+            <BookingForm
+              key={`${chef.id}:${oferta ?? ""}`}
+              chef={chef}
+              initialCalendar={initialCalendar}
+              initialOfferId={typeof oferta === "string" ? oferta : undefined}
+            />
           ) : (
             <p className="m-0 text-muted">
               {firstName(chef.name)} ainda está a preparar os menus. Volte em breve

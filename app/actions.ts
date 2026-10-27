@@ -3,18 +3,10 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking-token";
-import { getCalendar } from "@/lib/data";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { failInvalid } from "@/lib/result";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
-import type { Calendar } from "@/lib/types";
-
-export async function loadCalendar(chefId: string, year: number, month: number): Promise<Calendar> {
-  const from = new Date(Date.UTC(year, month, 1));
-  const to = new Date(Date.UTC(year, month + 1, 0));
-  return getCalendar(chefId, from, to);
-}
 
 const BookingInput = z.object({
   offerId: z.string().min(1),

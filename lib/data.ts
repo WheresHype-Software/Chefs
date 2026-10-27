@@ -25,6 +25,11 @@ export async function getCalendar(chefId: string, from: Date, to: Date): Promise
   return (data ?? { available: [], booked: [] }) as Calendar;
 }
 
+/** Free and booked days of one calendar month (month is 0-based, like Date). */
+export async function getMonthCalendar(chefId: string, year: number, month: number): Promise<Calendar> {
+  return getCalendar(chefId, new Date(Date.UTC(year, month, 1)), new Date(Date.UTC(year, month + 1, 0)));
+}
+
 type ReviewRow = {
   id: string;
   author_name: string;

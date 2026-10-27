@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { requestBooking } from "@/app/actions";
 import { callAction } from "@/lib/call-action";
 import type { Place } from "@/components/AddressSearch";
-import { useMonthCalendar } from "@/hooks/useMonthCalendar";
+import { useMonthCalendar, type MonthCalendarData } from "@/hooks/useMonthCalendar";
 import type { ChefCard } from "@/lib/types";
 
 export type Contact = { name: string; email: string; phone: string; notes: string };
@@ -13,7 +13,10 @@ export type SentBooking = { ref: string; link: string };
 const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
 /** All state and rules of the booking request form; the components only render it. */
-export function useBookingForm(chef: ChefCard, options: { initialOfferId?: string; initialAddress?: Place | null } = {}) {
+export function useBookingForm(
+  chef: ChefCard,
+  options: { initialOfferId?: string; initialAddress?: Place | null; initialCalendar?: MonthCalendarData } = {},
+) {
   const [offerIndex, setOfferIndex] = useState(() =>
     Math.max(
       0,
@@ -21,7 +24,7 @@ export function useBookingForm(chef: ChefCard, options: { initialOfferId?: strin
     ),
   );
   const offer = chef.offers[offerIndex]!;
-  const calendar = useMonthCalendar(chef.id);
+  const calendar = useMonthCalendar(chef.id, options.initialCalendar);
   const [day, setDay] = useState<string | null>(null);
   const [time, setTime] = useState<string | null>(null);
   const [guests, setGuests] = useState(() => Math.max(offer.minGuests, offer.unit === "pessoa" ? 4 : 1));
