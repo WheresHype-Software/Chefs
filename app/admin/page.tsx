@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { Wordmark } from "@/components/SiteChrome";
 import { notFound } from "next/navigation";
@@ -149,14 +150,26 @@ export default async function AdminPage() {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
+  const brand = (
+    <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
+      <Wordmark />
+    </Link>
+  );
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b border-line bg-white">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between px-5 py-4 md:px-8">
-          <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
-            <Wordmark />
-          </Link>
-          <div className="flex items-baseline gap-5 text-sm">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between px-5 md:px-8">
+          {brand}
+          <MobileMenu
+            brand={brand}
+            links={[
+              { href: "/admin", label: "Administração" },
+              { href: "/dashboard", label: "Painel" },
+              { href: "/", label: "Página inicial" },
+            ]}
+            actions={<SignOutButton block />}
+          />
+          <div className="hidden items-baseline gap-5 text-sm md:flex">
             <Link href="/dashboard" className="text-muted no-underline hover:text-ink">
               Painel
             </Link>
