@@ -43,3 +43,7 @@ next-env.d.ts
 
 # copied from node_modules on install
 /public/vendor
+
+# deploy watcher artifacts
+.deployed-sha
+deploy-watch.log

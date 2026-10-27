@@ -1,0 +1,27 @@
+services:
+  chefs:
+    image: whereshype/chefs:${VERSION:-latest}
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}
+        NEXT_PUBLIC_MAP_STYLE_URL: ${NEXT_PUBLIC_MAP_STYLE_URL:-}
+    container_name: chefs
+    restart: unless-stopped
+    networks:
+      - sites_proxy
+    environment:
+      VIRTUAL_HOST: chefs.whereshype.com
+      VIRTUAL_PORT: "3000"
+      LETSENCRYPT_HOST: chefs.whereshype.com
+      VERSION: ${VERSION:-latest}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+
+networks:
+  sites_proxy:
+    external: true

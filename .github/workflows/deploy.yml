@@ -1,0 +1,30 @@
+name: Deploy
+
+# Auto-deploy on every merge to main, plus a manual button (Actions -> Deploy -> Run).
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Only signal the server watcher: fast-forward the lightweight 'deploy' tag.
+      # No secrets, no SSH, no inbound route.
+      - name: Fast-forward deploy tag to HEAD of main
+        run: |
+          set -euo pipefail
+          git tag -f deploy HEAD
+          git push --force origin refs/tags/deploy
+
+      - name: Announce
+        run: echo "deploy tag moved to $(git rev-parse --short HEAD) - server watcher will pick it up and rebuild."
