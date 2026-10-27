@@ -11,6 +11,8 @@ export default async function Overview() {
   const chef = await getMyChef();
   if (!chef) {
     if (session.role === "chef") redirect("/dashboard/perfil");
+    // Admins without their own chef page belong in the admin area, not an empty chef view.
+    if (session.role === "admin") redirect("/admin");
     return <ClientHome />;
   }
 

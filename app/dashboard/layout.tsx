@@ -81,14 +81,15 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
             ) : (
               <span className="mt-1.5 text-[13px] text-muted">{status}</span>
             )}
-            {session.role === "admin" && (
-              <Link href="/admin" className="mt-1.5 text-[13px]">
-                Administração →
-              </Link>
-            )}
             {!session.demo && <SignOutButton className="mt-3 self-start text-[13px]" />}
           </div>
         )}
+        {session.role === "admin" && (
+          <Link href="/admin" className="side-link mt-2 border-t border-line pt-4">
+            Administração →
+          </Link>
+        )}
+        {!chef && !session.demo && <SignOutButton className="mt-auto self-start px-3.5 text-[13px]" />}
         {session.demo && (
           <span className="mx-3.5 mt-4 rounded-[2px] bg-paper px-3 py-2 text-xs text-muted">
             Modo de demonstração: dados de exemplo, nada é guardado.
