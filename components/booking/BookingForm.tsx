@@ -84,7 +84,9 @@ export function BookingForm({ chef, initialOfferId, initialAddress, onClose, ble
             inputClassName="w-full"
           />
           <span className="hint">
-            {offer.mode === "home" ? `${chefFirst} desloca-se até ${chef.radiusKm} km de ${chef.area}.` : "A taxa de entrega é definida pelo chef."}
+            {offer.mode === "home"
+              ? `${chefFirst} desloca-se até ${chef.radiusKm} km de ${chef.area}.`
+              : "A taxa de entrega é definida pelo chef."}
           </span>
         </div>
       )}
@@ -99,17 +101,44 @@ export function BookingForm({ chef, initialOfferId, initialAddress, onClose, ble
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(160px,100%),1fr))] gap-3.5">
         <Field label="Nome" className="sm:col-span-2">
-          <input type="text" autoComplete="name" required value={contact.name} onChange={(e) => form.updateContact("name", e.target.value)} placeholder="O seu nome" />
+          <input
+            type="text"
+            autoComplete="name"
+            required
+            value={contact.name}
+            onChange={(e) => form.updateContact("name", e.target.value)}
+            placeholder="O seu nome"
+          />
         </Field>
         <Field label="Email">
-          <input type="email" autoComplete="email" required value={contact.email} onChange={(e) => form.updateContact("email", e.target.value)} placeholder="nome@email.pt" />
+          <input
+            type="email"
+            autoComplete="email"
+            required
+            value={contact.email}
+            onChange={(e) => form.updateContact("email", e.target.value)}
+            placeholder="nome@email.pt"
+          />
         </Field>
         <Field label="Telemóvel">
-          <input type="tel" autoComplete="tel" required value={contact.phone} onChange={(e) => form.updateContact("phone", e.target.value)} placeholder="+351" />
+          <input
+            type="tel"
+            autoComplete="tel"
+            required
+            value={contact.phone}
+            onChange={(e) => form.updateContact("phone", e.target.value)}
+            placeholder="+351"
+          />
         </Field>
       </div>
       <Field label="Notas para o chef">
-        <textarea rows={3} maxLength={2000} value={contact.notes} onChange={(e) => form.updateContact("notes", e.target.value)} placeholder="Alergias, equipamento da cozinha, ocasião…" />
+        <textarea
+          rows={3}
+          maxLength={2000}
+          value={contact.notes}
+          onChange={(e) => form.updateContact("notes", e.target.value)}
+          placeholder="Alergias, equipamento da cozinha, ocasião…"
+        />
       </Field>
 
       <div className={`sticky bottom-0 flex flex-col gap-3 border-t border-line bg-white pb-[22px] pt-4 ${bleed ? "-mx-7 px-7" : ""}`}>

@@ -1,35 +1,47 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { usePolling } from "@/hooks/usePolling";
 import { getBookingView, postMessage } from "@/lib/bookings";
 import { timeLabel } from "@/lib/format";
 import type { BookingView, ChatMessage } from "@/lib/types";
 
-type Props = {
-  view: BookingView;
-  token?: string | null;
-  title: string;
-  subtitle?: string;
-};
+const POLL_MS = 8000;
 
-/** Booking conversation. Polls for new messages; works for guests (token) and signed-in users. */
-export function BookingChat({ view, token, title, subtitle }: Props) {
+type Props = { view: BookingView; title: string; subtitle?: string };
+
+function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
+  if (message.sender === "system") {
+    return <div className="self-center rounded-[2px] bg-[#F1EDE6] px-3 py-[5px] text-xs text-muted">{message.body}</div>;
+  }
+  return (
+    <div
+      className={`max-w-[75%] rounded-[3px] px-3.5 py-2.5 text-[15px] ${mine ? "self-end bg-ink text-white" : "self-start border border-line bg-white"}`}
+    >
+      {message.body}
+      <span className={`mt-1 block text-[11px] ${mine ? "text-right text-[#CFC8BE]" : "text-muted"}`}>{timeLabel(message.at)}</span>
+    </div>
+  );
+}
+
+/** Booking conversation for the client or the chef; polls for new messages while visible. */
+export function BookingChat({ view, title, subtitle }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(view.messages);
   const [draft, setDraft] = useState("");
-  const [pending, start] = useTransition();
+  const [error, setError] = useState(false);
+  const [pending, startTransition] = useTransition();
   const list = useRef<HTMLDivElement>(null);
   const me = view.viewer === "chef" ? "chef" : "client";
   const id = view.booking.id;
 
-  useEffect(() => {
-    if (id === "demo") return;
-    const t = setInterval(async () => {
-      if (document.hidden) return;
-      const v = await getBookingView(id, token);
-      if (v) setMessages(v.messages);
-    }, 8000);
-    return () => clearInterval(t);
-  }, [id, token]);
+  usePolling(
+    async () => {
+      const fresh = await getBookingView(id);
+      if (fresh) setMessages(fresh.messages);
+    },
+    POLL_MS,
+    id !== "demo",
+  );
 
   useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight });
@@ -39,9 +51,11 @@ export function BookingChat({ view, token, title, subtitle }: Props) {
     const body = draft.trim();
     if (!body) return;
     setDraft("");
+    setError(false);
     setMessages((m) => [...m, { id: `tmp-${Date.now()}`, sender: me, body, at: new Date().toISOString() }]);
-    start(async () => {
-      await postMessage(id, body, token);
+    startTransition(async () => {
+      const result = await postMessage(id, body);
+      if (!result.ok) setError(true);
     });
   }
 
@@ -55,24 +69,15 @@ export function BookingChat({ view, token, title, subtitle }: Props) {
         </div>
       </div>
       <div ref={list} className="flex h-[460px] flex-col gap-3 overflow-y-auto bg-[#FCFBF9] p-5" aria-live="polite">
-        {messages.map((m) =>
-          m.sender === "system" ? (
-            <div key={m.id} className="self-center rounded-[2px] bg-[#F1EDE6] px-3 py-[5px] text-xs text-muted">
-              {m.body}
-            </div>
-          ) : m.sender === me ? (
-            <div key={m.id} className="max-w-[75%] self-end rounded-[3px] bg-ink px-3.5 py-2.5 text-[15px] text-white">
-              {m.body}
-              <span className="mt-1 block text-right text-[11px] text-[#CFC8BE]">{timeLabel(m.at)}</span>
-            </div>
-          ) : (
-            <div key={m.id} className="max-w-[75%] self-start rounded-[3px] border border-line bg-white px-3.5 py-2.5 text-[15px]">
-              {m.body}
-              <span className="mt-1 block text-[11px] text-muted">{timeLabel(m.at)}</span>
-            </div>
-          ),
-        )}
+        {messages.map((m) => (
+          <Bubble key={m.id} message={m} mine={m.sender === me} />
+        ))}
       </div>
+      {error && (
+        <p role="alert" className="m-0 border-t border-line px-5 py-2 text-sm text-danger">
+          A última mensagem não foi enviada. Tente de novo.
+        </p>
+      )}
       <form
         className="flex items-center gap-2.5 border-t border-line p-3.5"
         onSubmit={(e) => {
@@ -84,6 +89,7 @@ export function BookingChat({ view, token, title, subtitle }: Props) {
           <span className="sr-only">Escrever mensagem</span>
           <input
             type="text"
+            maxLength={4000}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Escreva uma mensagem…"

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookingChat } from "@/components/BookingChat";
-import { ClientBookingActions, ReviewForm } from "@/components/ClientBookingActions";
+import { BookingChat } from "@/components/booking/BookingChat";
+import { ClientBookingActions, ReviewForm } from "@/components/booking/ClientBookingActions";
+import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, PAYMENT_LABEL } from "@/lib/data";
 import { getBookingView } from "@/lib/bookings";
@@ -39,11 +40,10 @@ function headline(status: BookingStatus, chef: string): string {
   }
 }
 
-export default async function ReservaPage({ params, searchParams }: PageProps<"/reserva/[id]">) {
+export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">) {
   const { id } = await params;
-  const { t } = await searchParams;
-  const token = typeof t === "string" ? t : null;
-  const view = await getBookingView(id, token);
+  // A guest's ?t= token was already moved into an httpOnly cookie by the proxy.
+  const view = await getBookingView(id);
   if (!view) notFound();
 
   const { booking: b, chef } = view;
@@ -63,6 +63,26 @@ export default async function ReservaPage({ params, searchParams }: PageProps<"/
     cancelled: "Esta reserva foi cancelada.",
     expired: "O chef não respondeu a tempo. Experimente outro chef disponível na mesma data.",
   };
+
+  const details: (DetailRow | false | null)[] = [
+    [
+      "Chef",
+      <Link key="c" href={`/chef/${chef.slug}`}>
+        {chef.name}
+      </Link>,
+    ],
+    ["Serviço", `${b.offer_title} · ${MODE_LABEL[b.fulfilment_mode]}`],
+    ["Data", `${dayLabel(b.date)}${b.time_label ? ` · ${b.time_label}` : ""}`],
+    ["Pessoas / unidades", String(b.guests)],
+    b.fulfilment_mode === "pickup"
+      ? ["Levantamento", view.pickupAddress ?? `${chef.area} · morada enviada quando o pedido for aceite`]
+      : ["Morada", b.address ?? "—"],
+    !!b.pickup_code && ["Código de levantamento", b.pickup_code],
+    ["Estimativa", b.quoted_price ? euro(b.quoted_price) : b.estimate ? euro(b.estimate) : "Sob orçamento"],
+    deposit !== null && [`Sinal (${chef.depositPercent} %)`, euro(deposit)],
+    ["Pagamento", chef.paymentMethods.map((m) => PAYMENT_LABEL[m] ?? m).join(" · ")],
+    view.policy && ["Cancelamento", view.policy.text ?? CANCELLATION_LABEL[view.policy.preset] ?? ""],
+  ];
 
   return (
     <div>
@@ -98,44 +118,25 @@ export default async function ReservaPage({ params, searchParams }: PageProps<"/
         <div className="flex flex-wrap items-start gap-8">
           <section className="box flex min-w-0 flex-[1_1_340px] flex-col gap-4 p-6">
             <h2 className="d m-0 text-[28px]">Detalhes</h2>
-            <dl className="m-0 flex flex-col gap-3 text-[15px]">
-              {[
-                ["Chef", <Link key="c" href={`/chef/${chef.slug}`}>{chef.name}</Link>],
-                ["Serviço", `${b.offer_title} · ${MODE_LABEL[b.fulfilment_mode]}`],
-                ["Data", `${dayLabel(b.date)}${b.time_label ? ` · ${b.time_label}` : ""}`],
-                ["Pessoas / unidades", String(b.guests)],
-                ...(b.fulfilment_mode === "pickup"
-                  ? [["Levantamento", view.pickupAddress ?? `${chef.area} · morada enviada quando o pedido for aceite`]]
-                  : [["Morada", b.address ?? "—"]]),
-                ...(b.pickup_code ? [["Código de levantamento", b.pickup_code]] : []),
-                ["Estimativa", b.quoted_price ? euro(b.quoted_price) : b.estimate ? euro(b.estimate) : "Sob orçamento"],
-                ...(deposit ? [[`Sinal (${chef.depositPercent} %)`, euro(deposit)]] : []),
-                ["Pagamento", chef.paymentMethods.map((m) => PAYMENT_LABEL[m] ?? m).join(" · ")],
-                ...(view.policy ? [["Cancelamento", view.policy.text ?? CANCELLATION_LABEL[view.policy.preset] ?? ""]] : []),
-              ].map(([k, v], i) => (
-                <div key={i} className="flex justify-between gap-3">
-                  <dt className="text-muted">{k}</dt>
-                  <dd className="m-0 text-right">{v}</dd>
-                </div>
-              ))}
-            </dl>
+            <DetailList items={details} />
             {b.status === "change_proposed" && (
               <div className="rounded-[2px] bg-paper p-3.5 text-sm">
                 <strong className="font-semibold">Proposta de {first}:</strong>{" "}
-                {[b.proposed_date && dayLabel(b.proposed_date), b.proposed_time, b.quoted_price && euro(b.quoted_price)].filter(Boolean).join(" · ")}
+                {[b.proposed_date && dayLabel(b.proposed_date), b.proposed_time, b.quoted_price && euro(b.quoted_price)]
+                  .filter(Boolean)
+                  .join(" · ")}
               </div>
             )}
-            <ClientBookingActions id={b.id} token={token} status={b.status} />
+            <ClientBookingActions id={b.id} status={b.status} />
             <span className="text-xs text-muted">
               {STATUS_LABEL[b.status]} · O serviço, preços e pagamentos são combinados diretamente com o chef.
             </span>
           </section>
 
           <div className="flex min-w-0 flex-[2_1_520px] flex-col gap-8">
-            {b.status === "completed" && !view.review && <ReviewForm id={b.id} token={token} chef={first} />}
+            {b.status === "completed" && !view.review && <ReviewForm id={b.id} chef={first} />}
             <BookingChat
               view={view}
-              token={token}
               title={chef.name}
               subtitle={chef.responseHours ? `Responde normalmente em ${chef.responseHours} horas` : undefined}
             />

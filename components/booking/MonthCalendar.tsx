@@ -27,7 +27,13 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onShi
       <div className="flex items-baseline justify-between border-b border-ink pb-2.5">
         <h3 className="lab m-0">Data</h3>
         <div className="flex items-center gap-2">
-          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onShift(-1)} disabled={!canGoBack} aria-label="Mês anterior">
+          <button
+            type="button"
+            className="ctl !h-8 !w-8 !text-sm"
+            onClick={() => onShift(-1)}
+            disabled={!canGoBack}
+            aria-label="Mês anterior"
+          >
             ‹
           </button>
           <span className="d min-w-36 text-center text-base italic">{monthLabel(year, month)}</span>

@@ -1,119 +1,106 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, hasSupabase } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { z } from "zod";
+import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
+import { demoBookingView } from "@/lib/demo-booking";
 import { fail, ok, type ActionResult } from "@/lib/result";
+import { createClient, hasSupabase } from "@/lib/supabase/server";
 import type { BookingStatus, BookingView } from "@/lib/types";
 
-function demoView(): BookingView {
-  const d = new Date();
-  d.setDate(d.getDate() + 12);
-  const at = (h: number) => new Date(Date.now() - h * 3600_000).toISOString();
-  return {
-    viewer: "client",
-    booking: {
-      id: "demo",
-      ref: "AL-DEMO",
-      status: "accepted",
-      offer_title: "Jantar do Minho",
-      fulfilment_mode: "home",
-      date: d.toISOString().slice(0, 10),
-      time_label: "20:00",
-      guests: 6,
-      address: "Rua Ferreira Borges 112, Lisboa",
-      notes: "Uma pessoa vegetariana.",
-      estimate: 330,
-      quoted_price: null,
-      proposed_date: null,
-      proposed_time: null,
-      pickup_code: null,
-      created_at: at(5),
-    },
-    chef: { id: "c-marta", slug: "marta-figueiredo", name: "Marta Figueiredo", area: "Campo de Ourique", responseHours: 3, paymentMethods: ["mbway", "transfer", "cash"], depositPercent: 30 },
-    client: { name: "Sofia Ramos", email: "sofia@email.pt", phone: "+351 912 345 678" },
-    policy: { preset: "moderate", text: null },
-    pickupAddress: null,
-    events: [
-      { to: "requested", at: at(5) },
-      { to: "accepted", at: at(2) },
-    ],
-    messages: [
-      { id: "m1", sender: "system", body: "Pedido enviado · Jantar do Minho", at: at(5) },
-      { id: "m2", sender: "client", body: "Olá Marta! É o jantar de aniversário da minha mãe. Temos forno e placa de indução, mas poucas travessas grandes.", at: at(5) },
-      { id: "m3", sender: "chef", body: "Olá Sofia, que bom! Levo eu as travessas e a loiça de serviço. Para a pessoa vegetariana faço um arroz de cogumelos em vez do pato, pode ser?", at: at(2.1) },
-      { id: "m4", sender: "system", body: "Marta aceitou o pedido", at: at(2) },
-      { id: "m5", sender: "chef", body: "Para confirmar, peço um sinal de 99 € por MB WAY. Chego às 18:00 para preparar.", at: at(1.9) },
-    ],
-    review: null,
-  };
+// Server actions are public endpoints: validate every argument, authorise in the database.
+
+const isDemo = (id: string) => !hasSupabase || id === "demo";
+const BookingId = z.string().regex(UUID_RE);
+
+/** The guest's magic-link token for this booking, from its httpOnly cookie (if any). */
+async function guestToken(bookingId: string): Promise<string | null> {
+  return (await cookies()).get(bookingTokenCookieName(bookingId))?.value ?? null;
 }
 
-export async function getBookingView(id: string, token?: string | null): Promise<BookingView | null> {
-  if (!hasSupabase || id === "demo") return demoView();
+export async function getBookingView(id: string): Promise<BookingView | null> {
+  if (isDemo(id)) return demoBookingView();
+  if (!BookingId.safeParse(id).success) return null;
   const sb = await createClient();
-  const { data, error } = await sb.rpc("booking_view", { p_booking_id: id, p_token: token ?? null });
-  if (error) return null;
-  return data as BookingView;
+  const { data, error } = await sb.rpc("booking_view", { p_booking_id: id, p_token: await guestToken(id) });
+  return error ? null : (data as BookingView);
 }
 
-export async function postMessage(id: string, body: string, token?: string | null): Promise<ActionResult> {
-  if (!hasSupabase || id === "demo") return ok();
+const MessageBody = z.string().trim().min(1).max(4000);
+
+export async function postMessage(id: string, body: string): Promise<ActionResult> {
+  if (isDemo(id)) return ok();
+  const input = z.object({ id: BookingId, body: MessageBody }).safeParse({ id, body });
+  if (!input.success) return fail("Mensagem inválida.");
+
   const sb = await createClient();
-  const view = await getBookingView(id, token);
+  const view = await getBookingView(id);
   if (!view) return fail("Reserva não encontrada.");
+
   if (view.viewer === "chef") {
+    const { data: booking } = await sb.from("bookings").select("chef_id, client_id").eq("id", id).single();
     const { data: conv } = await sb
       .from("conversations")
       .select("id")
-      .eq("chef_id", view.chef.id)
-      .eq("client_id", (await sb.from("bookings").select("client_id").eq("id", id).single()).data?.client_id ?? "")
+      .eq("chef_id", booking?.chef_id ?? "")
+      .eq("client_id", booking?.client_id ?? "")
       .single();
     if (!conv) return fail("Conversa não encontrada.");
-    const { error } = await sb.from("messages").insert({ conversation_id: conv.id, sender: "chef", body: body.slice(0, 4000) });
+    const { error } = await sb.from("messages").insert({ conversation_id: conv.id, sender: "chef", body: input.data.body });
     return error ? fail("Não foi possível enviar a mensagem.") : ok();
   }
-  const { error } = await sb.rpc("client_post_message", { p_booking_id: id, p_body: body, p_token: token ?? null });
+
+  const { error } = await sb.rpc("client_post_message", { p_booking_id: id, p_body: input.data.body, p_token: await guestToken(id) });
   return error ? fail("Não foi possível enviar a mensagem.") : ok();
 }
 
-export async function clientAction(id: string, action: "cancel" | "accept_proposal", token?: string | null): Promise<ActionResult> {
-  if (!hasSupabase || id === "demo") return ok();
+const ClientActionName = z.enum(["cancel", "accept_proposal"]);
+
+export async function clientAction(id: string, action: z.infer<typeof ClientActionName>): Promise<ActionResult> {
+  if (isDemo(id)) return ok();
+  const input = z.object({ id: BookingId, action: ClientActionName }).safeParse({ id, action });
+  if (!input.success) return fail("Pedido inválido.");
   const sb = await createClient();
-  const { error } = await sb.rpc("client_update_booking", { p_booking_id: id, p_action: action, p_token: token ?? null });
+  const { error } = await sb.rpc("client_update_booking", { p_booking_id: id, p_action: action, p_token: await guestToken(id) });
   revalidatePath(`/reserva/${id}`);
-  return error ? fail(error.message) : ok();
+  return error ? fail("Não foi possível concluir. Atualize a página e tente de novo.") : ok();
 }
 
-export type ChefUpdate = {
-  status: BookingStatus;
-  decline_reason?: string;
-  proposed_date?: string;
-  proposed_time?: string;
-  quoted_price?: number;
-};
+const ChefUpdateInput = z.object({
+  status: z.enum(["accepted", "declined", "change_proposed", "confirmed", "completed", "cancelled"]),
+  decline_reason: z.string().trim().max(500).optional(),
+  proposed_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  proposed_time: z.string().trim().max(40).optional(),
+  quoted_price: z.number().finite().min(0).max(100000).optional(),
+});
+
+export type ChefUpdate = z.infer<typeof ChefUpdateInput> & { status: BookingStatus };
 
 export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise<ActionResult> {
   if (!hasSupabase) return ok();
+  const parsedId = BookingId.safeParse(id);
+  // Only the workflow fields a chef may set; the database trigger enforces the transitions.
+  const parsed = ChefUpdateInput.safeParse(update);
+  if (!parsedId.success || !parsed.success) return fail("Dados inválidos.");
   const sb = await createClient();
-  // Server actions accept any JSON: only pass the workflow fields a chef may set.
-  const allowed: ChefUpdate = { status: update.status };
-  if (update.decline_reason) allowed.decline_reason = String(update.decline_reason).slice(0, 500);
-  if (update.proposed_date && /^\d{4}-\d{2}-\d{2}$/.test(update.proposed_date)) allowed.proposed_date = update.proposed_date;
-  if (update.proposed_time) allowed.proposed_time = String(update.proposed_time).slice(0, 40);
-  if (update.quoted_price != null && Number.isFinite(Number(update.quoted_price))) allowed.quoted_price = Number(update.quoted_price);
-  const { error } = await sb.from("bookings").update(allowed).eq("id", id);
+  const { error } = await sb.from("bookings").update(parsed.data).eq("id", id);
   revalidatePath("/dashboard", "layout");
-  return error ? fail(error.message) : ok();
+  return error ? fail("Não foi possível atualizar a reserva.") : ok();
 }
 
-export async function submitReview(
-  id: string,
-  scores: { food: number; presentation: number; punctuality: number; communication: number; value: number },
-  comment: string,
-  allowShowcase: boolean,
-  token?: string | null,
-): Promise<ActionResult> {
-  if (!hasSupabase || id === "demo") return ok();
+const Score = z.number().int().min(1).max(5);
+const ReviewInput = z.object({
+  scores: z.object({ food: Score, presentation: Score, punctuality: Score, communication: Score, value: Score }),
+  comment: z.string().trim().max(3000),
+  allowShowcase: z.boolean(),
+});
+
+export async function submitReview(id: string, review: z.infer<typeof ReviewInput>): Promise<ActionResult> {
+  if (isDemo(id)) return ok();
+  const parsed = ReviewInput.safeParse(review);
+  if (!BookingId.safeParse(id).success || !parsed.success) return fail("Avaliação inválida.");
+  const { scores, comment, allowShowcase } = parsed.data;
   const sb = await createClient();
   const { error } = await sb.rpc("submit_review", {
     p_booking_id: id,
@@ -125,8 +112,8 @@ export async function submitReview(
     p_comment: comment,
     p_photos: [],
     p_allow_showcase: allowShowcase,
-    p_token: token ?? null,
+    p_token: await guestToken(id),
   });
   revalidatePath(`/reserva/${id}`);
-  return error ? fail(error.message) : ok();
+  return error ? fail("Não foi possível publicar a avaliação.") : ok();
 }

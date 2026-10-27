@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookingChat } from "@/components/BookingChat";
+import { BookingChat } from "@/components/booking/BookingChat";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookingView } from "@/lib/bookings";
 import { getBooking } from "@/lib/dashboard";

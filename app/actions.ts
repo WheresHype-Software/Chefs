@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { z } from "zod";
+import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking-token";
 import { getCalendar } from "@/lib/data";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -74,14 +76,17 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   }
 
   const r = data as { bookingId: string; ref: string; token: string; chefName: string };
-  const link = `/reserva/${r.bookingId}?t=${r.token}`;
+  // This browser gets the token as an httpOnly cookie; the email carries it once in the link.
+  (await cookies()).set(bookingTokenCookieName(r.bookingId), r.token, bookingTokenCookieOptions(r.bookingId));
+  const link = `/reserva/${r.bookingId}`;
+  const emailLink = `${link}?t=${r.token}`;
   await sendEmail({
     to: b.email,
     subject: `Pedido ${r.ref} enviado a ${r.chefName}`,
     text:
       `Olá ${b.name.split(" ")[0]},\n\n` +
       `O seu pedido foi enviado a ${r.chefName}. O chef tem 48 horas para responder.\n\n` +
-      `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(link)}\n\n` +
+      `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(emailLink)}\n\n` +
       `Ainda não paga nada: o pagamento é combinado diretamente com o chef.\n\nAo Lume`,
   });
   await notifyChef(r.bookingId, r.ref, b);
