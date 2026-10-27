@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SignOutButton } from "@/components/SignOutButton";
 import { Wordmark } from "@/components/SiteChrome";
 import { notFound } from "next/navigation";
 import { ChefDecision, ReviewModeration } from "@/components/admin/ChefDecision";
@@ -155,7 +156,12 @@ function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
             <Wordmark />
           </Link>
-          <span className="lab text-muted">Administração</span>
+          <div className="flex items-baseline gap-5 text-sm">
+            <Link href="/dashboard" className="text-muted no-underline hover:text-ink">
+              Painel
+            </Link>
+            <SignOutButton />
+          </div>
         </div>
       </header>
       <main className="mx-auto flex max-w-[1240px] flex-col gap-8 px-5 py-10 md:px-8">

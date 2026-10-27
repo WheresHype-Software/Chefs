@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Wordmark } from "@/components/SiteChrome";
 import { SideNav } from "@/components/dashboard/SideNav";
+import { SignOutButton } from "@/components/SignOutButton";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
 import { tierLabel } from "@/lib/format";
 
@@ -22,7 +23,10 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
             <Wordmark />
           </Link>
-          <span className="lab text-muted">{session.role === "admin" ? "Admin" : "Chef"}</span>
+          <div className="flex items-baseline gap-4">
+            <span className="lab text-muted">{session.role === "admin" ? "Admin" : "Chef"}</span>
+            {!session.demo && <SignOutButton className="text-[13px] md:hidden" />}
+          </div>
         </div>
         <SideNav pending={pending} />
         {chef && (
@@ -45,6 +49,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
                 Administração →
               </Link>
             )}
+            {!session.demo && <SignOutButton className="mt-3 text-[13px]" />}
           </div>
         )}
         {session.demo && (
