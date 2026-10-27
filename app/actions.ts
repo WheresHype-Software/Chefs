@@ -6,6 +6,7 @@ import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking
 import { getCalendar } from "@/lib/data";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { failInvalid } from "@/lib/result";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 import type { Calendar } from "@/lib/types";
 
@@ -29,6 +30,18 @@ const BookingInput = z.object({
   notes: z.string().trim().max(2000).optional(),
 });
 
+const BOOKING_LABELS: Record<string, string> = {
+  offerId: "Escolha uma oferta.",
+  date: "Escolha um dia no calendário.",
+  time: "Escolha uma hora.",
+  guests: "Pessoas",
+  name: "Indique o seu nome.",
+  email: "O email não parece válido.",
+  phone: "Indique um número de telemóvel.",
+  address: "Morada",
+  notes: "Notas para o chef",
+};
+
 export type BookingResult = { ok: true; bookingId: string; ref: string; link: string } | { ok: false; error: string };
 
 const RPC_ERRORS: Record<string, string> = {
@@ -46,7 +59,10 @@ const RPC_ERRORS: Record<string, string> = {
 
 export async function requestBooking(input: z.infer<typeof BookingInput>): Promise<BookingResult> {
   const parsed = BookingInput.safeParse(input);
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos" };
+  if (!parsed.success) {
+    const invalid = failInvalid(parsed.error, BOOKING_LABELS);
+    return { ok: false, error: invalid.ok ? "" : invalid.error };
+  }
   const b = parsed.data;
 
   if (!hasSupabase) {
@@ -70,7 +86,8 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   });
   if (error) {
     const key = Object.keys(RPC_ERRORS).find((k) => error.message.includes(k));
-    return { ok: false, error: key ? RPC_ERRORS[key]! : "Não foi possível enviar o pedido. Tente de novo." };
+    if (!key) console.error("[action] requestBooking:", error);
+    return { ok: false, error: key ? RPC_ERRORS[key]! : "Não foi possível enviar o pedido. Tente de novo dentro de momentos." };
   }
 
   const r = data as { bookingId: string; ref: string; token: string; chefName: string };
@@ -78,6 +95,7 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   (await cookies()).set(bookingTokenCookieName(r.bookingId), r.token, bookingTokenCookieOptions(r.bookingId));
   const link = `/reserva/${r.bookingId}`;
   const emailLink = `${link}?t=${r.token}`;
+  // The booking exists from here on: email problems are logged, never shown as a failed request.
   await sendEmail({
     to: b.email,
     subject: `Pedido ${r.ref} enviado a ${r.chefName}`,
@@ -86,8 +104,8 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
       `O seu pedido foi enviado a ${r.chefName}. O chef tem 48 horas para responder.\n\n` +
       `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(emailLink)}\n\n` +
       `Ainda não paga nada: o pagamento é combinado diretamente com o chef.\n\nAo Lume`,
-  });
-  await notifyChef(r.bookingId, r.ref, b);
+  }).catch((err) => console.error("[action] requestBooking client email:", err));
+  await notifyChef(r.bookingId, r.ref, b).catch((err) => console.error("[action] requestBooking chef email:", err));
   return { ok: true, bookingId: r.bookingId, ref: r.ref, link };
 }
 

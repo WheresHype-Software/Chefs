@@ -5,7 +5,7 @@ import { z } from "zod";
 import { MAX_CATEGORIES } from "@/lib/constants";
 import { getMyChef, getSession } from "@/lib/dashboard";
 import { publicEnv } from "@/lib/env";
-import { fail, ok, type ActionResult as Result } from "@/lib/result";
+import { fail, failInvalid, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
 import type { ServiceType } from "@/lib/types";
 
@@ -15,6 +15,8 @@ async function chefContext() {
   if (session.demo) return { demo: true as const, chef, sb: null };
   return { demo: false as const, chef, sb: await createClient() };
 }
+
+const NO_CHEF = "Crie primeiro o seu perfil de chef, em Perfil.";
 
 function done(path = "/dashboard"): Result {
   revalidatePath(path, "layout");
@@ -44,9 +46,22 @@ const ProfileInput = z.object({
   deposit_percent: z.number().int().min(0).max(100).optional(),
 });
 
+const PROFILE_LABELS: Record<string, string> = {
+  display_name: "Nome público",
+  slug: "O link só pode ter letras, números e hífenes.",
+  headline: "Especialidade",
+  bio: "Sobre si",
+  area_name: "Zona de base",
+  service_radius_km: "Raio de serviço",
+  instagram: "Instagram",
+  website: "Site",
+  years_experience: "Anos de experiência",
+  deposit_percent: "Sinal pedido",
+};
+
 export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<Result> {
   const parsed = ProfileInput.safeParse(input);
-  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Dados inválidos");
+  if (!parsed.success) return failInvalid(parsed.error, PROFILE_LABELS);
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   const p = parsed.data;
@@ -69,7 +84,10 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
   const { error } = ctx.chef
     ? await ctx.sb.from("chefs").update(row).eq("id", ctx.chef.id)
     : await ctx.sb.from("chefs").insert({ ...row, profile_id: session.userId });
-  if (error) return fail(error.message.includes("chefs_slug_key") ? "Esse link já está a ser usado." : error.message);
+  if (error) {
+    if (error.code === "23505") return fail("Esse link já está a ser usado. Escolha outro.");
+    return failWith(error, "saveProfile", "Não foi possível guardar o perfil. Tente de novo.");
+  }
   if (!ctx.chef) {
     // New chef: default policy and logistics rows.
     const chef = await getMyChefFresh();
@@ -101,7 +119,8 @@ const storagePath = (url: string) => url.slice(url.indexOf(BUCKET_PATH) + BUCKET
 
 export async function addPhoto(url: string, kind: PhotoKind, caption?: string): Promise<Result> {
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   // Only accept files the chef uploaded to their own folder in our bucket.
   const session = await getSession();
   const prefix = `${publicEnv.supabaseUrl}${BUCKET_PATH}${session.userId}/`;
@@ -131,27 +150,34 @@ export async function addPhoto(url: string, kind: PhotoKind, caption?: string): 
     caption: caption?.trim().slice(0, 160) || null,
     sort_order: kind === "gallery" ? nextOrder : 0,
   });
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "addPhoto", "Não foi possível guardar a fotografia. Tente de novo.") : done();
 }
 
 export async function updatePhotoCaption(id: string, caption: string): Promise<Result> {
   if (!PhotoId.safeParse(id).success) return fail("Fotografia inválida.");
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const { error } = await ctx.sb
     .from("chef_photos")
     .update({ caption: caption.trim().slice(0, 160) || null })
     .eq("id", id)
     .eq("chef_id", ctx.chef.id);
-  return error ? fail(error.message) : done("/dashboard/fotos");
+  return error ? failWith(error, "updatePhotoCaption", "Não foi possível guardar a descrição. Tente de novo.") : done("/dashboard/fotos");
 }
 
 export async function deletePhoto(id: string): Promise<Result> {
   if (!PhotoId.safeParse(id).success) return fail("Fotografia inválida.");
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
-  const { data } = await ctx.sb.from("chef_photos").delete().eq("id", id).eq("chef_id", ctx.chef.id).select("url").maybeSingle();
-  if (data) await ctx.sb.storage.from("chef-photos").remove([storagePath(data.url)]);
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
+  const { data, error } = await ctx.sb.from("chef_photos").delete().eq("id", id).eq("chef_id", ctx.chef.id).select("url").maybeSingle();
+  if (error) return failWith(error, "deletePhoto", "Não foi possível apagar a fotografia. Tente de novo.");
+  // The row is gone; a leftover file is harmless, so a storage hiccup is only logged.
+  if (data) {
+    const { error: storageError } = await ctx.sb.storage.from("chef-photos").remove([storagePath(data.url)]);
+    if (storageError) console.error("[action] deletePhoto storage:", storageError);
+  }
   return done();
 }
 
@@ -159,7 +185,8 @@ export async function deletePhoto(id: string): Promise<Result> {
 export async function movePhoto(id: string, to: "first" | -1 | 1): Promise<Result> {
   if (!PhotoId.safeParse(id).success || !["first", -1, 1].includes(to)) return fail("Fotografia inválida.");
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const { data } = await ctx.sb
     .from("chef_photos")
     .select("id")
@@ -176,12 +203,13 @@ export async function movePhoto(id: string, to: "first" | -1 | 1): Promise<Resul
     ids.map((pid, i) => ctx.sb.from("chef_photos").update({ sort_order: i }).eq("id", pid).eq("chef_id", ctx.chef!.id)),
   );
   const error = results.find((r) => r.error)?.error;
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "movePhoto", "Não foi possível mudar a ordem. Tente de novo.") : done();
 }
 
 export async function submitForReview(): Promise<Result> {
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const { count } = await ctx.sb
     .from("chef_photos")
     .select("id", { count: "exact", head: true })
@@ -198,7 +226,7 @@ export async function submitForReview(): Promise<Result> {
   if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
   if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail("Indique o Instagram ou o site.");
   const { error } = await ctx.sb.from("chefs").update({ status: "pending" }).eq("id", ctx.chef.id);
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "submitForReview", "Não foi possível enviar para revisão. Tente de novo.") : done();
 }
 
 // ---------------------------------------------------------------------------
@@ -207,7 +235,8 @@ export async function submitForReview(): Promise<Result> {
 export async function saveCooking(categories: number[], diets: number[], services: ServiceType[]): Promise<Result> {
   if (categories.length > MAX_CATEGORIES) return fail(`Escolha até ${MAX_CATEGORIES} categorias.`);
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const id = ctx.chef.id;
   await ctx.sb.from("chef_categories").delete().eq("chef_id", id);
   await ctx.sb.from("chef_diets").delete().eq("chef_id", id);
@@ -218,7 +247,7 @@ export async function saveCooking(categories: number[], diets: number[], service
     services.length ? ctx.sb.from("chef_services").insert(services.map((service) => ({ chef_id: id, service }))) : null,
   ]);
   const err = results.find((r) => r?.error)?.error;
-  return err ? fail(err.message) : done();
+  return err ? failWith(err, "saveCooking", "Não foi possível guardar. Tente de novo.") : done();
 }
 
 // ---------------------------------------------------------------------------
@@ -243,13 +272,25 @@ const OfferInput = z.object({
   active: z.boolean(),
 });
 
+const OFFER_LABELS: Record<string, string> = {
+  title: "Nome da oferta",
+  description: "Descrição",
+  price: "Valor",
+  unit_label: "Unidade",
+  min_guests: "Mínimo",
+  max_guests: "Máximo",
+  lead_time_hours: "Antecedência",
+  time_slots: "Horas",
+};
+
 export async function saveOffer(input: z.infer<typeof OfferInput>): Promise<Result> {
   const parsed = OfferInput.safeParse(input);
-  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Dados inválidos");
+  if (!parsed.success) return failInvalid(parsed.error, OFFER_LABELS);
   const o = parsed.data;
   if (o.price_model !== "quote" && o.price == null) return fail("Indique o preço.");
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const SERVICE: Record<string, ServiceType> = { home: "home", delivery: "delivery", pickup: "pickup" };
   const row = {
     ...o,
@@ -259,14 +300,14 @@ export async function saveOffer(input: z.infer<typeof OfferInput>): Promise<Resu
     price: o.price_model === "quote" ? null : o.price,
   };
   const { error } = o.id ? await ctx.sb.from("offers").update(row).eq("id", o.id) : await ctx.sb.from("offers").insert(row);
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "saveOffer", "Não foi possível guardar a oferta. Tente de novo.") : done();
 }
 
 export async function deleteOffer(id: string): Promise<Result> {
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   const { error } = await ctx.sb.from("offers").delete().eq("id", id);
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "deleteOffer", "Não foi possível apagar a oferta. Tente de novo.") : done();
 }
 
 // ---------------------------------------------------------------------------
@@ -276,20 +317,22 @@ export async function deleteOffer(id: string): Promise<Result> {
 export async function cycleDay(date: string): Promise<Result> {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("Data inválida");
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const { data } = await ctx.sb.from("availability").select("id, status").eq("chef_id", ctx.chef.id).eq("date", date).maybeSingle();
   const res = !data
     ? await ctx.sb.from("availability").insert({ chef_id: ctx.chef.id, date, status: "available" })
     : data.status === "available"
       ? await ctx.sb.from("availability").update({ status: "blocked" }).eq("id", data.id)
       : await ctx.sb.from("availability").delete().eq("id", data.id);
-  return res.error ? fail(res.error.message) : done();
+  return res.error ? failWith(res.error, "cycleDay", "Não foi possível atualizar a agenda. Tente de novo.") : done();
 }
 
 /** Marks every given weekday of a month as available. */
 export async function openWeekdays(year: number, month: number, weekdays: number[]): Promise<Result> {
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const rows = [];
   const today = new Date().toISOString().slice(0, 10);
   for (let d = 1; d <= new Date(year, month + 1, 0).getDate(); d++) {
@@ -298,7 +341,7 @@ export async function openWeekdays(year: number, month: number, weekdays: number
     if (iso >= today && weekdays.includes(date.getUTCDay())) rows.push({ chef_id: ctx.chef.id, date: iso, status: "available" });
   }
   const { error } = await ctx.sb.from("availability").upsert(rows, { onConflict: "chef_id,date,start_time", ignoreDuplicates: true });
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "openWeekdays", "Não foi possível abrir esses dias. Tente de novo.") : done();
 }
 
 // ---------------------------------------------------------------------------
@@ -325,24 +368,41 @@ export async function saveLogistics(
   slots: { label: string; active: boolean }[],
 ): Promise<Result> {
   const parsed = LogisticsInput.safeParse(input);
-  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Dados inválidos");
+  if (!parsed.success)
+    return failInvalid(parsed.error, {
+      travel_radius_km: "Raio de deslocação",
+      free_distance_km: "Grátis até (km)",
+      fee_per_km: "Depois, por km",
+      arrival_minutes_before: "Chegada antes do serviço",
+      delivery_windows: "Janelas",
+      delivery_fee: "Taxa de entrega",
+      free_delivery_over: "Grátis acima de",
+      kitchen_address: "Morada da cozinha",
+    });
   const ctx = await chefContext();
-  if (ctx.demo || !ctx.chef) return ok();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
   const id = ctx.chef.id;
   const { error } = await ctx.sb.from("chef_logistics").upsert({ chef_id: id, ...parsed.data });
-  if (error) return fail(error.message);
-  // Travel radius also drives where the chef appears on the map.
-  await ctx.sb.from("chefs").update({ service_radius_km: parsed.data.travel_radius_km }).eq("id", id);
-  await ctx.sb.from("delivery_zones").delete().eq("chef_id", id);
-  await ctx.sb.from("pickup_slots").delete().eq("chef_id", id);
-  if (zones.length)
-    await ctx.sb
-      .from("delivery_zones")
-      .insert(zones.slice(0, 40).map((z) => ({ chef_id: id, name: z.name.slice(0, 80), active: z.active })));
-  if (slots.length)
-    await ctx.sb
-      .from("pickup_slots")
-      .insert(slots.slice(0, 20).map((s) => ({ chef_id: id, label: s.label.slice(0, 40), active: s.active })));
+  if (error) return failWith(error, "saveLogistics", "Não foi possível guardar a logística. Tente de novo.");
+  // Travel radius also drives how far from the chef clients can find them.
+  const steps = [
+    await ctx.sb.from("chefs").update({ service_radius_km: parsed.data.travel_radius_km }).eq("id", id),
+    await ctx.sb.from("delivery_zones").delete().eq("chef_id", id),
+    await ctx.sb.from("pickup_slots").delete().eq("chef_id", id),
+    zones.length
+      ? await ctx.sb
+          .from("delivery_zones")
+          .insert(zones.slice(0, 40).map((z) => ({ chef_id: id, name: z.name.slice(0, 80), active: z.active })))
+      : null,
+    slots.length
+      ? await ctx.sb
+          .from("pickup_slots")
+          .insert(slots.slice(0, 20).map((s) => ({ chef_id: id, label: s.label.slice(0, 40), active: s.active })))
+      : null,
+  ];
+  const stepError = steps.find((r) => r?.error)?.error;
+  if (stepError) return failWith(stepError, "saveLogistics zones", "Parte da logística não foi guardada. Tente de novo.");
   return done();
 }
 
@@ -353,7 +413,7 @@ export async function markFulfilled(bookingId: string, undo = false): Promise<Re
     .from("bookings")
     .update({ fulfilled_at: undo ? null : new Date().toISOString() })
     .eq("id", bookingId);
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "markFulfilled", "Não foi possível atualizar o serviço. Tente de novo.") : done();
 }
 
 // ---------------------------------------------------------------------------
@@ -364,7 +424,9 @@ export async function replyToReview(reviewId: string, reply: string): Promise<Re
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   const { error } = await ctx.sb.rpc("reply_to_review", { p_review_id: reviewId, p_reply: reply });
-  return error ? fail("Só pode responder uma vez.") : done();
+  return error
+    ? failWith(error, "replyToReview", "Não foi possível publicar a resposta. Só pode responder uma vez a cada avaliação.")
+    : done();
 }
 
 export async function reportReview(reviewId: string, reason: string): Promise<Result> {
@@ -374,5 +436,5 @@ export async function reportReview(reviewId: string, reason: string): Promise<Re
   const { error } = await ctx.sb
     .from("reports")
     .insert({ reporter: session.userId, target_type: "review", target_id: reviewId, reason: reason.slice(0, 1000) });
-  return error ? fail(error.message) : done();
+  return error ? failWith(error, "reportReview", "Não foi possível enviar a denúncia. Tente de novo.") : done();
 }
