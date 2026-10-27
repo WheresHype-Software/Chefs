@@ -7,6 +7,9 @@ import { ChefTile } from "@/components/search/ChefTile";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getChefs } from "@/lib/data";
 
+// Chef data changes (approvals, offers, reviews): rebuild the page at most once a minute.
+export const revalidate = 60;
+
 export default async function Home() {
   const chefs = await getChefs();
   // Best-rated first; new chefs without reviews keep a place at the end.
