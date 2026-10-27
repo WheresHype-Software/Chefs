@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
+import { fail, ok, type ActionResult } from "@/lib/result";
 import type { BookingStatus, BookingView } from "@/lib/types";
 
 function demoView(): BookingView {
@@ -55,11 +56,11 @@ export async function getBookingView(id: string, token?: string | null): Promise
   return data as BookingView;
 }
 
-export async function postMessage(id: string, body: string, token?: string | null): Promise<{ ok: boolean }> {
-  if (!hasSupabase || id === "demo") return { ok: true };
+export async function postMessage(id: string, body: string, token?: string | null): Promise<ActionResult> {
+  if (!hasSupabase || id === "demo") return ok();
   const sb = await createClient();
   const view = await getBookingView(id, token);
-  if (!view) return { ok: false };
+  if (!view) return fail("Reserva não encontrada.");
   if (view.viewer === "chef") {
     const { data: conv } = await sb
       .from("conversations")
@@ -67,20 +68,20 @@ export async function postMessage(id: string, body: string, token?: string | nul
       .eq("chef_id", view.chef.id)
       .eq("client_id", (await sb.from("bookings").select("client_id").eq("id", id).single()).data?.client_id ?? "")
       .single();
-    if (!conv) return { ok: false };
+    if (!conv) return fail("Conversa não encontrada.");
     const { error } = await sb.from("messages").insert({ conversation_id: conv.id, sender: "chef", body: body.slice(0, 4000) });
-    return { ok: !error };
+    return error ? fail("Não foi possível enviar a mensagem.") : ok();
   }
   const { error } = await sb.rpc("client_post_message", { p_booking_id: id, p_body: body, p_token: token ?? null });
-  return { ok: !error };
+  return error ? fail("Não foi possível enviar a mensagem.") : ok();
 }
 
-export async function clientAction(id: string, action: "cancel" | "accept_proposal", token?: string | null) {
-  if (!hasSupabase || id === "demo") return { ok: true };
+export async function clientAction(id: string, action: "cancel" | "accept_proposal", token?: string | null): Promise<ActionResult> {
+  if (!hasSupabase || id === "demo") return ok();
   const sb = await createClient();
   const { error } = await sb.rpc("client_update_booking", { p_booking_id: id, p_action: action, p_token: token ?? null });
   revalidatePath(`/reserva/${id}`);
-  return { ok: !error, error: error?.message };
+  return error ? fail(error.message) : ok();
 }
 
 export type ChefUpdate = {
@@ -91,8 +92,8 @@ export type ChefUpdate = {
   quoted_price?: number;
 };
 
-export async function chefUpdateBooking(id: string, update: ChefUpdate) {
-  if (!hasSupabase) return { ok: true };
+export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise<ActionResult> {
+  if (!hasSupabase) return ok();
   const sb = await createClient();
   // Server actions accept any JSON: only pass the workflow fields a chef may set.
   const allowed: ChefUpdate = { status: update.status };
@@ -102,7 +103,7 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate) {
   if (update.quoted_price != null && Number.isFinite(Number(update.quoted_price))) allowed.quoted_price = Number(update.quoted_price);
   const { error } = await sb.from("bookings").update(allowed).eq("id", id);
   revalidatePath("/dashboard", "layout");
-  return { ok: !error, error: error?.message };
+  return error ? fail(error.message) : ok();
 }
 
 export async function submitReview(
@@ -111,8 +112,8 @@ export async function submitReview(
   comment: string,
   allowShowcase: boolean,
   token?: string | null,
-) {
-  if (!hasSupabase || id === "demo") return { ok: true };
+): Promise<ActionResult> {
+  if (!hasSupabase || id === "demo") return ok();
   const sb = await createClient();
   const { error } = await sb.rpc("submit_review", {
     p_booking_id: id,
@@ -127,5 +128,5 @@ export async function submitReview(
     p_token: token ?? null,
   });
   revalidatePath(`/reserva/${id}`);
-  return { ok: !error, error: error?.message };
+  return error ? fail(error.message) : ok();
 }

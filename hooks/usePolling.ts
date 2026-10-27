@@ -1,0 +1,19 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+/** Calls `callback` every `intervalMs` while the tab is visible. */
+export function usePolling(callback: () => unknown, intervalMs: number, enabled = true) {
+  const latest = useRef(callback);
+  useEffect(() => {
+    latest.current = callback;
+  });
+
+  useEffect(() => {
+    if (!enabled) return;
+    const id = setInterval(() => {
+      if (!document.hidden) void latest.current();
+    }, intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs, enabled]);
+}
