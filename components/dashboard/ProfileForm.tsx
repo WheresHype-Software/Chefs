@@ -9,6 +9,7 @@ import { FormMessage } from "@/components/ui/FormMessage";
 import { usePhotoUpload } from "@/hooks/usePhotoUpload";
 import { useServerAction } from "@/hooks/useServerAction";
 import type { MyChef } from "@/lib/dashboard";
+import { firstPlace } from "@/lib/geocode";
 import { slugify } from "@/lib/slug";
 
 type Photos = { selfie: number; gallery: number };
@@ -44,12 +45,21 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
   const [place, setPlace] = useState<Place | null>(
     chef?.lat && chef?.lng ? { label: chef.area_name ?? "", lat: chef.lat, lng: chef.lng } : null,
   );
+  const [locating, setLocating] = useState(false);
   const { run, pending, message, setMessage } = useServerAction(saveProfile, { successMessage: "Perfil guardado." });
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((f) => ({ ...f, [key]: value }));
 
-  function save() {
-    if (!place) {
-      setMessage({ ok: false, text: "Escolha a sua zona na lista para o mostrarmos a clientes perto de si." });
+  async function save() {
+    // Typed a zone without picking a suggestion: look it up instead of refusing.
+    let base = place;
+    if (!base && areaQuery.trim()) {
+      setLocating(true);
+      base = await firstPlace(areaQuery);
+      setLocating(false);
+      if (base) setPlace(base);
+    }
+    if (!base) {
+      setMessage({ ok: false, text: 'Não encontrámos essa zona. Escreva o bairro e a cidade, por exemplo "Alvalade, Lisboa".' });
       return;
     }
     run({
@@ -59,8 +69,8 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
       service_radius_km: form.service_radius_km ?? 10,
       years_experience: form.years_experience ?? undefined,
       deposit_percent: form.deposit_percent ?? undefined,
-      lat: place.lat,
-      lng: place.lng,
+      lat: base.lat,
+      lng: base.lng,
     });
   }
 
@@ -147,8 +157,8 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
         </Field>
       </div>
       <FormMessage message={message} />
-      <button type="submit" className="btn self-start" disabled={pending}>
-        {chef ? "Guardar perfil" : "Criar perfil"}
+      <button type="submit" className="btn self-start" disabled={pending || locating}>
+        {locating ? "A procurar a zona…" : chef ? "Guardar perfil" : "Criar perfil"}
       </button>
     </form>
   );

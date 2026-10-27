@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { searchPlaces, type Place } from "@/lib/geocode";
 
-export type Place = { label: string; lat: number; lng: number };
+export type { Place };
 
 type Props = {
   value: string;
@@ -14,22 +15,6 @@ type Props = {
   icon?: boolean;
   label: string;
 };
-
-// Free geocoding via Photon (OpenStreetMap data, no key). Biased to Portugal.
-async function geocode(q: string, signal: AbortSignal): Promise<Place[]> {
-  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lang=pt&limit=5&lat=38.72&lon=-9.14&bbox=-9.6,36.9,-6.1,42.2`;
-  const res = await fetch(url, { signal });
-  if (!res.ok) return [];
-  const json = (await res.json()) as {
-    features: { geometry: { coordinates: [number, number] }; properties: Record<string, string> }[];
-  };
-  return json.features.map((f) => {
-    const p = f.properties;
-    const street = [p.street ?? p.name, p.housenumber].filter(Boolean).join(" ");
-    const label = [street || p.name, p.district ?? p.locality, p.city ?? p.county].filter(Boolean).join(", ");
-    return { label, lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] };
-  });
-}
 
 export function AddressSearch({ value, onChange, onSelect, placeholder, className, inputClassName, icon, label }: Props) {
   const [items, setItems] = useState<Place[]>([]);
@@ -45,7 +30,7 @@ export function AddressSearch({ value, onChange, onSelect, placeholder, classNam
     }
     const ctrl = new AbortController();
     const t = setTimeout(() => {
-      geocode(value, ctrl.signal)
+      searchPlaces(value, { init: { signal: ctrl.signal } })
         .then((r) => {
           setItems(r);
           setOpen(r.length > 0);
@@ -118,7 +103,7 @@ export function AddressSearch({ value, onChange, onSelect, placeholder, classNam
               key={`${p.lat},${p.lng},${i}`}
               role="option"
               aria-selected={i === active}
-              onMouseDown={(e) => {
+              onPointerDown={(e) => {
                 e.preventDefault();
                 pick(p);
               }}
