@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { bookingTokenCookieName, bookingTokenCookieOptions, TOKEN_RE, UUID_RE } from "@/lib/booking-token";
 import { hasSupabase, supabaseConfig } from "@/lib/env";
 
-const PROTECTED = ["/dashboard", "/admin"];
+const PROTECTED = ["/dashboard", "/admin", "/conta"];
 
 /**
  * Magic links arrive as /reserva/<id>?t=<token>. Move the token into an httpOnly cookie scoped to
@@ -24,7 +24,7 @@ function captureBookingToken(request: NextRequest): NextResponse | null {
   return response;
 }
 
-/** Refreshes the Supabase session cookie and keeps signed-out users out of the dashboard and admin. */
+/** Refreshes the Supabase session cookie and keeps signed-out users out of the dashboard, admin and client area. */
 async function refreshSession(request: NextRequest): Promise<NextResponse> {
   const { url, key } = supabaseConfig();
   let response = NextResponse.next({ request });

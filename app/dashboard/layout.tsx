@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Wordmark } from "@/components/SiteChrome";
 import { SideNav } from "@/components/dashboard/SideNav";
 import { MobileMenu } from "@/components/MobileMenu";
@@ -12,6 +13,8 @@ export const metadata: Metadata = { title: "Painel", robots: { index: false } };
 
 export default async function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
   const session = await getSession();
+  // The chef dashboard is for chefs and admins; clients have their own area.
+  if (session.role === "client") redirect("/conta");
   const chef = await getMyChef();
   const pending = chef ? (await getBookings({ statuses: ["requested"] })).length : 0;
 

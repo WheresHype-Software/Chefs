@@ -3,17 +3,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { redirect } from "next/navigation";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
-import { dayLabel, isoDay, longDay, rating, STATUS_LABEL } from "@/lib/format";
-import { createClient } from "@/lib/supabase/server";
+import { dayLabel, isoDay, longDay, rating } from "@/lib/format";
 
 export default async function Overview() {
   const session = await getSession();
   const chef = await getMyChef();
   if (!chef) {
-    if (session.role === "chef") redirect("/dashboard/perfil");
-    // Admins without their own chef page belong in the admin area, not an empty chef view.
-    if (session.role === "admin") redirect("/admin");
-    return <ClientHome />;
+    // Admins without their own chef page belong in the admin area; clients never get here (layout).
+    redirect(session.role === "admin" ? "/admin" : "/dashboard/perfil");
   }
 
   const today = isoDay(new Date());
@@ -99,58 +96,6 @@ export default async function Overview() {
           </Link>
         </div>
       )}
-    </div>
-  );
-}
-
-/** Registered clients without a chef profile see their bookings. */
-async function ClientHome() {
-  const sb = await createClient();
-  const { data } = await sb
-    .from("bookings")
-    .select("id, ref, status, offer_title, date, guests, chefs(display_name, slug)")
-    .order("date", { ascending: false });
-  const rows = (data ?? []) as unknown as {
-    id: string;
-    ref: string;
-    status: keyof typeof STATUS_LABEL;
-    offer_title: string;
-    date: string;
-    guests: number;
-    chefs: { display_name: string; slug: string } | null;
-  }[];
-  return (
-    <div className="flex flex-col gap-6">
-      <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">As minhas reservas</h1>
-      {rows.length === 0 ? (
-        <div className="box flex flex-col gap-3 p-6">
-          <span className="text-muted">Ainda não tem reservas.</span>
-          <Link href="/procurar" className="btn self-start">
-            Encontrar um chef
-          </Link>
-        </div>
-      ) : (
-        <div className="box p-6">
-          {rows.map((b) => (
-            <Link
-              key={b.id}
-              href={`/reserva/${b.id}`}
-              className="flex flex-wrap justify-between gap-3 border-b border-line py-4 text-ink no-underline last:border-b-0"
-            >
-              <span className="flex flex-col">
-                <span className="d text-xl">{b.chefs?.display_name}</span>
-                <span className="text-[13px] text-muted">
-                  {b.offer_title} · {b.guests} · {dayLabel(b.date)}
-                </span>
-              </span>
-              <span className="lab text-muted">{STATUS_LABEL[b.status]}</span>
-            </Link>
-          ))}
-        </div>
-      )}
-      <Link href="/entrar?chef=1" className="text-sm">
-        É chef? Crie o seu perfil →
-      </Link>
     </div>
   );
 }
