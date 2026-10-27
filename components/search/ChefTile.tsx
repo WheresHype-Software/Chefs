@@ -4,12 +4,16 @@ import { Star } from "@/components/ui/Star";
 import { fromPrice, SERVICE_LABEL, tierLabel } from "@/lib/format";
 import type { ChefCard } from "@/lib/types";
 
+function distanceLabel(km: number): string {
+  return km < 0.5 ? "muito perto" : `a ${String(km).replace(".", ",")} km`;
+}
+
 function RatingLine({ chef }: { chef: ChefCard }) {
   if (!chef.rating || chef.reviewCount === 0) return <span className="font-semibold text-cobalt">Novo no Ao Lume</span>;
   return (
     <span className="flex items-center gap-1 font-semibold">
       <Star />
-      <span className="num">{Number(chef.rating).toFixed(1).replace(".", ",")}</span>
+      <span>{Number(chef.rating).toFixed(1).replace(".", ",")}</span>
       <span className="font-normal text-muted">({chef.reviewCount})</span>
     </span>
   );
@@ -40,7 +44,7 @@ export function ChefTile({ chef, priority = false }: { chef: ChefCard; priority?
         <span className="text-[15px] text-ink-3">{chef.headline ?? chef.categories.join(" · ")}</span>
         <span className="text-[14px] text-muted">
           {chef.area}
-          {chef.distanceKm != null && ` · a ${String(chef.distanceKm).replace(".", ",")} km`}
+          {chef.distanceKm != null && ` · ${distanceLabel(chef.distanceKm)}`}
           {" · "}
           {chef.services.map((s) => SERVICE_LABEL[s]).join(", ")}
         </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AzulejoTile, type AzulejoVariant } from "@/components/brand/Azulejo";
 import { photoSrcSet, photoUrl, type StockPhoto } from "@/lib/photos";
 
@@ -18,6 +18,14 @@ type Props = {
 /** Cropped photo that degrades to an azulejo tile instead of a broken image. */
 export function Photo({ photo, alt, sizes = "(min-width: 768px) 33vw, 100vw", className = "", priority, fallback = "glaze" }: Props) {
   const [failed, setFailed] = useState(false);
+  const img = useRef<HTMLImageElement>(null);
+
+  // An image can fail before hydration, when React's onError is not attached yet.
+  useEffect(() => {
+    const el = img.current;
+    if (el?.complete && el.naturalWidth === 0) setFailed(true);
+  }, []);
+
   if (!photo || failed) {
     return (
       <div className={`overflow-hidden ${className}`}>
@@ -29,6 +37,7 @@ export function Photo({ photo, alt, sizes = "(min-width: 768px) 33vw, 100vw", cl
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={img}
       src={isStock ? photoUrl(photo) : photo}
       srcSet={isStock ? photoSrcSet(photo) : undefined}
       sizes={isStock ? sizes : undefined}

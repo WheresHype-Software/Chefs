@@ -13,7 +13,7 @@ type Props = {
   size?: "hero" | "compact";
 };
 
-const SERVICE_OPTIONS: [ServiceFilter, string][] = SERVICE_FILTERS.map(([key, label]) => [key, key === "all" ? "Qualquer serviço" : label]);
+const SERVICE_OPTIONS: [ServiceFilter, string][] = SERVICE_FILTERS.map(([key, label]) => [key, key === "all" ? "Tudo" : label]);
 
 function Cell({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
@@ -57,7 +57,7 @@ export function SearchBar({ initial = {}, size = "hero" }: Props) {
       role="search"
       aria-label="Procurar chefs"
       onSubmit={submit}
-      className={`grid w-full rounded-[12px] border border-line-2 bg-white shadow-[0_10px_30px_-12px_rgb(20_32_51/0.25)] md:grid-cols-[1.5fr_1fr_0.9fr_auto] md:items-stretch ${
+      className={`grid w-full rounded-[12px] border border-line-2 bg-white shadow-[0_10px_30px_-12px_rgb(20_32_51/0.25)] md:grid-cols-[1.4fr_1.1fr_1fr_auto] md:items-stretch ${
         hero ? "p-1.5" : "p-1"
       }`}
     >
