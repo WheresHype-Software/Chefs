@@ -28,6 +28,12 @@ function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
 /** Booking conversation for the client or the chef; polls for new messages while visible. */
 export function BookingChat({ view, title, subtitle }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(view.messages);
+  // A server refresh (e.g. after accepting the request) brings new messages: show them right away.
+  const [fromServer, setFromServer] = useState(view.messages);
+  if (view.messages !== fromServer) {
+    setFromServer(view.messages);
+    setMessages(view.messages);
+  }
   const [draft, setDraft] = useState("");
   const [error, setError] = useState(false);
   const [pending, startTransition] = useTransition();

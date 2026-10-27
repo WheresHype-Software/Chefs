@@ -127,7 +127,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
                   .join(" · ")}
               </div>
             )}
-            <ClientBookingActions id={b.id} status={b.status} />
+            <ClientBookingActions key={b.id} id={b.id} status={b.status} />
             <span className="text-xs text-muted">
               {STATUS_LABEL[b.status]} · O serviço, preços e pagamentos são combinados diretamente com o chef.
             </span>
@@ -136,6 +136,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
           <div className="flex min-w-0 flex-[2_1_520px] flex-col gap-8">
             {b.status === "completed" && !view.review && <ReviewForm id={b.id} chef={first} />}
             <BookingChat
+              key={b.id}
               view={view}
               title={chef.name}
               subtitle={chef.responseHours ? `Responde normalmente em ${chef.responseHours} horas` : undefined}

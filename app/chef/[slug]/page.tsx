@@ -273,7 +273,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
             <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
           </div>
           {bookable ? (
-            <BookingForm key={String(oferta ?? "")} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
+            <BookingForm key={`${chef.id}:${oferta ?? ""}`} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
           ) : (
             <p className="m-0 text-muted">
               {firstName(chef.name)} ainda está a preparar os menus. Volte em breve

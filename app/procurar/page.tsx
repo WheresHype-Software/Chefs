@@ -49,7 +49,7 @@ export default async function ProcurarPage({ searchParams }: PageProps<"/procura
       <main className="flex-1">
         <section className="border-b border-line bg-paper">
           <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-5 pb-6 pt-8 md:px-8 md:pt-10">
-            <SearchBar size="compact" initial={q} />
+            <SearchBar key={`${q.where}|${q.service}|${q.date ?? ""}`} size="compact" initial={q} />
             <div className="flex flex-col gap-1">
               <h1 className="d m-0 text-[clamp(28px,3.6vw,40px)] leading-[1.08]">{heading(q, chefs.length)}</h1>
               <p className="m-0 text-[15px] text-muted">{summary(q, chefs.length)}</p>
