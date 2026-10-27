@@ -1,56 +1,37 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { replyToReview, reportReview } from "@/app/dashboard/actions";
+import { Field } from "@/components/ui/Field";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useServerAction } from "@/hooks/useServerAction";
 
+/** Public one-time reply to a review, or a report to the team. */
 export function ReviewReply({ id }: { id: string }) {
-  const router = useRouter();
   const [text, setText] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+  const reply = useServerAction(replyToReview, { successMessage: "Resposta publicada." });
+  const report = useServerAction(reportReview, { successMessage: "Denúncia enviada à equipa.", refresh: false });
+  const pending = reply.pending || report.pending;
+
+  function askReport() {
+    const reason = prompt("Porque é que esta avaliação é abusiva?");
+    if (reason?.trim()) report.run(id, reason.trim());
+  }
+
   return (
     <div className="flex flex-col gap-2.5">
-      <label className="field lab">
-        Resposta pública (só pode responder uma vez)
-        <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} />
-      </label>
+      <Field label="Resposta pública (só pode responder uma vez)">
+        <textarea rows={2} maxLength={2000} value={text} onChange={(e) => setText(e.target.value)} />
+      </Field>
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          className="btn btn-sm"
-          disabled={pending || !text.trim()}
-          onClick={() =>
-            start(async () => {
-              const r = await replyToReview(id, text);
-              setMsg(r.ok ? "Resposta publicada." : r.error);
-              router.refresh();
-            })
-          }
-        >
+        <button type="button" className="btn btn-sm" disabled={pending || !text.trim()} onClick={() => reply.run(id, text)}>
           Responder
         </button>
-        <button
-          type="button"
-          className="btn btn-sm btn-o !border-line-2"
-          disabled={pending}
-          onClick={() => {
-            const reason = prompt("Porque é que esta avaliação é abusiva?");
-            if (!reason) return;
-            start(async () => {
-              const r = await reportReview(id, reason);
-              setMsg(r.ok ? "Denúncia enviada à equipa." : r.error);
-            });
-          }}
-        >
+        <button type="button" className="btn btn-sm btn-o !border-line-2" disabled={pending} onClick={askReport}>
           Denunciar
         </button>
       </div>
-      {msg && (
-        <p role="status" className="m-0 text-sm text-muted">
-          {msg}
-        </p>
-      )}
+      <FormMessage message={reply.message ?? report.message} />
     </div>
   );
 }

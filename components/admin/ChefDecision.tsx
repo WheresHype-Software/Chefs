@@ -1,8 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { moderateReview, reviewChef } from "@/app/admin/actions";
+import { Chip } from "@/components/ui/Chip";
+import { Field } from "@/components/ui/Field";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useServerAction } from "@/hooks/useServerAction";
+import { useToggleList } from "@/hooks/useToggleList";
 
 const BADGES: [string, string][] = [
   ["identity", "Identidade verificada"],
@@ -11,35 +15,34 @@ const BADGES: [string, string][] = [
   ["founder", "Chef fundador"],
 ];
 
-export function ChefDecision({ chefId, badges: initial }: { chefId: string; badges: string[] }) {
-  const router = useRouter();
-  const [badges, setBadges] = useState(initial.length ? initial : ["identity", "portfolio"]);
-  const [note, setNote] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+type Decision = "approved" | "rejected" | "suspended";
 
-  function decide(d: "approved" | "rejected" | "suspended") {
-    if (d !== "approved" && !note.trim()) return setMsg("Escreva o motivo: o chef recebe-o por email.");
-    start(async () => {
-      const r = await reviewChef(chefId, d, note, badges);
-      setMsg(r.ok ? "Feito." : r.error ?? "Erro");
-      router.refresh();
-    });
+/** Approve, ask for changes or suspend a chef, with the badges to grant. */
+export function ChefDecision({ chefId, badges: initial }: { chefId: string; badges: string[] }) {
+  const badges = useToggleList(initial.length ? initial : ["identity", "portfolio"]);
+  const [note, setNote] = useState("");
+  const { run, pending, message, setMessage } = useServerAction(reviewChef, { successMessage: "Feito." });
+
+  function decide(decision: Decision) {
+    if (decision !== "approved" && !note.trim()) {
+      setMessage({ ok: false, text: "Escreva o motivo: o chef recebe-o por email." });
+      return;
+    }
+    run(chefId, decision, note.trim(), badges.items);
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-1.5">
-        {BADGES.map(([k, label]) => (
-          <button key={k} type="button" className="chip" aria-pressed={badges.includes(k)} onClick={() => setBadges((b) => (b.includes(k) ? b.filter((x) => x !== k) : [...b, k]))}>
+        {BADGES.map(([key, label]) => (
+          <Chip key={key} pressed={badges.has(key)} onClick={() => badges.toggle(key)}>
             {label}
-          </button>
+          </Chip>
         ))}
       </div>
-      <label className="field lab">
-        Nota para o chef (obrigatória para recusar ou pedir alterações)
-        <input value={note} onChange={(e) => setNote(e.target.value)} />
-      </label>
+      <Field label="Nota para o chef (obrigatória para recusar ou pedir alterações)">
+        <input value={note} maxLength={1000} onChange={(e) => setNote(e.target.value)} />
+      </Field>
       <div className="flex flex-wrap gap-1.5">
         <button type="button" className="btn btn-sm" disabled={pending} onClick={() => decide("approved")}>
           Aprovar
@@ -47,34 +50,42 @@ export function ChefDecision({ chefId, badges: initial }: { chefId: string; badg
         <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => decide("rejected")}>
           Pedir alterações
         </button>
-        <button type="button" className="btn btn-sm btn-o !border-line-2 !text-danger" disabled={pending} onClick={() => decide("suspended")}>
+        <button
+          type="button"
+          className="btn btn-sm btn-o !border-line-2 !text-danger"
+          disabled={pending}
+          onClick={() => decide("suspended")}
+        >
           Suspender
         </button>
       </div>
-      {msg && <p className="m-0 text-sm text-muted">{msg}</p>}
+      <FormMessage message={message} />
     </div>
   );
 }
 
+/** Keep, hide or delete a reported review. */
 export function ReviewModeration({ reviewId, reportId }: { reviewId: string; reportId: string }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  const run = (a: "keep" | "hide" | "delete") =>
-    start(async () => {
-      await moderateReview(reviewId, reportId, a);
-      router.refresh();
-    });
+  const { run, pending, message } = useServerAction(moderateReview);
   return (
-    <div className="flex flex-wrap gap-1.5">
-      <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => run("keep")}>
-        Manter
-      </button>
-      <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => run("hide")}>
-        Esconder
-      </button>
-      <button type="button" className="btn btn-sm btn-o !border-line-2 !text-danger" disabled={pending} onClick={() => confirm("Apagar a avaliação?") && run("delete")}>
-        Apagar
-      </button>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-1.5">
+        <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => run(reviewId, reportId, "keep")}>
+          Manter
+        </button>
+        <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => run(reviewId, reportId, "hide")}>
+          Esconder
+        </button>
+        <button
+          type="button"
+          className="btn btn-sm btn-o !border-line-2 !text-danger"
+          disabled={pending}
+          onClick={() => confirm("Apagar a avaliação?") && run(reviewId, reportId, "delete")}
+        >
+          Apagar
+        </button>
+      </div>
+      <FormMessage message={message} />
     </div>
   );
 }

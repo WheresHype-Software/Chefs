@@ -1,4 +1,5 @@
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyChef, getSession } from "@/lib/dashboard";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,11 +18,11 @@ export default async function Perfil() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1.5">
-        <span className="lab text-muted">Perfil</span>
-        <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">{chef ? "O seu perfil" : "Crie o seu perfil de chef"}</h1>
-        {!chef && <p className="m-0 max-w-[600px] text-muted">Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão.</p>}
-      </div>
+      <PageHeader
+        eyebrow="Perfil"
+        title={chef ? "O seu perfil" : "Crie o seu perfil de chef"}
+        description={!chef && "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão."}
+      />
       <ProfileForm chef={chef} photos={photos} userId={session.userId} />
     </div>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookings, type DashBooking } from "@/lib/dashboard";
 import { dayLabel, euro, isoDay, MODE_LABEL, STATUS_LABEL } from "@/lib/format";
@@ -49,10 +50,7 @@ export default async function Pedidos() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1.5">
-        <span className="lab text-muted">Pedidos e reservas</span>
-        <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">Pedidos</h1>
-      </div>
+      <PageHeader eyebrow="Pedidos e reservas" title="Pedidos" />
 
       <section className="flex flex-col gap-3.5">
         <h2 className="lab m-0 border-b border-ink pb-2.5">Por responder · {requests.length}</h2>
@@ -73,9 +71,12 @@ export default async function Pedidos() {
       {past.length > 0 && (
         <section className="flex flex-col gap-3.5">
           <h2 className="lab m-0 border-b border-ink pb-2.5">Histórico</h2>
-          {past.slice(-20).reverse().map((b) => (
-            <Row key={b.id} b={b} showActions={false} />
-          ))}
+          {past
+            .slice(-20)
+            .reverse()
+            .map((b) => (
+              <Row key={b.id} b={b} showActions={false} />
+            ))}
         </section>
       )}
     </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { markFulfilled } from "@/app/dashboard/actions";
+import { Chip } from "@/components/ui/Chip";
 import type { DashBooking } from "@/lib/dashboard";
 import type { FulfilmentMode } from "@/lib/types";
 
@@ -39,9 +40,9 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
             ["pickup", "Levantamentos", count("pickup")],
           ] as [FulfilmentMode | "all", string, number][]
         ).map(([k, label, n]) => (
-          <button key={k} type="button" className="chip" aria-pressed={type === k} onClick={() => setType(k)}>
+          <Chip key={k} pressed={type === k} onClick={() => setType(k)}>
             {label} · {n}
-          </button>
+          </Chip>
         ))}
       </div>
 
@@ -64,7 +65,17 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
             <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-3 border-l border-line p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className={`lab rounded-[2px] px-[9px] py-[5px] ${TAG[i.fulfilment_mode]}`}>{TYPE_LABEL[i.fulfilment_mode]}</span>
-                <span className="lab text-muted">{isDone ? (isPick ? "Levantado" : i.fulfilment_mode === "delivery" ? "Entregue" : "Concluído") : i.status === "confirmed" ? "Sinal recebido" : "Aguarda sinal"}</span>
+                <span className="lab text-muted">
+                  {isDone
+                    ? isPick
+                      ? "Levantado"
+                      : i.fulfilment_mode === "delivery"
+                        ? "Entregue"
+                        : "Concluído"
+                    : i.status === "confirmed"
+                      ? "Sinal recebido"
+                      : "Aguarda sinal"}
+                </span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="d text-[22px] leading-[1.15]">{i.client?.name ?? "Cliente"}</span>
@@ -79,7 +90,9 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="lab text-muted">{isPick ? "Código de levantamento" : "Distância"}</span>
-                  <span className="num text-sm">{isPick ? (i.pickup_code ?? "—") : i.distance_km ? `${String(i.distance_km).replace(".", ",")} km` : "—"}</span>
+                  <span className="num text-sm">
+                    {isPick ? (i.pickup_code ?? "—") : i.distance_km ? `${String(i.distance_km).replace(".", ",")} km` : "—"}
+                  </span>
                 </div>
               </div>
               {i.notes && <span className="rounded-[2px] bg-paper px-3 py-2.5 text-sm text-ink-3">{i.notes}</span>}
@@ -93,7 +106,13 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
                   Mensagem
                 </Link>
                 <button type="button" className="btn btn-sm" onClick={() => toggle(i.id)}>
-                  {isDone ? "Desfazer" : isPick ? "Marcar levantado" : i.fulfilment_mode === "delivery" ? "Marcar entregue" : "Marcar concluído"}
+                  {isDone
+                    ? "Desfazer"
+                    : isPick
+                      ? "Marcar levantado"
+                      : i.fulfilment_mode === "delivery"
+                        ? "Marcar entregue"
+                        : "Marcar concluído"}
                 </button>
               </div>
             </div>

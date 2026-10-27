@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { saveCooking } from "@/app/dashboard/actions";
+import { Chip } from "@/components/ui/Chip";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { Switch } from "@/components/ui/Switch";
+import { useServerAction } from "@/hooks/useServerAction";
+import { useToggleList } from "@/hooks/useToggleList";
+import { MAX_CATEGORIES } from "@/lib/constants";
 import { SERVICE_LABEL } from "@/lib/format";
 import type { ServiceType } from "@/lib/types";
 
@@ -13,63 +18,66 @@ const SERVICES: [ServiceType, string][] = [
   ["meal_prep", "Refeições para a semana"],
 ];
 
+type Option = { id: number; name: string };
+
 type Props = {
-  categories: { id: number; name: string }[];
-  diets: { id: number; name: string }[];
+  categories: Option[];
+  diets: Option[];
   mine: { categories: number[]; diets: number[]; services: ServiceType[] };
   preview: { name: string; tier: string; area: string; rating: string; from: string };
 };
 
 export function CookingForm({ categories, diets, mine, preview }: Props) {
-  const [cats, setCats] = useState(mine.categories);
-  const [ds, setDs] = useState(mine.diets);
-  const [svc, setSvc] = useState(mine.services);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [pending, start] = useTransition();
-  const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const catLine = cats.map((id) => categories.find((c) => c.id === id)?.name).filter(Boolean).join(" · ") || "Sem categoria";
+  const cats = useToggleList(mine.categories, MAX_CATEGORIES);
+  const chosenDiets = useToggleList(mine.diets);
+  const services = useToggleList(mine.services);
+  const { run, pending, message } = useServerAction(saveCooking, { successMessage: "Guardado." });
+  const catLine =
+    cats.items
+      .map((id) => categories.find((c) => c.id === id)?.name)
+      .filter(Boolean)
+      .join(" · ") || "Sem categoria";
 
   return (
     <div className="flex flex-wrap items-start gap-6">
       <div className="flex min-w-0 flex-[3_1_460px] flex-col gap-3.5">
         <section className="box flex flex-col gap-3.5 p-6">
           <div className="flex items-baseline justify-between gap-3">
-            <span className="d text-2xl">Categorias de cozinha</span>
-            <span className="lab text-muted">{cats.length} de 3</span>
+            <h2 className="d m-0 text-2xl font-normal">Categorias de cozinha</h2>
+            <span className="lab text-muted">
+              {cats.items.length} de {MAX_CATEGORIES}
+            </span>
           </div>
           <span className="text-sm text-muted">Escolha até três. Os clientes filtram o mapa por estas categorias.</span>
           <div className="flex flex-wrap gap-1.5">
-            {categories.map((c) => {
-              const on = cats.includes(c.id);
-              return (
-                <button key={c.id} type="button" className="chip" aria-pressed={on} disabled={!on && cats.length >= 3} onClick={() => setCats((l) => toggle(l, c.id))}>
-                  {c.name}
-                </button>
-              );
-            })}
+            {categories.map((c) => (
+              <Chip key={c.id} pressed={cats.has(c.id)} disabled={!cats.has(c.id) && !cats.canAdd} onClick={() => cats.toggle(c.id)}>
+                {c.name}
+              </Chip>
+            ))}
           </div>
         </section>
 
         <section className="box flex flex-col gap-1 p-6">
-          <span className="d mb-2 text-2xl">Serviços que oferece</span>
-          {SERVICES.map(([k, d]) => (
-            <div key={k} className="flex items-center justify-between gap-4 border-t border-line py-3.5">
+          <h2 className="d mb-2 mt-0 text-2xl font-normal">Serviços que oferece</h2>
+          {SERVICES.map(([key, description]) => (
+            <div key={key} className="flex items-center justify-between gap-4 border-t border-line py-3.5">
               <span className="flex flex-col">
-                <strong className="font-semibold">{SERVICE_LABEL[k]}</strong>
-                <span className="text-[13px] text-muted">{d}</span>
+                <strong className="font-semibold">{SERVICE_LABEL[key]}</strong>
+                <span className="text-[13px] text-muted">{description}</span>
               </span>
-              <button type="button" className="sw" role="switch" aria-checked={svc.includes(k)} aria-label={SERVICE_LABEL[k]} onClick={() => setSvc((l) => toggle(l, k))} />
+              <Switch checked={services.has(key)} label={SERVICE_LABEL[key]} onChange={() => services.toggle(key)} />
             </div>
           ))}
         </section>
 
         <section className="box flex flex-col gap-3.5 p-6">
-          <span className="d text-2xl">Dietas que consegue fazer</span>
+          <h2 className="d m-0 text-2xl font-normal">Dietas que consegue fazer</h2>
           <div className="flex flex-wrap gap-1.5">
             {diets.map((d) => (
-              <button key={d.id} type="button" className="chip" aria-pressed={ds.includes(d.id)} onClick={() => setDs((l) => toggle(l, d.id))}>
+              <Chip key={d.id} pressed={chosenDiets.has(d.id)} onClick={() => chosenDiets.toggle(d.id)}>
                 {d.name}
-              </button>
+              </Chip>
             ))}
           </div>
         </section>
@@ -85,31 +93,17 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
             <span className="text-[13px] text-muted">
               {catLine} · {preview.area}
             </span>
-            <span className="text-[13px] text-muted">{svc.map((s) => SERVICE_LABEL[s]).join(" · ")}</span>
+            <span className="text-[13px] text-muted">{services.items.map((s) => SERVICE_LABEL[s]).join(" · ")}</span>
             <span className="mt-auto text-[13px]">
               <strong className="font-semibold">{preview.rating}</strong> · desde {preview.from}
             </span>
           </span>
         </div>
         <span className="text-[13px] text-muted">As alterações aparecem no mapa assim que guardar.</span>
-        <button
-          type="button"
-          className="btn"
-          disabled={pending}
-          onClick={() =>
-            start(async () => {
-              const r = await saveCooking(cats, ds, svc);
-              setMsg(r.ok ? "Guardado." : r.error);
-            })
-          }
-        >
+        <button type="button" className="btn" disabled={pending} onClick={() => run(cats.items, chosenDiets.items, services.items)}>
           Guardar alterações
         </button>
-        {msg && (
-          <p role="status" className="m-0 text-sm text-muted">
-            {msg}
-          </p>
-        )}
+        <FormMessage message={message} />
       </aside>
     </div>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { DayItems } from "@/components/dashboard/DayItems";
 import { LogisticsSettings } from "@/components/dashboard/LogisticsSettings";
 import { getBookings, getLogistics, requireChef } from "@/lib/dashboard";
@@ -36,12 +37,7 @@ export default async function Logistica({ searchParams }: PageProps<"/dashboard/
 
   return (
     <div className="flex flex-col gap-[26px]">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1.5">
-          <span className="lab text-muted">Logística</span>
-          <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">Deslocações, entregas e levantamentos</h1>
-        </div>
-      </div>
+      <PageHeader eyebrow="Logística" title="Deslocações, entregas e levantamentos" />
 
       <nav aria-label="Semana" className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
         {week.map((d) => {
@@ -68,7 +64,7 @@ export default async function Logistica({ searchParams }: PageProps<"/dashboard/
         </section>
         <LogisticsSettings
           initial={logistics.logistics}
-          zones={logistics.zones.map(({ name, active }) => ({ name, active }))}
+          zones={logistics.zones.map(({ name, active }) => ({ label: name, active }))}
           slots={logistics.slots.map(({ label, active }) => ({ label, active }))}
           area={chef.area_name ?? ""}
         />

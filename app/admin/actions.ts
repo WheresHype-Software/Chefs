@@ -46,7 +46,10 @@ export async function moderateReview(reviewId: string, reportId: string, action:
   const sb = await createClient();
   if (action === "hide") await sb.from("reviews").update({ status: "hidden" }).eq("id", reviewId);
   if (action === "delete") await sb.from("reviews").delete().eq("id", reviewId);
-  await sb.from("reports").update({ status: action === "keep" ? "dismissed" : "resolved" }).eq("id", reportId);
+  await sb
+    .from("reports")
+    .update({ status: action === "keep" ? "dismissed" : "resolved" })
+    .eq("id", reportId);
   const {
     data: { user },
   } = await sb.auth.getUser();

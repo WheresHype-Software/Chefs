@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { cycleDay, openWeekdays } from "@/app/dashboard/actions";
+import { Chip } from "@/components/ui/Chip";
+import { useToggleList } from "@/hooks/useToggleList";
 import { isoDay } from "@/lib/format";
 
 type DayState = "available" | "blocked" | "booked" | undefined;
@@ -21,7 +23,7 @@ export function AgendaGrid({
 }) {
   const [days, setDays] = useState(initial);
   const [pending, start] = useTransition();
-  const [weekdays, setWeekdays] = useState<number[]>([]);
+  const weekdays = useToggleList<number>([]);
   const lead = (new Date(year, month, 1).getDay() + 6) % 7;
   const count = new Date(year, month + 1, 0).getDate();
   const today = isoDay(new Date());
@@ -41,7 +43,7 @@ export function AgendaGrid({
   }
 
   function fillWeekdays() {
-    const jsDays = weekdays.map((w) => (w + 1) % 7); // Monday-first index -> JS getDay()
+    const jsDays = weekdays.items.map((w) => (w + 1) % 7); // Monday-first index -> JS getDay()
     setDays((d) => {
       const next = { ...d };
       for (let i = 1; i <= count; i++) {
@@ -62,17 +64,11 @@ export function AgendaGrid({
         <span className="d text-[22px]">Abrir dias da semana</span>
         <div className="flex flex-wrap gap-1.5">
           {WD.map((w, i) => (
-            <button
-              key={w}
-              type="button"
-              className="chip"
-              aria-pressed={weekdays.includes(i)}
-              onClick={() => setWeekdays((ws) => (ws.includes(i) ? ws.filter((x) => x !== i) : [...ws, i]))}
-            >
+            <Chip key={w} pressed={weekdays.has(i)} onClick={() => weekdays.toggle(i)}>
               {w}
-            </button>
+            </Chip>
           ))}
-          <button type="button" className="btn btn-sm" disabled={!weekdays.length || pending} onClick={fillWeekdays}>
+          <button type="button" className="btn btn-sm" disabled={!weekdays.items.length || pending} onClick={fillWeekdays}>
             Marcar disponíveis este mês
           </button>
         </div>

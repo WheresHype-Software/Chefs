@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatGrid } from "@/components/ui/StatGrid";
 import { redirect } from "next/navigation";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
 import { dayLabel, isoDay, longDay, rating, STATUS_LABEL } from "@/lib/format";
@@ -44,24 +46,16 @@ export default async function Overview() {
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
-        <span className="lab text-muted">{longDay(today)}</span>
-        <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">Olá, {chef.display_name.split(" ")[0]}</h1>
-      </div>
+      <PageHeader eyebrow={longDay(today)} title={`Olá, ${chef.display_name.split(" ")[0]}`} />
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(180px,100%),1fr))] gap-px border border-line bg-line">
-        {[
+      <StatGrid
+        items={[
           ["Pedidos por responder", String(requests.length)],
           ["Serviços esta semana", String(week.length)],
           ["Entregas", String(week.filter((b) => b.fulfilment_mode === "delivery").length)],
           ["Avaliação", rating(chef.rating_avg, chef.review_count).replace("★ ", "")],
-        ].map(([k, v]) => (
-          <div key={k} className="flex flex-col gap-1 bg-white p-[22px]">
-            <span className="lab text-muted">{k}</span>
-            <span className="d num text-[40px]">{v}</span>
-          </div>
-        ))}
-      </div>
+        ]}
+      />
 
       {requests.length > 0 && (
         <section className="box flex flex-col p-6">
@@ -136,7 +130,11 @@ async function ClientHome() {
       ) : (
         <div className="box p-6">
           {rows.map((b) => (
-            <Link key={b.id} href={`/reserva/${b.id}`} className="flex flex-wrap justify-between gap-3 border-b border-line py-4 text-ink no-underline last:border-b-0">
+            <Link
+              key={b.id}
+              href={`/reserva/${b.id}`}
+              className="flex flex-wrap justify-between gap-3 border-b border-line py-4 text-ink no-underline last:border-b-0"
+            >
               <span className="flex flex-col">
                 <span className="d text-xl">{b.chefs?.display_name}</span>
                 <span className="text-[13px] text-muted">

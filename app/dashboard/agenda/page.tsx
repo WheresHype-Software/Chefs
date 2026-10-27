@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { AgendaGrid } from "@/components/dashboard/AgendaGrid";
 import { getAvailability, getBookings } from "@/lib/dashboard";
 import { isoDay, monthLabel } from "@/lib/format";
@@ -6,7 +7,8 @@ import { isoDay, monthLabel } from "@/lib/format";
 export default async function Agenda({ searchParams }: PageProps<"/dashboard/agenda">) {
   const { mes } = await searchParams;
   const now = new Date();
-  const [y, m] = typeof mes === "string" && /^\d{4}-\d{2}$/.test(mes) ? mes.split("-").map(Number) : [now.getFullYear(), now.getMonth() + 1];
+  const [y, m] =
+    typeof mes === "string" && /^\d{4}-\d{2}$/.test(mes) ? mes.split("-").map(Number) : [now.getFullYear(), now.getMonth() + 1];
   const year = y!;
   const month = m! - 1;
   const from = isoDay(new Date(year, month, 1));
@@ -19,21 +21,21 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1.5">
-          <span className="lab text-muted">Agenda</span>
-          <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">Só recebe pedidos quando pode</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href={`?mes=${shift(-1)}`} className="ctl no-underline" aria-label="Mês anterior">
-            ‹
-          </Link>
-          <span className="d min-w-44 text-center text-xl italic">{monthLabel(year, month)}</span>
-          <Link href={`?mes=${shift(1)}`} className="ctl no-underline" aria-label="Mês seguinte">
-            ›
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Agenda"
+        title="Só recebe pedidos quando pode"
+        actions={
+          <div className="flex items-center gap-2">
+            <Link href={`?mes=${shift(-1)}`} className="ctl no-underline" aria-label="Mês anterior">
+              ‹
+            </Link>
+            <span className="d min-w-44 text-center text-xl italic">{monthLabel(year, month)}</span>
+            <Link href={`?mes=${shift(1)}`} className="ctl no-underline" aria-label="Mês seguinte">
+              ›
+            </Link>
+          </div>
+        }
+      />
       <AgendaGrid
         key={from}
         year={year}

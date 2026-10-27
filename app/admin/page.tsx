@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChefDecision, ReviewModeration } from "@/components/admin/ChefDecision";
+import { StatGrid } from "@/components/ui/StatGrid";
 import { getSession } from "@/lib/dashboard";
 import { TIER_LABEL } from "@/lib/format";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
@@ -37,7 +38,9 @@ export default async function AdminPage() {
   const [pending, reports, chefsApproved, requests, completed, reviews] = await Promise.all([
     sb
       .from("chefs")
-      .select("id, display_name, slug, tier, area_name, socials, badges, created_at, chef_photos(url, kind), chef_certifications(title, document_path)")
+      .select(
+        "id, display_name, slug, tier, area_name, socials, badges, created_at, chef_photos(url, kind), chef_certifications(title, document_path)",
+      )
       .eq("status", "pending")
       .order("created_at"),
     sb.from("reports").select("id, target_id, reason, created_at").eq("status", "open").eq("target_type", "review").order("created_at"),
@@ -58,20 +61,16 @@ export default async function AdminPage() {
 
   return (
     <Shell>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(170px,100%),1fr))] gap-px border border-line bg-line">
-        {[
+      <StatGrid
+        size="md"
+        items={[
           ["Chefs ativos", String(chefsApproved.count ?? 0)],
           ["Pedidos (7 dias)", String(requests.count ?? 0)],
           ["Taxa de aceitação", answered ? `${Math.round((accepted / answered) * 100)} %` : "—"],
           ["Concluídas (7 dias)", String(completed.count ?? 0)],
           ["Avaliações (7 dias)", String(reviews.count ?? 0)],
-        ].map(([k, v]) => (
-          <div key={k} className="flex flex-col gap-1 bg-white p-5">
-            <span className="lab text-muted">{k}</span>
-            <span className="d num text-[34px]">{v}</span>
-          </div>
-        ))}
-      </div>
+        ]}
+      />
 
       <section className="flex flex-col gap-4">
         <h2 className="lab m-0 border-b border-ink pb-2.5">Chefs por aprovar · {pending.data?.length ?? 0}</h2>
@@ -100,7 +99,9 @@ export default async function AdminPage() {
                     </>
                   )}
                 </span>
-                {c.chef_certifications.length > 0 && <span className="text-sm text-muted">Certificados: {c.chef_certifications.map((x) => x.title).join(", ")}</span>}
+                {c.chef_certifications.length > 0 && (
+                  <span className="text-sm text-muted">Certificados: {c.chef_certifications.map((x) => x.title).join(", ")}</span>
+                )}
                 <ChefDecision chefId={c.id} badges={c.badges} />
               </div>
               <div className="flex flex-[1_1_320px] flex-wrap content-start gap-2">
@@ -108,7 +109,9 @@ export default async function AdminPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={selfie.url} alt="Fotografia do chef" className="h-32 w-32 rounded-full object-cover" />
                 ) : (
-                  <span className="flex h-32 w-32 items-center justify-center rounded-full bg-paper text-xs text-danger">Sem fotografia</span>
+                  <span className="flex h-32 w-32 items-center justify-center rounded-full bg-paper text-xs text-danger">
+                    Sem fotografia
+                  </span>
                 )}
                 {gallery.map((p) => (
                   // eslint-disable-next-line @next/next/no-img-element

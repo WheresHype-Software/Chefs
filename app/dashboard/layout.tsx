@@ -35,7 +35,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
                 Ver perfil público →
               </Link>
             ) : (
-              <span className="mt-1.5 text-[13px] text-muted">Perfil {chef.status === "pending" ? "em revisão" : "ainda não publicado"}</span>
+              <span className="mt-1.5 text-[13px] text-muted">
+                Perfil {chef.status === "pending" ? "em revisão" : "ainda não publicado"}
+              </span>
             )}
             {session.role === "admin" && (
               <Link href="/admin" className="mt-1.5 text-[13px]">
@@ -50,7 +52,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           </span>
         )}
       </nav>
-      <main className="box-border flex min-w-0 flex-[999_1_560px] flex-col gap-7 px-4 pb-14 pt-6 md:px-11 md:pb-[72px] md:pt-9">{children}</main>
+      <main className="box-border flex min-w-0 flex-[999_1_560px] flex-col gap-7 px-4 pb-14 pt-6 md:px-11 md:pb-[72px] md:pt-9">
+        {children}
+      </main>
     </div>
   );
 }

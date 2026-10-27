@@ -8,7 +8,6 @@ import { fail, ok, type ActionResult as Result } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
 import type { ServiceType } from "@/lib/types";
 
-
 async function chefContext() {
   const session = await getSession();
   const chef = await getMyChef();
@@ -102,7 +101,11 @@ export async function addPhoto(url: string, kind: "selfie" | "cover" | "portrait
 export async function submitForReview(): Promise<Result> {
   const ctx = await chefContext();
   if (ctx.demo || !ctx.chef) return ok();
-  const { count } = await ctx.sb.from("chef_photos").select("id", { count: "exact", head: true }).eq("chef_id", ctx.chef.id).eq("kind", "gallery");
+  const { count } = await ctx.sb
+    .from("chef_photos")
+    .select("id", { count: "exact", head: true })
+    .eq("chef_id", ctx.chef.id)
+    .eq("kind", "gallery");
   const { data: selfie } = await ctx.sb.from("chef_photos").select("id").eq("chef_id", ctx.chef.id).eq("kind", "selfie").limit(1);
   if (!selfie?.length) return fail("Falta a sua fotografia.");
   if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
@@ -144,7 +147,11 @@ const OfferInput = z.object({
   unit_label: z.string().trim().min(1).max(30),
   min_guests: z.number().int().min(1).max(500),
   max_guests: z.number().int().min(1).max(500).nullable(),
-  lead_time_hours: z.number().int().min(0).max(24 * 60),
+  lead_time_hours: z
+    .number()
+    .int()
+    .min(0)
+    .max(24 * 60),
   time_slots: z.array(z.string().trim().min(1).max(40)).max(12),
   active: z.boolean(),
 });
@@ -157,7 +164,13 @@ export async function saveOffer(input: z.infer<typeof OfferInput>): Promise<Resu
   const ctx = await chefContext();
   if (ctx.demo || !ctx.chef) return ok();
   const SERVICE: Record<string, ServiceType> = { home: "home", delivery: "delivery", pickup: "pickup" };
-  const row = { ...o, id: undefined, chef_id: ctx.chef.id, service_types: [SERVICE[o.fulfilment_mode]], price: o.price_model === "quote" ? null : o.price };
+  const row = {
+    ...o,
+    id: undefined,
+    chef_id: ctx.chef.id,
+    service_types: [SERVICE[o.fulfilment_mode]],
+    price: o.price_model === "quote" ? null : o.price,
+  };
   const { error } = o.id ? await ctx.sb.from("offers").update(row).eq("id", o.id) : await ctx.sb.from("offers").insert(row);
   return error ? fail(error.message) : done();
 }
@@ -235,8 +248,14 @@ export async function saveLogistics(
   await ctx.sb.from("chefs").update({ service_radius_km: parsed.data.travel_radius_km }).eq("id", id);
   await ctx.sb.from("delivery_zones").delete().eq("chef_id", id);
   await ctx.sb.from("pickup_slots").delete().eq("chef_id", id);
-  if (zones.length) await ctx.sb.from("delivery_zones").insert(zones.slice(0, 40).map((z) => ({ chef_id: id, name: z.name.slice(0, 80), active: z.active })));
-  if (slots.length) await ctx.sb.from("pickup_slots").insert(slots.slice(0, 20).map((s) => ({ chef_id: id, label: s.label.slice(0, 40), active: s.active })));
+  if (zones.length)
+    await ctx.sb
+      .from("delivery_zones")
+      .insert(zones.slice(0, 40).map((z) => ({ chef_id: id, name: z.name.slice(0, 80), active: z.active })));
+  if (slots.length)
+    await ctx.sb
+      .from("pickup_slots")
+      .insert(slots.slice(0, 20).map((s) => ({ chef_id: id, label: s.label.slice(0, 40), active: s.active })));
   return done();
 }
 
@@ -265,6 +284,8 @@ export async function reportReview(reviewId: string, reason: string): Promise<Re
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   const session = await getSession();
-  const { error } = await ctx.sb.from("reports").insert({ reporter: session.userId, target_type: "review", target_id: reviewId, reason: reason.slice(0, 1000) });
+  const { error } = await ctx.sb
+    .from("reports")
+    .insert({ reporter: session.userId, target_type: "review", target_id: reviewId, reason: reason.slice(0, 1000) });
   return error ? fail(error.message) : done();
 }
