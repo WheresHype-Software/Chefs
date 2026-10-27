@@ -16,9 +16,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
     <div className="flex min-h-screen flex-wrap items-stretch bg-paper text-[15px]">
       <nav
         aria-label="Painel"
-        className="box-border flex flex-[1_1_100%] flex-col gap-0.5 border-b border-line bg-white px-3 py-3.5 md:min-h-screen md:flex-[0_0_250px] md:border-b-0 md:border-r md:px-4 md:py-6"
+        className="sticky top-0 z-20 box-border flex min-w-0 flex-[1_1_100%] flex-col gap-0.5 border-b border-line bg-white/95 px-3 pt-2.5 backdrop-blur-[6px] md:static md:min-h-screen md:bg-white md:flex-[0_0_250px] md:border-b-0 md:border-r md:px-4 md:py-6"
       >
-        <div className="flex items-baseline justify-between px-3.5 pb-3 md:pb-5">
+        <div className="flex items-baseline justify-between px-2 pb-1.5 md:px-3.5 md:pb-5">
           <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
             <Wordmark />
           </Link>

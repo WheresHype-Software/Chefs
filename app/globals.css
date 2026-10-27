@@ -409,6 +409,18 @@ a:hover {
   text-decoration: none;
   transition: background-color 0.15s var(--ease-out);
 }
+/* iOS zooms into any field under 16px on focus; phones get 16px everywhere. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  .side-link {
+    padding: 9px 13px;
+    font-size: 14px;
+  }
+}
 .side-link:hover {
   background: var(--color-paper);
   color: var(--color-ink);
