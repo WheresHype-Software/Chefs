@@ -24,7 +24,7 @@ function Cell({ label, children, className = "" }: { label: string; children: Re
   );
 }
 
-const inputClass = "w-full min-w-0 border-0 bg-transparent p-0 text-[16px] text-ink outline-none placeholder:text-faint";
+const inputClass = "w-full min-w-0 border-0 bg-transparent p-0 text-[16px] text-ink outline-none placeholder:text-muted";
 
 /** Where / what / when, then go to the results page. */
 export function SearchBar({ initial = {}, size = "hero" }: Props) {

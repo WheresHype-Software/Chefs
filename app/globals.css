@@ -370,7 +370,7 @@ a:hover {
 }
 .field input::placeholder,
 .field textarea::placeholder {
-  color: var(--color-faint);
+  color: var(--color-muted);
 }
 .field input:focus,
 .field textarea:focus,
