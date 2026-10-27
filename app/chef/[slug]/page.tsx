@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BookingForm } from "@/components/booking/BookingForm";
+import { MobileBookingBar } from "@/components/booking/MobileBookingBar";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, getChefProfile } from "@/lib/data";
-import { initials, MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel } from "@/lib/format";
+import { fromPrice, initials, MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel } from "@/lib/format";
 import { Photo } from "@/components/ui/Photo";
 
 export async function generateMetadata({ params }: PageProps<"/chef/[slug]">): Promise<Metadata> {
@@ -49,15 +50,36 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
     <div>
       <SiteHeader />
 
-      <section className="mx-auto max-w-[1240px] px-5 pt-6 md:px-8">
-        <div className={`grid h-[300px] gap-2.5 md:h-[440px] ${GRID[Math.min(photos.length, 5)]}`}>
-          {photos.slice(0, photos.length >= 5 ? 5 : 3).map((p, i) => (
-            <div key={i} className={`overflow-hidden rounded-[10px] ${i === 0 ? "col-span-2 row-span-2" : "hidden md:block"}`}>
+      <section className="mx-auto max-w-[1240px] px-5 pt-4 md:px-8 md:pt-6">
+        {/* Phones: swipe through every photo. */}
+        <ul
+          aria-label="Fotografias"
+          className="-mx-5 m-0 flex list-none snap-x snap-mandatory scroll-px-5 gap-2.5 overflow-x-auto px-5 [scrollbar-width:none] md:hidden"
+        >
+          {photos.map((p, i) => (
+            <li
+              key={i}
+              className={`aspect-[4/3] shrink-0 snap-start overflow-hidden rounded-[10px] ${photos.length > 1 ? "w-[86%]" : "w-full"}`}
+            >
               <Photo
                 photo={p.url}
                 alt={p.caption}
                 priority={i === 0}
-                sizes={i === 0 ? "(min-width: 768px) 60vw, 100vw" : "30vw"}
+                sizes="86vw"
+                fallback={i % 2 ? "cobalt" : "glaze"}
+                className="h-full w-full"
+              />
+            </li>
+          ))}
+        </ul>
+        <div className={`hidden h-[440px] gap-2.5 md:grid ${GRID[Math.min(photos.length, 5)]}`}>
+          {photos.slice(0, photos.length >= 5 ? 5 : 3).map((p, i) => (
+            <div key={i} className={`overflow-hidden rounded-[10px] ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+              <Photo
+                photo={p.url}
+                alt={p.caption}
+                priority={i === 0}
+                sizes={i === 0 ? "60vw" : "30vw"}
                 fallback={i % 2 ? "cobalt" : "glaze"}
                 className="h-full w-full"
               />
@@ -66,12 +88,12 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
         </div>
       </section>
 
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-14 px-5 pb-20 pt-10 md:px-8">
+      <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-12 px-5 pb-20 pt-7 md:gap-14 md:px-8 md:pt-10">
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-12">
-          <div className="flex flex-wrap items-center gap-6">
+          <div className="flex flex-wrap items-center gap-5 md:gap-6">
             <div
               aria-hidden="true"
-              className="flex h-24 w-24 items-center justify-center rounded-full bg-cobalt-soft text-[30px] font-extrabold tracking-[-0.03em] text-cobalt"
+              className="flex h-16 w-16 items-center text-[22px] md:h-24 md:w-24 justify-center rounded-full bg-cobalt-soft font-extrabold md:text-[30px] tracking-[-0.03em] text-cobalt"
             >
               {initials(chef.name)}
             </div>
@@ -84,7 +106,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
                   </span>
                 ))}
               </div>
-              <h1 className="d m-0 text-[clamp(40px,6vw,60px)] leading-none">{chef.name}</h1>
+              <h1 className="d m-0 text-[clamp(36px,6vw,60px)] leading-none">{chef.name}</h1>
               <span className="text-muted">
                 {chef.headline} · {chef.area} · {rating(chef.rating, chef.reviewCount)}
                 {chef.socials.instagram && (
@@ -212,9 +234,9 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
           </section>
         </main>
 
-        <aside id="reservar" className="box box-border flex min-w-0 flex-[1_1_360px] flex-col gap-4 p-[26px]">
-          <div className="flex items-baseline justify-between gap-3 border-b border-line-2 pb-3">
-            <span className="d text-[28px]">Pedir reserva</span>
+        <aside id="reservar" className="box box-border flex min-w-0 flex-[1_1_360px] scroll-mt-20 flex-col gap-4 p-5 md:p-[26px]">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-line-2 pb-3">
+            <h2 className="d m-0 text-[26px] md:text-[28px]">Pedir reserva</h2>
             <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
           </div>
           <BookingForm key={String(oferta ?? "")} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
@@ -240,6 +262,11 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
         </aside>
       </div>
 
+      <MobileBookingBar
+        targetId="reservar"
+        price={fromPrice(chef.offers)}
+        rating={`${rating(chef.rating, chef.reviewCount)} · ${chef.area}`}
+      />
       <SiteFooter />
     </div>
   );
