@@ -1,0 +1,28 @@
+import { ProfileForm } from "@/components/dashboard/ProfileForm";
+import { getMyChef, getSession } from "@/lib/dashboard";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function Perfil() {
+  const session = await getSession();
+  const chef = await getMyChef();
+  let photos = { selfie: 1, gallery: 6 };
+  if (!session.demo && chef) {
+    const sb = await createClient();
+    const { data } = await sb.from("chef_photos").select("kind").eq("chef_id", chef.id);
+    photos = {
+      selfie: (data ?? []).filter((p) => p.kind === "selfie").length,
+      gallery: (data ?? []).filter((p) => p.kind === "gallery").length,
+    };
+  } else if (!chef) photos = { selfie: 0, gallery: 0 };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1.5">
+        <span className="lab text-muted">Perfil</span>
+        <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">{chef ? "O seu perfil" : "Crie o seu perfil de chef"}</h1>
+        {!chef && <p className="m-0 max-w-[600px] text-muted">Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão.</p>}
+      </div>
+      <ProfileForm chef={chef} photos={photos} userId={session.userId} />
+    </div>
+  );
+}
