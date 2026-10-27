@@ -88,8 +88,9 @@ export function AgendaGrid({
             const iso = isoDay(new Date(year, month, i + 1));
             const state: DayState = bookedSet.has(iso) ? "booked" : days[iso];
             const past = iso < today;
-            const style =
-              state === "booked"
+            const style = past
+              ? "border-transparent text-[#A9A59E]"
+              : state === "booked"
                 ? "bg-ink text-white border-ink"
                 : state === "available"
                   ? "border-line-3 font-semibold"
@@ -102,7 +103,7 @@ export function AgendaGrid({
                 type="button"
                 disabled={past || state === "booked"}
                 onClick={() => cycle(iso)}
-                className={`num flex h-12 items-center justify-center rounded-[2px] border text-sm transition hover:border-ink disabled:cursor-default disabled:hover:border-transparent ${style} ${past ? "opacity-40" : ""}`}
+                className={`num flex h-12 items-center justify-center rounded-[2px] border text-sm transition hover:border-ink disabled:cursor-default disabled:hover:border-transparent ${style}`}
                 aria-label={`${i + 1}: ${state === "booked" ? "reservado" : state === "available" ? "disponível" : state === "blocked" ? "bloqueado" : "fechado"}`}
               >
                 {i + 1}
