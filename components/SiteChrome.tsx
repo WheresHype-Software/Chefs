@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
+import { MobileMenu } from "@/components/MobileMenu";
 
 export function Wordmark({ suffix }: { suffix?: string }) {
   return (
@@ -11,44 +12,69 @@ export function Wordmark({ suffix }: { suffix?: string }) {
   );
 }
 
-type NavItem = { href: string; label: string; /** Also shown on phones, next to the main button. */ mobile?: boolean };
+type NavItem = { href: string; label: string };
 
 const CLIENT_NAV: NavItem[] = [
-  { href: "/#como", label: "Como funciona" },
   { href: "/procurar", label: "Procurar chefs" },
-  { href: "/para-chefs", label: "Sou chef", mobile: true },
+  { href: "/#como", label: "Como funciona" },
+  { href: "/para-chefs", label: "Sou chef" },
 ];
 
 const CHEF_NAV: NavItem[] = [
-  { href: "#ferramenta", label: "Ferramenta" },
-  { href: "#marketing", label: "Marketing" },
-  { href: "#perguntas", label: "Perguntas" },
+  { href: "/para-chefs#ferramenta", label: "Ferramenta" },
+  { href: "/para-chefs#marketing", label: "Marketing" },
+  { href: "/para-chefs#perguntas", label: "Perguntas" },
   { href: "/", label: "Sou cliente" },
-  { href: "/entrar?next=/dashboard", label: "Entrar", mobile: true },
 ];
 
 export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
   const nav = chefs ? CHEF_NAV : CLIENT_NAV;
+  const home = chefs ? "/para-chefs" : "/";
+  const brand = (
+    <Link href={home} className="no-underline" aria-label="Ao Lume, página inicial">
+      <Wordmark suffix={chefs ? "para chefs" : undefined} />
+    </Link>
+  );
+  const primary = chefs ? { href: "/entrar?chef=1", label: "Criar perfil" } : { href: "/entrar", label: "Entrar" };
+  const secondary = chefs
+    ? { href: "/entrar?next=/dashboard", label: "Entrar" }
+    : { href: "/entrar?chef=1", label: "Criar perfil de chef" };
+
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur-[6px]">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-5 md:px-8">
-        <Link href={chefs ? "/para-chefs" : "/"} className="no-underline" aria-label="Ao Lume, página inicial">
-          <Wordmark suffix={chefs ? "para chefs" : undefined} />
-        </Link>
-        <nav aria-label="Principal" className="flex items-center gap-1 text-[15px] font-medium">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${item.mobile ? "inline" : "hidden md:inline"} rounded-md px-3 py-2 no-underline hover:bg-paper`}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link href={chefs ? "/entrar?chef=1" : "/entrar"} className="btn btn-sm ml-1 md:ml-2">
-            {chefs ? "Criar perfil" : "Entrar"}
+        {brand}
+        <div className="flex items-center gap-1">
+          <nav aria-label="Principal" className="hidden items-center gap-1 text-[15px] font-medium md:flex">
+            {nav.map((item) => (
+              <Link key={item.href} href={item.href} className="rounded-md px-3 py-2 no-underline hover:bg-paper">
+                {item.label}
+              </Link>
+            ))}
+            {chefs && (
+              <Link href={secondary.href} className="rounded-md px-3 py-2 no-underline hover:bg-paper">
+                {secondary.label}
+              </Link>
+            )}
+          </nav>
+          <Link href={primary.href} className="btn btn-sm md:ml-2">
+            {primary.label}
           </Link>
-        </nav>
+          <MobileMenu
+            brand={brand}
+            links={nav}
+            actions={
+              <>
+                <Link href={primary.href} className="btn w-full">
+                  {primary.label}
+                </Link>
+                <Link href={secondary.href} className="btn btn-o w-full">
+                  {secondary.label}
+                </Link>
+              </>
+            }
+          />
+        </div>
       </div>
     </header>
   );

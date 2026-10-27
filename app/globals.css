@@ -416,10 +416,6 @@ a:hover {
   textarea {
     font-size: 16px !important;
   }
-  .side-link {
-    padding: 9px 13px;
-    font-size: 14px;
-  }
 }
 .side-link:hover {
   background: var(--color-paper);
@@ -600,7 +596,25 @@ input[type="range"] {
 .al-toast {
   animation: al-toast 3.4s ease infinite;
 }
+/* Mobile menu sheet (components/MobileMenu.tsx) */
+.menu-sheet[open] {
+  animation: menu-in 0.28s var(--ease-out);
+}
+.menu-sheet::backdrop {
+  background: transparent;
+}
+html:has(.menu-sheet[open]) {
+  overflow: hidden;
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .menu-sheet[open],
   .tile-set,
   .al-in,
   .al-rv,
