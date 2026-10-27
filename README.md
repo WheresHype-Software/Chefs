@@ -33,19 +33,38 @@ Without Supabase credentials the app runs in **demo mode**: the map, chef pages 
 
 The seed adds seven demo chefs in Lisbon with no login attached. Delete them before launch.
 
-## What's where
+## Project structure
 
-| Path                              | What                                                                                                                                      |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/page.tsx`                    | Home: 3D chef map, filters, card rail and slide-in booking panel, then "how it works"                                                     |
-| `app/chef/[slug]`                 | Chef showcase: gallery, about, experience, offers, reviews, booking form                                                                  |
-| `app/reserva/[id]`                | Booking status, chat, cancel or accept a proposal, review once completed. Guests open it with the `?t=` magic-link token from their email |
-| `app/para-chefs`                  | Marketing page for chefs                                                                                                                  |
-| `app/entrar`                      | Sign in: email link, password, Google, chef sign-up                                                                                       |
-| `app/dashboard/*`                 | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile and verification                    |
-| `app/admin`                       | Approval queue, reported reviews, weekly stats                                                                                            |
-| `supabase/migrations`             | Schema, RLS, API functions, storage buckets, cron jobs                                                                                    |
-| `lib/data.ts`, `lib/dashboard.ts` | Data access with demo fallbacks                                                                                                           |
+| Path                           | What                                                                                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app/`                         | Routes. Pages are server components; each feature keeps its server actions next to it (`app/actions.ts`, `app/dashboard/actions.ts`, `app/admin/actions.ts`) |
+| `app/page.tsx`                 | Home: 3D chef map, filters, card rail and slide-in booking panel, then "how it works"                                                                        |
+| `app/chef/[slug]`              | Chef showcase: gallery, about, experience, offers, reviews, booking form                                                                                     |
+| `app/reserva/[id]`             | Booking status, chat, cancel or accept a proposal, review once completed                                                                                     |
+| `app/para-chefs`, `app/entrar` | Marketing page for chefs; sign in (email link, password, Google, chef sign-up)                                                                               |
+| `app/dashboard/*`              | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile                                                        |
+| `app/admin`                    | Approval queue, reported reviews, weekly stats                                                                                                               |
+| `components/ui/`               | Design-system primitives: `Field`, `Switch`, `Chip`, `Stepper`, `PageHeader`, `StatGrid`, `DetailList`, `FormMessage`                                        |
+| `components/<feature>/`        | Feature components: `map/`, `booking/`, `dashboard/`, `admin/`, `home/`                                                                                      |
+| `hooks/`                       | Client hooks: `useServerAction`, `useBookingForm`, `useChefFilters`, `useMonthCalendar`, `usePolling`, `usePhotoUpload`, `useMediaQuery`, `useToggleList`    |
+| `lib/`                         | Server and shared logic: env, Supabase clients, data access with demo fallbacks, formatting, constants                                                       |
+| `supabase/`                    | Migrations (schema, RLS, functions, storage, cron) and seed data                                                                                             |
+
+### Conventions
+
+- **Server first.** Pages fetch on the server; client components only handle interaction.
+- **Logic in hooks, markup in components.** A component that grows state or rules gets a `use…` hook (e.g. `useBookingForm`); repeated markup becomes a `components/ui` primitive.
+- **Server actions are public endpoints.** Each one validates its arguments with zod, returns an `ActionResult` (`{ ok: true } | { ok: false, error }`), never throws to the client, and leaves authorisation to RLS and database functions.
+- **Secrets stay on the server.** Public config lives in `lib/env.ts`; secrets in `lib/env.server.ts` (guarded by `server-only`).
+- **One commit per feature**, with conventional prefixes (`feat`, `refactor`, `fix`, `chore`, `docs`).
+- `npm run lint`, `npm run typecheck` and `npm run format:check` before pushing.
+
+## Security
+
+- Every table has Row Level Security; see the next section for the rules.
+- Guests use a magic-link token. The email link carries it once (`/reserva/<id>?t=…`); the proxy moves it into an httpOnly cookie scoped to that booking and redirects to the clean URL.
+- Security headers on every response: Content-Security-Policy, HSTS, `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy (`no-referrer` on booking pages) and a permissions policy.
+- Uploads go to the chef's own Storage folder, with size and type limits set on the bucket; the server re-checks the path before saving a photo.
 
 ## How the database protects data
 
