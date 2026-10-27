@@ -50,6 +50,8 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
   if (ctx.demo) return ok();
   const p = parsed.data;
   const session = await getSession();
+  if (!ctx.chef && session.role === "client")
+    return fail("Esta é uma conta de cliente. Para ter um perfil de chef, crie uma conta de chef.");
   const row = {
     display_name: p.display_name,
     slug: p.slug,
