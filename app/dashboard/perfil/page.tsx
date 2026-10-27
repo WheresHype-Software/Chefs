@@ -11,7 +11,8 @@ export default async function Perfil() {
     const sb = await createClient();
     const { data } = await sb.from("chef_photos").select("kind").eq("chef_id", chef.id);
     photos = {
-      selfie: (data ?? []).filter((p) => p.kind === "selfie").length,
+      // The profile photo (or, on older accounts, the verification selfie).
+      selfie: (data ?? []).filter((p) => p.kind === "portrait" || p.kind === "selfie").length,
       gallery: (data ?? []).filter((p) => p.kind === "gallery").length,
     };
   } else if (!chef) photos = { selfie: 0, gallery: 0 };
@@ -22,7 +23,7 @@ export default async function Perfil() {
         title={chef ? "O seu perfil" : "Crie o seu perfil de chef"}
         description={!chef && "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão."}
       />
-      <ProfileForm chef={chef} photos={photos} userId={session.userId} />
+      <ProfileForm chef={chef} photos={photos} />
     </div>
   );
 }

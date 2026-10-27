@@ -78,7 +78,7 @@ export default async function AdminPage() {
       <section className="flex flex-col gap-4">
         <h2 className="lab m-0 border-b border-line-2 pb-2.5">Chefs por aprovar · {pending.data?.length ?? 0}</h2>
         {(pending.data as PendingChef[] | null)?.map((c) => {
-          const selfie = c.chef_photos.find((p) => p.kind === "selfie");
+          const selfie = c.chef_photos.find((p) => p.kind === "portrait") ?? c.chef_photos.find((p) => p.kind === "selfie");
           const gallery = c.chef_photos.filter((p) => p.kind === "gallery");
           return (
             <article key={c.id} className="box flex flex-wrap gap-6 p-4 md:p-6">

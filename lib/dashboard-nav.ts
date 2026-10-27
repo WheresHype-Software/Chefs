@@ -8,4 +8,5 @@ export const DASHBOARD_NAV: readonly { href: string; label: string }[] = [
   { href: "/dashboard/cozinha", label: "Cozinha e serviços" },
   { href: "/dashboard/avaliacoes", label: "Avaliações" },
   { href: "/dashboard/perfil", label: "Perfil" },
+  { href: "/dashboard/fotos", label: "Fotografias" },
 ];

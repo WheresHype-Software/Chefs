@@ -88,16 +88,94 @@ async function getMyChefFresh(): Promise<string | null> {
   return data?.id ?? null;
 }
 
-export async function addPhoto(url: string, kind: "selfie" | "cover" | "portrait" | "gallery", caption?: string): Promise<Result> {
+// ---------------------------------------------------------------------------
+// Photos: profile photo, verification selfie and captioned dish photos
+// ---------------------------------------------------------------------------
+type PhotoKind = "selfie" | "portrait" | "gallery";
+const PHOTO_KINDS: PhotoKind[] = ["selfie", "portrait", "gallery"];
+const PhotoId = z.string().uuid();
+const BUCKET_PATH = "/storage/v1/object/public/chef-photos/";
+
+/** Storage path of one of our public chef-photos URLs ("<user id>/<file>"). */
+const storagePath = (url: string) => url.slice(url.indexOf(BUCKET_PATH) + BUCKET_PATH.length);
+
+export async function addPhoto(url: string, kind: PhotoKind, caption?: string): Promise<Result> {
   const ctx = await chefContext();
   if (ctx.demo || !ctx.chef) return ok();
   // Only accept files the chef uploaded to their own folder in our bucket.
   const session = await getSession();
-  const prefix = `${publicEnv.supabaseUrl}/storage/v1/object/public/chef-photos/${session.userId}/`;
-  if (!url.startsWith(prefix) || !["selfie", "cover", "portrait", "gallery"].includes(kind)) {
-    return fail("Fotografia inválida.");
+  const prefix = `${publicEnv.supabaseUrl}${BUCKET_PATH}${session.userId}/`;
+  if (!url.startsWith(prefix) || !PHOTO_KINDS.includes(kind)) return fail("Fotografia inválida.");
+
+  const { data: existing } = await ctx.sb.from("chef_photos").select("id, url, kind, sort_order").eq("chef_id", ctx.chef.id);
+  const rows = existing ?? [];
+  // One profile photo and one selfie: a new upload replaces the old file.
+  if (kind !== "gallery") {
+    const old = rows.filter((r) => r.kind === kind);
+    if (old.length) {
+      await ctx.sb
+        .from("chef_photos")
+        .delete()
+        .in(
+          "id",
+          old.map((r) => r.id),
+        );
+      await ctx.sb.storage.from("chef-photos").remove(old.map((r) => storagePath(r.url)));
+    }
   }
-  const { error } = await ctx.sb.from("chef_photos").insert({ chef_id: ctx.chef.id, url, kind, caption: caption?.slice(0, 120) ?? null });
+  const nextOrder = Math.max(-1, ...rows.filter((r) => r.kind === "gallery").map((r) => r.sort_order)) + 1;
+  const { error } = await ctx.sb.from("chef_photos").insert({
+    chef_id: ctx.chef.id,
+    url,
+    kind,
+    caption: caption?.trim().slice(0, 160) || null,
+    sort_order: kind === "gallery" ? nextOrder : 0,
+  });
+  return error ? fail(error.message) : done();
+}
+
+export async function updatePhotoCaption(id: string, caption: string): Promise<Result> {
+  if (!PhotoId.safeParse(id).success) return fail("Fotografia inválida.");
+  const ctx = await chefContext();
+  if (ctx.demo || !ctx.chef) return ok();
+  const { error } = await ctx.sb
+    .from("chef_photos")
+    .update({ caption: caption.trim().slice(0, 160) || null })
+    .eq("id", id)
+    .eq("chef_id", ctx.chef.id);
+  return error ? fail(error.message) : done("/dashboard/fotos");
+}
+
+export async function deletePhoto(id: string): Promise<Result> {
+  if (!PhotoId.safeParse(id).success) return fail("Fotografia inválida.");
+  const ctx = await chefContext();
+  if (ctx.demo || !ctx.chef) return ok();
+  const { data } = await ctx.sb.from("chef_photos").delete().eq("id", id).eq("chef_id", ctx.chef.id).select("url").maybeSingle();
+  if (data) await ctx.sb.storage.from("chef-photos").remove([storagePath(data.url)]);
+  return done();
+}
+
+/** Reorders dish photos: "first" makes it the cover, -1/1 moves it one place. */
+export async function movePhoto(id: string, to: "first" | -1 | 1): Promise<Result> {
+  if (!PhotoId.safeParse(id).success || !["first", -1, 1].includes(to)) return fail("Fotografia inválida.");
+  const ctx = await chefContext();
+  if (ctx.demo || !ctx.chef) return ok();
+  const { data } = await ctx.sb
+    .from("chef_photos")
+    .select("id")
+    .eq("chef_id", ctx.chef.id)
+    .eq("kind", "gallery")
+    .order("sort_order")
+    .order("id");
+  const ids = (data ?? []).map((r) => r.id);
+  const from = ids.indexOf(id);
+  if (from < 0) return fail("Fotografia inválida.");
+  const target = to === "first" ? 0 : Math.min(ids.length - 1, Math.max(0, from + to));
+  ids.splice(target, 0, ...ids.splice(from, 1));
+  const results = await Promise.all(
+    ids.map((pid, i) => ctx.sb.from("chef_photos").update({ sort_order: i }).eq("id", pid).eq("chef_id", ctx.chef!.id)),
+  );
+  const error = results.find((r) => r.error)?.error;
   return error ? fail(error.message) : done();
 }
 
@@ -109,8 +187,14 @@ export async function submitForReview(): Promise<Result> {
     .select("id", { count: "exact", head: true })
     .eq("chef_id", ctx.chef.id)
     .eq("kind", "gallery");
-  const { data: selfie } = await ctx.sb.from("chef_photos").select("id").eq("chef_id", ctx.chef.id).eq("kind", "selfie").limit(1);
-  if (!selfie?.length) return fail("Falta a sua fotografia.");
+  // The profile photo is what the team compares with the dish photos (older accounts sent a selfie).
+  const { data: face } = await ctx.sb
+    .from("chef_photos")
+    .select("id")
+    .eq("chef_id", ctx.chef.id)
+    .in("kind", ["portrait", "selfie"])
+    .limit(1);
+  if (!face?.length) return fail("Falta a fotografia de perfil.");
   if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
   if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail("Indique o Instagram ou o site.");
   const { error } = await ctx.sb.from("chefs").update({ status: "pending" }).eq("id", ctx.chef.id);

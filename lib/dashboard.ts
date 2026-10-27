@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { CUISINES } from "./constants";
 import { isoDay } from "./format";
+import { PHOTOS, photoUrl } from "./photos";
 import { createClient, hasSupabase } from "./supabase/server";
 import type { BookingStatus, FulfilmentMode, PriceModel, ServiceType } from "./types";
 
@@ -226,6 +227,23 @@ export type DashReview = {
   offer_title: string | null;
 };
 
+export type ChefPhoto = { id: string; url: string; kind: "selfie" | "portrait" | "gallery"; caption: string | null };
+
+/** The chef's photos: dish photos in display order (the first is the cover), then profile photo and selfie. */
+export async function getMyPhotos(): Promise<ChefPhoto[]> {
+  const chef = await requireChef();
+  if ((await getSession()).demo) return DEMO_PHOTOS;
+  const sb = await createClient();
+  const { data } = await sb
+    .from("chef_photos")
+    .select("id, url, kind, caption")
+    .eq("chef_id", chef.id)
+    .in("kind", ["selfie", "portrait", "gallery"])
+    .order("sort_order")
+    .order("id");
+  return (data ?? []) as ChefPhoto[];
+}
+
 export async function getReviews(): Promise<DashReview[]> {
   const chef = await requireChef();
   if ((await getSession()).demo) return DEMO_REVIEWS;
@@ -401,6 +419,13 @@ const DEMO_LOGISTICS = {
   })),
   slots: ["10:30–11:30", "12:00–13:00", "17:00–18:00", "19:00–20:00"].map((label, i) => ({ id: `s${i}`, label, active: i !== 3 })),
 };
+
+const DEMO_PHOTOS: ChefPhoto[] = [
+  { id: "00000000-0000-4000-8000-000000000001", url: photoUrl(PHOTOS.spread), kind: "gallery", caption: "Mesa de petiscos para 20" },
+  { id: "00000000-0000-4000-8000-000000000002", url: photoUrl(PHOTOS.grill), kind: "gallery", caption: "Espetadas no carvão" },
+  { id: "00000000-0000-4000-8000-000000000003", url: photoUrl(PHOTOS.table), kind: "gallery", caption: null },
+  { id: "00000000-0000-4000-8000-000000000004", url: photoUrl(PHOTOS.cooking), kind: "portrait", caption: null },
+];
 
 const DEMO_COOKING = {
   categories: CUISINES.map((name, i) => ({ id: i + 1, name })),

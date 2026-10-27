@@ -1,12 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { saveProfile, submitForReview } from "@/app/dashboard/actions";
 import { AddressSearch, type Place } from "@/components/AddressSearch";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
-import { usePhotoUpload } from "@/hooks/usePhotoUpload";
 import { useServerAction } from "@/hooks/useServerAction";
 import type { MyChef } from "@/lib/dashboard";
 import { firstPlace } from "@/lib/geocode";
@@ -165,12 +165,11 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
 }
 
 /** Checklist, photo uploads and "send for review". */
-function Verification({ chef, photos, userId }: { chef: MyChef | null; photos: Photos; userId: string | null }) {
-  const { upload, uploading, message: uploadMessage } = usePhotoUpload(userId);
+function Verification({ chef, photos }: { chef: MyChef | null; photos: Photos }) {
   const submit = useServerAction(submitForReview, { successMessage: "Enviado para revisão. Respondemos por email." });
   const canSubmit = chef?.status === "draft" || chef?.status === "rejected";
   const checklist: [string, boolean][] = [
-    ["Fotografia sua", photos.selfie > 0],
+    ["Fotografia de perfil", photos.selfie > 0],
     ["Instagram ou site", Boolean(chef?.socials.instagram || chef?.socials.website)],
     [`Fotos de pratos (${photos.gallery}/3)`, photos.gallery >= 3],
   ];
@@ -180,8 +179,8 @@ function Verification({ chef, photos, userId }: { chef: MyChef | null; photos: P
       <div className="box flex flex-col gap-3 p-6">
         <h2 className="d m-0 text-2xl font-normal">Verificação</h2>
         <span className="text-sm text-muted">
-          Uma fotografia sua, o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara as fotos antes de o perfil ficar
-          público.
+          Uma fotografia de perfil, o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara as fotos antes de o perfil
+          ficar público.
         </span>
         <ul className="m-0 list-none border-t border-line p-0 text-sm">
           {checklist.map(([label, done]) => (
@@ -191,19 +190,13 @@ function Verification({ chef, photos, userId }: { chef: MyChef | null; photos: P
             </li>
           ))}
         </ul>
-        {chef && (
-          <>
-            <label className={`btn btn-sm btn-o cursor-pointer ${uploading ? "pointer-events-none opacity-60" : ""}`}>
-              {uploading ? "A carregar…" : "Carregar fotografia sua"}
-              <input type="file" accept="image/*" capture="user" className="sr-only" onChange={(e) => upload("selfie", e.target.files)} />
-            </label>
-            <label className={`btn btn-sm btn-o cursor-pointer ${uploading ? "pointer-events-none opacity-60" : ""}`}>
-              Carregar fotos de pratos
-              <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => upload("gallery", e.target.files)} />
-            </label>
-          </>
+        {chef ? (
+          <Link href="/dashboard/fotos" className="btn btn-sm btn-o">
+            Gerir fotografias
+          </Link>
+        ) : (
+          <span className="text-sm text-muted">Guarde o perfil primeiro; depois carregue as fotografias.</span>
         )}
-        <FormMessage message={uploadMessage} />
         <span className="lab mt-2 text-muted">Estado: {STATUS_LABEL[chef?.status ?? "draft"]}</span>
         {chef?.status === "rejected" && chef.verification_notes && <span className="text-sm text-danger">{chef.verification_notes}</span>}
         {canSubmit && (
@@ -220,11 +213,11 @@ function Verification({ chef, photos, userId }: { chef: MyChef | null; photos: P
   );
 }
 
-export function ProfileForm({ chef, photos, userId }: { chef: MyChef | null; photos: Photos; userId: string | null }) {
+export function ProfileForm({ chef, photos }: { chef: MyChef | null; photos: Photos }) {
   return (
     <div className="flex flex-wrap items-start gap-6">
       <ProfileDetails chef={chef} />
-      <Verification chef={chef} photos={photos} userId={userId} />
+      <Verification chef={chef} photos={photos} />
     </div>
   );
 }
