@@ -50,7 +50,7 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
     sb.from("chefs").select("languages, socials, years_experience, payment_methods, deposit_percent").eq("id", card.id).single(),
     sb.from("chef_experience").select("place, role, start_year, end_year").eq("chef_id", card.id).order("start_year"),
     sb.from("chef_certifications").select("title, issuer, verified").eq("chef_id", card.id),
-    sb.from("chef_photos").select("url, caption, kind").eq("chef_id", card.id).eq("kind", "gallery").order("sort_order"),
+    sb.from("chef_photos").select("url, caption, kind").eq("chef_id", card.id).in("kind", ["gallery", "portrait"]).order("sort_order"),
     sb.from("cancellation_policies").select("preset, custom_text").eq("chef_id", card.id).maybeSingle(),
     sb
       .from("reviews")
@@ -79,7 +79,8 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
       years: `${e.start_year ?? ""}–${e.end_year ?? "hoje"}`,
     })),
     certifications: certs.data ?? [],
-    gallery: (photos.data ?? []).map((p) => ({ url: p.url, caption: p.caption ?? "" })),
+    portrait: photos.data?.find((p) => p.kind === "portrait")?.url ?? null,
+    gallery: (photos.data ?? []).filter((p) => p.kind === "gallery").map((p) => ({ url: p.url, caption: p.caption ?? "" })),
     reviews: rv.map((r) => ({
       id: r.id,
       author: r.author_name,

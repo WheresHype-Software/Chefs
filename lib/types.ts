@@ -62,6 +62,8 @@ export type ChefProfile = ChefCard & {
   cancellation: { preset: string; text: string | null } | null;
   experience: { place: string; role: string | null; years: string }[];
   certifications: { title: string; issuer: string | null; verified: boolean }[];
+  /** Public profile photo; initials are shown without one. */
+  portrait: string | null;
   gallery: { url: string | null; caption: string }[];
   reviews: Review[];
   categoryAverages: { label: string; value: number }[];

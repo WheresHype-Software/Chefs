@@ -45,6 +45,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
 
   const photos = chef.gallery.length ? chef.gallery : [{ url: null, caption: "Fotografia" }];
   const tier = tierLabel(chef.tier, chef.isNew, chef.reviewCount, chef.rating);
+  const dishes = chef.gallery.filter((d): d is { url: string; caption: string } => Boolean(d.url));
 
   return (
     <div>
@@ -91,12 +92,18 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-12 px-5 pb-20 pt-7 md:gap-14 md:px-8 md:pt-10">
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-12">
           <div className="flex flex-wrap items-center gap-5 md:gap-6">
-            <div
-              aria-hidden="true"
-              className="flex h-16 w-16 items-center text-[22px] md:h-24 md:w-24 justify-center rounded-full bg-cobalt-soft font-extrabold md:text-[30px] tracking-[-0.03em] text-cobalt"
-            >
-              {initials(chef.name)}
-            </div>
+            {chef.portrait ? (
+              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-cobalt-soft md:h-24 md:w-24">
+                <Photo photo={chef.portrait} alt={`Fotografia de ${chef.name}`} sizes="96px" priority className="h-full w-full" />
+              </div>
+            ) : (
+              <div
+                aria-hidden="true"
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-cobalt-soft text-[22px] font-extrabold tracking-[-0.03em] text-cobalt md:h-24 md:w-24 md:text-[30px]"
+              >
+                {initials(chef.name)}
+              </div>
+            )}
             <div className="flex flex-[1_1_300px] flex-col gap-2">
               <div className="flex flex-wrap gap-2">
                 <span className="lab rounded-[2px] border border-cobalt px-[9px] py-[5px]">{tier}</span>
@@ -187,6 +194,29 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
               ))}
             </div>
           </section>
+
+          {dishes.length > 0 && (
+            <section className="flex flex-col gap-[18px]">
+              <h2 className="d m-0 text-[32px]">Pratos</h2>
+              <ul className="m-0 grid list-none grid-cols-2 gap-x-3 gap-y-5 p-0 md:grid-cols-3 md:gap-x-4">
+                {dishes.map((d, i) => (
+                  <li key={`${d.url}-${i}`}>
+                    <figure className="m-0 flex flex-col gap-2">
+                      <div className="aspect-square overflow-hidden rounded-[10px] bg-paper">
+                        <Photo
+                          photo={d.url}
+                          alt={d.caption || `Prato de ${chef.name}`}
+                          sizes="(min-width: 768px) 20vw, 45vw"
+                          className="h-full w-full"
+                        />
+                      </div>
+                      {d.caption && <figcaption className="text-[14px] leading-snug text-ink-3">{d.caption}</figcaption>}
+                    </figure>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section className="flex flex-col gap-5">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
