@@ -88,24 +88,24 @@ export default function ParaChefs() {
       <Compare />
 
       <section id="ferramenta" className="bg-paper">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-20 md:px-10 md:py-[120px]">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[760px] flex-col gap-4">
-            <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
+            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
           </div>
           <ToolTabs />
         </div>
       </section>
 
-      <section className="mx-auto flex max-w-[1280px] flex-col gap-12 px-5 py-20 md:px-10 md:py-[120px]">
+      <section className="mx-auto flex max-w-[1280px] flex-col gap-12 px-5 py-14 md:px-10 md:py-[120px]">
         <div className="al-rv flex flex-wrap items-end justify-between gap-5">
-          <h2 className="d m-0 max-w-[760px] text-[clamp(38px,6vw,68px)] leading-none">O essencial de quem cozinha por conta própria.</h2>
+          <h2 className="d m-0 max-w-[760px] text-[clamp(32px,6vw,68px)] leading-none">O essencial de quem cozinha por conta própria.</h2>
           <span className="lab text-muted">Grátis no lançamento · Pro mais tarde</span>
         </div>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-line-2">
           {TOOLS.map(([t, d, free]) => (
-            <div key={t} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-7 md:pr-7">
+            <div key={t} className="al-rv flex flex-col gap-1.5 border-b border-line pb-5 pt-5 md:gap-2.5 md:pb-[30px] md:pr-7 md:pt-7">
               <div className="flex items-baseline justify-between gap-3">
-                <span className="d text-2xl leading-[1.15]">{t}</span>
+                <span className="d text-xl leading-[1.15] md:text-2xl">{t}</span>
                 <span className={`lab whitespace-nowrap ${free ? "text-ink" : "text-muted"}`}>{free ? "Grátis" : "Pro"}</span>
               </div>
               <span className="text-[15px] text-muted">{d}</span>
@@ -115,17 +115,17 @@ export default function ParaChefs() {
       </section>
 
       <section id="marketing" className="bg-cobalt-deep text-white">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-20 md:px-10 md:py-[120px]">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
-            <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
+            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
             <p className="m-0 max-w-[600px] text-lg text-[#c9d6ee]">
               Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
             </p>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-white">
             {MKT.map(([t, d]) => (
-              <div key={t} className="al-rv flex flex-col gap-3 border-b border-[#2a4a86] pb-[34px] pt-7">
-                <span className="d text-[26px] leading-[1.12]">{t}</span>
+              <div key={t} className="al-rv flex flex-col gap-2 border-b border-[#2a4a86] pb-6 pt-6 md:gap-3 md:pb-[34px] md:pt-7">
+                <span className="d text-[22px] leading-[1.12] md:text-[26px]">{t}</span>
                 <span className="text-[15px] text-[#c9d6ee]">{d}</span>
               </div>
             ))}
@@ -153,9 +153,9 @@ export default function ParaChefs() {
         </div>
       </section>
 
-      <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-20 md:px-10 md:py-[120px]">
+      <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-14 md:px-10 md:py-[120px]">
         <div className="al-rv flex min-w-0 flex-[1_1_420px] flex-col gap-[18px]">
-          <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">O dinheiro é seu. Todo.</h2>
+          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">O dinheiro é seu. Todo.</h2>
           <p className="m-0 max-w-[520px] text-lg text-ink-3">
             O Ao Lume liga-o ao cliente e organiza a reserva. Preço, sinal e regras de cancelamento são definidos por si, e o cliente
             paga-lhe diretamente.
@@ -176,8 +176,8 @@ export default function ParaChefs() {
       </section>
 
       <section className="border-t border-line">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-20 md:px-10 md:py-[120px]">
-          <h2 className="d al-rv m-0 text-[clamp(38px,6vw,68px)] leading-none">Entrar leva dez minutos.</h2>
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
+          <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Entrar leva dez minutos.</h2>
           <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-line-2 p-0">
             {[
               ["1", "Crie a conta", "Nome, email e o tipo de perfil: profissional ou caseiro."],
@@ -201,9 +201,9 @@ export default function ParaChefs() {
       </section>
 
       <section id="perguntas" className="bg-paper">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap gap-12 px-5 py-20 md:px-10 md:py-[120px]">
+        <div className="mx-auto flex max-w-[1280px] flex-wrap gap-12 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="flex-[1_1_280px]">
-            <h2 className="d al-rv m-0 text-[clamp(38px,6vw,68px)] leading-none">Perguntas</h2>
+            <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Perguntas</h2>
           </div>
           <div className="min-w-0 flex-[2_1_520px] border-t border-line-2">
             {FAQ.map(([q, a]) => (

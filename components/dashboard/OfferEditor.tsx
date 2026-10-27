@@ -39,7 +39,7 @@ function OfferRow({ offer, onEdit }: { offer: DashOffer; onEdit: () => void }) {
           {offer.min_guests}–{offer.max_guests ?? "∞"} · reservar com {offer.lead_time_hours} h · {offer.time_slots.join(", ")}
         </span>
       </div>
-      <div className="flex flex-col items-end justify-between gap-3">
+      <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:flex-col sm:items-end">
         <span className="num font-semibold">
           {offerPriceLabel({ priceModel: offer.price_model, price: offer.price, unit: offer.unit_label })}
         </span>

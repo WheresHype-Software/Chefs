@@ -79,13 +79,13 @@ export default async function AdminPage() {
           const selfie = c.chef_photos.find((p) => p.kind === "selfie");
           const gallery = c.chef_photos.filter((p) => p.kind === "gallery");
           return (
-            <article key={c.id} className="box flex flex-wrap gap-6 p-6">
-              <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-3">
+            <article key={c.id} className="box flex flex-wrap gap-6 p-4 md:p-6">
+              <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-3">
                 <span className="lab text-muted">
                   {TIER_LABEL[c.tier]} · {c.area_name} · desde {new Date(c.created_at).toLocaleDateString("pt-PT")}
                 </span>
                 <span className="d text-[28px] leading-none">{c.display_name}</span>
-                <span className="text-sm">
+                <span className="text-sm [overflow-wrap:anywhere]">
                   {c.socials.instagram && (
                     <a href={`https://instagram.com/${c.socials.instagram.replace("@", "")}`} target="_blank" rel="noopener">
                       {c.socials.instagram}
@@ -105,18 +105,18 @@ export default async function AdminPage() {
                 )}
                 <ChefDecision chefId={c.id} badges={c.badges} />
               </div>
-              <div className="flex flex-[1_1_320px] flex-wrap content-start gap-2">
+              <div className="flex min-w-0 flex-[1_1_280px] flex-wrap content-start gap-2">
                 {selfie ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={selfie.url} alt="Fotografia do chef" className="h-32 w-32 rounded-full object-cover" />
+                  <img src={selfie.url} alt="Fotografia do chef" className="h-24 w-24 rounded-full object-cover sm:h-32 sm:w-32" />
                 ) : (
-                  <span className="flex h-32 w-32 items-center justify-center rounded-full bg-paper text-xs text-danger">
+                  <span className="flex h-24 w-24 items-center sm:h-32 sm:w-32 justify-center rounded-full bg-paper text-xs text-danger">
                     Sem fotografia
                   </span>
                 )}
                 {gallery.map((p) => (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img key={p.url} src={p.url} alt="Prato" className="h-32 w-32 rounded-[2px] object-cover" />
+                  <img key={p.url} src={p.url} alt="Prato" className="h-24 w-24 rounded-[2px] object-cover sm:h-32 sm:w-32" />
                 ))}
               </div>
             </article>

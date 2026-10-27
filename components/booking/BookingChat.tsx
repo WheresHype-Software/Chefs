@@ -12,14 +12,14 @@ type Props = { view: BookingView; title: string; subtitle?: string };
 
 function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
   if (message.sender === "system") {
-    return <div className="self-center rounded-[2px] bg-[#F1EDE6] px-3 py-[5px] text-xs text-muted">{message.body}</div>;
+    return <div className="self-center rounded-[2px] bg-cobalt-soft px-3 py-[5px] text-xs text-muted">{message.body}</div>;
   }
   return (
     <div
       className={`max-w-[75%] rounded-[3px] px-3.5 py-2.5 text-[15px] ${mine ? "self-end bg-cobalt text-white" : "self-start border border-line bg-white"}`}
     >
       {message.body}
-      <span className={`mt-1 block text-[11px] ${mine ? "text-right text-[#CFC8BE]" : "text-muted"}`}>{timeLabel(message.at)}</span>
+      <span className={`mt-1 block text-[11px] ${mine ? "text-right text-[#c9d6ee]" : "text-muted"}`}>{timeLabel(message.at)}</span>
     </div>
   );
 }
@@ -62,13 +62,13 @@ export function BookingChat({ view, title, subtitle }: Props) {
   return (
     <section aria-label="Conversa" className="box flex min-w-0 flex-col overflow-hidden">
       <div className="flex items-center gap-3 border-b border-line px-5 py-4">
-        <span className="h-10 w-10 flex-none rounded-full bg-[#D8CBBB]" aria-hidden="true" />
+        <span className="h-10 w-10 flex-none rounded-full bg-cobalt-soft" aria-hidden="true" />
         <div className="flex flex-col">
           <strong className="font-semibold">{title}</strong>
           {subtitle && <span className="text-[13px] text-ok">{subtitle}</span>}
         </div>
       </div>
-      <div ref={list} className="flex h-[460px] flex-col gap-3 overflow-y-auto bg-[#FCFBF9] p-5" aria-live="polite">
+      <div ref={list} className="flex h-[min(460px,62vh)] flex-col gap-3 overflow-y-auto bg-paper p-4 md:p-5" aria-live="polite">
         {messages.map((m) => (
           <Bubble key={m.id} message={m} mine={m.sender === me} />
         ))}
@@ -85,7 +85,7 @@ export function BookingChat({ view, title, subtitle }: Props) {
           send();
         }}
       >
-        <label className="flex flex-auto">
+        <label className="flex min-w-0 flex-auto">
           <span className="sr-only">Escrever mensagem</span>
           <input
             type="text"
@@ -93,10 +93,10 @@ export function BookingChat({ view, title, subtitle }: Props) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Escreva uma mensagem…"
-            className="flex-auto rounded-[2px] border border-line-2 px-4 py-3 text-[15px] text-ink outline-none focus:border-cobalt"
+            className="w-full min-w-0 flex-auto rounded-[2px] border border-line-2 px-4 py-3 text-base md:text-[15px] text-ink outline-none focus:border-cobalt"
           />
         </label>
-        <button type="submit" className="btn btn-sm" disabled={pending || !draft.trim()}>
+        <button type="submit" className="btn btn-sm shrink-0" disabled={pending || !draft.trim()}>
           Enviar
         </button>
       </form>
