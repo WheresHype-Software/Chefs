@@ -123,7 +123,7 @@ async function ClientHome() {
       {rows.length === 0 ? (
         <div className="box flex flex-col gap-3 p-6">
           <span className="text-muted">Ainda não tem reservas.</span>
-          <Link href="/#mapa" className="btn self-start">
+          <Link href="/procurar" className="btn self-start">
             Encontrar um chef
           </Link>
         </div>

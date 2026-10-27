@@ -13,7 +13,7 @@ const TOOLS: [string, string, boolean][] = [
   ["Chat com clientes", "Uma conversa por reserva, sem perder mensagens.", true],
   ["Ofertas e menus", "Preço fixo, por pessoa ou sob orçamento.", true],
   ["Cancelamento", "Flexível, moderado, rígido ou à sua medida.", true],
-  ["Categorias de cozinha", "Até três, para os clientes o encontrarem no filtro do mapa.", true],
+  ["Categorias de cozinha", "Até três, para os clientes o encontrarem nos filtros da pesquisa.", true],
   ["Deslocações e entregas", "Moradas, raio, zonas, taxas e o percurso do dia.", true],
   ["Levantamentos", "Horários na sua cozinha e código de confirmação.", true],
   ["Sinal por MB WAY", "Peça o sinal sem sair da reserva.", false],
@@ -26,7 +26,7 @@ const TOOLS: [string, string, boolean][] = [
 const MKT = [
   ["Um link para a bio", "aolume.pt/chef/o-seu-nome substitui o formulário e o “manda mensagem”."],
   ["Kit de partilha", "Código QR, imagens para stories e cartões com as suas melhores avaliações."],
-  ["No mapa, perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
+  ["Perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
   ["Avaliações verificadas", "Só quem concluiu uma reserva avalia, e pode responder a cada uma."],
   ["Destaque para quem começa", "Novos talentos aparecem na página inicial nas primeiras semanas."],
   ["Encomendas de época", "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite."],
@@ -35,12 +35,12 @@ const MKT = [
 const FAQ = [
   [
     "Quanto custa?",
-    "No lançamento é gratuito e não há comissão por reserva. Mais tarde haverá um plano Pro opcional, com ferramentas extra e destaque pago no mapa.",
+    "No lançamento é gratuito e não há comissão por reserva. Mais tarde haverá um plano Pro opcional, com ferramentas extra e destaque pago nas pesquisas.",
   ],
   ["Como recebo o pagamento?", "Diretamente do cliente, por MB WAY, transferência ou dinheiro. O Ao Lume não toca no seu dinheiro."],
   [
     "Sou cozinheiro caseiro. Posso entrar?",
-    "Sim. Há perfis de chef profissional e de cozinheiro caseiro, e todos são revistos pela nossa equipa antes de aparecerem no mapa.",
+    "Sim. Há perfis de chef profissional e de cozinheiro caseiro, e todos são revistos pela nossa equipa antes de aparecerem nas pesquisas.",
   ],
   [
     "Preciso de licenças?",
@@ -141,7 +141,7 @@ export default function ParaChefs() {
               <div className="flex flex-col gap-2 bg-cobalt-deep p-[26px]">
                 <span className="lab text-[#c9d6ee]">5 reservas · 4,5 ou mais</span>
                 <span className="d text-[30px]">Chef em ascensão</span>
-                <span className="text-sm text-[#c9d6ee]">Sobe no mapa para os clientes da sua zona.</span>
+                <span className="text-sm text-[#c9d6ee]">Sobe nas pesquisas dos clientes da sua zona.</span>
               </div>
               <div className="flex flex-col gap-2 bg-white p-[26px] text-ink">
                 <span className="lab text-muted">25 reservas · 4,7 ou mais</span>
@@ -182,7 +182,7 @@ export default function ParaChefs() {
             {[
               ["1", "Crie a conta", "Nome, email e o tipo de perfil: profissional ou caseiro."],
               ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
-              ["3", "Aprovação", "A nossa equipa revê cada perfil antes de entrar no mapa."],
+              ["3", "Aprovação", "A nossa equipa revê cada perfil antes de ficar público."],
               ["4", "Partilhe o link", "Ponha aolume.pt/chef/o-seu-nome na bio e receba pedidos."],
             ].map(([n, t, d]) => (
               <li key={n} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-[26px]">

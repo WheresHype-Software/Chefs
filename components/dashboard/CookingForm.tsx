@@ -48,7 +48,7 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
               {cats.items.length} de {MAX_CATEGORIES}
             </span>
           </div>
-          <span className="text-sm text-muted">Escolha até três. Os clientes filtram o mapa por estas categorias.</span>
+          <span className="text-sm text-muted">Escolha até três. Os clientes filtram a pesquisa por estas categorias.</span>
           <div className="flex flex-wrap gap-1.5">
             {categories.map((c) => (
               <Chip key={c.id} pressed={cats.has(c.id)} disabled={!cats.has(c.id) && !cats.canAdd} onClick={() => cats.toggle(c.id)}>
@@ -84,9 +84,9 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
       </div>
 
       <aside className="flex min-w-0 flex-[2_1_300px] flex-col gap-3.5">
-        <span className="lab text-muted">Como aparece no mapa</span>
+        <span className="lab text-muted">Como aparece na pesquisa</span>
         <div className="box flex gap-3.5 p-2.5">
-          <span className="h-[150px] flex-[0_0_88px] rounded-[2px] bg-[#ECE9E3]" aria-hidden="true" />
+          <span className="h-[150px] flex-[0_0_88px] rounded-[2px] bg-cobalt-soft" aria-hidden="true" />
           <span className="flex min-w-0 flex-col gap-[3px] py-1 pr-1">
             <span className="lab text-muted">{preview.tier}</span>
             <span className="d text-[22px] leading-[1.1]">{preview.name}</span>
@@ -99,7 +99,7 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
             </span>
           </span>
         </div>
-        <span className="text-[13px] text-muted">As alterações aparecem no mapa assim que guardar.</span>
+        <span className="text-[13px] text-muted">As alterações aparecem na pesquisa assim que guardar.</span>
         <button type="button" className="btn" disabled={pending} onClick={() => run(cats.items, chosenDiets.items, services.items)}>
           Guardar alterações
         </button>

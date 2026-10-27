@@ -33,7 +33,7 @@ export async function reviewChef(chefId: string, decision: Decision, note: strin
       subject: decision === "approved" ? "O seu perfil Ao Lume foi aprovado" : "O seu perfil Ao Lume precisa de alterações",
       text:
         decision === "approved"
-          ? `Olá ${data?.display_name},\n\nO seu perfil já está no mapa: ${siteUrl(`/chef/${data?.slug}`)}\nPartilhe o link na bio do Instagram.\n\nAo Lume`
+          ? `Olá ${data?.display_name},\n\nO seu perfil já está publicado: ${siteUrl(`/chef/${data?.slug}`)}\nPartilhe o link na bio do Instagram.\n\nAo Lume`
           : `Olá ${data?.display_name},\n\nRevimos o seu perfil e precisamos de algumas alterações:\n${note}\n\nAtualize em ${siteUrl("/dashboard/perfil")} e volte a enviar.\n\nAo Lume`,
     });
   }

@@ -49,7 +49,7 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
 
   function save() {
     if (!place) {
-      setMessage({ ok: false, text: "Escolha a sua zona na lista para o colocarmos no mapa." });
+      setMessage({ ok: false, text: "Escolha a sua zona na lista para o mostrarmos a clientes perto de si." });
       return;
     }
     run({
@@ -125,7 +125,7 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
             placeholder="Bairro ou freguesia"
             inputClassName="w-full"
           />
-          <span className="hint">No mapa aparece a zona, nunca a sua morada.</span>
+          <span className="hint">Os clientes veem a zona, nunca a sua morada.</span>
         </div>
         <Field label="Raio de serviço (km)">
           <input
@@ -175,8 +175,8 @@ function Verification({ chef, photos, userId }: { chef: MyChef | null; photos: P
       <div className="box flex flex-col gap-3 p-6">
         <h2 className="d m-0 text-2xl font-normal">Verificação</h2>
         <span className="text-sm text-muted">
-          Uma fotografia sua, o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara as fotos antes de o perfil entrar no
-          mapa.
+          Uma fotografia sua, o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara as fotos antes de o perfil ficar
+          público.
         </span>
         <ul className="m-0 list-none border-t border-line p-0 text-sm">
           {checklist.map(([label, done]) => (

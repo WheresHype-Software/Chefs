@@ -191,7 +191,7 @@ export function ToolTabs() {
           {tab === 0 && (
             <div key="t0" className="al-in overflow-hidden rounded-[3px] border border-line">
               <div className="border-b border-line bg-paper px-3.5 py-2.5 text-[13px] text-ink-3">aolume.pt/chef/marta-figueiredo</div>
-              <div className="h-[120px] bg-[#ECE8E1]" />
+              <div className="h-[120px] bg-cobalt-soft" />
               <div className="flex flex-col gap-1.5 p-[18px]">
                 <span className="lab text-muted">Profissional · Campo de Ourique</span>
                 <span className="d text-[28px]">Marta Figueiredo</span>

@@ -17,7 +17,7 @@ export default async function EntrarPage({ searchParams }: PageProps<"/entrar">)
           <h1 className="d m-0 text-[clamp(40px,6vw,64px)] leading-none">{asChef ? "Crie o seu perfil de chef." : "Entrar no Ao Lume."}</h1>
           <p className="m-0 max-w-[460px] text-ink-3">
             {asChef
-              ? "Conta, fotografia, Instagram ou site e três fotos de pratos. A nossa equipa revê cada perfil antes de aparecer no mapa."
+              ? "Conta, fotografia, Instagram ou site e três fotos de pratos. A nossa equipa revê cada perfil antes de aparecer nas pesquisas."
               : "Clientes não precisam de conta para pedir uma reserva: o link no email abre o pedido e a conversa. A conta guarda o histórico e os chefs favoritos."}
           </p>
           {sp.erro === "link" && (

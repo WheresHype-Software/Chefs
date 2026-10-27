@@ -164,7 +164,7 @@ function OfferForm({ offer, onDone }: { offer: DashOffer; onDone: () => void }) 
       </div>
       <label className="flex items-center gap-3 text-sm">
         <input type="checkbox" checked={o.active} onChange={(e) => set("active", e.target.checked)} className="accent-ink" />
-        Visível no perfil e no mapa
+        Visível no perfil e nas pesquisas
       </label>
       <FormMessage message={save.message ?? remove.message} />
       <div className="flex flex-wrap gap-2">

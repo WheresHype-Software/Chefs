@@ -98,7 +98,7 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
           </SettingRow>
         </div>
         <span className="text-[13px] text-muted">
-          Aparece no mapa a clientes até {s.travel_radius_km} km de {area}
+          Aparece a clientes até {s.travel_radius_km} km de {area}
           {s.travel_radius_km > s.free_distance_km
             ? `, com taxa de deslocação a partir dos ${s.free_distance_km} km.`
             : ", sem taxa de deslocação."}

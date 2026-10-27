@@ -93,7 +93,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
           <span className="text-[15px] font-medium text-muted">Pedido n.º {b.ref}</span>
           <p className="m-0 max-w-[640px] text-muted">{intro[b.status]}</p>
           {ended && (
-            <Link href="/#mapa" className="btn btn-o mt-2 self-start">
+            <Link href="/procurar" className="btn btn-o mt-2 self-start">
               Procurar outro chef
             </Link>
           )}

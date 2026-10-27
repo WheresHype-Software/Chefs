@@ -89,14 +89,14 @@ export function AgendaGrid({
             const state: DayState = bookedSet.has(iso) ? "booked" : days[iso];
             const past = iso < today;
             const style = past
-              ? "border-transparent text-[#A9A59E]"
+              ? "border-transparent text-faint"
               : state === "booked"
                 ? "bg-cobalt text-white border-cobalt"
                 : state === "available"
                   ? "border-line-3 font-semibold"
                   : state === "blocked"
                     ? "text-faint line-through border-transparent"
-                    : "border-transparent text-[#A9A59E]";
+                    : "border-transparent text-faint";
             return (
               <button
                 key={iso}

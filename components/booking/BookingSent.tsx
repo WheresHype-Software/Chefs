@@ -21,7 +21,7 @@ export function BookingSent({ chefFirstName, email, summary, link, onClose }: Pr
       </Link>
       {onClose && (
         <button type="button" className="btn btn-o" onClick={onClose}>
-          Voltar ao mapa
+          Voltar aos resultados
         </button>
       )}
     </div>
