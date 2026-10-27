@@ -6,7 +6,7 @@ import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking
 import { sendEmail, siteUrl } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { failInvalid } from "@/lib/result";
-import { createClient, hasSupabase } from "@/lib/supabase/server";
+import { createAnonClient, createClient, hasSupabase } from "@/lib/supabase/server";
 
 const BookingInput = z.object({
   offerId: z.string().min(1),
@@ -34,7 +34,18 @@ const BOOKING_LABELS: Record<string, string> = {
   notes: "Notas para o chef",
 };
 
-export type BookingResult = { ok: true; bookingId: string; ref: string; link: string } | { ok: false; error: string };
+export type BookingResult =
+  | {
+      ok: true;
+      bookingId: string;
+      ref: string;
+      link: string;
+      /** Full link with the guest token: the way back to the booking without an account. */
+      privateLink: string;
+      /** Whether the confirmation email actually went out. */
+      emailed: boolean;
+    }
+  | { ok: false; error: string };
 
 const RPC_ERRORS: Record<string, string> = {
   invalid_email: "O email não parece válido.",
@@ -59,7 +70,7 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
 
   if (!hasSupabase) {
     // Demo mode: nothing is stored, the status page shows an example booking.
-    return { ok: true, bookingId: "demo", ref: "AL-DEMO", link: "/reserva/demo" };
+    return { ok: true, bookingId: "demo", ref: "AL-DEMO", link: "/reserva/demo", privateLink: siteUrl("/reserva/demo"), emailed: false };
   }
 
   const sb = await createClient();
@@ -88,7 +99,7 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   const link = `/reserva/${r.bookingId}`;
   const emailLink = `${link}?t=${r.token}`;
   // The booking exists from here on: email problems are logged, never shown as a failed request.
-  await sendEmail({
+  const emailed = await sendEmail({
     to: b.email,
     subject: `Pedido ${r.ref} enviado a ${r.chefName}`,
     text:
@@ -96,9 +107,12 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
       `O seu pedido foi enviado a ${r.chefName}. O chef tem 48 horas para responder.\n\n` +
       `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(emailLink)}\n\n` +
       `Ainda não paga nada: o pagamento é combinado diretamente com o chef.\n\nAo Lume`,
-  }).catch((err) => console.error("[action] requestBooking client email:", err));
+  }).catch((err) => {
+    console.error("[action] requestBooking client email:", err);
+    return false;
+  });
   await notifyChef(r.bookingId, r.ref, b).catch((err) => console.error("[action] requestBooking chef email:", err));
-  return { ok: true, bookingId: r.bookingId, ref: r.ref, link };
+  return { ok: true, bookingId: r.bookingId, ref: r.ref, link, privateLink: siteUrl(emailLink), emailed };
 }
 
 async function notifyChef(bookingId: string, ref: string, b: z.infer<typeof BookingInput>) {
@@ -115,4 +129,36 @@ async function notifyChef(bookingId: string, ref: string, b: z.infer<typeof Book
       (b.notes ? `\nNotas: ${b.notes}\n` : "") +
       `\nResponda em 48 horas: ${siteUrl(`/dashboard/pedidos/${bookingId}`)}\n\nAo Lume`,
   });
+}
+
+const LookupInput = z.object({
+  ref: z.string().trim().min(3).max(40),
+  email: z.string().trim().email(),
+});
+
+export type LookupResult = { ok: true; link: string } | { ok: false; error: string };
+
+/** "Acompanhar pedido": booking number + email → a fresh guest token in this browser → the booking page. */
+export async function findGuestBooking(input: z.infer<typeof LookupInput>): Promise<LookupResult> {
+  const parsed = LookupInput.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.path[0] === "email" ? "O email não parece válido." : "Indique o número do pedido." };
+  }
+  if (!hasSupabase) return { ok: true, link: "/reserva/demo" };
+  // People type "1027-0482", "al 1027 0482" or "AL-1027-0482": normalise to the stored form.
+  const digits = parsed.data.ref
+    .toUpperCase()
+    .replace(/^AL/, "")
+    .replace(/[^0-9]/g, "");
+  const ref = digits.length === 8 ? `AL-${digits.slice(0, 4)}-${digits.slice(4)}` : parsed.data.ref.toUpperCase();
+  const { data, error } = await createAnonClient().rpc("find_guest_booking", { p_ref: ref, p_email: parsed.data.email });
+  if (error) {
+    if (error.message.includes("too_many_attempts")) return { ok: false, error: "Demasiadas tentativas. Tente de novo daqui a uma hora." };
+    console.error("[action] findGuestBooking:", error);
+    return { ok: false, error: "Não foi possível procurar o pedido. Tente de novo dentro de momentos." };
+  }
+  const found = data as { bookingId: string; token: string } | null;
+  if (!found) return { ok: false, error: "Não encontrámos um pedido com esse número e esse email." };
+  (await cookies()).set(bookingTokenCookieName(found.bookingId), found.token, bookingTokenCookieOptions(found.bookingId));
+  return { ok: true, link: `/reserva/${found.bookingId}` };
 }

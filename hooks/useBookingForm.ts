@@ -8,7 +8,7 @@ import { useMonthCalendar, type MonthCalendarData } from "@/hooks/useMonthCalend
 import type { ChefCard } from "@/lib/types";
 
 export type Contact = { name: string; email: string; phone: string; notes: string };
-export type SentBooking = { ref: string; link: string };
+export type SentBooking = { id: string; ref: string; link: string; privateLink: string; emailed: boolean };
 
 const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
@@ -75,7 +75,8 @@ export function useBookingForm(
           ...(needsAddress ? { address, lat: place?.lat, lng: place?.lng } : {}),
         }),
       );
-      if (result.ok) setSent({ ref: result.ref, link: result.link });
+      if (result.ok)
+        setSent({ id: result.bookingId, ref: result.ref, link: result.link, privateLink: result.privateLink, emailed: result.emailed });
       else setError(result.error);
     });
   }

@@ -32,9 +32,11 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
   if (form.sent) {
     return (
       <BookingSent
+        booking={form.sent}
         chefFirstName={chefFirst}
+        chefName={chef.name}
+        date={form.day!}
         email={contact.email}
-        link={form.sent.link}
         onClose={onClose}
         summary={[
           ["Pedido", form.sent.ref],

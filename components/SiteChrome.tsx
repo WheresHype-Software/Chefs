@@ -17,6 +17,7 @@ type NavItem = { href: string; label: string };
 const CLIENT_NAV: NavItem[] = [
   { href: "/procurar", label: "Procurar chefs" },
   { href: "/#como", label: "Como funciona" },
+  { href: "/pedido", label: "Acompanhar pedido" },
   { href: "/para-chefs", label: "Sou chef" },
 ];
 
@@ -100,6 +101,9 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           </Link>
           <Link href="/#como" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
             Como funciona
+          </Link>
+          <Link href="/pedido" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
+            Acompanhar pedido
           </Link>
           <Link href="/entrar" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
             Entrar
