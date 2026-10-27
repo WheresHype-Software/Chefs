@@ -70,7 +70,10 @@ export async function clientAction(id: string, action: z.infer<typeof ClientActi
 const ChefUpdateInput = z.object({
   status: z.enum(["accepted", "declined", "change_proposed", "confirmed", "completed", "cancelled"]),
   decline_reason: z.string().trim().max(500).optional(),
-  proposed_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  proposed_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   proposed_time: z.string().trim().max(40).optional(),
   quoted_price: z.number().finite().min(0).max(100000).optional(),
 });

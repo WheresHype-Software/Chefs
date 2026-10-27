@@ -108,7 +108,11 @@ export function AddressSearch({ value, onChange, onSelect, placeholder, classNam
         />
       </label>
       {open && (
-        <ul id={listId} role="listbox" className="absolute left-0 right-0 top-full z-20 mt-1 border border-line bg-white shadow-[0_18px_40px_rgba(17,17,16,.12)]">
+        <ul
+          id={listId}
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-20 mt-1 border border-line bg-white shadow-[0_18px_40px_rgba(17,17,16,.12)]"
+        >
           {items.map((p, i) => (
             <li
               key={`${p.lat},${p.lng},${i}`}

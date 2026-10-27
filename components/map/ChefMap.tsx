@@ -44,7 +44,8 @@ function restyle(map: MLMap) {
     try {
       if (layer.type === "background") map.setPaintProperty(layer.id, "background-color", "#F1F0EC");
       if (layer.id.startsWith("water") && layer.type === "fill") map.setPaintProperty(layer.id, "fill-color", "#E1E5E7");
-      if (/park|landcover_wood|landuse_park/.test(layer.id) && layer.type === "fill") map.setPaintProperty(layer.id, "fill-color", "#E4E7E0");
+      if (/park|landcover_wood|landuse_park/.test(layer.id) && layer.type === "fill")
+        map.setPaintProperty(layer.id, "fill-color", "#E4E7E0");
       if (layer.type === "line" && /highway|road/.test(layer.id)) map.setPaintProperty(layer.id, "line-color", "#FBFBF9");
       if (layer.type === "symbol") map.setPaintProperty(layer.id, "text-color", "#76726B");
     } catch {

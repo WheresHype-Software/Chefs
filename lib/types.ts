@@ -2,15 +2,7 @@ export type ServiceType = "home" | "delivery" | "pickup" | "events" | "meal_prep
 export type FulfilmentMode = "home" | "delivery" | "pickup";
 export type PriceModel = "fixed" | "per_person" | "quote";
 export type ChefTier = "professional" | "home";
-export type BookingStatus =
-  | "requested"
-  | "accepted"
-  | "change_proposed"
-  | "declined"
-  | "confirmed"
-  | "completed"
-  | "cancelled"
-  | "expired";
+export type BookingStatus = "requested" | "accepted" | "change_proposed" | "declined" | "confirmed" | "completed" | "cancelled" | "expired";
 
 export type Offer = {
   id: string;
@@ -99,7 +91,15 @@ export type BookingView = {
     pickup_code: string | null;
     created_at: string;
   };
-  chef: { id: string; slug: string; name: string; area: string | null; responseHours: number | null; paymentMethods: string[]; depositPercent: number | null };
+  chef: {
+    id: string;
+    slug: string;
+    name: string;
+    area: string | null;
+    responseHours: number | null;
+    paymentMethods: string[];
+    depositPercent: number | null;
+  };
   client: { name: string | null; email: string; phone: string | null };
   policy: { preset: string; text: string | null } | null;
   pickupAddress: string | null;

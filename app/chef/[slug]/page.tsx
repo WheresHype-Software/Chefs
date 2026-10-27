@@ -70,7 +70,10 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-14 px-5 pb-20 pt-10 md:px-8">
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-12">
           <div className="flex flex-wrap items-center gap-6">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full text-[11px] text-muted" style={{ background: toneFor(chef.slug) }}>
+            <div
+              className="flex h-28 w-28 items-center justify-center rounded-full text-[11px] text-muted"
+              style={{ background: toneFor(chef.slug) }}
+            >
               [Retrato]
             </div>
             <div className="flex flex-[1_1_300px] flex-col gap-2">
@@ -167,7 +170,9 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
           <section className="flex flex-col gap-5">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="d m-0 text-[32px]">
-                {chef.reviewCount ? `${rating(chef.rating, chef.reviewCount).replace(/\(.*\)/, "")}· ${chef.reviewCount} avaliações` : "Avaliações"}
+                {chef.reviewCount
+                  ? `${rating(chef.rating, chef.reviewCount).replace(/\(.*\)/, "")}· ${chef.reviewCount} avaliações`
+                  : "Avaliações"}
               </h2>
               <span className="text-sm text-muted">Só clientes com reserva concluída podem avaliar</span>
             </div>
@@ -192,9 +197,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
                   <article key={r.id} className="flex flex-col gap-3 rounded-[3px] border border-line p-[22px]">
                     <div className="flex justify-between gap-3 text-sm">
                       <strong className="font-semibold">{r.author}</strong>
-                      <span className="text-muted">
-                        {new Date(r.date).toLocaleDateString("pt-PT", { month: "long", year: "numeric" })}
-                      </span>
+                      <span className="text-muted">{new Date(r.date).toLocaleDateString("pt-PT", { month: "long", year: "numeric" })}</span>
                     </div>
                     {r.what && <span className="text-[13px] text-muted">{r.what}</span>}
                     {r.comment && <p className="m-0">{r.comment}</p>}

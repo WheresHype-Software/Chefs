@@ -54,7 +54,9 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
     sb.from("cancellation_policies").select("preset, custom_text").eq("chef_id", card.id).maybeSingle(),
     sb
       .from("reviews")
-      .select("id, author_name, created_at, comment, overall, chef_reply, food, presentation, punctuality, communication, value, bookings(offer_title, guests)")
+      .select(
+        "id, author_name, created_at, comment, overall, chef_reply, food, presentation, punctuality, communication, value, bookings(offer_title, guests)",
+      )
       .eq("chef_id", card.id)
       .order("created_at", { ascending: false })
       .limit(20),

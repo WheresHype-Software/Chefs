@@ -33,11 +33,23 @@ const MKT = [
 ];
 
 const FAQ = [
-  ["Quanto custa?", "No lançamento é gratuito e não há comissão por reserva. Mais tarde haverá um plano Pro opcional, com ferramentas extra e destaque pago no mapa."],
+  [
+    "Quanto custa?",
+    "No lançamento é gratuito e não há comissão por reserva. Mais tarde haverá um plano Pro opcional, com ferramentas extra e destaque pago no mapa.",
+  ],
   ["Como recebo o pagamento?", "Diretamente do cliente, por MB WAY, transferência ou dinheiro. O Ao Lume não toca no seu dinheiro."],
-  ["Sou cozinheiro caseiro. Posso entrar?", "Sim. Há perfis de chef profissional e de cozinheiro caseiro, e todos são revistos pela nossa equipa antes de aparecerem no mapa."],
-  ["Preciso de licenças?", "Cada chef é responsável pelas regras da sua atividade, como a formação em HACCP e a declaração de atividade nas Finanças. Vamos publicar um guia para ajudar."],
-  ["E se um cliente cancelar?", "Define a sua política de cancelamento: flexível, moderada, rígida ou à sua medida. O cliente vê-a antes de pedir."],
+  [
+    "Sou cozinheiro caseiro. Posso entrar?",
+    "Sim. Há perfis de chef profissional e de cozinheiro caseiro, e todos são revistos pela nossa equipa antes de aparecerem no mapa.",
+  ],
+  [
+    "Preciso de licenças?",
+    "Cada chef é responsável pelas regras da sua atividade, como a formação em HACCP e a declaração de atividade nas Finanças. Vamos publicar um guia para ajudar.",
+  ],
+  [
+    "E se um cliente cancelar?",
+    "Define a sua política de cancelamento: flexível, moderada, rígida ou à sua medida. O cliente vê-a antes de pedir.",
+  ],
 ];
 
 export default function ParaChefs() {
@@ -57,7 +69,8 @@ export default function ParaChefs() {
           </h1>
           <span className="al-line block h-px w-[120px] bg-ink" aria-hidden="true" />
           <p className="al-in m-0 max-w-[500px] text-lg text-ink-3" style={{ animationDelay: "180ms" }}>
-            Troque o Google Forms, as mensagens no Instagram e o caderno de encomendas por uma página de reservas com calendário, chat e avaliações.
+            Troque o Google Forms, as mensagens no Instagram e o caderno de encomendas por uma página de reservas com calendário, chat e
+            avaliações.
           </p>
           <div className="al-in flex flex-wrap gap-2.5" style={{ animationDelay: "260ms" }}>
             <Link href="/entrar?chef=1" className="btn">
@@ -109,7 +122,9 @@ export default function ParaChefs() {
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
             <span className="lab text-[#BDB9B1]">Marketing que trabalha por si</span>
             <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
-            <p className="m-0 max-w-[600px] text-lg text-[#BDB9B1]">Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.</p>
+            <p className="m-0 max-w-[600px] text-lg text-[#BDB9B1]">
+              Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
+            </p>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-white">
             {MKT.map(([n, t, d]) => (
@@ -148,7 +163,8 @@ export default function ParaChefs() {
           <span className="lab text-muted">Sem comissões</span>
           <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">O dinheiro é seu. Todo.</h2>
           <p className="m-0 max-w-[520px] text-lg text-ink-3">
-            O Ao Lume liga-o ao cliente e organiza a reserva. Preço, sinal e regras de cancelamento são definidos por si, e o cliente paga-lhe diretamente.
+            O Ao Lume liga-o ao cliente e organiza a reserva. Preço, sinal e regras de cancelamento são definidos por si, e o cliente
+            paga-lhe diretamente.
           </p>
         </div>
         <div className="al-rv grid min-w-0 flex-[1_1_420px] grid-cols-[repeat(auto-fit,minmax(min(190px,100%),1fr))] border-t border-ink">
@@ -195,7 +211,10 @@ export default function ParaChefs() {
               <details key={q} className="group border-b border-line-2 py-[18px]">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
                   <span className="d text-[22px] leading-[1.2]">{q}</span>
-                  <span aria-hidden="true" className="text-2xl font-light leading-none transition-transform duration-300 group-open:rotate-45">
+                  <span
+                    aria-hidden="true"
+                    className="text-2xl font-light leading-none transition-transform duration-300 group-open:rotate-45"
+                  >
                     +
                   </span>
                 </summary>

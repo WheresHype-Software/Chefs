@@ -16,7 +16,8 @@ export const hasSupabase = Boolean(supabaseUrl && supabaseKey);
 
 /** Typed accessor for the Supabase config; only call it after checking hasSupabase. */
 export function supabaseConfig(): { url: string; key: string } {
-  if (!supabaseUrl || !supabaseKey) throw new Error("Supabase is not configured (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).");
+  if (!supabaseUrl || !supabaseKey)
+    throw new Error("Supabase is not configured (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).");
   return { url: supabaseUrl, key: supabaseKey };
 }
 

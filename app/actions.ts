@@ -29,9 +29,7 @@ const BookingInput = z.object({
   notes: z.string().trim().max(2000).optional(),
 });
 
-export type BookingResult =
-  | { ok: true; bookingId: string; ref: string; link: string }
-  | { ok: false; error: string };
+export type BookingResult = { ok: true; bookingId: string; ref: string; link: string } | { ok: false; error: string };
 
 const RPC_ERRORS: Record<string, string> = {
   invalid_email: "O email não parece válido.",
@@ -96,11 +94,7 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
 async function notifyChef(bookingId: string, ref: string, b: z.infer<typeof BookingInput>) {
   const admin = createAdminClient();
   if (!admin) return;
-  const { data } = await admin
-    .from("bookings")
-    .select("offer_title, chefs(display_name, profiles(email))")
-    .eq("id", bookingId)
-    .single();
+  const { data } = await admin.from("bookings").select("offer_title, chefs(display_name, profiles(email))").eq("id", bookingId).single();
   const chef = data?.chefs as unknown as { display_name: string; profiles: { email: string } | null } | null;
   if (!chef?.profiles?.email) return;
   await sendEmail({

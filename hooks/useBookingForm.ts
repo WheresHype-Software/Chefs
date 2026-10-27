@@ -13,7 +13,12 @@ const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min)
 
 /** All state and rules of the booking request form; the components only render it. */
 export function useBookingForm(chef: ChefCard, options: { initialOfferId?: string; initialAddress?: Place | null } = {}) {
-  const [offerIndex, setOfferIndex] = useState(() => Math.max(0, chef.offers.findIndex((o) => o.id === options.initialOfferId)));
+  const [offerIndex, setOfferIndex] = useState(() =>
+    Math.max(
+      0,
+      chef.offers.findIndex((o) => o.id === options.initialOfferId),
+    ),
+  );
   const offer = chef.offers[offerIndex]!;
   const calendar = useMonthCalendar(chef.id);
   const [day, setDay] = useState<string | null>(null);

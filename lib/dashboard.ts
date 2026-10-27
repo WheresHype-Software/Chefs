@@ -141,14 +141,20 @@ export async function getOffers(): Promise<DashOffer[]> {
   const sb = await createClient();
   const { data } = await sb
     .from("offers")
-    .select("id, title, description, fulfilment_mode, price_model, price, unit_label, min_guests, max_guests, lead_time_hours, time_slots, active")
+    .select(
+      "id, title, description, fulfilment_mode, price_model, price, unit_label, min_guests, max_guests, lead_time_hours, time_slots, active",
+    )
     .eq("chef_id", chef.id)
     .order("sort_order")
     .order("created_at");
   return (data ?? []) as DashOffer[];
 }
 
-export async function getLogistics(): Promise<{ logistics: Logistics; zones: { id: string; name: string; active: boolean }[]; slots: { id: string; label: string; active: boolean }[] }> {
+export async function getLogistics(): Promise<{
+  logistics: Logistics;
+  zones: { id: string; name: string; active: boolean }[];
+  slots: { id: string; label: string; active: boolean }[];
+}> {
   const chef = await requireChef();
   if ((await getSession()).demo) return DEMO_LOGISTICS;
   const sb = await createClient();
@@ -158,7 +164,12 @@ export async function getLogistics(): Promise<{ logistics: Logistics; zones: { i
     sb.from("pickup_slots").select("id, label, active").eq("chef_id", chef.id).order("label"),
   ]);
   return {
-    logistics: (l.data as Logistics) ?? { ...DEMO_LOGISTICS.logistics, kitchen_address: null, delivery_enabled: false, pickup_enabled: false },
+    logistics: (l.data as Logistics) ?? {
+      ...DEMO_LOGISTICS.logistics,
+      kitchen_address: null,
+      delivery_enabled: false,
+      pickup_enabled: false,
+    },
     zones: z.data ?? [],
     slots: p.data ?? [],
   };
@@ -290,21 +301,81 @@ function demoBookings(): DashBooking[] {
     ...extra,
   });
   return [
-    mk("r1", 5, "requested", "home", "20:00", "Sofia Ramos", "Chef em casa", 6, { notes: "É o aniversário da minha mãe. Uma pessoa vegetariana, alergia a frutos secos." }),
-    mk("r2", 9, "requested", "delivery", "13:00", "Rita Gomes", "Mesa de petiscos", 20, { notes: "Montagem da mesa às 13:00, festa às 13:30." }),
-    mk("b1", 1, "confirmed", "delivery", "12:30", "Atelier Norte", "Mesa de petiscos", 12, { notes: "Entrar pela porta lateral. Pedem talheres descartáveis.", distance_km: 2.1 }),
-    mk("b2", 3, "confirmed", "pickup", "17:30", "Joana Reis", "Caixa de petiscos", 4, { notes: "Pediu para separar os pastéis de bacalhau.", pickup_code: "3307" }),
-    mk("b3", 4, "accepted", "home", "18:30", "Hugo e Rita", "Chef em casa", 2, { notes: "Jantar de aniversário de namoro. Placa a gás, sem forno.", distance_km: 5.6 }),
-    mk("b4", 6, "confirmed", "pickup", "11:00", "Miguel Antunes", "Caixa de petiscos", 6, { notes: "Vem de bicicleta, prefere tudo em caixas fechadas." }),
-    mk("b5", 6, "confirmed", "delivery", "15:30", "Hugo Faria", "Mesa de petiscos", 8, { notes: "Deixar na portaria se não atenderem.", distance_km: 2.4 }),
-    mk("b6", 6, "confirmed", "home", "18:00", "Sofia Ramos", "Chef em casa", 6, { notes: "Placa de indução e forno. Estacionamento EMEL na rua.", distance_km: 4.8 }),
+    mk("r1", 5, "requested", "home", "20:00", "Sofia Ramos", "Chef em casa", 6, {
+      notes: "É o aniversário da minha mãe. Uma pessoa vegetariana, alergia a frutos secos.",
+    }),
+    mk("r2", 9, "requested", "delivery", "13:00", "Rita Gomes", "Mesa de petiscos", 20, {
+      notes: "Montagem da mesa às 13:00, festa às 13:30.",
+    }),
+    mk("b1", 1, "confirmed", "delivery", "12:30", "Atelier Norte", "Mesa de petiscos", 12, {
+      notes: "Entrar pela porta lateral. Pedem talheres descartáveis.",
+      distance_km: 2.1,
+    }),
+    mk("b2", 3, "confirmed", "pickup", "17:30", "Joana Reis", "Caixa de petiscos", 4, {
+      notes: "Pediu para separar os pastéis de bacalhau.",
+      pickup_code: "3307",
+    }),
+    mk("b3", 4, "accepted", "home", "18:30", "Hugo e Rita", "Chef em casa", 2, {
+      notes: "Jantar de aniversário de namoro. Placa a gás, sem forno.",
+      distance_km: 5.6,
+    }),
+    mk("b4", 6, "confirmed", "pickup", "11:00", "Miguel Antunes", "Caixa de petiscos", 6, {
+      notes: "Vem de bicicleta, prefere tudo em caixas fechadas.",
+    }),
+    mk("b5", 6, "confirmed", "delivery", "15:30", "Hugo Faria", "Mesa de petiscos", 8, {
+      notes: "Deixar na portaria se não atenderem.",
+      distance_km: 2.4,
+    }),
+    mk("b6", 6, "confirmed", "home", "18:00", "Sofia Ramos", "Chef em casa", 6, {
+      notes: "Placa de indução e forno. Estacionamento EMEL na rua.",
+      distance_km: 4.8,
+    }),
   ];
 }
 
 const DEMO_OFFERS: DashOffer[] = [
-  { id: "o1", title: "Mesa de petiscos", description: "Oito petiscos, entrega e montagem", fulfilment_mode: "delivery", price_model: "per_person", price: 22, unit_label: "pessoa", min_guests: 8, max_guests: 40, lead_time_hours: 72, time_slots: ["12:30", "19:00", "20:00"], active: true },
-  { id: "o2", title: "Chef em casa", description: "Três tempos tradicionais", fulfilment_mode: "home", price_model: "per_person", price: 40, unit_label: "pessoa", min_guests: 2, max_guests: 12, lead_time_hours: 48, time_slots: ["12:30", "19:00", "20:00"], active: true },
-  { id: "o3", title: "Caixa de petiscos", description: "Para levantar na cozinha", fulfilment_mode: "pickup", price_model: "per_person", price: 15, unit_label: "pessoa", min_guests: 2, max_guests: 12, lead_time_hours: 24, time_slots: ["10:30–11:30", "17:00–18:00"], active: true },
+  {
+    id: "o1",
+    title: "Mesa de petiscos",
+    description: "Oito petiscos, entrega e montagem",
+    fulfilment_mode: "delivery",
+    price_model: "per_person",
+    price: 22,
+    unit_label: "pessoa",
+    min_guests: 8,
+    max_guests: 40,
+    lead_time_hours: 72,
+    time_slots: ["12:30", "19:00", "20:00"],
+    active: true,
+  },
+  {
+    id: "o2",
+    title: "Chef em casa",
+    description: "Três tempos tradicionais",
+    fulfilment_mode: "home",
+    price_model: "per_person",
+    price: 40,
+    unit_label: "pessoa",
+    min_guests: 2,
+    max_guests: 12,
+    lead_time_hours: 48,
+    time_slots: ["12:30", "19:00", "20:00"],
+    active: true,
+  },
+  {
+    id: "o3",
+    title: "Caixa de petiscos",
+    description: "Para levantar na cozinha",
+    fulfilment_mode: "pickup",
+    price_model: "per_person",
+    price: 15,
+    unit_label: "pessoa",
+    min_guests: 2,
+    max_guests: 12,
+    lead_time_hours: 24,
+    time_slots: ["10:30–11:30", "17:00–18:00"],
+    active: true,
+  },
 ];
 
 const DEMO_LOGISTICS = {
@@ -331,14 +402,41 @@ const DEMO_LOGISTICS = {
 };
 
 const DEMO_COOKING = {
-  categories: ["Portuguesa", "Petiscos", "Marisco e peixe", "Grelhados", "Cozinha de autor", "Mediterrânica", "Vegetariana", "Vegan", "Saudável", "Pastelaria", "Brasileira", "Asiática"].map(
-    (name, i) => ({ id: i + 1, name }),
-  ),
+  categories: [
+    "Portuguesa",
+    "Petiscos",
+    "Marisco e peixe",
+    "Grelhados",
+    "Cozinha de autor",
+    "Mediterrânica",
+    "Vegetariana",
+    "Vegan",
+    "Saudável",
+    "Pastelaria",
+    "Brasileira",
+    "Asiática",
+  ].map((name, i) => ({ id: i + 1, name })),
   diets: ["Vegetariano", "Vegan", "Sem glúten", "Sem lactose", "Halal", "Para crianças"].map((name, i) => ({ id: i + 1, name })),
   mine: { categories: [1, 2], diets: [1, 3, 4, 6], services: ["home", "delivery", "pickup", "events"] as ServiceType[] },
 };
 
 const DEMO_REVIEWS: DashReview[] = [
-  { id: "rv1", author_name: "Inês B.", created_at: new Date(Date.now() - 6 * 86400_000).toISOString(), overall: 5, comment: "Os pastéis de bacalhau desapareceram em cinco minutos. Montagem impecável.", chef_reply: null, offer_title: "Mesa de petiscos" },
-  { id: "rv2", author_name: "Pedro C.", created_at: new Date(Date.now() - 20 * 86400_000).toISOString(), overall: 4.6, comment: "Muito bom e pontual. A salada de polvo é obrigatória.", chef_reply: "Obrigada, Pedro! Até à próxima.", offer_title: "Caixa de petiscos" },
+  {
+    id: "rv1",
+    author_name: "Inês B.",
+    created_at: new Date(Date.now() - 6 * 86400_000).toISOString(),
+    overall: 5,
+    comment: "Os pastéis de bacalhau desapareceram em cinco minutos. Montagem impecável.",
+    chef_reply: null,
+    offer_title: "Mesa de petiscos",
+  },
+  {
+    id: "rv2",
+    author_name: "Pedro C.",
+    created_at: new Date(Date.now() - 20 * 86400_000).toISOString(),
+    overall: 4.6,
+    comment: "Muito bom e pontual. A salada de polvo é obrigatória.",
+    chef_reply: "Obrigada, Pedro! Até à próxima.",
+    offer_title: "Caixa de petiscos",
+  },
 ];

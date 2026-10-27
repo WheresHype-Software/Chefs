@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 
 // [Example data] Illustrative requests for the hero animation.
 const REQ = [
-  { who: "Sofia Ramos", what: "Jantar em casa · 6 pessoas · sáb.", note: "É o aniversário da minha mãe. Uma pessoa vegetariana.", exp: "9 h" },
+  {
+    who: "Sofia Ramos",
+    what: "Jantar em casa · 6 pessoas · sáb.",
+    note: "É o aniversário da minha mãe. Uma pessoa vegetariana.",
+    exp: "9 h",
+  },
   { who: "Miguel Antunes", what: "Marmitas · 10 refeições · segunda", note: "Podem ser sem lactose? Obrigado!", exp: "20 h" },
   { who: "Emma Clarke", what: "Evento · 16 pessoas · sáb.", note: "Birthday lunch with a Portuguese menu, please.", exp: "41 h" },
 ];
@@ -62,7 +67,10 @@ export function HeroStage() {
           ))}
         </div>
       </div>
-      <div key={k} className="al-toast absolute bottom-[30px] right-6 hidden max-w-[220px] rounded-[2px] bg-ink px-4 py-3 text-[13px] text-white md:block">
+      <div
+        key={k}
+        className="al-toast absolute bottom-[30px] right-6 hidden max-w-[220px] rounded-[2px] bg-ink px-4 py-3 text-[13px] text-white md:block"
+      >
         {TOASTS[k]}
       </div>
     </div>
@@ -101,7 +109,11 @@ export function Compare() {
         {(after ? AFTER : BEFORE).map(([k, v]) => (
           <div key={k} className="al-rv flex flex-col gap-3.5 border-b border-line pb-8 pr-6 pt-[26px]">
             <span className="lab text-muted">{k}</span>
-            <span className={`d text-[26px] leading-[1.18] transition-opacity duration-500 ${after ? "text-ink" : "italic text-[#6B6862]"}`}>{v}</span>
+            <span
+              className={`d text-[26px] leading-[1.18] transition-opacity duration-500 ${after ? "text-ink" : "italic text-[#6B6862]"}`}
+            >
+              {v}
+            </span>
           </div>
         ))}
       </div>
@@ -114,19 +126,31 @@ const TABS = [
     label: "Página",
     title: "A sua montra, pronta a partilhar",
     text: "Fotos, menus, preços e avaliações num link curto que cabe na bio do Instagram.",
-    points: ["Link próprio: aolume.pt/chef/o-seu-nome", "Preço fixo, por pessoa ou sob orçamento", "Pagamento e cancelamento visíveis para o cliente"],
+    points: [
+      "Link próprio: aolume.pt/chef/o-seu-nome",
+      "Preço fixo, por pessoa ou sob orçamento",
+      "Pagamento e cancelamento visíveis para o cliente",
+    ],
   },
   {
     label: "Pedidos",
     title: "Aceitar, recusar ou propor outra data",
     text: "Cada pedido chega com data, número de pessoas, morada e restrições. Responde com um toque.",
-    points: ["Os pedidos expiram em 48 horas", "Reserva concluída automaticamente no dia seguinte", "Avisos por email, e mais tarde por WhatsApp"],
+    points: [
+      "Os pedidos expiram em 48 horas",
+      "Reserva concluída automaticamente no dia seguinte",
+      "Avisos por email, e mais tarde por WhatsApp",
+    ],
   },
   {
     label: "Agenda",
     title: "Só recebe pedidos quando pode",
     text: "Marque os dias livres, bloqueie férias e defina até onde se desloca. Só aparece a clientes dentro da sua área.",
-    points: ["Dias livres, reservados e bloqueados", "Raio de serviço em km ou locais específicos", "Sincronização com o Google Calendar no plano Pro"],
+    points: [
+      "Dias livres, reservados e bloqueados",
+      "Raio de serviço em km ou locais específicos",
+      "Sincronização com o Google Calendar no plano Pro",
+    ],
   },
   {
     label: "Chat",
@@ -141,7 +165,11 @@ export function ToolTabs() {
   const cur = TABS[tab]!;
   return (
     <>
-      <div role="tablist" aria-label="Funcionalidades" className="box-border flex max-w-full flex-wrap gap-1 self-start rounded-[3px] border border-ink p-[3px]">
+      <div
+        role="tablist"
+        aria-label="Funcionalidades"
+        className="box-border flex max-w-full flex-wrap gap-1 self-start rounded-[3px] border border-ink p-[3px]"
+      >
         {TABS.map((t, i) => (
           <button key={t.label} type="button" role="tab" className="seg" aria-selected={i === tab} onClick={() => setTab(i)}>
             {t.label}
@@ -160,7 +188,10 @@ export function ToolTabs() {
             ))}
           </ul>
         </div>
-        <div className="box box-border flex min-h-[340px] min-w-0 flex-[1_1_420px] flex-col justify-center gap-3 p-[26px]" aria-hidden="true">
+        <div
+          className="box box-border flex min-h-[340px] min-w-0 flex-[1_1_420px] flex-col justify-center gap-3 p-[26px]"
+          aria-hidden="true"
+        >
           {tab === 0 && (
             <div key="t0" className="al-in overflow-hidden rounded-[3px] border border-line">
               <div className="border-b border-line bg-paper px-3.5 py-2.5 text-[13px] text-ink-3">aolume.pt/chef/marta-figueiredo</div>
@@ -219,10 +250,16 @@ export function ToolTabs() {
           )}
           {tab === 3 && (
             <div key="t3" className="al-in flex flex-col gap-2.5">
-              <span className="max-w-[80%] self-start rounded-[3px] border border-line px-3.5 py-2.5 text-sm">Olá! Temos uma pessoa vegetariana, é possível?</span>
-              <span className="max-w-[80%] self-end rounded-[3px] bg-ink px-3.5 py-2.5 text-sm text-white">Claro, faço um arroz de cogumelos em vez do pato.</span>
+              <span className="max-w-[80%] self-start rounded-[3px] border border-line px-3.5 py-2.5 text-sm">
+                Olá! Temos uma pessoa vegetariana, é possível?
+              </span>
+              <span className="max-w-[80%] self-end rounded-[3px] bg-ink px-3.5 py-2.5 text-sm text-white">
+                Claro, faço um arroz de cogumelos em vez do pato.
+              </span>
               <span className="lab self-center py-2 text-muted">Pedido aceite · sinal de 99 € combinado</span>
-              <span className="max-w-[80%] self-start rounded-[3px] border border-line px-3.5 py-2.5 text-sm">Perfeito, já enviei por MB WAY.</span>
+              <span className="max-w-[80%] self-start rounded-[3px] border border-line px-3.5 py-2.5 text-sm">
+                Perfeito, já enviei por MB WAY.
+              </span>
             </div>
           )}
         </div>

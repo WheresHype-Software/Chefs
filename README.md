@@ -35,17 +35,17 @@ The seed adds seven demo chefs in Lisbon with no login attached. Delete them bef
 
 ## What's where
 
-| Path | What |
-| --- | --- |
-| `app/page.tsx` | Home: 3D chef map, filters, card rail and slide-in booking panel, then "how it works" |
-| `app/chef/[slug]` | Chef showcase: gallery, about, experience, offers, reviews, booking form |
-| `app/reserva/[id]` | Booking status, chat, cancel or accept a proposal, review once completed. Guests open it with the `?t=` magic-link token from their email |
-| `app/para-chefs` | Marketing page for chefs |
-| `app/entrar` | Sign in: email link, password, Google, chef sign-up |
-| `app/dashboard/*` | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile and verification |
-| `app/admin` | Approval queue, reported reviews, weekly stats |
-| `supabase/migrations` | Schema, RLS, API functions, storage buckets, cron jobs |
-| `lib/data.ts`, `lib/dashboard.ts` | Data access with demo fallbacks |
+| Path                              | What                                                                                                                                      |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/page.tsx`                    | Home: 3D chef map, filters, card rail and slide-in booking panel, then "how it works"                                                     |
+| `app/chef/[slug]`                 | Chef showcase: gallery, about, experience, offers, reviews, booking form                                                                  |
+| `app/reserva/[id]`                | Booking status, chat, cancel or accept a proposal, review once completed. Guests open it with the `?t=` magic-link token from their email |
+| `app/para-chefs`                  | Marketing page for chefs                                                                                                                  |
+| `app/entrar`                      | Sign in: email link, password, Google, chef sign-up                                                                                       |
+| `app/dashboard/*`                 | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile and verification                    |
+| `app/admin`                       | Approval queue, reported reviews, weekly stats                                                                                            |
+| `supabase/migrations`             | Schema, RLS, API functions, storage buckets, cron jobs                                                                                    |
+| `lib/data.ts`, `lib/dashboard.ts` | Data access with demo fallbacks                                                                                                           |
 
 ## How the database protects data
 

@@ -12,8 +12,8 @@ export default function Termos() {
         garante a segurança alimentar.
       </p>
       <p className="m-0">
-        Cada chef é responsável pelo seu serviço, preços, pagamentos, política de cancelamento e pelo cumprimento das regras aplicáveis à sua
-        atividade, incluindo higiene e segurança alimentar (HACCP), licenciamento e obrigações fiscais.
+        Cada chef é responsável pelo seu serviço, preços, pagamentos, política de cancelamento e pelo cumprimento das regras aplicáveis à
+        sua atividade, incluindo higiene e segurança alimentar (HACCP), licenciamento e obrigações fiscais.
       </p>
       <p className="m-0">[Texto completo dos termos para clientes e para chefs]</p>
     </LegalPage>

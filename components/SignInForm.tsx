@@ -65,7 +65,14 @@ export function SignInForm({ next, asChef }: { next: string; asChef: boolean }) 
             ["signup", "Criar conta"],
           ] as [Mode, string][]
         ).map(([k, label]) => (
-          <button key={k} type="button" role="tab" className="seg !min-h-9 !px-3 !text-[11px]" aria-selected={mode === k} onClick={() => setMode(k)}>
+          <button
+            key={k}
+            type="button"
+            role="tab"
+            className="seg !min-h-9 !px-3 !text-[11px]"
+            aria-selected={mode === k}
+            onClick={() => setMode(k)}
+          >
             {label}
           </button>
         ))}

@@ -23,4 +23,3 @@ export async function sendEmail(mail: Mail): Promise<void> {
   });
   if (!res.ok) console.error(`[email] Resend ${res.status}: ${await res.text()}`);
 }
-
