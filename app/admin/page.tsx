@@ -29,7 +29,7 @@ export default async function AdminPage() {
     sb
       .from("chefs")
       .select(
-        "id, display_name, slug, tier, area_name, socials, badges, created_at, chef_photos(url, kind, caption, sort_order), chef_certifications(title, document_path)",
+        "id, display_name, slug, tier, headline, bio, area_name, socials, badges, created_at, chef_photos(url, kind, caption, sort_order), chef_certifications(title, document_path), chef_categories(cuisine_categories(name_pt)), offers(count)",
       )
       .eq("status", "pending")
       .order("created_at"),
@@ -64,9 +64,11 @@ export default async function AdminPage() {
 
       <section className="flex flex-col gap-4">
         <h2 className="lab m-0 border-b border-line-2 pb-2.5">Chefs por aprovar · {pending.data?.length ?? 0}</h2>
-        {(pending.data as PendingChef[] | null)?.map((c) => (
-          <PendingChefCard key={c.id} chef={c} />
-        ))}
+        {pending.data?.length ? (
+          (pending.data as unknown as PendingChef[]).map((c) => <PendingChefCard key={c.id} chef={c} />)
+        ) : (
+          <p className="m-0 text-muted">Nenhum chef à espera de aprovação.</p>
+        )}
       </section>
 
       <section className="flex flex-col gap-4">
