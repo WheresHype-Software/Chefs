@@ -1,5 +1,6 @@
 // Demo data used when no Supabase project is configured. Mirrors supabase/seed.sql.
 import { isoDay } from "./format";
+import { PHOTOS, photoUrl, type StockPhoto } from "./photos";
 import type { Calendar, ChefCard, ChefProfile, Offer } from "./types";
 
 type Seed = Omit<ChefCard, "distanceKm" | "offers" | "cover" | "promoted" | "badges"> & {
@@ -283,11 +284,22 @@ const SEEDS: Seed[] = [
   },
 ];
 
+// Temporary stock covers for the demo chefs (see lib/photos.ts).
+const COVERS: Record<string, StockPhoto> = {
+  "marta-figueiredo": PHOTOS.plated,
+  "rui-barata": PHOTOS.grill,
+  "ines-cordeiro": PHOTOS.soup,
+  "joana-lopes": PHOTOS.cake,
+  "tiago-mendes": PHOTOS.spread,
+  "carla-nunes": PHOTOS.table,
+  "andre-sousa": PHOTOS.salad,
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const MOCK_CHEFS: ChefCard[] = SEEDS.map(({ weekdays: _w, offers, ...c }) => ({
   ...c,
   distanceKm: null,
-  cover: null,
+  cover: photoUrl(COVERS[c.slug] ?? PHOTOS.table),
   promoted: false,
   badges: ["identity", "portfolio"],
   offers: offers.map((o, i) => ({

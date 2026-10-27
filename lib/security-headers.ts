@@ -20,7 +20,7 @@ export function securityHeaders(): { key: string; value: string }[] {
     // Next.js inlines its bootstrap script; 'unsafe-eval' only for dev tooling.
     `script-src ${sources("'self'", "'unsafe-inline'", dev && "'unsafe-eval'")}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src ${sources("'self'", "data:", "blob:", supabase, mapStyle)}`,
+    `img-src ${sources("'self'", "data:", "blob:", supabase, mapStyle, "https://images.unsplash.com")}`,
     "font-src 'self' data:",
     `connect-src ${sources("'self'", supabase, supabaseWs, mapStyle, "https://photon.komoot.io", dev && "ws:")}`,
     "worker-src 'self' blob:",
