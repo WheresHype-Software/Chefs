@@ -53,7 +53,7 @@ export default async function Pedidos() {
       <PageHeader title="Pedidos" />
 
       <section className="flex flex-col gap-3.5">
-        <h2 className="lab m-0 border-b border-ink pb-2.5">Por responder · {requests.length}</h2>
+        <h2 className="lab m-0 border-b border-line-2 pb-2.5">Por responder · {requests.length}</h2>
         {requests.length === 0 && <p className="m-0 text-muted">Sem pedidos novos. Os pedidos expiram ao fim de 48 horas.</p>}
         {requests.map((b) => (
           <Row key={b.id} b={b} showActions />
@@ -61,7 +61,7 @@ export default async function Pedidos() {
       </section>
 
       <section className="flex flex-col gap-3.5">
-        <h2 className="lab m-0 border-b border-ink pb-2.5">Próximas reservas · {upcoming.length}</h2>
+        <h2 className="lab m-0 border-b border-line-2 pb-2.5">Próximas reservas · {upcoming.length}</h2>
         {upcoming.length === 0 && <p className="m-0 text-muted">Sem reservas marcadas.</p>}
         {upcoming.map((b) => (
           <Row key={b.id} b={b} showActions />
@@ -70,7 +70,7 @@ export default async function Pedidos() {
 
       {past.length > 0 && (
         <section className="flex flex-col gap-3.5">
-          <h2 className="lab m-0 border-b border-ink pb-2.5">Histórico</h2>
+          <h2 className="lab m-0 border-b border-line-2 pb-2.5">Histórico</h2>
           {past
             .slice(-20)
             .reverse()

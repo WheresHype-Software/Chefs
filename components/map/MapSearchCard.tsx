@@ -34,7 +34,7 @@ export function MapSearchCard({ count, place, service, cuisine, onPlace, onServi
         }}
         onSelect={onPlace}
         placeholder="A sua morada ou bairro"
-        className="border-b border-ink pb-2.5 pt-1.5"
+        className="border-b border-line-2 pb-2.5 pt-1.5"
         inputClassName="min-w-0 flex-1 border-0 bg-transparent p-0 text-base text-ink outline-none"
       />
       <div

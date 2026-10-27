@@ -16,7 +16,7 @@ function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
   }
   return (
     <div
-      className={`max-w-[75%] rounded-[3px] px-3.5 py-2.5 text-[15px] ${mine ? "self-end bg-ink text-white" : "self-start border border-line bg-white"}`}
+      className={`max-w-[75%] rounded-[3px] px-3.5 py-2.5 text-[15px] ${mine ? "self-end bg-cobalt text-white" : "self-start border border-line bg-white"}`}
     >
       {message.body}
       <span className={`mt-1 block text-[11px] ${mine ? "text-right text-[#CFC8BE]" : "text-muted"}`}>{timeLabel(message.at)}</span>
@@ -93,7 +93,7 @@ export function BookingChat({ view, title, subtitle }: Props) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Escreva uma mensagem…"
-            className="flex-auto rounded-[2px] border border-line-2 px-4 py-3 text-[15px] text-ink outline-none focus:border-ink"
+            className="flex-auto rounded-[2px] border border-line-2 px-4 py-3 text-[15px] text-ink outline-none focus:border-cobalt"
           />
         </label>
         <button type="submit" className="btn btn-sm" disabled={pending || !draft.trim()}>

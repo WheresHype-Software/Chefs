@@ -89,8 +89,8 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
       <SiteHeader />
       <div className="mx-auto flex max-w-[1240px] flex-col gap-8 px-5 pb-[72px] pt-10 md:px-8">
         <div className="flex flex-col gap-2.5">
-          <span className="lab text-muted">Pedido n.º {b.ref}</span>
-          <h1 className="d m-0 text-[clamp(36px,5vw,52px)] leading-[1.05]">{headline(b.status, first)}</h1>
+          <h1 className="d m-0 text-[clamp(32px,4.4vw,48px)] leading-[1.05]">{headline(b.status, first)}</h1>
+          <span className="text-[15px] font-medium text-muted">Pedido n.º {b.ref}</span>
           <p className="m-0 max-w-[640px] text-muted">{intro[b.status]}</p>
           {ended && (
             <Link href="/#mapa" className="btn btn-o mt-2 self-start">
@@ -106,7 +106,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
               const ev = reached(s.key);
               return (
                 <li key={s.key} className="flex flex-col gap-2" aria-current={i === currentIdx ? "step" : undefined}>
-                  <span className={`h-1 rounded ${done ? "bg-ink" : "bg-line"}`} />
+                  <span className={`h-1 rounded ${done ? "bg-cobalt" : "bg-line"}`} />
                   <strong className="font-semibold">{s.label}</strong>
                   <span className="text-muted">{ev ? shortStamp(ev.at) : s.hint}</span>
                 </li>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Wordmark } from "@/components/SiteChrome";
 import { notFound } from "next/navigation";
 import { ChefDecision, ReviewModeration } from "@/components/admin/ChefDecision";
 import { StatGrid } from "@/components/ui/StatGrid";
@@ -73,7 +74,7 @@ export default async function AdminPage() {
       />
 
       <section className="flex flex-col gap-4">
-        <h2 className="lab m-0 border-b border-ink pb-2.5">Chefs por aprovar · {pending.data?.length ?? 0}</h2>
+        <h2 className="lab m-0 border-b border-line-2 pb-2.5">Chefs por aprovar · {pending.data?.length ?? 0}</h2>
         {(pending.data as PendingChef[] | null)?.map((c) => {
           const selfie = c.chef_photos.find((p) => p.kind === "selfie");
           const gallery = c.chef_photos.filter((p) => p.kind === "gallery");
@@ -124,7 +125,7 @@ export default async function AdminPage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="lab m-0 border-b border-ink pb-2.5">Avaliações denunciadas · {reports.data?.length ?? 0}</h2>
+        <h2 className="lab m-0 border-b border-line-2 pb-2.5">Avaliações denunciadas · {reports.data?.length ?? 0}</h2>
         {(reports.data ?? []).map((r) => {
           const rv = (reportedReviews ?? []).find((x) => x.id === r.target_id) as
             | { id: string; author_name: string; comment: string | null; overall: number; chefs: { display_name: string } | null }
@@ -151,8 +152,8 @@ function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-paper">
       <header className="border-b border-line bg-white">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between px-5 py-4 md:px-8">
-          <Link href="/" className="wordmark d text-lg">
-            Ao Lume
+          <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
+            <Wordmark />
           </Link>
           <span className="lab text-muted">Administração</span>
         </div>

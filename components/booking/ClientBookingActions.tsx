@@ -54,7 +54,7 @@ function StarRating({ label, value, onChange }: { label: string; value: number; 
           <button
             key={n}
             type="button"
-            className={`ctl !h-9 !w-9 !text-base ${value >= n ? "!border-ink !bg-ink !text-white" : ""}`}
+            className={`ctl !h-9 !w-9 !text-base ${value >= n ? "!border-cobalt !bg-cobalt !text-white" : ""}`}
             aria-label={`${label}: ${n} de 5`}
             aria-pressed={value >= n}
             onClick={() => onChange(n)}

@@ -7,7 +7,7 @@ export function StatGrid({ items, size = "lg" }: Props) {
       {items.map(([label, value]) => (
         <div key={label} className="flex flex-col gap-1 bg-white p-[22px]">
           <span className="lab text-muted">{label}</span>
-          <span className={`d num ${size === "lg" ? "text-[40px]" : "text-[34px]"}`}>{value}</span>
+          <span className={`d ${size === "lg" ? "text-[40px]" : "text-[34px]"}`}>{value}</span>
         </div>
       ))}
     </div>

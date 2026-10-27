@@ -13,7 +13,7 @@ export function DetailList({ items: all, variant = "plain" }: Props) {
   const items = all.filter((row): row is DetailRow => Boolean(row));
   if (variant === "ruled") {
     return (
-      <dl className="m-0 flex flex-col border-t border-ink text-[15px]">
+      <dl className="m-0 flex flex-col border-t border-line-2 text-[15px]">
         {items.map(([label, value]) => (
           <div key={label} className="flex justify-between gap-3 border-b border-line py-3 last:border-b-0">
             <dt className="lab text-muted">{label}</dt>

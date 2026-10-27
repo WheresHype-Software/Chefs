@@ -349,7 +349,11 @@ export function mockProfile(slug: string): ChefProfile | null {
       { place: "Por conta própria", role: "Chef privada", years: "2020–hoje" },
     ],
     certifications: [{ title: "Formação HACCP", issuer: "[Entidade]", verified: true }],
-    gallery: c.offers.map((o) => ({ url: null, caption: o.title })).concat([{ url: null, caption: "Mesa posta" }]),
+    gallery: [
+      { url: c.cover, caption: c.offers[0]!.title },
+      { url: photoUrl(PHOTOS.cooking), caption: "Na cozinha" },
+      { url: photoUrl(PHOTOS.table), caption: "Mesa posta" },
+    ],
     reviews:
       c.reviewCount > 0
         ? [

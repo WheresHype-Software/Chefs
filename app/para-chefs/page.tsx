@@ -24,12 +24,12 @@ const TOOLS: [string, string, boolean][] = [
 ];
 
 const MKT = [
-  ["I.", "Um link para a bio", "aolume.pt/chef/o-seu-nome substitui o formulário e o “manda mensagem”."],
-  ["II.", "Kit de partilha", "Código QR, imagens para stories e cartões com as suas melhores avaliações."],
-  ["III.", "No mapa, perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
-  ["IV.", "Avaliações verificadas", "Só quem concluiu uma reserva avalia, e pode responder a cada uma."],
-  ["V.", "Destaque para quem começa", "Novos talentos aparecem na página inicial nas primeiras semanas."],
-  ["VI.", "Encomendas de época", "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite."],
+  ["Um link para a bio", "aolume.pt/chef/o-seu-nome substitui o formulário e o “manda mensagem”."],
+  ["Kit de partilha", "Código QR, imagens para stories e cartões com as suas melhores avaliações."],
+  ["No mapa, perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
+  ["Avaliações verificadas", "Só quem concluiu uma reserva avalia, e pode responder a cada uma."],
+  ["Destaque para quem começa", "Novos talentos aparecem na página inicial nas primeiras semanas."],
+  ["Encomendas de época", "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite."],
 ];
 
 const FAQ = [
@@ -59,15 +59,13 @@ export default function ParaChefs() {
 
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-14 px-5 pb-[72px] pt-[88px] md:px-10">
         <div className="flex min-w-0 flex-[1_1_520px] flex-col gap-7">
-          <span className="lab al-in text-muted">Para chefs profissionais e cozinheiros caseiros</span>
           <h1 className="d al-in m-0 text-[clamp(48px,8.4vw,104px)] leading-[.94] tracking-[-0.02em]" style={{ animationDelay: "80ms" }}>
             Cozinhe.
             <br />
             As reservas
             <br />
-            <em>tratamos nós.</em>
+            <span className="text-cobalt">tratamos nós.</span>
           </h1>
-          <span className="al-line block h-px w-[120px] bg-ink" aria-hidden="true" />
           <p className="al-in m-0 max-w-[500px] text-lg text-ink-3" style={{ animationDelay: "180ms" }}>
             Troque o Google Forms, as mensagens no Instagram e o caderno de encomendas por uma página de reservas com calendário, chat e
             avaliações.
@@ -92,7 +90,6 @@ export default function ParaChefs() {
       <section id="ferramenta" className="bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-20 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[760px] flex-col gap-4">
-            <span className="lab text-muted">A ferramenta de reservas</span>
             <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
           </div>
           <ToolTabs />
@@ -104,12 +101,12 @@ export default function ParaChefs() {
           <h2 className="d m-0 max-w-[760px] text-[clamp(38px,6vw,68px)] leading-none">O essencial de quem cozinha por conta própria.</h2>
           <span className="lab text-muted">Grátis no lançamento · Pro mais tarde</span>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-ink">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-line-2">
           {TOOLS.map(([t, d, free]) => (
             <div key={t} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-7 md:pr-7">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="d text-2xl leading-[1.15]">{t}</span>
-                <span className={`lab whitespace-nowrap ${free ? "text-ink" : "text-[#6B6862]"}`}>{free ? "Grátis" : "Pro"}</span>
+                <span className={`lab whitespace-nowrap ${free ? "text-ink" : "text-muted"}`}>{free ? "Grátis" : "Pro"}</span>
               </div>
               <span className="text-[15px] text-muted">{d}</span>
             </div>
@@ -117,36 +114,34 @@ export default function ParaChefs() {
         </div>
       </section>
 
-      <section id="marketing" className="bg-ink text-white">
+      <section id="marketing" className="bg-cobalt-deep text-white">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-20 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
-            <span className="lab text-[#BDB9B1]">Marketing que trabalha por si</span>
             <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
-            <p className="m-0 max-w-[600px] text-lg text-[#BDB9B1]">
+            <p className="m-0 max-w-[600px] text-lg text-[#c9d6ee]">
               Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
             </p>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-white">
-            {MKT.map(([n, t, d]) => (
-              <div key={n} className="al-rv flex flex-col gap-3 border-b border-[#34332F] pb-[34px] pt-7">
-                <span className="d text-base italic text-[#BDB9B1]">{n}</span>
-                <span className="d text-[28px] leading-[1.12]">{t}</span>
-                <span className="text-[15px] text-[#BDB9B1]">{d}</span>
+            {MKT.map(([t, d]) => (
+              <div key={t} className="al-rv flex flex-col gap-3 border-b border-[#2a4a86] pb-[34px] pt-7">
+                <span className="d text-[26px] leading-[1.12]">{t}</span>
+                <span className="text-[15px] text-[#c9d6ee]">{d}</span>
               </div>
             ))}
           </div>
           <div className="al-rv flex flex-col gap-[26px]">
             <h3 className="d m-0 text-[clamp(30px,4vw,44px)]">O seu percurso</h3>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] gap-px border border-[#34332F] bg-[#34332F]">
-              <div className="flex flex-col gap-2 bg-ink p-[26px]">
-                <span className="lab text-[#BDB9B1]">À entrada</span>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] gap-px border border-[#2a4a86] bg-[#2a4a86]">
+              <div className="flex flex-col gap-2 bg-cobalt-deep p-[26px]">
+                <span className="lab text-[#c9d6ee]">À entrada</span>
                 <span className="d text-[30px]">Novo talento</span>
-                <span className="text-sm text-[#BDB9B1]">Destaque na página inicial nas primeiras semanas.</span>
+                <span className="text-sm text-[#c9d6ee]">Destaque na página inicial nas primeiras semanas.</span>
               </div>
-              <div className="flex flex-col gap-2 bg-ink p-[26px]">
-                <span className="lab text-[#BDB9B1]">5 reservas · 4,5 ou mais</span>
+              <div className="flex flex-col gap-2 bg-cobalt-deep p-[26px]">
+                <span className="lab text-[#c9d6ee]">5 reservas · 4,5 ou mais</span>
                 <span className="d text-[30px]">Chef em ascensão</span>
-                <span className="text-sm text-[#BDB9B1]">Sobe no mapa para os clientes da sua zona.</span>
+                <span className="text-sm text-[#c9d6ee]">Sobe no mapa para os clientes da sua zona.</span>
               </div>
               <div className="flex flex-col gap-2 bg-white p-[26px] text-ink">
                 <span className="lab text-muted">25 reservas · 4,7 ou mais</span>
@@ -160,20 +155,19 @@ export default function ParaChefs() {
 
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-20 md:px-10 md:py-[120px]">
         <div className="al-rv flex min-w-0 flex-[1_1_420px] flex-col gap-[18px]">
-          <span className="lab text-muted">Sem comissões</span>
           <h2 className="d m-0 text-[clamp(38px,6vw,68px)] leading-none">O dinheiro é seu. Todo.</h2>
           <p className="m-0 max-w-[520px] text-lg text-ink-3">
             O Ao Lume liga-o ao cliente e organiza a reserva. Preço, sinal e regras de cancelamento são definidos por si, e o cliente
             paga-lhe diretamente.
           </p>
         </div>
-        <div className="al-rv grid min-w-0 flex-[1_1_420px] grid-cols-[repeat(auto-fit,minmax(min(190px,100%),1fr))] border-t border-ink">
+        <div className="al-rv grid min-w-0 flex-[1_1_420px] grid-cols-[repeat(auto-fit,minmax(min(190px,100%),1fr))] border-t border-line-2">
           <div className="flex flex-col gap-2 pr-6 pt-6">
             <span className="lab">Ao Lume</span>
             <span className="d text-[clamp(64px,9vw,104px)] leading-none">0 %</span>
             <span className="text-sm text-muted">de comissão por reserva</span>
           </div>
-          <div className="flex flex-col gap-2 pt-6 text-[#6B6862]">
+          <div className="flex flex-col gap-2 pt-6 text-muted">
             <span className="lab">Plataformas internacionais</span>
             <span className="d text-[clamp(64px,9vw,104px)] leading-none line-through decoration-1">20 %</span>
             <span className="text-sm">ou mais, por reserva, mais taxas</span>
@@ -184,15 +178,20 @@ export default function ParaChefs() {
       <section className="border-t border-line">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-20 md:px-10 md:py-[120px]">
           <h2 className="d al-rv m-0 text-[clamp(38px,6vw,68px)] leading-none">Entrar leva dez minutos.</h2>
-          <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-ink p-0">
+          <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-line-2 p-0">
             {[
-              ["I.", "Crie a conta", "Nome, email e o tipo de perfil: profissional ou caseiro."],
-              ["II.", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
-              ["III.", "Aprovação", "A nossa equipa revê cada perfil antes de entrar no mapa."],
-              ["IV.", "Partilhe o link", "Ponha aolume.pt/chef/o-seu-nome na bio e receba pedidos."],
+              ["1", "Crie a conta", "Nome, email e o tipo de perfil: profissional ou caseiro."],
+              ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
+              ["3", "Aprovação", "A nossa equipa revê cada perfil antes de entrar no mapa."],
+              ["4", "Partilhe o link", "Ponha aolume.pt/chef/o-seu-nome na bio e receba pedidos."],
             ].map(([n, t, d]) => (
               <li key={n} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-[26px]">
-                <span className="d text-lg italic">{n}</span>
+                <span
+                  aria-hidden="true"
+                  className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-cobalt text-[18px] font-extrabold text-white"
+                >
+                  {n}
+                </span>
                 <strong className="text-lg font-semibold">{t}</strong>
                 <span className="text-muted">{d}</span>
               </li>
@@ -206,7 +205,7 @@ export default function ParaChefs() {
           <div className="flex-[1_1_280px]">
             <h2 className="d al-rv m-0 text-[clamp(38px,6vw,68px)] leading-none">Perguntas</h2>
           </div>
-          <div className="min-w-0 flex-[2_1_520px] border-t border-ink">
+          <div className="min-w-0 flex-[2_1_520px] border-t border-line-2">
             {FAQ.map(([q, a]) => (
               <details key={q} className="group border-b border-line-2 py-[18px]">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
@@ -225,17 +224,17 @@ export default function ParaChefs() {
         </div>
       </section>
 
-      <section className="bg-ink text-white">
+      <section className="bg-cobalt-deep text-white">
         <div className="al-rv mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-5 py-20 text-center md:px-10 md:py-[120px]">
-          <span className="lab text-[#BDB9B1]">Gratuito no lançamento · sem contrato</span>
           <h2 className="d m-0 max-w-[900px] text-[clamp(42px,7vw,88px)] leading-[.98]">
             Vista a jaleca.
             <br />
-            <em>O resto é connosco.</em>
+            <span className="text-yolk">O resto é connosco.</span>
           </h2>
           <Link href="/entrar?chef=1" className="btn btn-w">
             Criar o meu perfil
           </Link>
+          <span className="text-[15px] text-[#c9d6ee]">Gratuito no lançamento, sem contrato.</span>
         </div>
       </section>
 

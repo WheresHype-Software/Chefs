@@ -14,7 +14,6 @@ export default async function EntrarPage({ searchParams }: PageProps<"/entrar">)
       <SiteHeader chefs={asChef} />
       <div className="mx-auto flex max-w-[1080px] flex-wrap gap-14 px-5 py-16 md:px-8 md:py-24">
         <div className="flex flex-[1_1_340px] flex-col gap-5">
-          <span className="lab text-muted">{asChef ? "Para chefs" : "A sua conta"}</span>
           <h1 className="d m-0 text-[clamp(40px,6vw,64px)] leading-none">{asChef ? "Crie o seu perfil de chef." : "Entrar no Ao Lume."}</h1>
           <p className="m-0 max-w-[460px] text-ink-3">
             {asChef

@@ -91,7 +91,7 @@ export function AgendaGrid({
             const style = past
               ? "border-transparent text-[#A9A59E]"
               : state === "booked"
-                ? "bg-ink text-white border-ink"
+                ? "bg-cobalt text-white border-cobalt"
                 : state === "available"
                   ? "border-line-3 font-semibold"
                   : state === "blocked"
@@ -103,7 +103,7 @@ export function AgendaGrid({
                 type="button"
                 disabled={past || state === "booked"}
                 onClick={() => cycle(iso)}
-                className={`num flex h-12 items-center justify-center rounded-[2px] border text-sm transition hover:border-ink disabled:cursor-default disabled:hover:border-transparent ${style}`}
+                className={`num flex h-12 items-center justify-center rounded-[2px] border text-sm transition hover:border-cobalt disabled:cursor-default disabled:hover:border-transparent ${style}`}
                 aria-label={`${i + 1}: ${state === "booked" ? "reservado" : state === "available" ? "disponível" : state === "blocked" ? "bloqueado" : "fechado"}`}
               >
                 {i + 1}

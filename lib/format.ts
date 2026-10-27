@@ -129,7 +129,7 @@ export function shortStamp(iso: string): string {
   return `${d.getDate()} ${MONTHS[d.getMonth()]!.slice(0, 3)}., ${timeLabel(iso)}`;
 }
 
-const TONES = ["#ECE8E1", "#E9E7E2", "#E6E8E3", "#EDE9E4", "#E8E6E1", "#ECE9E3", "#E5E8E2"];
+const TONES = ["#e4ecf8", "#eef3fa", "#dfe7f4", "#e9eff8", "#f3f6fb", "#e6edf7", "#dce5f3"];
 
 /** Neutral placeholder tone for a chef without photos, stable per id. */
 export function toneFor(id: string): string {

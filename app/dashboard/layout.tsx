@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Wordmark } from "@/components/SiteChrome";
 import { SideNav } from "@/components/dashboard/SideNav";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
 import { tierLabel } from "@/lib/format";
@@ -18,8 +19,8 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
         className="box-border flex flex-[1_1_100%] flex-col gap-0.5 border-b border-line bg-white px-3 py-3.5 md:min-h-screen md:flex-[0_0_250px] md:border-b-0 md:border-r md:px-4 md:py-6"
       >
         <div className="flex items-baseline justify-between px-3.5 pb-3 md:pb-5">
-          <Link href="/" className="wordmark d text-lg">
-            Ao Lume
+          <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
+            <Wordmark />
           </Link>
           <span className="lab text-muted">{session.role === "admin" ? "Admin" : "Chef"}</span>
         </div>

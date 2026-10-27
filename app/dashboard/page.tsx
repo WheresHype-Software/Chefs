@@ -59,7 +59,7 @@ export default async function Overview() {
 
       {requests.length > 0 && (
         <section className="box flex flex-col p-6">
-          <div className="flex items-baseline justify-between border-b border-ink pb-3">
+          <div className="flex items-baseline justify-between border-b border-line-2 pb-3">
             <h2 className="d m-0 text-2xl">Novos pedidos</h2>
             <Link href="/dashboard/pedidos" className="text-sm">
               Ver todos →
@@ -77,7 +77,7 @@ export default async function Overview() {
                   {b.offer_title} · {b.guests} · {dayLabel(b.date)}
                 </span>
               </span>
-              <span className="lab rounded-[2px] bg-ink px-2.5 py-1.5 text-white">Responder</span>
+              <span className="lab rounded-[2px] bg-cobalt px-2.5 py-1.5 text-white">Responder</span>
             </Link>
           ))}
         </section>

@@ -71,7 +71,7 @@ export function MapExplorer({ chefs, service }: { chefs: ChefCard[]; service?: S
       <MapControls map={map} />
 
       {!touched && (
-        <span className="lab pointer-events-none absolute bottom-[226px] left-1/2 z-[3] hidden -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-ink px-4 py-[11px] text-white md:block">
+        <span className="lab pointer-events-none absolute bottom-[226px] left-1/2 z-[3] hidden -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-cobalt px-4 py-[11px] text-white md:block">
           Arraste para explorar · toque num chef
         </span>
       )}

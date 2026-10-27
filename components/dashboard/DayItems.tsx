@@ -9,8 +9,8 @@ import type { FulfilmentMode } from "@/lib/types";
 
 const TYPE_LABEL: Record<FulfilmentMode, string> = { home: "Em casa do cliente", delivery: "Entrega", pickup: "Levantamento" };
 const TAG: Record<FulfilmentMode, string> = {
-  home: "bg-ink text-white",
-  delivery: "border border-ink",
+  home: "bg-cobalt text-white",
+  delivery: "border border-cobalt",
   pickup: "border border-dashed border-faint text-ink-3",
 };
 

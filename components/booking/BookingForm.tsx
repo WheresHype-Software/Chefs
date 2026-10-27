@@ -68,7 +68,7 @@ export function BookingForm({ chef, initialOfferId, initialAddress, onClose, ble
       <TimeSlots slots={offer.timeSlots} selected={form.time} onSelect={form.setTime} />
 
       <div className="flex items-center justify-between gap-3 border-b border-line pb-5">
-        <h3 className="lab m-0">{unitTitle(offer)}</h3>
+        <h3 className="m-0 text-[15px] font-semibold">{unitTitle(offer)}</h3>
         <Stepper value={form.guests} min={offer.minGuests} max={form.maxGuests} onChange={form.setGuests} />
       </div>
 

@@ -24,8 +24,8 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onShi
 
   return (
     <div className="flex flex-col gap-2.5">
-      <div className="flex items-baseline justify-between border-b border-ink pb-2.5">
-        <h3 className="lab m-0">Data</h3>
+      <div className="flex items-baseline justify-between border-b border-line pb-2.5">
+        <h3 className="m-0 text-[15px] font-semibold">Data</h3>
         <div className="flex items-center gap-2">
           <button
             type="button"

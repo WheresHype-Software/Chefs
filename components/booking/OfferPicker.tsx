@@ -7,7 +7,7 @@ type Props = { offers: Offer[]; selected: number; onSelect: (index: number) => v
 export function OfferPicker({ offers, selected, onSelect }: Props) {
   return (
     <div role="radiogroup" aria-label="Menu">
-      <h3 className="lab m-0 mb-1 border-b border-ink pb-2.5">Menu</h3>
+      <h3 className="m-0 text-[15px] font-semibold mb-1 border-b border-line pb-2.5">Menu</h3>
       {offers.map((o, i) => (
         <button key={o.id} type="button" role="radio" className="opt" aria-checked={i === selected} onClick={() => onSelect(i)}>
           <span className="flex gap-3">

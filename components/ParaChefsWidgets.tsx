@@ -27,7 +27,7 @@ export function HeroStage() {
   return (
     <div className="al-in relative h-[500px] min-w-0 flex-[1_1_440px] md:h-[580px]" style={{ animationDelay: "220ms" }} aria-hidden="true">
       <div className="fabric absolute inset-0 rounded-[3px] border border-line" style={{ backgroundColor: "#F7F6F3" }} />
-      <span className="lab absolute left-6 top-6 text-muted">Os seus pedidos</span>
+      <span className="absolute left-6 top-6 text-[15px] font-semibold text-ink">Os seus pedidos</span>
       <span className="d absolute right-6 top-[18px] text-lg italic">Esta semana</span>
       {REQ.map((r, i) => {
         const pos = (i - k + 3) % 3;
@@ -63,13 +63,13 @@ export function HeroStage() {
         <span className="lab">Agenda</span>
         <div className="grid grid-cols-7 gap-[3px]">
           {Array.from({ length: 28 }, (_, i) => (
-            <span key={i} className={`h-[18px] rounded-[1px] ${BUSY.includes(i + 1) ? "bg-ink" : "bg-[#EFEEEA]"}`} />
+            <span key={i} className={`h-[18px] rounded-[1px] ${BUSY.includes(i + 1) ? "bg-cobalt" : "bg-cobalt-soft"}`} />
           ))}
         </div>
       </div>
       <div
         key={k}
-        className="al-toast absolute bottom-[30px] right-6 hidden max-w-[220px] rounded-[2px] bg-ink px-4 py-3 text-[13px] text-white md:block"
+        className="al-toast absolute bottom-[30px] right-6 hidden max-w-[220px] rounded-[2px] bg-cobalt px-4 py-3 text-[13px] text-white md:block"
       >
         {TOASTS[k]}
       </div>
@@ -105,15 +105,11 @@ export function Compare() {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-t border-ink">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-t border-line-2">
         {(after ? AFTER : BEFORE).map(([k, v]) => (
           <div key={k} className="al-rv flex flex-col gap-3.5 border-b border-line pb-8 pr-6 pt-[26px]">
             <span className="lab text-muted">{k}</span>
-            <span
-              className={`d text-[26px] leading-[1.18] transition-opacity duration-500 ${after ? "text-ink" : "italic text-[#6B6862]"}`}
-            >
-              {v}
-            </span>
+            <span className={`d text-[26px] leading-[1.18] transition-opacity duration-500 ${after ? "text-ink" : "text-muted"}`}>{v}</span>
           </div>
         ))}
       </div>
@@ -176,7 +172,7 @@ export function ToolTabs() {
           </button>
         ))}
       </div>
-      <div role="tabpanel" className="flex flex-wrap items-center gap-7 border-t border-ink pt-10 md:gap-12">
+      <div role="tabpanel" className="flex flex-wrap items-center gap-7 border-t border-line-2 pt-10 md:gap-12">
         <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-[18px]">
           <h3 className="d m-0 text-[clamp(30px,4vw,44px)] leading-[1.04]">{cur.title}</h3>
           <p className="m-0 text-[17px] text-ink-3">{cur.text}</p>
@@ -205,9 +201,9 @@ export function ToolTabs() {
             </div>
           )}
           {tab === 1 && (
-            <div key="t1" className="al-in border-t border-ink">
+            <div key="t1" className="al-in border-t border-line-2">
               {[
-                ["Sofia Ramos", "Jantar em casa · 6 pessoas", "Novo · 9 h", "bg-ink text-white"],
+                ["Sofia Ramos", "Jantar em casa · 6 pessoas", "Novo · 9 h", "bg-cobalt text-white"],
                 ["Luís Antunes", "Mariscada · 4 pessoas", "Data proposta", "border border-ink"],
                 ["Ana Pires", "Jantar do Minho · 8 pessoas", "Confirmado", "border border-line-3 text-muted"],
               ].map(([w, d, s, c]) => (
@@ -223,7 +219,7 @@ export function ToolTabs() {
           )}
           {tab === 2 && (
             <div key="t2" className="al-in flex flex-col gap-3.5">
-              <div className="flex items-baseline justify-between border-b border-ink pb-2.5">
+              <div className="flex items-baseline justify-between border-b border-line-2 pb-2.5">
                 <span className="d text-xl italic">Este mês</span>
                 <span className="lab text-muted">Raio 15 km</span>
               </div>
@@ -234,7 +230,7 @@ export function ToolTabs() {
                 {Array.from({ length: 29 }, (_, i) => {
                   const d = i + 1;
                   const c = [6, 7, 14, 21, 22].includes(d)
-                    ? "bg-ink text-white"
+                    ? "bg-cobalt text-white"
                     : [10, 11, 24].includes(d)
                       ? "text-faint line-through"
                       : "border border-line-3";
@@ -253,7 +249,7 @@ export function ToolTabs() {
               <span className="max-w-[80%] self-start rounded-[3px] border border-line px-3.5 py-2.5 text-sm">
                 Olá! Temos uma pessoa vegetariana, é possível?
               </span>
-              <span className="max-w-[80%] self-end rounded-[3px] bg-ink px-3.5 py-2.5 text-sm text-white">
+              <span className="max-w-[80%] self-end rounded-[3px] bg-cobalt px-3.5 py-2.5 text-sm text-white">
                 Claro, faço um arroz de cogumelos em vez do pato.
               </span>
               <span className="lab self-center py-2 text-muted">Pedido aceite · sinal de 99 € combinado</span>

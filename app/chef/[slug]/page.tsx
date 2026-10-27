@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, getChefProfile } from "@/lib/data";
-import { MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel, toneFor } from "@/lib/format";
+import { initials, MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel } from "@/lib/format";
+import { Photo } from "@/components/ui/Photo";
 
 export async function generateMetadata({ params }: PageProps<"/chef/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -51,17 +52,15 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
       <section className="mx-auto max-w-[1240px] px-5 pt-6 md:px-8">
         <div className={`grid h-[300px] gap-2.5 md:h-[440px] ${GRID[Math.min(photos.length, 5)]}`}>
           {photos.slice(0, photos.length >= 5 ? 5 : 3).map((p, i) => (
-            <div
-              key={i}
-              className={`relative flex items-end overflow-hidden rounded-[2px] p-3 ${i === 0 ? "col-span-2 row-span-2" : "hidden md:flex"}`}
-              style={{ background: toneFor(chef.id + i) }}
-            >
-              {p.url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.url} alt={p.caption} className="absolute inset-0 h-full w-full object-cover" />
-              ) : (
-                <span className="lab text-muted">[Foto] {p.caption}</span>
-              )}
+            <div key={i} className={`overflow-hidden rounded-[10px] ${i === 0 ? "col-span-2 row-span-2" : "hidden md:block"}`}>
+              <Photo
+                photo={p.url}
+                alt={p.caption}
+                priority={i === 0}
+                sizes={i === 0 ? "(min-width: 768px) 60vw, 100vw" : "30vw"}
+                fallback={i % 2 ? "cobalt" : "glaze"}
+                className="h-full w-full"
+              />
             </div>
           ))}
         </div>
@@ -71,14 +70,14 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-12">
           <div className="flex flex-wrap items-center gap-6">
             <div
-              className="flex h-28 w-28 items-center justify-center rounded-full text-[11px] text-muted"
-              style={{ background: toneFor(chef.slug) }}
+              aria-hidden="true"
+              className="flex h-24 w-24 items-center justify-center rounded-full bg-cobalt-soft text-[30px] font-extrabold tracking-[-0.03em] text-cobalt"
             >
-              [Retrato]
+              {initials(chef.name)}
             </div>
             <div className="flex flex-[1_1_300px] flex-col gap-2">
               <div className="flex flex-wrap gap-2">
-                <span className="lab rounded-[2px] border border-ink px-[9px] py-[5px]">{tier}</span>
+                <span className="lab rounded-[2px] border border-cobalt px-[9px] py-[5px]">{tier}</span>
                 {chef.badges.map((b) => (
                   <span key={b} className="lab rounded-[2px] border border-line-2 px-[9px] py-[5px] text-muted">
                     {BADGE_LABEL[b] ?? b}
@@ -121,7 +120,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
           {(chef.experience.length > 0 || chef.certifications.length > 0) && (
             <section className="flex flex-col gap-3.5">
               <h2 className="d m-0 text-[32px]">Percurso</h2>
-              <ul className="m-0 list-none border-t border-ink p-0">
+              <ul className="m-0 list-none border-t border-line-2 p-0">
                 {chef.experience.map((e) => (
                   <li key={e.place + e.years} className="flex flex-wrap justify-between gap-3 border-b border-line py-3.5">
                     <span>
@@ -146,7 +145,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
 
           <section className="flex flex-col gap-[18px]">
             <h2 className="d m-0 text-[32px]">Ofertas</h2>
-            <div className="border-t border-ink">
+            <div className="border-t border-line-2">
               {chef.offers.map((o) => (
                 <a
                   key={o.id}
@@ -182,7 +181,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
                   <div key={k.label} className="flex items-center gap-3 text-sm">
                     <span className="flex-[0_0_110px]">{k.label}</span>
                     <span className="h-1 flex-auto overflow-hidden rounded bg-line">
-                      <span className="block h-1 bg-ink" style={{ width: `${(k.value / 5) * 100}%` }} />
+                      <span className="block h-1 bg-cobalt" style={{ width: `${(k.value / 5) * 100}%` }} />
                     </span>
                     <span className="num w-7 text-right">{k.value.toFixed(1).replace(".", ",")}</span>
                   </div>
@@ -214,7 +213,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
         </main>
 
         <aside id="reservar" className="box box-border flex min-w-0 flex-[1_1_360px] flex-col gap-4 p-[26px]">
-          <div className="flex items-baseline justify-between gap-3 border-b border-ink pb-3">
+          <div className="flex items-baseline justify-between gap-3 border-b border-line-2 pb-3">
             <span className="d text-[28px]">Pedir reserva</span>
             <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
           </div>
