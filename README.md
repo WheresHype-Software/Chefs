@@ -18,7 +18,7 @@ npm install
 npm run dev
 ```
 
-Without Supabase credentials the app runs in **demo mode**: the map, chef pages and booking form use the seed chefs from `lib/mock.ts`, a sent request opens an example booking at `/reserva/demo`, and `/dashboard` shows the chef dashboard with example data. Nothing is saved.
+Without Supabase credentials the app runs in **demo mode**: search, chef pages and the booking form use the seed chefs from `lib/mock.ts`, a sent request opens an example booking at `/reserva/demo`, and `/dashboard` shows the chef dashboard with example data. Nothing is saved.
 
 ## Connect Supabase
 
@@ -33,19 +33,24 @@ Without Supabase credentials the app runs in **demo mode**: the map, chef pages 
 
 The seed adds seven demo chefs in Lisbon with no login attached. Delete them before launch.
 
+## Design
+
+The visual system is documented in [DESIGN.md](DESIGN.md) and the product context in [PRODUCT.md](PRODUCT.md). Photography is temporary Unsplash stock listed in `lib/photos.ts`; replace it with real chefs and dishes before launch. The map is parked for now (components kept in `components/map`).
+
 ## Project structure
 
 | Path                           | What                                                                                                                                                         |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `app/`                         | Routes. Pages are server components; each feature keeps its server actions next to it (`app/actions.ts`, `app/dashboard/actions.ts`, `app/admin/actions.ts`) |
-| `app/page.tsx`                 | Home: 3D chef map, filters, card rail and slide-in booking panel, then "how it works"                                                                        |
+| `app/page.tsx`                 | Home: tiled-wall hero with the search, services, how it works, best-rated chefs, chef invitation                                                             |
+| `app/procurar`                 | Search results: chefs filtered by area, service, cuisine and date                                                                                            |
 | `app/chef/[slug]`              | Chef showcase: gallery, about, experience, offers, reviews, booking form                                                                                     |
 | `app/reserva/[id]`             | Booking status, chat, cancel or accept a proposal, review once completed                                                                                     |
 | `app/para-chefs`, `app/entrar` | Marketing page for chefs; sign in (email link, password, Google, chef sign-up)                                                                               |
 | `app/dashboard/*`              | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile                                                        |
 | `app/admin`                    | Approval queue, reported reviews, weekly stats                                                                                                               |
 | `components/ui/`               | Design-system primitives: `Field`, `Switch`, `Chip`, `Stepper`, `PageHeader`, `StatGrid`, `DetailList`, `FormMessage`                                        |
-| `components/<feature>/`        | Feature components: `map/`, `booking/`, `dashboard/`, `admin/`, `home/`                                                                                      |
+| `components/<feature>/`        | Feature components: `home/`, `search/`, `booking/`, `dashboard/`, `admin/`, `brand/` (azulejo tiles), `map/` (parked)                                        |
 | `hooks/`                       | Client hooks: `useServerAction`, `useBookingForm`, `useChefFilters`, `useMonthCalendar`, `usePolling`, `usePhotoUpload`, `useMediaQuery`, `useToggleList`    |
 | `lib/`                         | Server and shared logic: env, Supabase clients, data access with demo fallbacks, formatting, constants                                                       |
 | `supabase/`                    | Migrations (schema, RLS, functions, storage, cron) and seed data                                                                                             |
