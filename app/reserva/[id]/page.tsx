@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { BookingChat } from "@/components/booking/BookingChat";
 import { ClientBookingActions, ReviewForm } from "@/components/booking/ClientBookingActions";
+import { GuestLookupForm } from "@/components/booking/GuestLookup";
+import { RememberBooking } from "@/components/booking/RememberBooking";
+import { StatusSteps } from "@/components/booking/StatusSteps";
 import { DetailList, type DetailRow } from "@/components/ui/DetailList";
-import { SiteHeader } from "@/components/SiteChrome";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, PAYMENT_LABEL } from "@/lib/data";
 import { getBookingView } from "@/lib/bookings";
 import { dayLabel, euro, firstName, MODE_LABEL, shortStamp, STATUS_LABEL } from "@/lib/format";
@@ -13,11 +15,29 @@ import type { BookingStatus } from "@/lib/types";
 export const metadata: Metadata = { title: "A sua reserva", robots: { index: false } };
 
 const STEPS: { key: BookingStatus; label: string; hint: string }[] = [
-  { key: "requested", label: "Pedido enviado", hint: "" },
-  { key: "accepted", label: "Aceite pelo chef", hint: "Combine o sinal" },
-  { key: "confirmed", label: "Confirmado", hint: "Após o sinal" },
-  { key: "completed", label: "Concluído", hint: "Depois poderá avaliar" },
+  { key: "requested", label: "Pedido enviado", hint: "O chef tem 48 horas para responder" },
+  { key: "accepted", label: "Aceite pelo chef", hint: "Depois combina o sinal com o chef" },
+  { key: "confirmed", label: "Confirmado", hint: "Quando o chef receber o sinal" },
+  { key: "completed", label: "Concluído", hint: "Depois do serviço poderá avaliar" },
 ];
+
+/** Opened without access (no link, other device, or a wrong id): offer the lookup instead of a 404. */
+function NoAccess() {
+  return (
+    <div className="flex min-h-screen flex-col bg-paper">
+      <SiteHeader />
+      <main className="mx-auto box-border flex w-full max-w-[760px] flex-1 flex-col gap-6 px-5 pb-16 pt-8 md:px-8 md:pt-12">
+        <h1 className="d m-0 text-[clamp(30px,5vw,44px)] leading-[1.05]">Não conseguimos abrir este pedido aqui.</h1>
+        <p className="m-0 max-w-[60ch] text-muted">
+          Os pedidos abrem com o link que guardou (ou que recebeu por email), no dispositivo onde o pediu, ou com o número do pedido e o seu
+          email.
+        </p>
+        <GuestLookupForm />
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
 
 function headline(status: BookingStatus, chef: string): string {
   switch (status) {
@@ -44,7 +64,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
   const { id } = await params;
   // A guest's ?t= token was already moved into an httpOnly cookie by the proxy.
   const view = await getBookingView(id);
-  if (!view) notFound();
+  if (!view) return <NoAccess />;
 
   const { booking: b, chef } = view;
   const first = firstName(chef.name);
@@ -100,20 +120,17 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
         </div>
 
         {!ended && (
-          <ol aria-label="Estado" className="m-0 grid list-none grid-cols-2 gap-2.5 p-0 text-sm md:grid-cols-4">
-            {STEPS.map((s, i) => {
-              const done = i <= currentIdx;
+          <StatusSteps
+            // Completed is the last step and done, so nothing stays "current" after it.
+            current={b.status === "completed" ? STEPS.length : currentIdx + (b.status === "change_proposed" ? 0 : 1)}
+            action={b.status === "change_proposed" ? "Responda à proposta do chef" : undefined}
+            steps={STEPS.map((s) => {
               const ev = reached(s.key);
-              return (
-                <li key={s.key} className="flex flex-col gap-2" aria-current={i === currentIdx ? "step" : undefined}>
-                  <span className={`h-1 rounded ${done ? "bg-cobalt" : "bg-line"}`} />
-                  <strong className="font-semibold">{s.label}</strong>
-                  <span className="text-muted">{ev ? shortStamp(ev.at) : s.hint}</span>
-                </li>
-              );
+              return { label: s.label, detail: ev ? shortStamp(ev.at) : s.hint };
             })}
-          </ol>
+          />
         )}
+        {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: chef.name, date: b.date }} />}
 
         <div className="flex flex-wrap items-start gap-8">
           <section className="box flex min-w-0 flex-[1_1_340px] flex-col gap-4 p-6">
