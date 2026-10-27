@@ -4,26 +4,13 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { Wordmark } from "@/components/SiteChrome";
 import { notFound } from "next/navigation";
-import { ChefDecision, ReviewModeration } from "@/components/admin/ChefDecision";
+import { ReviewModeration } from "@/components/admin/ChefDecision";
+import { PendingChefCard, type PendingChef } from "@/components/admin/PendingChefCard";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { getSession } from "@/lib/dashboard";
-import { TIER_LABEL } from "@/lib/format";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Administração", robots: { index: false } };
-
-type PendingChef = {
-  id: string;
-  display_name: string;
-  slug: string;
-  tier: string;
-  area_name: string | null;
-  socials: { instagram?: string; website?: string };
-  badges: string[];
-  created_at: string;
-  chef_photos: { url: string; kind: string }[];
-  chef_certifications: { title: string; document_path: string | null }[];
-};
 
 export default async function AdminPage() {
   if (!hasSupabase) {
@@ -42,7 +29,7 @@ export default async function AdminPage() {
     sb
       .from("chefs")
       .select(
-        "id, display_name, slug, tier, area_name, socials, badges, created_at, chef_photos(url, kind), chef_certifications(title, document_path)",
+        "id, display_name, slug, tier, area_name, socials, badges, created_at, chef_photos(url, kind, caption, sort_order), chef_certifications(title, document_path)",
       )
       .eq("status", "pending")
       .order("created_at"),
@@ -77,53 +64,9 @@ export default async function AdminPage() {
 
       <section className="flex flex-col gap-4">
         <h2 className="lab m-0 border-b border-line-2 pb-2.5">Chefs por aprovar · {pending.data?.length ?? 0}</h2>
-        {(pending.data as PendingChef[] | null)?.map((c) => {
-          const selfie = c.chef_photos.find((p) => p.kind === "portrait") ?? c.chef_photos.find((p) => p.kind === "selfie");
-          const gallery = c.chef_photos.filter((p) => p.kind === "gallery");
-          return (
-            <article key={c.id} className="box flex flex-wrap gap-6 p-4 md:p-6">
-              <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-3">
-                <span className="lab text-muted">
-                  {TIER_LABEL[c.tier]} · {c.area_name} · desde {new Date(c.created_at).toLocaleDateString("pt-PT")}
-                </span>
-                <span className="d text-[28px] leading-none">{c.display_name}</span>
-                <span className="text-sm [overflow-wrap:anywhere]">
-                  {c.socials.instagram && (
-                    <a href={`https://instagram.com/${c.socials.instagram.replace("@", "")}`} target="_blank" rel="noopener">
-                      {c.socials.instagram}
-                    </a>
-                  )}
-                  {c.socials.website && (
-                    <>
-                      {" · "}
-                      <a href={c.socials.website} target="_blank" rel="noopener noreferrer">
-                        {c.socials.website}
-                      </a>
-                    </>
-                  )}
-                </span>
-                {c.chef_certifications.length > 0 && (
-                  <span className="text-sm text-muted">Certificados: {c.chef_certifications.map((x) => x.title).join(", ")}</span>
-                )}
-                <ChefDecision chefId={c.id} badges={c.badges} />
-              </div>
-              <div className="flex min-w-0 flex-[1_1_280px] flex-wrap content-start gap-2">
-                {selfie ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={selfie.url} alt="Fotografia do chef" className="h-24 w-24 rounded-full object-cover sm:h-32 sm:w-32" />
-                ) : (
-                  <span className="flex h-24 w-24 items-center sm:h-32 sm:w-32 justify-center rounded-full bg-paper text-xs text-danger">
-                    Sem fotografia
-                  </span>
-                )}
-                {gallery.map((p) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={p.url} src={p.url} alt="Prato" className="h-24 w-24 rounded-[2px] object-cover sm:h-32 sm:w-32" />
-                ))}
-              </div>
-            </article>
-          );
-        })}
+        {(pending.data as PendingChef[] | null)?.map((c) => (
+          <PendingChefCard key={c.id} chef={c} />
+        ))}
       </section>
 
       <section className="flex flex-col gap-4">
