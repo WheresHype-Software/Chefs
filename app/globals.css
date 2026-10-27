@@ -228,7 +228,8 @@ a:hover {
   box-sizing: border-box;
   transition: all 0.2s ease;
 }
-.opt[aria-pressed="true"] .dot {
+.opt[aria-pressed="true"] .dot,
+.opt[aria-checked="true"] .dot {
   border-width: 5px;
 }
 

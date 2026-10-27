@@ -9,15 +9,15 @@ type Props = {
   calendar: Calendar | null;
   selected: string | null;
   onSelect: (iso: string) => void;
-  onMonth: (delta: number) => void;
-  canPrev: boolean;
+  onShift: (delta: number) => void;
+  canGoBack: boolean;
 };
 
-const WD = ["S", "T", "Q", "Q", "S", "S", "D"];
+const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"];
 
-export function MonthCalendar({ year, month, calendar, selected, onSelect, onMonth, canPrev }: Props) {
-  const first = new Date(year, month, 1);
-  const lead = (first.getDay() + 6) % 7; // Monday first
+/** Month grid of a chef's free days: outlined = available, struck = booked. */
+export function MonthCalendar({ year, month, calendar, selected, onSelect, onShift, canGoBack }: Props) {
+  const lead = (new Date(year, month, 1).getDay() + 6) % 7; // Monday first
   const days = new Date(year, month + 1, 0).getDate();
   const available = new Set(calendar?.available ?? []);
   const booked = new Set(calendar?.booked ?? []);
@@ -27,17 +27,17 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onMon
       <div className="flex items-baseline justify-between border-b border-ink pb-2.5">
         <h3 className="lab m-0">Data</h3>
         <div className="flex items-center gap-2">
-          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onMonth(-1)} disabled={!canPrev} aria-label="Mês anterior">
+          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onShift(-1)} disabled={!canGoBack} aria-label="Mês anterior">
             ‹
           </button>
           <span className="d min-w-36 text-center text-base italic">{monthLabel(year, month)}</span>
-          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onMonth(1)} aria-label="Mês seguinte">
+          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onShift(1)} aria-label="Mês seguinte">
             ›
           </button>
         </div>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[.1em] text-muted" aria-hidden="true">
-        {WD.map((d, i) => (
+        {WEEKDAYS.map((d, i) => (
           <span key={i}>{d}</span>
         ))}
       </div>
@@ -47,18 +47,18 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onMon
         ))}
         {Array.from({ length: days }, (_, i) => {
           const iso = isoDay(new Date(year, month, i + 1));
-          const a = available.has(iso);
-          const b = booked.has(iso);
-          const s = selected === iso ? "x" : a ? "a" : b ? "b" : "o";
+          const isFree = available.has(iso);
+          const isBooked = booked.has(iso);
+          const state = selected === iso ? "x" : isFree ? "a" : isBooked ? "b" : "o";
           return (
             <button
               key={iso}
               type="button"
               className="cal-day"
-              data-s={s}
-              disabled={!a}
-              onClick={() => a && onSelect(iso)}
-              aria-label={`${i + 1}${a ? ", disponível" : b ? ", reservado" : ", indisponível"}`}
+              data-s={state}
+              disabled={!isFree}
+              onClick={() => onSelect(iso)}
+              aria-label={`${i + 1}${isFree ? ", disponível" : isBooked ? ", reservado" : ", indisponível"}`}
               aria-pressed={selected === iso}
             >
               {i + 1}

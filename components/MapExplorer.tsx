@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AddressSearch, type Place } from "@/components/AddressSearch";
-import { BookingPanel } from "@/components/BookingPanel";
+import { BookingPanel } from "@/components/booking/BookingPanel";
 import { ChefMap, type ChefMapHandle } from "@/components/ChefMap";
 import { SiteHeaderFloating } from "@/components/SiteChrome";
 import { fromPrice, rating, tierLabel, toneFor } from "@/lib/format";

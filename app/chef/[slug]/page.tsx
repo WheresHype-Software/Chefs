@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BookingPanel } from "@/components/BookingPanel";
+import { BookingForm } from "@/components/booking/BookingForm";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, getChefProfile } from "@/lib/data";
 import { MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel, toneFor } from "@/lib/format";
@@ -215,7 +215,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
             <span className="d text-[28px]">Pedir reserva</span>
             <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
           </div>
-          <BookingPanel key={String(oferta ?? "")} chef={chef} variant="embedded" initialOfferId={typeof oferta === "string" ? oferta : undefined} />
+          <BookingForm key={String(oferta ?? "")} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
           <dl className="m-0 flex flex-col gap-2.5 border-t border-line pt-4 text-sm">
             <div className="flex justify-between gap-3">
               <dt className="text-muted">Pagamento ao chef</dt>
