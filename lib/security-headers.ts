@@ -22,7 +22,7 @@ export function securityHeaders(): { key: string; value: string }[] {
     "style-src 'self' 'unsafe-inline'",
     `img-src ${sources("'self'", "data:", "blob:", supabase, mapStyle, "https://images.unsplash.com")}`,
     "font-src 'self' data:",
-    `connect-src ${sources("'self'", supabase, supabaseWs, mapStyle, "https://photon.komoot.io", dev && "ws:")}`,
+    `connect-src ${sources("'self'", supabase, supabaseWs, mapStyle, "https://photon.komoot.io", "https://nominatim.openstreetmap.org", dev && "ws:")}`,
     "worker-src 'self' blob:",
     "frame-ancestors 'none'",
     "base-uri 'self'",
