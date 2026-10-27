@@ -4,7 +4,7 @@ import { BookingForm } from "@/components/booking/BookingForm";
 import { MobileBookingBar } from "@/components/booking/MobileBookingBar";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, getChefProfile } from "@/lib/data";
-import { fromPrice, initials, MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel } from "@/lib/format";
+import { firstName, fromPrice, initials, MODE_LABEL, offerPriceLabel, rating, SERVICE_LABEL, tierLabel } from "@/lib/format";
 import { Photo } from "@/components/ui/Photo";
 
 export async function generateMetadata({ params }: PageProps<"/chef/[slug]">): Promise<Metadata> {
@@ -45,6 +45,8 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
 
   const photos = chef.gallery.length ? chef.gallery : [{ url: null, caption: "Fotografia" }];
   const tier = tierLabel(chef.tier, chef.isNew, chef.reviewCount, chef.rating);
+  // A newly approved chef may not have published an offer yet: the page must still work.
+  const bookable = chef.offers.length > 0;
   const dishes = chef.gallery.filter((d): d is { url: string; caption: string } => Boolean(d.url));
 
   return (
@@ -174,7 +176,8 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
 
           <section className="flex flex-col gap-[18px]">
             <h2 className="d m-0 text-[32px]">Ofertas</h2>
-            <div className="border-t border-line-2">
+            {!bookable && <p className="m-0 border-t border-line-2 pt-4 text-muted">Ainda sem ofertas publicadas.</p>}
+            <div className={bookable ? "border-t border-line-2" : "hidden"}>
               {chef.offers.map((o) => (
                 <a
                   key={o.id}
@@ -269,7 +272,14 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
             <h2 className="d m-0 text-[26px] md:text-[28px]">Pedir reserva</h2>
             <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
           </div>
-          <BookingForm key={String(oferta ?? "")} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
+          {bookable ? (
+            <BookingForm key={String(oferta ?? "")} chef={chef} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
+          ) : (
+            <p className="m-0 text-muted">
+              {firstName(chef.name)} ainda está a preparar os menus. Volte em breve
+              {chef.socials.instagram ? ", ou acompanhe no Instagram." : "."}
+            </p>
+          )}
           <dl className="m-0 flex flex-col gap-2.5 border-t border-line pt-4 text-sm">
             <div className="flex justify-between gap-3">
               <dt className="text-muted">Pagamento ao chef</dt>
@@ -292,11 +302,13 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
         </aside>
       </div>
 
-      <MobileBookingBar
-        targetId="reservar"
-        price={fromPrice(chef.offers)}
-        rating={`${rating(chef.rating, chef.reviewCount)} · ${chef.area}`}
-      />
+      {bookable && (
+        <MobileBookingBar
+          targetId="reservar"
+          price={fromPrice(chef.offers)}
+          rating={`${rating(chef.rating, chef.reviewCount)} · ${chef.area}`}
+        />
+      )}
       <SiteFooter />
     </div>
   );
