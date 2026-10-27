@@ -7,7 +7,6 @@ export default async function Ofertas() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        eyebrow="Ofertas"
         title="Menus, caixas e encomendas"
         description="Preço fixo, por pessoa ou sob orçamento. Cada oferta diz onde é servida: em casa do cliente, entrega ou levantamento."
       />

@@ -37,7 +37,7 @@ export default async function Logistica({ searchParams }: PageProps<"/dashboard/
 
   return (
     <div className="flex flex-col gap-[26px]">
-      <PageHeader eyebrow="Logística" title="Deslocações, entregas e levantamentos" />
+      <PageHeader title="Deslocações, entregas e levantamentos" />
 
       <nav aria-label="Semana" className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
         {week.map((d) => {

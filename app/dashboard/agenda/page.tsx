@@ -22,7 +22,6 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        eyebrow="Agenda"
         title="Só recebe pedidos quando pode"
         actions={
           <div className="flex items-center gap-2">

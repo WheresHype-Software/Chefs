@@ -50,7 +50,7 @@ export default async function Pedidos() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader eyebrow="Pedidos e reservas" title="Pedidos" />
+      <PageHeader title="Pedidos" />
 
       <section className="flex flex-col gap-3.5">
         <h2 className="lab m-0 border-b border-ink pb-2.5">Por responder · {requests.length}</h2>

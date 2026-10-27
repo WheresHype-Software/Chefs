@@ -19,7 +19,6 @@ export default async function Perfil() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        eyebrow="Perfil"
         title={chef ? "O seu perfil" : "Crie o seu perfil de chef"}
         description={!chef && "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão."}
       />

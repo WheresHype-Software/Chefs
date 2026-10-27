@@ -1,48 +1,98 @@
 @import "tailwindcss";
 
-/* Ao Lume — "chef's whites": crisp white, black ink, fine hairlines, square corners. */
+/*
+ * Ao Lume — "azulejo de cozinha".
+ * The tiled walls of Portuguese kitchens and tascas: white glaze, cobalt blue, grout lines,
+ * and the ochre of old azulejo panels as the one warm accent.
+ */
 @theme {
-  --color-ink: #111110;
-  --color-ink-2: #33312d;
-  --color-ink-3: #3b3934;
-  --color-muted: #5e5b55;
-  --color-faint: #8e8a83;
-  --color-line: #e7e5e0;
-  --color-line-2: #e1ded8;
-  --color-line-3: #d3d0c9;
-  --color-paper: #f7f6f3;
-  --color-mapbg: #f1f0ec;
-  --color-danger: #8a2e17;
-  --color-ok: #2f5b2a;
-  --font-display: var(--font-bodoni), "Bodoni 72", Didot, Georgia, serif;
-  --font-sans: var(--font-hanken), "Helvetica Neue", Arial, sans-serif;
-  --radius-sq: 2px;
-  --radius-box: 3px;
+  /* Ink: deep cobalt-tinted navy for text */
+  --color-ink: #142033;
+  --color-ink-2: #26324a;
+  --color-ink-3: #37435c;
+  --color-muted: #535e76;
+  --color-faint: #7a849a;
+
+  /* Glaze and grout */
+  --color-glaze: #ffffff;
+  --color-paper: #f3f6fb;
+  --color-mapbg: #edf1f8;
+  --color-line: #dde4ef;
+  --color-line-2: #ccd6e5;
+  --color-line-3: #b3c0d4;
+
+  /* Cobalt, the colour of the tiles */
+  --color-cobalt: #1d4aa1;
+  --color-cobalt-deep: #12306e;
+  --color-cobalt-soft: #e4ecf8;
+
+  /* Ochre / yolk accent, used sparingly */
+  --color-yolk: #f0b429;
+  --color-yolk-soft: #fdf3d6;
+
+  --color-danger: #a3261a;
+  --color-ok: #1f6b45;
+
+  --font-display: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+
+  --radius-sq: 6px;
+  --radius-box: 10px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   margin: 0;
-  background: #ffffff;
+  background: var(--color-glaze);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.55;
+  font-feature-settings: "ss01";
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Browser surfaces carry the design too */
+::selection {
+  background: var(--color-yolk);
+  color: var(--color-ink);
+}
+html {
+  scrollbar-color: var(--color-line-3) transparent;
+}
+input,
+textarea {
+  caret-color: var(--color-cobalt);
 }
 
 a {
   color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
 }
 a:hover {
-  color: var(--color-muted);
+  color: var(--color-cobalt);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-ink);
+  outline: 2px solid var(--color-cobalt);
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .sr-only {
@@ -54,25 +104,25 @@ a:hover {
   white-space: nowrap;
 }
 
-/* Display type and labels */
+/* Display type: one grotesque family, set heavy and tight. */
 .d {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-optical-sizing: auto;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
+/* Small supporting text (formerly tracked caps labels). */
 .lab {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-size: 13px;
   font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .wordmark {
   font-family: var(--font-display);
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -85,79 +135,95 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  min-height: 50px;
-  padding: 0 26px;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
   border-radius: var(--radius-sq);
-  background: var(--color-ink);
+  background: var(--color-cobalt);
   color: #fff;
-  border: 1px solid var(--color-ink);
+  border: 1px solid var(--color-cobalt);
   font: inherit;
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
   transition:
-    background 0.3s ease,
-    color 0.3s ease,
-    border-color 0.3s ease;
+    background-color 0.18s var(--ease-out),
+    border-color 0.18s var(--ease-out),
+    color 0.18s var(--ease-out),
+    transform 0.12s var(--ease-out);
 }
 .btn:hover {
-  background: #fff;
-  color: var(--color-ink);
+  background: var(--color-cobalt-deep);
+  border-color: var(--color-cobalt-deep);
+  color: #fff;
+}
+.btn:active {
+  transform: translateY(1px);
 }
 .btn-sm {
-  min-height: 42px;
-  padding: 0 18px;
-  font-size: 11px;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
 }
 .btn-o {
-  background: transparent;
+  background: var(--color-glaze);
   color: var(--color-ink);
+  border-color: var(--color-line-3);
 }
 .btn-o:hover {
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-paper);
+  border-color: var(--color-cobalt);
+  color: var(--color-cobalt);
 }
 .btn-w {
   background: #fff;
-  color: var(--color-ink);
+  color: var(--color-cobalt-deep);
   border-color: #fff;
 }
 .btn-w:hover {
-  background: transparent;
-  color: #fff;
+  background: var(--color-yolk);
+  border-color: var(--color-yolk);
+  color: var(--color-ink);
 }
 .btn:disabled,
 .btn[aria-disabled="true"] {
-  background: #efeeea;
-  border-color: #efeeea;
-  color: #6b6862;
+  background: var(--color-paper);
+  border-color: var(--color-line);
+  color: var(--color-faint);
   cursor: default;
+  transform: none;
 }
 
 .chip {
-  min-height: 38px;
+  min-height: 40px;
   padding: 0 14px;
   border: 1px solid var(--color-line-2);
-  background: #fff;
+  background: var(--color-glaze);
   color: var(--color-ink);
   font: inherit;
-  font-size: 13px;
-  border-radius: var(--radius-sq);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.25s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition:
+    background-color 0.18s var(--ease-out),
+    border-color 0.18s var(--ease-out),
+    color 0.18s var(--ease-out);
 }
 .chip:hover {
-  border-color: var(--color-ink);
+  border-color: var(--color-cobalt);
+  color: var(--color-cobalt);
 }
-.chip[aria-pressed="true"] {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+.chip[aria-pressed="true"],
+.chip[aria-current="true"] {
+  background: var(--color-cobalt);
+  border-color: var(--color-cobalt);
   color: #fff;
 }
 .chip:disabled {
@@ -170,7 +236,7 @@ a:hover {
   height: 44px;
   border-radius: var(--radius-sq);
   border: 1px solid var(--color-line-2);
-  background: #fff;
+  background: var(--color-glaze);
   color: var(--color-ink);
   font: inherit;
   font-size: 18px;
@@ -178,30 +244,32 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.18s var(--ease-out);
 }
 .ctl:hover {
-  border-color: var(--color-ink);
+  border-color: var(--color-cobalt);
+}
+.ctl:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .seg {
   font: inherit;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   border: 0;
   border-radius: var(--radius-sq);
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 42px;
+  padding: 0 16px;
   cursor: pointer;
   background: transparent;
   color: var(--color-ink);
-  transition: all 0.3s ease;
+  transition: all 0.18s var(--ease-out);
 }
 .seg[aria-pressed="true"],
 .seg[aria-selected="true"] {
-  background: var(--color-ink);
+  background: var(--color-cobalt);
   color: #fff;
 }
 
@@ -222,18 +290,18 @@ a:hover {
   cursor: pointer;
 }
 .opt .dot {
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--color-ink);
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--color-line-3);
   border-radius: 50%;
   flex: 0 0 auto;
   margin-top: 3px;
   box-sizing: border-box;
-  transition: all 0.2s ease;
+  transition: all 0.18s var(--ease-out);
 }
 .opt[aria-pressed="true"] .dot,
 .opt[aria-checked="true"] .dot {
-  border-width: 5px;
+  border: 5px solid var(--color-cobalt);
 }
 
 /* Calendar day */
@@ -248,71 +316,77 @@ a:hover {
   align-items: center;
   justify-content: center;
   font-variant-numeric: tabular-nums;
-  transition: all 0.2s ease;
+  transition: all 0.15s var(--ease-out);
   border: 1px solid transparent;
   background: transparent;
-  color: #a9a59e;
+  color: var(--color-faint);
 }
 .cal-day[data-s="a"] {
-  border-color: var(--color-line-3);
-  color: var(--color-ink);
+  background: var(--color-cobalt-soft);
+  color: var(--color-cobalt-deep);
   font-weight: 600;
   cursor: pointer;
 }
 .cal-day[data-s="a"]:hover {
-  border-color: var(--color-ink);
+  border-color: var(--color-cobalt);
 }
 .cal-day[data-s="b"] {
   color: var(--color-faint);
   text-decoration: line-through;
 }
 .cal-day[data-s="x"] {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+  background: var(--color-cobalt);
+  border-color: var(--color-cobalt);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
-/* Underlined form field */
+/* Form field */
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  color: var(--color-muted);
+  color: var(--color-ink-3);
+  font-size: 14px;
+  font-weight: 600;
 }
 .field input,
 .field textarea,
 .field select {
   font: inherit;
-  letter-spacing: 0;
-  text-transform: none;
-  font-size: 15px;
-  border: 0;
-  border-bottom: 1px solid #c9c5be;
-  padding: 8px 0;
+  font-weight: 400;
+  font-size: 16px;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-sq);
+  padding: 11px 13px;
   color: var(--color-ink);
   outline: none;
   min-width: 0;
-  background: transparent;
-  border-radius: 0;
+  background: var(--color-glaze);
+  transition:
+    border-color 0.15s var(--ease-out),
+    box-shadow 0.15s var(--ease-out);
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--color-faint);
 }
 .field input:focus,
 .field textarea:focus,
 .field select:focus {
-  border-bottom-color: var(--color-ink);
+  border-color: var(--color-cobalt);
+  box-shadow: 0 0 0 3px var(--color-cobalt-soft);
 }
 .field .hint {
-  letter-spacing: 0;
-  text-transform: none;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-muted);
 }
 
-/* Dashboard */
+/* Surfaces */
 .box {
-  background: #fff;
+  background: var(--color-glaze);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-box);
 }
@@ -322,9 +396,10 @@ a:hover {
   border: 0;
   background: transparent;
   color: var(--color-ink);
-  padding: 12px 14px;
+  padding: 11px 14px;
   border-radius: var(--radius-sq);
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -332,22 +407,23 @@ a:hover {
   gap: 10px;
   white-space: nowrap;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: background-color 0.15s var(--ease-out);
 }
 .side-link:hover {
-  background: #f3f2ee;
+  background: var(--color-paper);
   color: var(--color-ink);
 }
 .side-link[aria-current="page"] {
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-cobalt-soft);
+  color: var(--color-cobalt-deep);
+  font-weight: 700;
 }
 .week-day {
   font: inherit;
   flex: 1 1 0;
   min-width: 64px;
   border: 1px solid var(--color-line-2);
-  background: #fff;
+  background: var(--color-glaze);
   color: var(--color-ink);
   border-radius: var(--radius-sq);
   padding: 10px 6px;
@@ -357,15 +433,15 @@ a:hover {
   align-items: center;
   gap: 2px;
   text-decoration: none;
-  transition: all 0.25s ease;
+  transition: all 0.18s var(--ease-out);
 }
 .week-day:hover {
-  border-color: var(--color-ink);
+  border-color: var(--color-cobalt);
   color: var(--color-ink);
 }
 .week-day[aria-current="date"] {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+  background: var(--color-cobalt);
+  border-color: var(--color-cobalt);
   color: #fff;
 }
 .sw {
@@ -373,49 +449,59 @@ a:hover {
   width: 46px;
   height: 26px;
   border-radius: 26px;
-  border: 1px solid var(--color-ink);
-  background: #fff;
+  border: 0;
+  background: var(--color-line-3);
   cursor: pointer;
   padding: 0;
   flex: 0 0 auto;
-  transition: background 0.25s ease;
+  transition: background-color 0.2s var(--ease-out);
 }
 .sw::after {
   content: "";
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--color-ink);
-  transition:
-    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background 0.25s ease;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(20 32 51 / 0.25);
+  transition: transform 0.25s var(--ease-out);
 }
 .sw[aria-checked="true"] {
-  background: var(--color-ink);
+  background: var(--color-cobalt);
 }
 .sw[aria-checked="true"]::after {
   transform: translateX(20px);
-  background: #fff;
 }
 input[type="range"] {
-  accent-color: var(--color-ink);
+  accent-color: var(--color-cobalt);
   width: 100%;
 }
 
-/* Texture used on map and hero stages */
-.fabric {
-  background-color: var(--color-mapbg);
-  background-image: repeating-linear-gradient(45deg, rgba(17, 17, 16, 0.022) 0 1px, transparent 1px 6px);
+/* Grout: the light lines between tiles, used as the page's background texture. */
+.fabric,
+.grout {
+  background-color: var(--color-paper);
+  background-image: linear-gradient(var(--color-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-/* Motion */
+/* Motion: one authored moment (tiles being set), quiet feedback elsewhere. */
+@keyframes tile-set {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 @keyframes al-up {
   from {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -425,7 +511,7 @@ input[type="range"] {
 @keyframes al-drop {
   from {
     opacity: 0;
-    transform: translateY(-30px);
+    transform: translateY(-16px);
   }
   to {
     opacity: 1;
@@ -464,13 +550,13 @@ input[type="range"] {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-7px);
+    transform: translateY(-6px);
   }
 }
 @keyframes al-toast {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   14%,
   82% {
@@ -482,16 +568,19 @@ input[type="range"] {
     transform: translateY(-6px);
   }
 }
+.tile-set {
+  animation: tile-set 0.6s var(--ease-out) both;
+}
 .al-in {
-  animation: al-up 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: al-up 0.5s var(--ease-out) both;
 }
 .al-check path {
   stroke-dasharray: 60;
-  animation: al-draw 0.8s 0.2s ease-out both;
+  animation: al-draw 0.6s 0.15s ease-out both;
 }
 .al-line {
   transform-origin: left;
-  animation: al-line 1.4s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: al-line 1s 0.2s var(--ease-out) both;
 }
 .al-float {
   animation: al-float 6s ease-in-out infinite;
@@ -499,14 +588,8 @@ input[type="range"] {
 .al-toast {
   animation: al-toast 3.4s ease infinite;
 }
-@supports (animation-timeline: view()) {
-  .al-rv {
-    animation: al-up linear both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 25%;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
+  .tile-set,
   .al-in,
   .al-rv,
   .al-check path,
@@ -519,7 +602,7 @@ input[type="range"] {
   }
 }
 
-/* MapLibre chef pins */
+/* MapLibre chef pins (map is parked; kept for when it returns) */
 .al-pin {
   display: flex;
   flex-direction: column;
@@ -527,57 +610,51 @@ input[type="range"] {
   cursor: pointer;
 }
 .al-bub {
-  animation: al-drop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  transition: transform 0.3s ease;
+  animation: al-drop 0.6s var(--ease-out) both;
+  transition: transform 0.2s ease;
 }
 .al-pin:hover .al-bub {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 }
 .al-pin button {
   font: inherit;
   display: flex;
   align-items: stretch;
   padding: 0;
-  border-radius: 2px;
-  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-sq);
+  border: 1px solid var(--color-cobalt);
   background: #fff;
   color: var(--color-ink);
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 10px 28px rgba(17, 17, 16, 0.16);
+  box-shadow: 0 6px 18px rgb(20 32 51 / 0.18);
   overflow: hidden;
-  transition:
-    background 0.3s ease,
-    color 0.3s ease;
 }
 .al-pin[data-sel="true"] button {
-  background: var(--color-ink);
+  background: var(--color-cobalt);
   color: #fff;
 }
 .al-pin .ini {
-  padding: 7px 10px;
-  font-size: 15px;
+  padding: 6px 9px;
+  font-size: 14px;
   border-right: 1px solid var(--color-line-2);
 }
-.al-pin[data-sel="true"] .ini {
-  border-right-color: #3a3936;
-}
 .al-pin .price {
-  padding: 7px 11px;
+  padding: 6px 10px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .al-pin .stem {
-  width: 1px;
-  height: 40px;
-  background: var(--color-ink);
+  width: 2px;
+  height: 32px;
+  background: var(--color-cobalt);
 }
 .al-pin .foot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--color-ink);
+  background: var(--color-cobalt);
   margin-top: -3px;
 }
 .al-pin[data-hidden="true"] {
@@ -587,16 +664,13 @@ input[type="range"] {
 .al-pulse {
   position: absolute;
   left: 50%;
-  bottom: -46px;
-  width: 100px;
-  height: 100px;
-  margin-left: -50px;
+  bottom: -40px;
+  width: 90px;
+  height: 90px;
+  margin-left: -45px;
   border-radius: 50%;
-  border: 2px solid var(--color-ink);
+  border: 2px solid var(--color-cobalt);
   box-sizing: border-box;
   animation: al-pulse 2s ease-out infinite;
   pointer-events: none;
-}
-.maplibregl-ctrl-attrib {
-  font-size: 10px;
 }

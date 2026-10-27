@@ -7,7 +7,6 @@ import { ChefMap, type ChefMapHandle } from "@/components/map/ChefMap";
 import { ChefRail } from "@/components/map/ChefRail";
 import { MapControls } from "@/components/map/MapControls";
 import { MapSearchCard } from "@/components/map/MapSearchCard";
-import { SiteHeaderFloating } from "@/components/SiteChrome";
 import { useChefFilters } from "@/hooks/useChefFilters";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { ServiceFilter } from "@/lib/constants";
@@ -58,8 +57,6 @@ export function MapExplorer({ chefs, service }: { chefs: ChefCard[]; service?: S
         home={filters.place}
         padRight={chef && wide ? PANEL_WIDTH : 0}
       />
-
-      <SiteHeaderFloating />
 
       <MapSearchCard
         count={filters.matches.length}

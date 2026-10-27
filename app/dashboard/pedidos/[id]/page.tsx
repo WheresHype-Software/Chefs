@@ -30,7 +30,7 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
       <Link href="/dashboard/pedidos" className="text-sm">
         ← Pedidos
       </Link>
-      <PageHeader eyebrow={`${b.ref} · ${STATUS_LABEL[b.status]}`} title={b.client?.name ?? "Cliente"} />
+      <PageHeader meta={`${b.ref} · ${STATUS_LABEL[b.status]}`} title={b.client?.name ?? "Cliente"} />
       <div className="flex flex-wrap items-start gap-6">
         <section className="box flex min-w-0 flex-[1_1_320px] flex-col gap-4 p-6">
           <DetailList items={details} />

@@ -9,7 +9,7 @@ export default async function Avaliacoes() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        eyebrow={`Avaliações · ${rating(chef.rating_avg, chef.review_count)}`}
+        meta={rating(chef.rating_avg, chef.review_count)}
         title="O que dizem os seus clientes"
         description="Só clientes com reserva concluída avaliam. Pode responder uma vez a cada avaliação, e denunciar avaliações abusivas: a equipa decide."
       />

@@ -46,7 +46,7 @@ export default async function Overview() {
         </div>
       )}
 
-      <PageHeader eyebrow={longDay(today)} title={`Olá, ${chef.display_name.split(" ")[0]}`} />
+      <PageHeader meta={longDay(today)} title={`Olá, ${chef.display_name.split(" ")[0]}`} />
 
       <StatGrid
         items={[

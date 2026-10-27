@@ -9,7 +9,7 @@ export default async function Cozinha() {
   const prices = offers.filter((o) => o.active && o.price != null).map((o) => Number(o.price));
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader eyebrow="Perfil" title="Cozinha e serviços" />
+      <PageHeader title="Cozinha e serviços" />
       <CookingForm
         {...cooking}
         preview={{

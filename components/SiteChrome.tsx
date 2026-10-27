@@ -1,63 +1,46 @@
 import Link from "next/link";
+import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
 
-export function SiteHeaderFloating() {
+export function Wordmark({ suffix }: { suffix?: string }) {
   return (
-    <header className="absolute left-2.5 right-2.5 top-2.5 z-[6] flex items-center justify-between gap-3 rounded-[3px] border border-line bg-white py-2 pl-[22px] pr-2 md:left-4 md:right-4 md:top-4">
-      <Link href="/" className="wordmark d text-[22px]">
-        Ao Lume
-      </Link>
-      <nav aria-label="Principal" className="flex items-center gap-[26px] text-sm">
-        <a href="#como" className="hidden no-underline md:inline">
-          Como funciona
-        </a>
-        <Link href="/para-chefs" className="no-underline">
-          Para chefs
-        </Link>
-        <Link href="/entrar" className="btn btn-sm">
-          Entrar
-        </Link>
-      </nav>
-    </header>
+    <span className="flex items-center gap-2">
+      <TileMark />
+      <span className="wordmark text-[22px] leading-none text-ink">ao lume</span>
+      {suffix && <span className="text-sm font-medium text-muted">{suffix}</span>}
+    </span>
   );
 }
 
+const CLIENT_NAV = [
+  { href: "/#como", label: "Como funciona" },
+  { href: "/procurar", label: "Procurar chefs" },
+  { href: "/para-chefs", label: "Sou chef" },
+];
+
+const CHEF_NAV = [
+  { href: "#ferramenta", label: "Ferramenta" },
+  { href: "#marketing", label: "Marketing" },
+  { href: "#perguntas", label: "Perguntas" },
+  { href: "/", label: "Sou cliente" },
+];
+
 export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
+  const nav = chefs ? CHEF_NAV : CLIENT_NAV;
   return (
-    <header className="sticky top-0 z-10 border-b border-line bg-white">
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3.5 px-5 py-3 md:px-10">
-        <Link href={chefs ? "/para-chefs" : "/"} className="flex items-baseline gap-3 no-underline">
-          <span className="wordmark d text-[22px]">Ao Lume</span>
-          {chefs && <span className="lab text-muted">Chefs</span>}
+    <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur-[6px]">
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-5 md:px-8">
+        <Link href={chefs ? "/para-chefs" : "/"} className="no-underline" aria-label="Ao Lume, página inicial">
+          <Wordmark suffix={chefs ? "para chefs" : undefined} />
         </Link>
-        <nav aria-label="Principal" className="flex items-center gap-7 text-sm">
-          {chefs ? (
-            <>
-              <a href="#ferramenta" className="hidden no-underline md:inline">
-                Ferramenta
-              </a>
-              <a href="#marketing" className="hidden no-underline md:inline">
-                Marketing
-              </a>
-              <a href="#perguntas" className="hidden no-underline md:inline">
-                Perguntas
-              </a>
-              <Link href="/" className="hidden no-underline md:inline">
-                Sou cliente
-              </Link>
-              <Link href="/entrar?chef=1" className="btn btn-sm">
-                Começar
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link href="/para-chefs" className="no-underline">
-                Para chefs
-              </Link>
-              <Link href="/entrar" className="btn btn-sm">
-                Entrar
-              </Link>
-            </>
-          )}
+        <nav aria-label="Principal" className="flex items-center gap-1 text-[15px] font-medium">
+          {nav.map((item) => (
+            <Link key={item.href} href={item.href} className="hidden rounded-md px-3 py-2 no-underline hover:bg-paper md:inline">
+              {item.label}
+            </Link>
+          ))}
+          <Link href={chefs ? "/entrar?chef=1" : "/entrar"} className="btn btn-sm ml-2">
+            {chefs ? "Criar perfil" : "Entrar"}
+          </Link>
         </nav>
       </div>
     </header>
@@ -66,29 +49,42 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
 
 export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
   return (
-    <footer className="mx-auto flex max-w-[1240px] flex-wrap items-baseline justify-between gap-5 px-5 pb-12 pt-10 text-[13px] text-muted md:px-8">
-      <span className="wordmark d text-lg text-ink">Ao Lume</span>
-      <nav aria-label="Rodapé" className="flex flex-wrap gap-[22px]">
-        {chefs ? (
-          <Link href="/" className="text-muted">
-            Para clientes
+    <footer className="bg-cobalt-deep text-white">
+      <div className="h-12 overflow-hidden" aria-hidden="true">
+        <AzulejoField variant="cobalt" size={48} />
+      </div>
+      <div className="mx-auto grid max-w-[1280px] gap-10 px-5 py-14 md:grid-cols-[1.4fr_1fr_1fr] md:px-8">
+        <div className="flex flex-col gap-3">
+          <span className="wordmark text-[26px] text-white">ao lume</span>
+          <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">
+            Chefs e cozinheiros caseiros perto de si. O serviço, os preços e os pagamentos são combinados diretamente com cada chef.
+          </p>
+        </div>
+        <nav aria-label="Para clientes" className="flex flex-col gap-2 text-[15px]">
+          <span className="mb-1 font-semibold">Clientes</span>
+          <Link href="/procurar" className="text-[#c9d6ee] no-underline hover:text-white">
+            Procurar chefs
           </Link>
-        ) : (
-          <Link href="/para-chefs" className="text-muted">
-            Para chefs
+          <Link href="/#como" className="text-[#c9d6ee] no-underline hover:text-white">
+            Como funciona
           </Link>
-        )}
-        <Link href="/termos" className="text-muted">
-          Termos
-        </Link>
-        <Link href="/privacidade" className="text-muted">
-          Privacidade
-        </Link>
-        <a href="https://instagram.com/aolume" className="text-muted" rel="noopener">
-          Instagram
-        </a>
-      </nav>
-      <span>Cada chef é responsável pelo seu serviço, licenças e pagamentos.</span>
+          <Link href="/entrar" className="text-[#c9d6ee] no-underline hover:text-white">
+            Entrar
+          </Link>
+        </nav>
+        <nav aria-label="Para chefs" className="flex flex-col gap-2 text-[15px]">
+          <span className="mb-1 font-semibold">{chefs ? "Ao Lume" : "Chefs"}</span>
+          <Link href="/para-chefs" className="text-[#c9d6ee] no-underline hover:text-white">
+            Ao Lume para chefs
+          </Link>
+          <Link href="/termos" className="text-[#c9d6ee] no-underline hover:text-white">
+            Termos
+          </Link>
+          <Link href="/privacidade" className="text-[#c9d6ee] no-underline hover:text-white">
+            Privacidade
+          </Link>
+        </nav>
+      </div>
     </footer>
   );
 }
