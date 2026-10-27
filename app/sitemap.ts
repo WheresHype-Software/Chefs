@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
+import { publicEnv } from "@/lib/env";
 import { getChefs } from "@/lib/data";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const base = publicEnv.siteUrl;
   const chefs = await getChefs();
   return [
     { url: `${base}/`, changeFrequency: "daily", priority: 1 },

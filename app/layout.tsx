@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, Hanken_Grotesk } from "next/font/google";
+import { publicEnv } from "@/lib/env";
 import "./globals.css";
 
 const bodoni = Bodoni_Moda({
@@ -16,7 +17,7 @@ const hanken = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(publicEnv.siteUrl),
   title: {
     default: "Ao Lume — chefs privados e comida caseira perto de si",
     template: "%s · Ao Lume",

@@ -3,11 +3,12 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MLMap, Marker, StyleSpecification } from "maplibre-gl";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { publicEnv } from "@/lib/env";
 import { fromPrice, initials } from "@/lib/format";
 import type { ChefCard } from "@/lib/types";
 
 // Free vector tiles, no API key: https://openfreemap.org
-const STYLE_URL = process.env.NEXT_PUBLIC_MAP_STYLE_URL ?? "https://tiles.openfreemap.org/styles/positron";
+const STYLE_URL = publicEnv.mapStyleUrl;
 const LISBON: [number, number] = [-9.155, 38.725];
 const TILT = 54;
 const BEARING = -14;

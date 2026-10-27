@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { addPhoto, saveProfile, submitForReview } from "@/app/dashboard/actions";
 import { AddressSearch, type Place } from "@/components/AddressSearch";
 import type { MyChef } from "@/lib/dashboard";
-import { createClient, hasSupabaseBrowser } from "@/lib/supabase/client";
+import { createClient, hasSupabase } from "@/lib/supabase/client";
 
 function slugify(s: string) {
   return s
@@ -55,7 +55,7 @@ export function ProfileForm({ chef, photos, userId }: { chef: MyChef | null; pho
   }
 
   async function upload(kind: "selfie" | "gallery", files: FileList | null) {
-    if (!files?.length || !userId || !hasSupabaseBrowser) return;
+    if (!files?.length || !userId || !hasSupabase) return;
     setMsg(null);
     const sb = createClient();
     for (const file of Array.from(files).slice(0, 8)) {

@@ -1,4 +1,7 @@
 import "server-only";
+import { serverEnv } from "./env.server";
+
+export { siteUrl } from "./env";
 
 type Mail = { to: string; subject: string; text: string; html?: string };
 
@@ -7,8 +10,8 @@ type Mail = { to: string; subject: string; text: string; html?: string };
  * Without a key (local dev, demo) the message is logged instead.
  */
 export async function sendEmail(mail: Mail): Promise<void> {
-  const key = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM ?? "Ao Lume <reservas@aolume.pt>";
+  const key = serverEnv.resendApiKey;
+  const from = serverEnv.emailFrom;
   if (!key) {
     console.info(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.text}`);
     return;
@@ -21,6 +24,3 @@ export async function sendEmail(mail: Mail): Promise<void> {
   if (!res.ok) console.error(`[email] Resend ${res.status}: ${await res.text()}`);
 }
 
-export function siteUrl(path = ""): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "") + path;
-}

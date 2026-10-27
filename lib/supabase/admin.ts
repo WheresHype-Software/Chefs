@@ -1,13 +1,15 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import { publicEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/env.server";
 
 /**
- * Service-role client for server-only jobs that must bypass RLS (e.g. looking up a chef's email
- * to notify them). Returns null when SUPABASE_SERVICE_ROLE_KEY is not configured.
+ * Secret-key client for server-only jobs that must bypass RLS (e.g. looking up a chef's email
+ * to notify them). Returns null when no secret key is configured.
  */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  if (!publicEnv.supabaseUrl || !serverEnv.supabaseSecretKey) return null;
+  return createClient(publicEnv.supabaseUrl, serverEnv.supabaseSecretKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }

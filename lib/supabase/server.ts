@@ -2,17 +2,15 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { createClient as createPlainClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { supabaseConfig } from "@/lib/env";
 
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-/** True when the app is wired to a Supabase project; otherwise it runs on demo data. */
-export const hasSupabase = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+export { hasSupabase } from "@/lib/env";
 
 /** Request-scoped client that acts as the signed-in user (RLS applies). */
 export async function createClient() {
+  const { url, key } = supabaseConfig();
   const cookieStore = await cookies();
-  return createServerClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
+  return createServerClient(url, key, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -30,7 +28,6 @@ export async function createClient() {
 
 /** Anonymous client for public reads and guest RPCs (no cookies, RLS applies). */
 export function createAnonClient() {
-  return createPlainClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const { url, key } = supabaseConfig();
+  return createPlainClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }

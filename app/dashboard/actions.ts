@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getMyChef, getSession } from "@/lib/dashboard";
+import { publicEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import type { ServiceType } from "@/lib/types";
 
@@ -90,7 +91,7 @@ export async function addPhoto(url: string, kind: "selfie" | "cover" | "portrait
   if (ctx.demo || !ctx.chef) return { ok: true };
   // Only accept files the chef uploaded to their own folder in our bucket.
   const session = await getSession();
-  const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chef-photos/${session.userId}/`;
+  const prefix = `${publicEnv.supabaseUrl}/storage/v1/object/public/chef-photos/${session.userId}/`;
   if (!url.startsWith(prefix) || !["selfie", "cover", "portrait", "gallery"].includes(kind)) {
     return { ok: false, error: "Fotografia inválida." };
   }

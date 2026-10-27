@@ -26,7 +26,7 @@ Without Supabase credentials the app runs in **demo mode**: the map, chef pages 
 2. Apply the migrations in `supabase/migrations/` in order, then `supabase/seed.sql`:
    - with the CLI: `supabase link --project-ref <ref>` → `supabase db push` → run `seed.sql` in the SQL editor, or
    - paste each file into the SQL editor in order.
-3. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+3. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (Project Settings → API keys).
 4. In Supabase → Authentication → URL configuration, add `http://localhost:3000/auth/callback` (and your production URL) to the redirect URLs. Enable the Google provider if you want "Continuar com Google".
 5. Make yourself an admin after signing up:
    `update public.profiles set role = 'admin' where email = 'you@example.com';`
