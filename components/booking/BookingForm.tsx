@@ -61,6 +61,8 @@ export function BookingForm({ chef, initialOfferId, initialAddress, onClose, ble
         calendar={calendar.calendar}
         canGoBack={calendar.canGoBack}
         onShift={calendar.shift}
+        failed={calendar.failed}
+        onRetry={calendar.retry}
         selected={form.day}
         onSelect={form.setDay}
       />

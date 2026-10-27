@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { usePolling } from "@/hooks/usePolling";
+import { callAction } from "@/lib/call-action";
 import { getBookingView, postMessage } from "@/lib/bookings";
 import { timeLabel } from "@/lib/format";
 import type { BookingView, ChatMessage } from "@/lib/types";
@@ -54,7 +55,7 @@ export function BookingChat({ view, title, subtitle }: Props) {
     setError(false);
     setMessages((m) => [...m, { id: `tmp-${Date.now()}`, sender: me, body, at: new Date().toISOString() }]);
     startTransition(async () => {
-      const result = await postMessage(id, body);
+      const result = await callAction(() => postMessage(id, body));
       if (!result.ok) setError(true);
     });
   }

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { markFulfilled } from "@/app/dashboard/actions";
 import { Chip } from "@/components/ui/Chip";
+import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
+import { callAction } from "@/lib/call-action";
 import type { DashBooking } from "@/lib/dashboard";
 import type { FulfilmentMode } from "@/lib/types";
 
@@ -18,14 +20,20 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
   const [type, setType] = useState<FulfilmentMode | "all">("all");
   const [done, setDone] = useState<Record<string, boolean>>(() => Object.fromEntries(items.map((i) => [i.id, Boolean(i.fulfilled_at)])));
   const [, start] = useTransition();
+  const [message, setMessage] = useState<FormMessageValue | null>(null);
   const count = (t: FulfilmentMode) => items.filter((i) => i.fulfilment_mode === t).length;
   const shown = items.filter((i) => type === "all" || i.fulfilment_mode === type);
 
   function toggle(id: string) {
     const next = !done[id];
     setDone((d) => ({ ...d, [id]: next }));
+    setMessage(null);
     start(async () => {
-      await markFulfilled(id, !next);
+      const result = await callAction(() => markFulfilled(id, !next));
+      if (!result.ok) {
+        setDone((d) => ({ ...d, [id]: !next }));
+        setMessage({ ok: false, text: result.error });
+      }
     });
   }
 
@@ -45,6 +53,8 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
           </Chip>
         ))}
       </div>
+
+      <FormMessage message={message} />
 
       {shown.length === 0 && (
         <div className="box flex flex-col gap-1.5 px-6 py-10 text-center">

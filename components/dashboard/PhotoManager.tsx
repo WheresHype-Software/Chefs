@@ -6,6 +6,7 @@ import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage"
 import { Photo } from "@/components/ui/Photo";
 import { usePhotoUpload, type UploadKind } from "@/hooks/usePhotoUpload";
 import type { ChefPhoto } from "@/lib/dashboard";
+import { callAction } from "@/lib/call-action";
 import type { ActionResult } from "@/lib/result";
 
 type Change = { type: "delete"; id: string } | { type: "move"; id: string; to: "first" | -1 | 1 };
@@ -71,7 +72,7 @@ function CaptionField({ photo, onSaved }: { photo: ChefPhoto; onSaved: (r: Actio
         onBlur={() => {
           if (text.trim() === saved.trim()) return;
           start(async () => {
-            const r = await updatePhotoCaption(photo.id, text);
+            const r = await callAction(() => updatePhotoCaption(photo.id, text));
             if (r.ok) setSaved(text);
             onSaved(r);
           });
@@ -100,7 +101,7 @@ export function PhotoManager({ photos, userId, initials }: Props) {
     setMessage(null);
     start(async () => {
       apply(c);
-      const r = await run();
+      const r = await callAction(run);
       if (!r.ok) setMessage({ ok: false, text: r.error });
     });
   }

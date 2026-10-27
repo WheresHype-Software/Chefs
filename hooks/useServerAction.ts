@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { FormMessageValue } from "@/components/ui/FormMessage";
+import { callAction } from "@/lib/call-action";
 import type { ActionResult } from "@/lib/result";
 
 type Options = {
@@ -25,7 +26,7 @@ export function useServerAction<Args extends unknown[]>(action: (...args: Args) 
   function run(...args: Args) {
     setMessage(null);
     startTransition(async () => {
-      const result = await action(...args);
+      const result = await callAction(() => action(...args));
       if (!result.ok) {
         setMessage({ ok: false, text: result.error });
         return;

@@ -10,13 +10,16 @@ type Props = {
   selected: string | null;
   onSelect: (iso: string) => void;
   onShift: (delta: number) => void;
+  /** The days could not be loaded: show a retry instead of an empty month. */
+  failed?: boolean;
+  onRetry?: () => void;
   canGoBack: boolean;
 };
 
 const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"];
 
 /** Month grid of a chef's free days: outlined = available, struck = booked. */
-export function MonthCalendar({ year, month, calendar, selected, onSelect, onShift, canGoBack }: Props) {
+export function MonthCalendar({ year, month, calendar, selected, onSelect, onShift, canGoBack, failed = false, onRetry }: Props) {
   const lead = (new Date(year, month, 1).getDay() + 6) % 7; // Monday first
   const days = new Date(year, month + 1, 0).getDate();
   const available = new Set(calendar?.available ?? []);
@@ -72,7 +75,22 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onShi
           );
         })}
       </div>
-      <span className="text-xs text-muted">Com contorno: disponível · Riscado: já reservado</span>
+      {failed ? (
+        <p role="alert" className="m-0 flex flex-wrap items-center gap-x-2 text-sm text-danger">
+          Não foi possível carregar os dias livres.
+          {onRetry && (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="cursor-pointer border-0 bg-transparent p-0 font-semibold text-cobalt underline"
+            >
+              Tentar de novo
+            </button>
+          )}
+        </p>
+      ) : (
+        <span className="text-xs text-muted">Com contorno: disponível · Riscado: já reservado</span>
+      )}
     </div>
   );
 }

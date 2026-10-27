@@ -8,14 +8,16 @@ import type { Calendar } from "@/lib/types";
 export function useMonthCalendar(chefId: string) {
   const [now] = useState(() => new Date());
   const [month, setMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
-  const key = `${chefId}:${month.year}-${month.month}`;
-  const [loaded, setLoaded] = useState<{ key: string; data: Calendar } | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const key = `${chefId}:${month.year}-${month.month}:${attempt}`;
+  const [loaded, setLoaded] = useState<{ key: string; data: Calendar | null } | null>(null);
 
   useEffect(() => {
     let live = true;
     loadCalendar(chefId, month.year, month.month)
       .then((data) => live && setLoaded({ key, data }))
-      .catch(() => live && setLoaded({ key, data: { available: [], booked: [] } }));
+      // null data = the days could not be loaded; the calendar offers a retry.
+      .catch(() => live && setLoaded({ key, data: null }));
     return () => {
       live = false;
     };
@@ -31,6 +33,8 @@ export function useMonthCalendar(chefId: string) {
   return {
     ...month,
     calendar: loaded?.key === key ? loaded.data : null,
+    failed: loaded?.key === key && loaded.data === null,
+    retry: () => setAttempt((n) => n + 1),
     canGoBack: month.year > now.getFullYear() || month.month > now.getMonth(),
     shift,
   };

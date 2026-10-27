@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { requestBooking } from "@/app/actions";
+import { callAction } from "@/lib/call-action";
 import type { Place } from "@/components/AddressSearch";
 import { useMonthCalendar } from "@/hooks/useMonthCalendar";
 import type { ChefCard } from "@/lib/types";
@@ -58,17 +59,19 @@ export function useBookingForm(chef: ChefCard, options: { initialOfferId?: strin
     if (!ready || !day || !time) return;
     setError(null);
     startTransition(async () => {
-      const result = await requestBooking({
-        offerId: offer.id,
-        date: day,
-        time,
-        guests,
-        name: contact.name,
-        email: contact.email,
-        phone: contact.phone,
-        notes: contact.notes || undefined,
-        ...(needsAddress ? { address, lat: place?.lat, lng: place?.lng } : {}),
-      });
+      const result = await callAction(() =>
+        requestBooking({
+          offerId: offer.id,
+          date: day,
+          time,
+          guests,
+          name: contact.name,
+          email: contact.email,
+          phone: contact.phone,
+          notes: contact.notes || undefined,
+          ...(needsAddress ? { address, lat: place?.lat, lng: place?.lng } : {}),
+        }),
+      );
       if (result.ok) setSent({ ref: result.ref, link: result.link });
       else setError(result.error);
     });

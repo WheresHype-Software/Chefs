@@ -3,8 +3,11 @@
 import { useState, useTransition } from "react";
 import { cycleDay, openWeekdays } from "@/app/dashboard/actions";
 import { Chip } from "@/components/ui/Chip";
+import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
 import { useToggleList } from "@/hooks/useToggleList";
+import { callAction } from "@/lib/call-action";
 import { isoDay } from "@/lib/format";
+import type { ActionResult } from "@/lib/result";
 
 type DayState = "available" | "blocked" | "booked" | undefined;
 
@@ -23,11 +26,25 @@ export function AgendaGrid({
 }) {
   const [days, setDays] = useState(initial);
   const [pending, start] = useTransition();
+  const [message, setMessage] = useState<FormMessageValue | null>(null);
   const weekdays = useToggleList<number>([]);
   const lead = (new Date(year, month, 1).getDay() + 6) % 7;
   const count = new Date(year, month + 1, 0).getDate();
   const today = isoDay(new Date());
   const bookedSet = new Set(booked);
+
+  /** Applies a change on screen at once and puts the previous days back if saving fails. */
+  function save(run: () => Promise<ActionResult>) {
+    const before = days;
+    setMessage(null);
+    start(async () => {
+      const result = await callAction(run);
+      if (!result.ok) {
+        setDays(before);
+        setMessage({ ok: false, text: result.error });
+      }
+    });
+  }
 
   function cycle(iso: string) {
     setDays((d) => {
@@ -37,9 +54,7 @@ export function AgendaGrid({
       else delete next[iso];
       return next;
     });
-    start(async () => {
-      await cycleDay(iso);
-    });
+    save(() => cycleDay(iso));
   }
 
   function fillWeekdays() {
@@ -53,9 +68,7 @@ export function AgendaGrid({
       }
       return next;
     });
-    start(async () => {
-      await openWeekdays(year, month, jsDays);
-    });
+    save(() => openWeekdays(year, month, jsDays));
   }
 
   return (
@@ -74,6 +87,7 @@ export function AgendaGrid({
         </div>
       </div>
 
+      <FormMessage message={message} />
       <div className="box p-[22px]">
         <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[.1em] text-muted" aria-hidden="true">
           {WD.map((w) => (
