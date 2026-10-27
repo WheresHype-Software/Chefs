@@ -48,7 +48,7 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
               {cats.items.length} de {MAX_CATEGORIES}
             </span>
           </div>
-          <span className="text-sm text-muted">Escolha até três. Os clientes filtram a pesquisa por estas categorias.</span>
+          <span className="text-sm text-muted">Escolha até {MAX_CATEGORIES}. Os clientes filtram a pesquisa por estas categorias.</span>
           <div className="flex flex-wrap gap-1.5">
             {categories.map((c) => (
               <Chip key={c.id} pressed={cats.has(c.id)} disabled={!cats.has(c.id) && !cats.canAdd} onClick={() => cats.toggle(c.id)}>

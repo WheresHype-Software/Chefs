@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { CUISINES } from "./constants";
 import { isoDay } from "./format";
 import { createClient, hasSupabase } from "./supabase/server";
 import type { BookingStatus, FulfilmentMode, PriceModel, ServiceType } from "./types";
@@ -402,20 +403,7 @@ const DEMO_LOGISTICS = {
 };
 
 const DEMO_COOKING = {
-  categories: [
-    "Portuguesa",
-    "Petiscos",
-    "Marisco e peixe",
-    "Grelhados",
-    "Cozinha de autor",
-    "Mediterrânica",
-    "Vegetariana",
-    "Vegan",
-    "Saudável",
-    "Pastelaria",
-    "Brasileira",
-    "Asiática",
-  ].map((name, i) => ({ id: i + 1, name })),
+  categories: CUISINES.map((name, i) => ({ id: i + 1, name })),
   diets: ["Vegetariano", "Vegan", "Sem glúten", "Sem lactose", "Halal", "Para crianças"].map((name, i) => ({ id: i + 1, name })),
   mine: { categories: [1, 2], diets: [1, 3, 4, 6], services: ["home", "delivery", "pickup", "events"] as ServiceType[] },
 };

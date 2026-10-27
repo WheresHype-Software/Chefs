@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AzulejoTile } from "@/components/brand/Azulejo";
 import { ChefTile } from "@/components/search/ChefTile";
+import { CuisineSelect } from "@/components/search/CuisineSelect";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { CUISINES, SERVICE_FILTERS } from "@/lib/constants";
+import { CUISINES, POPULAR_CUISINES, SERVICE_FILTERS } from "@/lib/constants";
 import { dayLabel } from "@/lib/format";
 import { searchChefs } from "@/lib/search";
 import { parseSearchQuery, searchHref, type SearchQuery } from "@/lib/search-params";
@@ -65,11 +66,18 @@ export default async function ProcurarPage({ searchParams }: PageProps<"/procura
                 <Link href={searchHref(q, { cuisine: null })} scroll={false} className="chip" aria-current={!q.cuisine}>
                   Todas as cozinhas
                 </Link>
-                {CUISINES.map((c) => (
+                {POPULAR_CUISINES.map((c) => (
                   <Link key={c} href={searchHref(q, { cuisine: c })} scroll={false} className="chip" aria-current={q.cuisine === c}>
                     {c}
                   </Link>
                 ))}
+                <CuisineSelect
+                  current={q.cuisine}
+                  options={CUISINES.filter((c) => !POPULAR_CUISINES.includes(c)).map((c) => ({
+                    label: c,
+                    href: searchHref(q, { cuisine: c }),
+                  }))}
+                />
               </FilterRow>
             </div>
           </div>

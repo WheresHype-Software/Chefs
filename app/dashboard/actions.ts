@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { MAX_CATEGORIES } from "@/lib/constants";
 import { getMyChef, getSession } from "@/lib/dashboard";
 import { publicEnv } from "@/lib/env";
 import { fail, ok, type ActionResult as Result } from "@/lib/result";
@@ -120,7 +121,7 @@ export async function submitForReview(): Promise<Result> {
 // Cooking categories, services, diets
 // ---------------------------------------------------------------------------
 export async function saveCooking(categories: number[], diets: number[], services: ServiceType[]): Promise<Result> {
-  if (categories.length > 3) return fail("Escolha até três categorias.");
+  if (categories.length > MAX_CATEGORIES) return fail(`Escolha até ${MAX_CATEGORIES} categorias.`);
   const ctx = await chefContext();
   if (ctx.demo || !ctx.chef) return ok();
   const id = ctx.chef.id;
