@@ -596,6 +596,17 @@ input[type="range"] {
 .al-toast {
   animation: al-toast 3.4s ease infinite;
 }
+/* Booking form: the pinned summary steps aside while a field has focus, so the on-screen
+   keyboard and the summary never hide what the person is typing. */
+@media (max-width: 1039px) {
+  .booking-form:has(:is(input, textarea, select):focus) .booking-summary {
+    position: static;
+  }
+}
+.booking-form :is(input, textarea, select) {
+  scroll-margin: 96px 0 24px;
+}
+
 /* Mobile menu sheet (components/MobileMenu.tsx) */
 .menu-sheet[open] {
   animation: menu-in 0.28s var(--ease-out);

@@ -88,6 +88,17 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onShi
             </button>
           )}
         </p>
+      ) : calendar && available.size === 0 ? (
+        <p className="m-0 flex flex-wrap items-center gap-x-2 text-sm text-ink-3">
+          Sem dias livres neste mês.
+          <button
+            type="button"
+            onClick={() => onShift(1)}
+            className="cursor-pointer border-0 bg-transparent p-0 font-semibold text-cobalt underline"
+          >
+            Ver o mês seguinte
+          </button>
+        </p>
       ) : (
         <span className="text-xs text-muted">Com contorno: disponível · Riscado: já reservado</span>
       )}

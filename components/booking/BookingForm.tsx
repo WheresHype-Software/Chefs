@@ -50,7 +50,7 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
 
   return (
     <form
-      className="flex flex-col gap-7"
+      className="booking-form flex flex-col gap-7"
       onSubmit={(e) => {
         e.preventDefault();
         form.submit();
@@ -146,17 +146,28 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
         />
       </Field>
 
-      <div className={`sticky bottom-0 flex flex-col gap-3 border-t border-line bg-white pb-[22px] pt-4 ${bleed ? "-mx-7 px-7" : ""}`}>
-        <div className="num flex items-baseline justify-between gap-3">
-          <span className="text-sm text-muted">{form.estimate == null ? offer.title : `${euro(offer.price)} × ${form.guests}`}</span>
-          <span className="d text-2xl">{form.estimate == null ? "Sob orçamento" : euro(form.estimate)}</span>
+      {/* Pinned while choosing; unpinned while typing (globals.css) so it never covers a field. */}
+      <div
+        className={`booking-summary sticky bottom-0 z-10 flex flex-col gap-2.5 border-t border-line bg-white pb-[max(14px,env(safe-area-inset-bottom))] pt-3 ${bleed ? "-mx-7 px-7" : ""}`}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="d num text-[22px] leading-tight">{form.estimate == null ? "Sob orçamento" : euro(form.estimate)}</span>
+            <span className="truncate text-[13px] text-muted">
+              {form.day
+                ? [dayLabel(form.day), form.time, `${form.guests} ${unitTitle(offer).toLowerCase()}`].filter(Boolean).join(" · ")
+                : form.estimate == null
+                  ? offer.title
+                  : `${euro(offer.price)} × ${form.guests}`}
+            </span>
+          </div>
+          <button type="submit" className="btn shrink-0" disabled={!form.ready || form.pending}>
+            {form.pending ? "A enviar…" : form.ctaLabel}
+          </button>
         </div>
         <FormMessage message={form.error ? { ok: false, text: form.error } : null} />
-        <button type="submit" className="btn w-full" disabled={!form.ready || form.pending}>
-          {form.pending ? "A enviar…" : form.ctaLabel}
-        </button>
-        <span className="text-center text-xs text-muted">Ainda não paga nada · paga diretamente ao chef</span>
       </div>
+      <span className="-mt-4 text-center text-xs text-muted">Ainda não paga nada · paga diretamente ao chef</span>
     </form>
   );
 }
