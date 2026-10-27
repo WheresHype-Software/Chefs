@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { deleteOffer, saveOffer } from "@/app/dashboard/actions";
 import { Field } from "@/components/ui/Field";
@@ -50,32 +51,75 @@ function OfferRow({ offer, onEdit }: { offer: DashOffer; onEdit: () => void }) {
   );
 }
 
-/** The chef's offers with an inline editor for creating and changing them. */
-export function OfferList({ offers }: { offers: DashOffer[] }) {
-  const [editing, setEditing] = useState<DashOffer | null>(null);
+/** After a new offer: clients can only book on open days, so point to the agenda. */
+function NextStepAgenda({ openDays, onClose }: { openDays: number; onClose: () => void }) {
   return (
-    <div className="flex flex-wrap items-start gap-6">
-      <section className="flex min-w-0 flex-[3_1_420px] flex-col gap-3.5">
-        {offers.length === 0 && (
-          <p className="m-0 text-muted">Ainda não tem ofertas. Crie a primeira: um menu, uma caixa, uma encomenda.</p>
-        )}
-        {offers.map((o) => (
-          <OfferRow key={o.id} offer={o} onEdit={() => setEditing(o)} />
-        ))}
-        <button type="button" className="btn self-start" onClick={() => setEditing({ ...EMPTY_OFFER })}>
-          Nova oferta
+    <div role="status" className="flex flex-col gap-3 rounded-[10px] border border-cobalt/30 bg-cobalt-soft p-5">
+      <span className="d text-xl">Oferta criada.</span>
+      <span className="text-[15px] text-ink-3">
+        {openDays > 0
+          ? `Tem ${openDays} ${openDays === 1 ? "dia aberto" : "dias abertos"} na agenda: os clientes já podem pedir esta oferta nesses dias.`
+          : "Agora abra na agenda os dias em que pode cozinhar. Os clientes só podem pedir reserva nos dias abertos."}
+      </span>
+      <div className="flex flex-wrap gap-2">
+        <Link href="/dashboard/agenda" className="btn btn-sm">
+          {openDays > 0 ? "Ver a agenda" : "Abrir dias na agenda"}
+        </Link>
+        <button type="button" className="btn btn-sm btn-o" onClick={onClose}>
+          Fechar
         </button>
-      </section>
-      {editing && <OfferForm key={editing.id || "new"} offer={editing} onDone={() => setEditing(null)} />}
+      </div>
     </div>
   );
 }
 
-function OfferForm({ offer, onDone }: { offer: DashOffer; onDone: () => void }) {
+/** The chef's offers with an inline editor for creating and changing them. */
+export function OfferList({ offers, openDays }: { offers: DashOffer[]; openDays: number }) {
+  const [editing, setEditing] = useState<DashOffer | null>(null);
+  const [created, setCreated] = useState(false);
+  return (
+    <div className="flex flex-wrap items-start gap-6">
+      <section className="flex min-w-0 flex-[3_1_420px] flex-col gap-3.5">
+        {created && <NextStepAgenda openDays={openDays} onClose={() => setCreated(false)} />}
+        {offers.length === 0 && (
+          <p className="m-0 text-muted">
+            Ainda não tem ofertas. Crie a primeira: um menu, uma caixa, uma encomenda. Depois abra na agenda os dias em que pode cozinhar.
+          </p>
+        )}
+        {offers.map((o) => (
+          <OfferRow key={o.id} offer={o} onEdit={() => setEditing(o)} />
+        ))}
+        <button
+          type="button"
+          className="btn self-start"
+          onClick={() => {
+            setCreated(false);
+            setEditing({ ...EMPTY_OFFER });
+          }}
+        >
+          Nova oferta
+        </button>
+      </section>
+      {editing && (
+        <OfferForm
+          key={editing.id || "new"}
+          offer={editing}
+          onDone={(saved) => {
+            if (saved && !editing.id) setCreated(true);
+            setEditing(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** `onDone(true)` after a save, `onDone(false)` after delete or cancel. */
+function OfferForm({ offer, onDone }: { offer: DashOffer; onDone: (saved: boolean) => void }) {
   const [o, setOffer] = useState(offer);
   const [slots, setSlots] = useState(offer.time_slots.join(", "));
-  const save = useServerAction(saveOffer, { onSuccess: onDone });
-  const remove = useServerAction(deleteOffer, { onSuccess: onDone });
+  const save = useServerAction(saveOffer, { onSuccess: () => onDone(true) });
+  const remove = useServerAction(deleteOffer, { onSuccess: () => onDone(false) });
   const pending = save.pending || remove.pending;
   const set = <K extends keyof DashOffer>(key: K, value: DashOffer[K]) => setOffer((p) => ({ ...p, [key]: value }));
 
@@ -162,7 +206,7 @@ function OfferForm({ offer, onDone }: { offer: DashOffer; onDone: () => void }) 
         <button type="submit" className="btn btn-sm" disabled={pending}>
           Guardar
         </button>
-        <button type="button" className="btn btn-sm btn-o" onClick={onDone}>
+        <button type="button" className="btn btn-sm btn-o" onClick={() => onDone(false)}>
           Fechar
         </button>
         {o.id && (

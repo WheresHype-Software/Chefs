@@ -2,7 +2,8 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { redirect } from "next/navigation";
-import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
+import { SetupChecklist } from "@/components/dashboard/SetupChecklist";
+import { getBookings, getMyChef, getSession, getSetupProgress } from "@/lib/dashboard";
 import { dayLabel, isoDay, longDay, rating } from "@/lib/format";
 
 export default async function Overview() {
@@ -16,9 +17,10 @@ export default async function Overview() {
   const today = isoDay(new Date());
   const in7 = new Date();
   in7.setDate(in7.getDate() + 6);
-  const [requests, week] = await Promise.all([
+  const [requests, week, progress] = await Promise.all([
     getBookings({ statuses: ["requested"] }),
     getBookings({ from: today, to: isoDay(in7), statuses: ["accepted", "confirmed"] }),
+    getSetupProgress(),
   ]);
   const byDay = new Map<string, number>();
   week.forEach((b) => byDay.set(b.date, (byDay.get(b.date) ?? 0) + 1));
@@ -27,23 +29,7 @@ export default async function Overview() {
 
   return (
     <div className="flex flex-col gap-6">
-      {chef.status !== "approved" && (
-        <div className="box flex flex-wrap items-center justify-between gap-4 p-6">
-          <span className="flex flex-col gap-1">
-            <span className="d text-2xl">{chef.status === "pending" ? "O seu perfil está em revisão" : "Complete o seu perfil"}</span>
-            <span className="text-muted">
-              {chef.status === "pending"
-                ? "A nossa equipa responde por email. Entretanto pode preparar ofertas e a agenda."
-                : chef.status === "rejected"
-                  ? `Pedimos alterações: ${chef.verification_notes ?? "veja o email que enviámos."}`
-                  : "Fotografia, Instagram ou site e três fotos de pratos, depois envie para revisão."}
-            </span>
-          </span>
-          <Link href="/dashboard/perfil" className="btn">
-            Abrir perfil
-          </Link>
-        </div>
-      )}
+      <SetupChecklist chef={chef} progress={progress} />
 
       <PageHeader meta={longDay(today)} title={`Olá, ${chef.display_name.split(" ")[0]}`} />
 

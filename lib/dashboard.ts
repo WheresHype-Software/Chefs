@@ -191,6 +191,39 @@ export async function getAvailability(from: string, to: string): Promise<{ date:
   return (data ?? []) as { date: string; status: "available" | "blocked" }[];
 }
 
+export type SetupProgress = {
+  profilePhoto: boolean;
+  dishPhotos: number;
+  activeOffers: number;
+  /** Open days from today on. */
+  openDays: number;
+};
+
+/** What a chef still has to do before clients can find and book them. */
+export async function getSetupProgress(): Promise<SetupProgress> {
+  const chef = await requireChef();
+  if ((await getSession()).demo) return { profilePhoto: true, dishPhotos: 3, activeOffers: 3, openDays: 12 };
+  const sb = await createClient();
+  const today = isoDay(new Date());
+  const [photos, offers, days] = await Promise.all([
+    sb.from("chef_photos").select("kind").eq("chef_id", chef.id),
+    sb.from("offers").select("id", { count: "exact", head: true }).eq("chef_id", chef.id).eq("active", true),
+    sb
+      .from("availability")
+      .select("id", { count: "exact", head: true })
+      .eq("chef_id", chef.id)
+      .eq("status", "available")
+      .gte("date", today),
+  ]);
+  const kinds = (photos.data ?? []).map((p) => p.kind as string);
+  return {
+    profilePhoto: kinds.includes("portrait") || kinds.includes("selfie"),
+    dishPhotos: kinds.filter((k) => k === "gallery").length,
+    activeOffers: offers.count ?? 0,
+    openDays: days.count ?? 0,
+  };
+}
+
 export async function getCooking(): Promise<{
   categories: { id: number; name: string }[];
   diets: { id: number; name: string }[];
