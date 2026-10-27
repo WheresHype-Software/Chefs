@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
 import { demoBookingView } from "@/lib/demo-booking";
-import { fail, ok, type ActionResult } from "@/lib/result";
+import { fail, failWith, ok, type ActionResult } from "@/lib/result";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 import type { BookingStatus, BookingView } from "@/lib/types";
 
@@ -48,11 +48,11 @@ export async function postMessage(id: string, body: string): Promise<ActionResul
       .single();
     if (!conv) return fail("Conversa não encontrada.");
     const { error } = await sb.from("messages").insert({ conversation_id: conv.id, sender: "chef", body: input.data.body });
-    return error ? fail("Não foi possível enviar a mensagem.") : ok();
+    return error ? failWith(error, "postMessage chef", "Não foi possível enviar a mensagem.") : ok();
   }
 
   const { error } = await sb.rpc("client_post_message", { p_booking_id: id, p_body: input.data.body, p_token: await guestToken(id) });
-  return error ? fail("Não foi possível enviar a mensagem.") : ok();
+  return error ? failWith(error, "postMessage client", "Não foi possível enviar a mensagem.") : ok();
 }
 
 const ClientActionName = z.enum(["cancel", "accept_proposal"]);
@@ -64,7 +64,7 @@ export async function clientAction(id: string, action: z.infer<typeof ClientActi
   const sb = await createClient();
   const { error } = await sb.rpc("client_update_booking", { p_booking_id: id, p_action: action, p_token: await guestToken(id) });
   revalidatePath(`/reserva/${id}`);
-  return error ? fail("Não foi possível concluir. Atualize a página e tente de novo.") : ok();
+  return error ? failWith(error, "clientAction", "Não foi possível concluir. Atualize a página e tente de novo.") : ok();
 }
 
 const ChefUpdateInput = z.object({
@@ -87,9 +87,15 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   const parsed = ChefUpdateInput.safeParse(update);
   if (!parsedId.success || !parsed.success) return fail("Dados inválidos.");
   const sb = await createClient();
-  const { error } = await sb.from("bookings").update(parsed.data).eq("id", id);
+  // select() returns the row, so "nothing was updated" (not this chef's booking) is caught too.
+  const { data, error } = await sb.from("bookings").update(parsed.data).eq("id", id).select("id").maybeSingle();
   revalidatePath("/dashboard", "layout");
-  return error ? fail("Não foi possível atualizar a reserva.") : ok();
+  if (error?.message.includes("invalid_transition")) {
+    return failWith(error, "chefUpdateBooking", "Este pedido já mudou de estado. Atualize a página para ver o estado atual.");
+  }
+  if (error) return failWith(error, "chefUpdateBooking", "Não foi possível atualizar a reserva. Tente de novo.");
+  if (!data) return failWith({ id }, "chefUpdateBooking no row", "Não encontrámos este pedido. Atualize a página.");
+  return ok();
 }
 
 const Score = z.number().int().min(1).max(5);
@@ -118,5 +124,5 @@ export async function submitReview(id: string, review: z.infer<typeof ReviewInpu
     p_token: await guestToken(id),
   });
   revalidatePath(`/reserva/${id}`);
-  return error ? fail("Não foi possível publicar a avaliação.") : ok();
+  return error ? failWith(error, "submitReview", "Não foi possível publicar a avaliação.") : ok();
 }
