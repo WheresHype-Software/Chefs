@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MapExplorer, ServiceList } from "@/components/MapExplorer";
+import { ServiceList } from "@/components/home/ServiceList";
+import { MapExplorer } from "@/components/map/MapExplorer";
 import { SiteFooter } from "@/components/SiteChrome";
 import { getChefs } from "@/lib/data";
 import type { ServiceType } from "@/lib/types";
@@ -26,7 +27,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
   return (
     <div>
-      <MapExplorer chefs={chefs} filter={filter} />
+      <MapExplorer chefs={chefs} service={filter} />
 
       <section id="como" className="mx-auto flex max-w-[1240px] flex-col gap-14 px-5 pb-24 pt-28 md:px-8">
         <div className="al-rv flex flex-wrap items-end justify-between gap-6">
@@ -50,7 +51,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <span className="lab text-muted">A carta</span>
             <h2 className="d m-0 text-[clamp(38px,6vw,64px)] leading-none">O que pode pedir.</h2>
           </div>
-          <ServiceList onPickHref />
+          <ServiceList />
         </div>
       </section>
 
