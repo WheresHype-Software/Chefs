@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { saveLogistics } from "@/app/dashboard/actions";
 import { ToggleChipList, type ToggleItem } from "@/components/dashboard/ToggleChipList";
 import { Field } from "@/components/ui/Field";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Switch } from "@/components/ui/Switch";
 import { useServerAction } from "@/hooks/useServerAction";
@@ -11,7 +12,11 @@ import type { Logistics } from "@/lib/dashboard";
 
 type Props = { initial: Logistics; zones: ToggleItem[]; slots: ToggleItem[]; area: string };
 
-const toNumber = (v: string) => Number(v.replace(",", "."));
+const parseWindows = (text: string) =>
+  text
+    .split(/[·,;]/)
+    .map((w) => w.trim())
+    .filter(Boolean);
 const numberInput = "w-20 border-0 border-b border-line-3 bg-transparent py-1 text-right text-sm outline-none focus:border-ink";
 
 /** A titled card with an on/off switch; its body shows only when switched on. */
@@ -50,6 +55,8 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
   const [settings, setSettings] = useState(initial);
   const [zones, setZones] = useState(initialZones);
   const [slots, setSlots] = useState(initialSlots);
+  // Free text while typing; split into windows only when saving.
+  const [windows, setWindows] = useState(initial.delivery_windows.join(", "));
   const { run, pending, message } = useServerAction(saveLogistics, { successMessage: "Guardado." });
   const set = <K extends keyof Logistics>(key: K, value: Logistics[K]) => setSettings((s) => ({ ...s, [key]: value }));
   const s = settings;
@@ -73,27 +80,33 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
         </label>
         <div className="flex flex-col border-t border-line">
           <SettingRow label="Grátis até (km)">
-            <input
+            <NumberInput
               className={numberInput}
-              inputMode="decimal"
+              decimal
+              min={0}
+              emptyValue={0}
               value={s.free_distance_km}
-              onChange={(e) => set("free_distance_km", toNumber(e.target.value) || 0)}
+              onChange={(v) => set("free_distance_km", v ?? 0)}
             />
           </SettingRow>
           <SettingRow label="Depois, por km (€)">
-            <input
+            <NumberInput
               className={numberInput}
-              inputMode="decimal"
+              decimal
+              min={0}
+              emptyValue={0}
               value={s.fee_per_km}
-              onChange={(e) => set("fee_per_km", toNumber(e.target.value) || 0)}
+              onChange={(v) => set("fee_per_km", v ?? 0)}
             />
           </SettingRow>
           <SettingRow label="Chegada antes do serviço (min)">
-            <input
+            <NumberInput
               className={numberInput}
-              inputMode="numeric"
+              min={0}
+              max={600}
+              emptyValue={0}
               value={s.arrival_minutes_before}
-              onChange={(e) => set("arrival_minutes_before", Number(e.target.value) || 0)}
+              onChange={(v) => set("arrival_minutes_before", v ?? 0)}
             />
           </SettingRow>
         </div>
@@ -112,32 +125,21 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
           <SettingRow label="Janelas">
             <input
               className="w-44 border-0 border-b border-line-3 bg-transparent py-1 text-right text-sm outline-none focus:border-ink"
-              value={s.delivery_windows.join(" · ")}
-              onChange={(e) =>
-                set(
-                  "delivery_windows",
-                  e.target.value
-                    .split("·")
-                    .map((w) => w.trim())
-                    .filter(Boolean),
-                )
-              }
+              value={windows}
+              onChange={(e) => setWindows(e.target.value)}
+              placeholder="12:00-14:00, 19:00-21:00"
             />
           </SettingRow>
           <SettingRow label="Taxa (€)">
-            <input
-              className={numberInput}
-              inputMode="decimal"
-              value={s.delivery_fee ?? ""}
-              onChange={(e) => set("delivery_fee", e.target.value ? toNumber(e.target.value) : null)}
-            />
+            <NumberInput className={numberInput} decimal min={0} value={s.delivery_fee} onChange={(v) => set("delivery_fee", v)} />
           </SettingRow>
           <SettingRow label="Grátis acima de (€)">
-            <input
+            <NumberInput
               className={numberInput}
-              inputMode="decimal"
-              value={s.free_delivery_over ?? ""}
-              onChange={(e) => set("free_delivery_over", e.target.value ? toNumber(e.target.value) : null)}
+              decimal
+              min={0}
+              value={s.free_delivery_over}
+              onChange={(v) => set("free_delivery_over", v)}
             />
           </SettingRow>
           <SettingRow label="Quem entrega">
@@ -173,7 +175,7 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
         disabled={pending}
         onClick={() =>
           run(
-            s,
+            { ...s, delivery_windows: parseWindows(windows) },
             zones.map((z) => ({ name: z.label, active: z.active })),
             slots,
           )

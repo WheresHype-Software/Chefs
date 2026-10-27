@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { deleteOffer, saveOffer } from "@/app/dashboard/actions";
 import { Field } from "@/components/ui/Field";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
 import type { DashOffer } from "@/lib/dashboard";
@@ -22,8 +23,6 @@ const EMPTY_OFFER: DashOffer = {
   time_slots: ["13:00", "20:00"],
   active: true,
 };
-
-const toNumber = (v: string) => Number(v.replace(",", "."));
 
 function OfferRow({ offer, onEdit }: { offer: DashOffer; onEdit: () => void }) {
   return (
@@ -130,11 +129,7 @@ function OfferForm({ offer, onDone }: { offer: DashOffer; onDone: () => void }) 
         </Field>
         {o.price_model !== "quote" && (
           <Field label="Valor (€)">
-            <input
-              inputMode="decimal"
-              value={o.price ?? ""}
-              onChange={(e) => set("price", e.target.value ? toNumber(e.target.value) : null)}
-            />
+            <NumberInput decimal min={0} value={o.price} onChange={(v) => set("price", v)} />
           </Field>
         )}
         <Field label="Unidade">
@@ -146,17 +141,13 @@ function OfferForm({ offer, onDone }: { offer: DashOffer; onDone: () => void }) 
           />
         </Field>
         <Field label="Mínimo">
-          <input inputMode="numeric" value={o.min_guests} onChange={(e) => set("min_guests", Number(e.target.value) || 1)} />
+          <NumberInput min={1} max={500} emptyValue={1} value={o.min_guests} onChange={(v) => set("min_guests", v ?? 1)} />
         </Field>
         <Field label="Máximo">
-          <input
-            inputMode="numeric"
-            value={o.max_guests ?? ""}
-            onChange={(e) => set("max_guests", e.target.value ? Number(e.target.value) : null)}
-          />
+          <NumberInput min={1} max={500} value={o.max_guests} onChange={(v) => set("max_guests", v)} placeholder="Sem limite" />
         </Field>
         <Field label="Antecedência (horas)">
-          <input inputMode="numeric" value={o.lead_time_hours} onChange={(e) => set("lead_time_hours", Number(e.target.value) || 0)} />
+          <NumberInput min={0} max={720} emptyValue={0} value={o.lead_time_hours} onChange={(v) => set("lead_time_hours", v ?? 0)} />
         </Field>
         <Field label="Horas (separadas por vírgula)">
           <input value={slots} onChange={(e) => setSlots(e.target.value)} placeholder="13:00, 20:00" />

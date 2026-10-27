@@ -4,6 +4,7 @@ import { useState } from "react";
 import { saveProfile, submitForReview } from "@/app/dashboard/actions";
 import { AddressSearch, type Place } from "@/components/AddressSearch";
 import { Field } from "@/components/ui/Field";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { usePhotoUpload } from "@/hooks/usePhotoUpload";
 import { useServerAction } from "@/hooks/useServerAction";
@@ -28,11 +29,11 @@ function initialForm(chef: MyChef | null) {
     headline: chef?.headline ?? "",
     bio: chef?.bio ?? "",
     area_name: chef?.area_name ?? "",
-    service_radius_km: Number(chef?.service_radius_km ?? 10),
+    service_radius_km: Number(chef?.service_radius_km ?? 10) as number | null,
     instagram: chef?.socials.instagram ?? "",
     website: chef?.socials.website ?? "",
-    years_experience: chef?.years_experience ?? undefined,
-    deposit_percent: chef?.deposit_percent ?? 30,
+    years_experience: chef?.years_experience ?? (null as number | null),
+    deposit_percent: chef?.deposit_percent ?? (30 as number | null),
   };
 }
 
@@ -45,7 +46,6 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
   );
   const { run, pending, message, setMessage } = useServerAction(saveProfile, { successMessage: "Perfil guardado." });
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((f) => ({ ...f, [key]: value }));
-  const toNumber = (v: string) => (v ? Number(v) : undefined);
 
   function save() {
     if (!place) {
@@ -56,6 +56,9 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
       ...form,
       slug: form.slug || slugify(form.display_name),
       area_name: form.area_name || areaQuery.split(",")[0]!.trim(),
+      service_radius_km: form.service_radius_km ?? 10,
+      years_experience: form.years_experience ?? undefined,
+      deposit_percent: form.deposit_percent ?? undefined,
       lat: place.lat,
       lng: place.lng,
     });
@@ -128,11 +131,7 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
           <span className="hint">Os clientes veem a zona, nunca a sua morada.</span>
         </div>
         <Field label="Raio de serviço (km)">
-          <input
-            inputMode="numeric"
-            value={form.service_radius_km}
-            onChange={(e) => set("service_radius_km", Number(e.target.value) || 1)}
-          />
+          <NumberInput min={1} max={100} emptyValue={10} value={form.service_radius_km} onChange={(v) => set("service_radius_km", v)} />
         </Field>
         <Field label="Instagram">
           <input maxLength={80} value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@o.seu.perfil" />
@@ -141,14 +140,10 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
           <input type="url" maxLength={200} value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://" />
         </Field>
         <Field label="Anos de experiência">
-          <input
-            inputMode="numeric"
-            value={form.years_experience ?? ""}
-            onChange={(e) => set("years_experience", toNumber(e.target.value))}
-          />
+          <NumberInput min={0} max={70} value={form.years_experience} onChange={(v) => set("years_experience", v)} />
         </Field>
         <Field label="Sinal pedido (%)">
-          <input inputMode="numeric" value={form.deposit_percent} onChange={(e) => set("deposit_percent", Number(e.target.value) || 0)} />
+          <NumberInput min={0} max={100} emptyValue={0} value={form.deposit_percent} onChange={(v) => set("deposit_percent", v)} />
         </Field>
       </div>
       <FormMessage message={message} />
