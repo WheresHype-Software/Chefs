@@ -11,25 +11,40 @@ export const getChefs = cache(async (lat?: number, lng?: number): Promise<ChefCa
     p_lng: lng ?? null,
   });
   if (error) throw new Error(`chefs_near: ${error.message}`);
-  return withPortraits((data ?? []) as Omit<ChefCard, "portrait">[]);
+  return withPhotos((data ?? []) as Omit<ChefCard, "portrait" | "dishes">[]);
 });
 
+/** Dish photos carried by each search result (cards show a few; the profile page shows all). */
+const DISHES_PER_CHEF = 4;
+
 /**
- * Adds each chef's profile photo to search results (chefs_near returns only the dish cover), so
- * cards can show the person. One query for the whole list; verification selfies stay private.
+ * Adds each chef's profile photo and first dish photos to search results (chefs_near returns only
+ * the cover), so cards can show the person and their food. One query for the whole list;
+ * verification selfies stay private.
  */
-export async function withPortraits(chefs: Omit<ChefCard, "portrait">[]): Promise<ChefCard[]> {
+export async function withPhotos(chefs: Omit<ChefCard, "portrait" | "dishes">[]): Promise<ChefCard[]> {
   if (!chefs.length) return [];
   const { data } = await createAnonClient()
     .from("chef_photos")
-    .select("chef_id, url")
-    .eq("kind", "portrait")
+    .select("chef_id, url, kind")
+    .in("kind", ["portrait", "gallery"])
     .in(
       "chef_id",
       chefs.map((c) => c.id),
-    );
-  const byChef = new Map((data ?? []).map((p) => [p.chef_id as string, p.url as string]));
-  return chefs.map((c) => ({ ...c, portrait: byChef.get(c.id) ?? null }));
+    )
+    .order("sort_order");
+  const rows = (data ?? []) as { chef_id: string; url: string; kind: string }[];
+  return chefs.map((c) => {
+    const mine = rows.filter((r) => r.chef_id === c.id);
+    return {
+      ...c,
+      portrait: mine.find((r) => r.kind === "portrait")?.url ?? null,
+      dishes: mine
+        .filter((r) => r.kind === "gallery")
+        .slice(0, DISHES_PER_CHEF)
+        .map((r) => r.url),
+    };
+  });
 }
 
 export async function getCalendar(chefId: string, from: Date, to: Date): Promise<Calendar> {

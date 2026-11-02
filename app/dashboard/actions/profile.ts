@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { getSession } from "@/lib/dashboard";
+import { LANGUAGES } from "@/lib/languages";
 import { fail, failInvalid, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
 import { chefContext, done, NO_CHEF } from "./context";
@@ -24,6 +25,11 @@ const ProfileInput = z.object({
   website: z.string().trim().max(200).optional(),
   years_experience: z.number().int().min(0).max(70).optional(),
   deposit_percent: z.number().int().min(0).max(100).optional(),
+  // Optional: shown on the public page only when set.
+  languages: z
+    .array(z.enum(LANGUAGES.map(([code]) => code) as [string, ...string[]]))
+    .max(LANGUAGES.length)
+    .optional(),
 });
 
 const PROFILE_LABELS: Record<string, string> = {
@@ -59,6 +65,7 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
     socials: { instagram: p.instagram || undefined, website: p.website || undefined },
     years_experience: p.years_experience ?? null,
     deposit_percent: p.deposit_percent ?? null,
+    ...(p.languages ? { languages: p.languages } : {}),
     ...(p.lat != null && p.lng != null ? { base_location: `SRID=4326;POINT(${p.lng} ${p.lat})` } : {}),
   };
   const { error } = ctx.chef

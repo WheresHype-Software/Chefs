@@ -28,9 +28,6 @@ export const CITIES: City[] = [
   { slug: "lagos", name: "Lagos", lat: 37.1028, lng: -8.673 },
 ];
 
-/** Shown in the footer and as "outras cidades". */
-export const MAIN_CITIES = ["lisboa", "porto", "cascais", "sintra", "braga", "faro"];
-
 export const cityBySlug = (slug: string) => CITIES.find((c) => c.slug === slug) ?? null;
 
 /** The closest city with a page, if it's within `maxKm` (used for a chef's breadcrumb). */

@@ -1,6 +1,6 @@
 import "server-only";
 import { firstPlace } from "./geocode";
-import { withPortraits } from "./data";
+import { withPhotos } from "./data";
 import { distanceKm } from "./geo";
 import { MOCK_CHEFS, mockCalendar } from "./mock";
 import type { SearchQuery } from "./search-params";
@@ -45,5 +45,5 @@ export async function searchChefs(q: SearchQuery): Promise<SearchResult> {
     p_date: q.date,
   });
   if (error) throw new Error(`chefs_near: ${error.message}`);
-  return { chefs: sortChefs(await withPortraits((data ?? []) as Omit<ChefCard, "portrait">[]), Boolean(place)), place };
+  return { chefs: sortChefs(await withPhotos((data ?? []) as Omit<ChefCard, "portrait" | "dishes">[]), Boolean(place)), place };
 }

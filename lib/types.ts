@@ -40,8 +40,9 @@ export type ChefCard = {
   categories: string[];
   services: ServiceType[];
   cover: string | null;
-  /** The chef's profile photo (added by lib/data, not by chefs_near). */
+  /** The chef's profile photo and first dish photos (added by lib/data, not by chefs_near). */
   portrait: string | null;
+  dishes: string[];
   offers: Offer[];
 };
 
@@ -101,6 +102,8 @@ export type BookingView = {
     id: string;
     slug: string;
     name: string;
+    /** Added by getBookingView, for the Chef / Cozinheiro title. */
+    badges: string[];
     area: string | null;
     responseHours: number | null;
     paymentMethods: string[];

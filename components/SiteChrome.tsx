@@ -3,7 +3,6 @@ import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
 import { MobileMenu } from "@/components/MobileMenu";
 import { PanToss } from "@/components/brand/PanToss";
 import { SITE_DOMAIN } from "@/lib/constants";
-import { cityBySlug, MAIN_CITIES } from "@/lib/cities";
 import { COMPANY, COMPLAINTS_BOOK_URL } from "@/lib/legal";
 
 /** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
@@ -98,7 +97,7 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
       <div className="h-12 overflow-hidden" aria-hidden="true">
         <AzulejoField variant="cobalt" size={48} />
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-x-6 gap-y-8 px-5 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-10 md:px-8 md:py-14">
+      <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-x-6 gap-y-8 px-5 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:gap-10 md:px-8 md:py-14">
         <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <span className="wordmark text-[26px] text-white">ao lume</span>
           <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">
@@ -119,14 +118,6 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           <Link href="/entrar" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
             Entrar
           </Link>
-        </nav>
-        <nav aria-label="Chefs por cidade" className="flex flex-col text-[15px]">
-          <span className="mb-1 font-semibold">Cidades</span>
-          {MAIN_CITIES.map((slug) => (
-            <Link key={slug} href={`/chefs/${slug}`} className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-              Chefs em {cityBySlug(slug)!.name}
-            </Link>
-          ))}
         </nav>
         <nav aria-label="Para chefs" className="flex flex-col text-[15px]">
           <span className="mb-1 font-semibold">{chefs ? "Ao Lume" : "Chefs"}</span>

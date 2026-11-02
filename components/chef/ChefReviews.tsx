@@ -1,3 +1,4 @@
+import { ChefSection } from "@/components/chef/ChefSection";
 import { ReviewList, Stars } from "@/components/chef/ReviewList";
 import type { ChefProfile } from "@/lib/types";
 
@@ -43,23 +44,15 @@ function Summary({ chef }: { chef: ChefProfile }) {
 /** Reviews: only clients with a completed booking can write one; the chef can reply publicly. */
 export function ChefReviews({ chef }: { chef: ChefProfile }) {
   return (
-    <section id="avaliacoes" aria-labelledby="avaliacoes-title" className="flex scroll-mt-32 flex-col gap-5">
-      <div className="flex flex-col gap-1">
-        <h2 id="avaliacoes-title" className="d m-0 text-[32px]">
-          Avaliações
-        </h2>
-        <p className="m-0 text-[15px] text-muted">Só clientes com uma reserva concluída podem avaliar.</p>
-      </div>
+    <ChefSection id="avaliacoes" icon="star" title="Avaliações" subtitle="Só clientes com uma reserva concluída podem avaliar.">
       {chef.reviews.length === 0 ? (
-        <p className="m-0 rounded-[10px] border border-line p-5 text-muted">
-          Ainda sem avaliações. As primeiras chegam depois das primeiras reservas concluídas.
-        </p>
+        <p className="m-0 text-muted">Ainda sem avaliações. As primeiras chegam depois das primeiras reservas concluídas.</p>
       ) : (
         <>
           <Summary chef={chef} />
           <ReviewList reviews={chef.reviews} />
         </>
       )}
-    </section>
+    </ChefSection>
   );
 }

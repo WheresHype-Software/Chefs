@@ -25,7 +25,10 @@ export async function getBookingView(id: string): Promise<BookingView | null> {
   if (!BookingId.safeParse(id).success) return null;
   const sb = await createClient();
   const { data, error } = await sb.rpc("booking_view", { p_booking_id: id, p_token: await guestToken(id) });
-  return error ? null : (data as BookingView);
+  if (error || !data) return null;
+  const view = data as Omit<BookingView, "chef"> & { chef: Omit<BookingView["chef"], "badges"> };
+  const { data: chef } = await sb.from("chefs").select("badges").eq("id", view.chef.id).maybeSingle();
+  return { ...view, chef: { ...view.chef, badges: (chef?.badges as string[] | undefined) ?? [] } };
 }
 
 const MessageBody = z.string().trim().min(1).max(4000);

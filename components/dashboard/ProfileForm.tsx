@@ -2,11 +2,13 @@
 
 import { AddressSearch } from "@/components/AddressSearch";
 import { ProfileVerification, type VerificationPhotos } from "@/components/dashboard/ProfileVerification";
+import { Chip } from "@/components/ui/Chip";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
+import { LANGUAGES } from "@/lib/languages";
 import { slugify } from "@/lib/slug";
 import { SITE_DOMAIN } from "@/lib/constants";
 
@@ -90,6 +92,23 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
           <NumberInput min={0} max={100} emptyValue={0} value={form.deposit_percent} onChange={(v) => set("deposit_percent", v)} />
         </Field>
       </div>
+      <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+        <legend className="field lab mb-2 p-0">Idiomas que fala (opcional)</legend>
+        <div className="flex flex-wrap gap-1.5">
+          {LANGUAGES.map(([code, name]) => (
+            <Chip
+              key={code}
+              pressed={form.languages.includes(code)}
+              onClick={() =>
+                set("languages", form.languages.includes(code) ? form.languages.filter((l) => l !== code) : [...form.languages, code])
+              }
+            >
+              {name}
+            </Chip>
+          ))}
+        </div>
+        <span className="hint">Aparecem no seu perfil, para clientes que falam outras línguas.</span>
+      </fieldset>
       <FormMessage message={message} />
       <button type="submit" className="btn self-start" disabled={busy}>
         {locating ? "A procurar a zona…" : chef ? "Guardar perfil" : "Criar perfil"}

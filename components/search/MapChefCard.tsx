@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Photo } from "@/components/ui/Photo";
-import { fromPrice, titledName } from "@/lib/format";
+import { fromPrice, initials, titledName } from "@/lib/format";
 import type { LatLng } from "@/lib/geo";
 import { durationLabel, travelEstimates, type TravelMode } from "@/lib/travel";
 import type { ChefCard } from "@/lib/types";
@@ -37,54 +37,91 @@ type Props = {
   raised?: boolean;
 };
 
-/** The chef picked on the map: who, where, from how much, and rough travel times to their zone. */
+/** Up to three dishes across the top: the chef's food, not just the cover. */
+function DishStrip({ chef }: { chef: ChefCard }) {
+  const dishes = (chef.dishes.length ? chef.dishes : [chef.cover]).slice(0, 3);
+  return (
+    <div
+      className="grid h-28 grid-rows-1 gap-0.5 overflow-hidden bg-paper"
+      style={{ gridTemplateColumns: `repeat(${dishes.length}, minmax(0, 1fr))` }}
+    >
+      {dishes.map((url, i) => (
+        <Photo key={`${url}-${i}`} photo={url} alt="" sizes="120px" className="h-full min-h-0 w-full" />
+      ))}
+    </div>
+  );
+}
+
+/** The chef picked on the map: their face first, a few dishes, where, from how much, and rough travel times. */
 export function MapChefCard({ chef, origin, originIsMe, onClose, raised = false }: Props) {
   const trip = origin ? travelEstimates(origin, chef) : null;
 
   return (
     <div
-      className={`al-in absolute inset-x-3 z-[5] md:bottom-auto md:top-3 flex flex-col gap-3 rounded-[10px] border border-line bg-white p-3 shadow-[0_18px_40px_-18px_rgb(20_32_51/0.45)] md:left-3 md:right-auto md:w-[360px] ${raised ? "bottom-[76px]" : "bottom-3"}`}
+      className={`al-in absolute inset-x-3 z-[5] flex flex-col overflow-hidden rounded-[12px] border border-line bg-white shadow-[0_18px_40px_-18px_rgb(20_32_51/0.45)] md:bottom-auto md:left-3 md:right-auto md:top-3 md:w-[360px] ${raised ? "bottom-[76px]" : "bottom-3"}`}
     >
-      <div className="flex gap-3">
-        <Link href={`/chef/${chef.slug}`} className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[8px] bg-paper" tabIndex={-1}>
-          <Photo photo={chef.cover} alt="" sizes="72px" className="h-full w-full" />
+      <div className="relative">
+        <Link href={`/chef/${chef.slug}`} tabIndex={-1} aria-hidden="true" className="block">
+          <DishStrip chef={chef} />
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <button
+          type="button"
+          onClick={onClose}
+          className="ctl absolute right-2 top-2 !h-8 !w-8 !bg-white/95 !text-base shadow"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+        <Link
+          href={`/chef/${chef.slug}`}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="absolute -bottom-10 left-4 h-[84px] w-[84px] overflow-hidden rounded-full bg-cobalt-soft shadow-[0_6px_18px_-6px_rgb(20_32_51/0.45)] ring-4 ring-white"
+        >
+          {chef.portrait ? (
+            <Photo photo={chef.portrait} alt="" sizes="84px" className="h-full w-full" />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-[26px] font-extrabold tracking-[-0.03em] text-cobalt">
+              {initials(chef.name)}
+            </span>
+          )}
+        </Link>
+      </div>
+
+      <div className="flex flex-col gap-3 p-3 pt-1">
+        <div className="flex min-w-0 flex-col gap-0.5 pl-[100px]">
           <Link href={`/chef/${chef.slug}`} className="truncate text-[17px] font-bold text-ink no-underline hover:text-cobalt">
             {titledName(chef)}
           </Link>
-          <span className="truncate text-[14px] text-muted">
-            {chef.area} · desloca-se até {chef.radiusKm} km
-          </span>
           <span className="text-[14px]">
-            desde <strong className="num">{fromPrice(chef.offers)}</strong>
+            desde <strong className="tabular-nums">{fromPrice(chef.offers)}</strong>
           </span>
         </div>
-        <button type="button" onClick={onClose} className="ctl !h-8 !w-8 shrink-0 !text-base" aria-label="Fechar">
-          ×
-        </button>
+        <span className="truncate text-[14px] text-muted">
+          {chef.area} · desloca-se até {chef.radiusKm} km
+        </span>
+
+        {trip && (
+          <div className="flex flex-col gap-1.5 border-t border-line pt-2.5">
+            <span className="text-[12px] text-muted">
+              Cerca de {String(trip.km).replace(".", ",")} km {originIsMe ? "de si" : "da zona pesquisada"} · estimativa até à zona do chef
+            </span>
+            <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
+              {trip.times.map((t) => (
+                <li key={t.mode} className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 text-[13px] font-semibold">
+                  {ICON[t.mode]}
+                  <span className="sr-only">{t.label}:</span>
+                  {durationLabel(t.minutes)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <Link href={`/chef/${chef.slug}`} className="btn btn-sm">
+          Ver perfil e pedir reserva
+        </Link>
       </div>
-
-      {trip && (
-        <div className="flex flex-col gap-1.5 border-t border-line pt-2.5">
-          <span className="text-[12px] text-muted">
-            Cerca de {String(trip.km).replace(".", ",")} km {originIsMe ? "de si" : "da zona pesquisada"} · estimativa até à zona do chef
-          </span>
-          <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
-            {trip.times.map((t) => (
-              <li key={t.mode} className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 text-[13px] font-semibold">
-                {ICON[t.mode]}
-                <span className="sr-only">{t.label}:</span>
-                {durationLabel(t.minutes)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <Link href={`/chef/${chef.slug}`} className="btn btn-sm">
-        Ver perfil e pedir reserva
-      </Link>
     </div>
   );
 }

@@ -47,6 +47,11 @@ export function titledName(chef: { name: string; badges: readonly string[] }): s
   return `${chefTitle(chef.badges)} ${chef.name}`;
 }
 
+/** "Chef Marta", "Cozinheiro Rui": the first name with the title, for sentences. */
+export function titledFirst(chef: { name: string; badges: readonly string[] }): string {
+  return `${chefTitle(chef.badges)} ${firstName(chef.name)}`;
+}
+
 export const SERVICE_LABEL: Record<ServiceType, string> = {
   home: "Chef em casa",
   delivery: "Entrega",

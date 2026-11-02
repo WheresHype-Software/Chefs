@@ -24,6 +24,7 @@ function initialForm(chef: MyChef | null) {
     website: chef?.socials.website ?? "",
     years_experience: chef?.years_experience ?? (null as number | null),
     deposit_percent: chef?.deposit_percent ?? (DEFAULT_DEPOSIT_PERCENT as number | null),
+    languages: chef?.languages ?? ([] as string[]),
   };
 }
 

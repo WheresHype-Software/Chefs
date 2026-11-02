@@ -10,7 +10,7 @@ import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, PAYMENT_LABEL } from "@/lib/data";
 import { getBookingView } from "@/lib/bookings";
-import { dayLabel, euro, firstName, MODE_LABEL, shortStamp, STATUS_LABEL } from "@/lib/format";
+import { dayLabel, euro, titledFirst, titledName, MODE_LABEL, shortStamp, STATUS_LABEL } from "@/lib/format";
 import type { BookingStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "A sua reserva", robots: { index: false } };
@@ -68,7 +68,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
   if (!view) return <NoAccess />;
 
   const { booking: b, chef } = view;
-  const first = firstName(chef.name);
+  const first = titledFirst(chef);
   const reached = (k: BookingStatus) => view.events.find((e) => e.to === k);
   const currentIdx = STEPS.findIndex((s) => s.key === (b.status === "change_proposed" ? "requested" : b.status));
   const deposit = chef.depositPercent && b.estimate ? Math.round((b.estimate * chef.depositPercent) / 100) : null;
@@ -89,7 +89,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
     [
       "Chef",
       <Link key="c" href={`/chef/${chef.slug}`}>
-        {chef.name}
+        {titledName(chef)}
       </Link>,
     ],
     ["Serviço", `${b.offer_title} · ${MODE_LABEL[b.fulfilment_mode]}`],
@@ -131,7 +131,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             })}
           />
         )}
-        {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: chef.name, date: b.date }} />}
+        {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: titledName(chef), date: b.date }} />}
 
         <div className="flex flex-wrap items-start gap-8">
           <section className="box flex min-w-0 flex-[1_1_340px] flex-col gap-4 p-6">
@@ -156,7 +156,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             <BookingChat
               key={b.id}
               view={view}
-              title={chef.name}
+              title={titledName(chef)}
               subtitle={chef.responseHours ? `Responde normalmente em ${chef.responseHours} horas` : undefined}
             />
           </div>

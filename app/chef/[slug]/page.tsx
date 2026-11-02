@@ -3,19 +3,19 @@ import { notFound } from "next/navigation";
 import { MobileBookingBar } from "@/components/booking/MobileBookingBar";
 import { ChefAbout } from "@/components/chef/ChefAbout";
 import { ChefBookingAside } from "@/components/chef/ChefBookingAside";
-import { ChefDishes } from "@/components/chef/ChefDishes";
+import { ChefCuisines } from "@/components/chef/ChefCuisines";
 import { ChefGallery } from "@/components/chef/ChefGallery";
 import { ChefHeader } from "@/components/chef/ChefHeader";
 import { ChefKeyFacts } from "@/components/chef/ChefKeyFacts";
 import { ChefOffers } from "@/components/chef/ChefOffers";
 import { ChefReviews } from "@/components/chef/ChefReviews";
-import { ChefSectionNav, type ChefSection } from "@/components/chef/ChefSectionNav";
+import { ChefSectionNav, type NavSection } from "@/components/chef/ChefSectionNav";
 import { ChefTerms } from "@/components/chef/ChefTerms";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getChefProfile, getMonthCalendar } from "@/lib/data";
-import { fromPrice, rating } from "@/lib/format";
+import { fromPrice, rating, titledName } from "@/lib/format";
 import { breadcrumbJsonLd, chefBreadcrumbs, chefJsonLd } from "@/lib/seo";
 import type { ChefProfile } from "@/lib/types";
 
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/chef/[slug]">): P
   const { slug } = await params;
   const chef = await getChefProfile(slug);
   if (!chef) return {};
-  const title = `${chef.name} · ${chef.headline ?? "Chef"} em ${chef.area}`;
+  const title = `${titledName(chef)} · ${chef.headline ?? "Cozinha"} em ${chef.area}`;
   return {
     title,
     description: chef.bio ?? undefined,
@@ -47,13 +47,12 @@ async function initialCalendarFor(chefId: string) {
 }
 
 /** The jump links: only sections this chef actually has. */
-function sectionsFor(chef: ChefProfile): ChefSection[] {
+function sectionsFor(chef: ChefProfile): NavSection[] {
   return [
     { id: "sobre", label: "Sobre" },
     { id: "menus", label: "Menus" },
-    ...(chef.gallery.some((d) => d.url) ? [{ id: "pratos", label: "Pratos" }] : []),
-    { id: "avaliacoes", label: chef.reviewCount ? `Avaliações (${chef.reviewCount})` : "Avaliações" },
     { id: "condicoes", label: "Pagamento" },
+    { id: "avaliacoes", label: chef.reviewCount ? `Avaliações (${chef.reviewCount})` : "Avaliações" },
   ];
 }
 
@@ -73,22 +72,29 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
 
       <ChefGallery gallery={chef.gallery} />
 
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-12 px-5 pb-20 pt-7 md:gap-14 md:px-8 md:pt-10">
-        <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-12">
-          <div className="flex flex-col gap-5">
-            <Breadcrumbs items={crumbs} />
-            <ChefHeader chef={chef} />
-            <ChefKeyFacts chef={chef} />
-          </div>
-          <ChefSectionNav sections={sectionsFor(chef)} bookable={bookable} />
-          <ChefAbout chef={chef} />
-          <ChefOffers offers={chef.offers} />
-          <ChefDishes chef={chef} />
-          <ChefReviews chef={chef} />
-          <ChefTerms chef={chef} />
-        </main>
+      <div className="mt-6 bg-paper">
+        <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-8 px-5 pb-20 pt-7 md:gap-10 md:px-8 md:pt-10">
+          <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-5">
+            <div className="flex flex-col gap-5">
+              <Breadcrumbs items={crumbs} />
+              <ChefHeader chef={chef} />
+              <ChefKeyFacts chef={chef} />
+            </div>
+            <ChefSectionNav sections={sectionsFor(chef)} bookable={bookable} />
+            <ChefAbout chef={chef} />
+            <ChefCuisines chef={chef} />
+            <ChefOffers offers={chef.offers} />
+            {/* The rules sit right after the menus, so they are read before choosing. */}
+            <ChefTerms chef={chef} />
+            <ChefReviews chef={chef} />
+          </main>
 
-        <ChefBookingAside chef={chef} initialCalendar={initialCalendar} initialOfferId={typeof oferta === "string" ? oferta : undefined} />
+          <ChefBookingAside
+            chef={chef}
+            initialCalendar={initialCalendar}
+            initialOfferId={typeof oferta === "string" ? oferta : undefined}
+          />
+        </div>
       </div>
 
       {bookable && (

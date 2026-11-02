@@ -1,3 +1,4 @@
+import { ChefSection } from "@/components/chef/ChefSection";
 import { MODE_LABEL, offerPriceLabel } from "@/lib/format";
 import type { Offer } from "@/lib/types";
 
@@ -24,15 +25,14 @@ function offerDetails(o: Offer): string[] {
 /** The chef's menus with what each includes; each opens the booking form with that menu picked. */
 export function ChefOffers({ offers }: { offers: Offer[] }) {
   return (
-    <section id="menus" aria-labelledby="menus-title" className="flex scroll-mt-32 flex-col gap-[18px]">
-      <div className="flex flex-col gap-1">
-        <h2 id="menus-title" className="d m-0 text-[32px]">
-          Menus e preços
-        </h2>
-        {offers.length > 0 && <p className="m-0 text-[15px] text-muted">Escolha um menu para pedir reserva com ele.</p>}
-      </div>
+    <ChefSection
+      id="menus"
+      icon="menu"
+      title="Menus e preços"
+      subtitle={offers.length ? "Escolha um menu para pedir reserva com ele." : undefined}
+    >
       {offers.length === 0 ? (
-        <p className="m-0 border-t border-line-2 pt-4 text-muted">Ainda sem menus publicados.</p>
+        <p className="m-0 text-muted">Ainda sem menus publicados.</p>
       ) : (
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {offers.map((o) => (
@@ -54,7 +54,7 @@ export function ChefOffers({ offers }: { offers: Offer[] }) {
                   </ul>
                 </div>
                 <div className="flex flex-col items-start justify-between gap-2 sm:items-end">
-                  <span className="num text-lg font-bold">{offerPriceLabel(o)}</span>
+                  <span className="text-lg font-bold tabular-nums">{offerPriceLabel(o)}</span>
                   <span className="text-sm font-semibold text-cobalt group-hover:underline">Pedir este menu →</span>
                 </div>
               </a>
@@ -62,6 +62,6 @@ export function ChefOffers({ offers }: { offers: Offer[] }) {
           ))}
         </ul>
       )}
-    </section>
+    </ChefSection>
   );
 }

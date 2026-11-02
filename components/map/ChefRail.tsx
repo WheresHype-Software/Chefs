@@ -1,4 +1,4 @@
-import { chefTitle, fromPrice, rating, toneFor } from "@/lib/format";
+import { chefTitle, titledName, fromPrice, rating, toneFor } from "@/lib/format";
 import type { ChefCard } from "@/lib/types";
 
 /** Compact chef card used in the map rail and the dashboard preview. */
@@ -20,7 +20,7 @@ export function ChefMiniCard({ chef, selected, onSelect }: { chef: ChefCard; sel
       </span>
       <span className="flex min-w-0 flex-col gap-[3px] py-1 pr-1">
         <span className="lab text-muted">{chefTitle(chef.badges)}</span>
-        <span className="d text-[22px] leading-[1.1]">{chef.name}</span>
+        <span className="d text-[22px] leading-[1.1]">{titledName(chef)}</span>
         <span className="text-[13px] text-muted">
           {chef.categories.join(" · ")} · {chef.area}
         </span>

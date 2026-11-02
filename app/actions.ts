@@ -7,6 +7,7 @@ import { sendEmail, siteUrl } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { failInvalid } from "@/lib/result";
 import { createAnonClient, createClient, hasSupabase } from "@/lib/supabase/server";
+import { titledName } from "@/lib/format";
 
 const BookingInput = z.object({
   offerId: z.string().min(1),
@@ -94,6 +95,8 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   }
 
   const r = data as { bookingId: string; ref: string; token: string; chefName: string };
+  const { data: offer } = await sb.from("offers").select("chefs(badges)").eq("id", b.offerId).maybeSingle();
+  const chefName = titledName({ name: r.chefName, badges: (offer?.chefs as unknown as { badges: string[] } | null)?.badges ?? [] });
   // This browser gets the token as an httpOnly cookie; the email carries it once in the link.
   (await cookies()).set(bookingTokenCookieName(r.bookingId), r.token, bookingTokenCookieOptions(r.bookingId));
   const link = `/reserva/${r.bookingId}`;
@@ -101,10 +104,10 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   // The booking exists from here on: email problems are logged, never shown as a failed request.
   const emailed = await sendEmail({
     to: b.email,
-    subject: `Pedido ${r.ref} enviado a ${r.chefName}`,
+    subject: `Pedido ${r.ref} enviado a ${chefName}`,
     text:
       `Olá ${b.name.split(" ")[0]},\n\n` +
-      `O seu pedido foi enviado a ${r.chefName}. O chef tem 48 horas para responder.\n\n` +
+      `O seu pedido foi enviado a ${chefName}. Tem 48 horas para responder.\n\n` +
       `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(emailLink)}\n\n` +
       `Ainda não paga nada: o pagamento é combinado diretamente com o chef.\n\nAo Lume`,
   }).catch((err) => {

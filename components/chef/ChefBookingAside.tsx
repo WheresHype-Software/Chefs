@@ -1,6 +1,7 @@
 import { BookingForm } from "@/components/booking/BookingForm";
+import { ICONS } from "@/components/chef/icons";
 import type { MonthCalendarData } from "@/hooks/useMonthCalendar";
-import { firstName } from "@/lib/format";
+import { titledFirst } from "@/lib/format";
 import type { ChefProfile } from "@/lib/types";
 
 type Props = { chef: ChefProfile; initialCalendar?: MonthCalendarData; initialOfferId?: string };
@@ -15,18 +16,14 @@ export function ChefBookingAside({ chef, initialCalendar, initialOfferId }: Prop
         <span className="text-[13px] text-muted">{chef.responseHours ? `responde em ~${chef.responseHours} h` : ""}</span>
       </div>
       {bookable && (
-        <ol className="m-0 flex list-none flex-col gap-1.5 rounded-[8px] bg-paper p-3 text-[14px] text-ink-3">
-          {[
-            "Escolha o menu, o dia e a hora.",
-            "Envie o pedido: não paga nada e não precisa de conta.",
-            `${firstName(chef.name)} aceita ou propõe outra data em até 48 h.`,
-          ].map((step, i) => (
-            <li key={step} className="flex gap-2">
-              <span className="num font-bold text-cobalt">{i + 1}.</span>
-              {step}
+        <ul className="m-0 flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0 text-[14px] text-ink-3">
+          {["Sem criar conta", "Não paga ao pedir", `Resposta em até 48 h`].map((t) => (
+            <li key={t} className="flex items-center gap-1.5">
+              <span className="text-cobalt [&_svg]:h-4 [&_svg]:w-4">{ICONS.check}</span>
+              {t}
             </li>
           ))}
-        </ol>
+        </ul>
       )}
       {bookable ? (
         <BookingForm
@@ -37,7 +34,7 @@ export function ChefBookingAside({ chef, initialCalendar, initialOfferId }: Prop
         />
       ) : (
         <p className="m-0 text-muted">
-          {firstName(chef.name)} ainda está a preparar os menus. Volte em breve
+          {titledFirst(chef)} ainda está a preparar os menus. Volte em breve
           {chef.socials.instagram ? ", ou acompanhe no Instagram." : "."}
         </p>
       )}
