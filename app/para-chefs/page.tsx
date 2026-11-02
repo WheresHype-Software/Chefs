@@ -11,7 +11,7 @@ import { SITE_DOMAIN } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Para chefs",
-  description: "Página de reservas, calendário, chat e avaliações para chefs privados e cozinheiros caseiros. Grátis no lançamento.",
+  description: "Página de reservas, calendário, chat e avaliações para chefs privados e cozinheiros caseiros.",
 };
 
 const MKT = [
@@ -59,14 +59,14 @@ export default function ParaChefs() {
           </p>
           <div className="al-in flex flex-wrap gap-2.5" style={{ animationDelay: "260ms" }}>
             <Link href="/entrar?chef=1" className="btn">
-              Criar perfil grátis
+              Criar o meu perfil
             </Link>
             <a href="#ferramenta" className="btn btn-o">
               Ver a ferramenta
             </a>
           </div>
           <span className="al-in text-sm text-muted" style={{ animationDelay: "340ms" }}>
-            Grátis no lançamento · o cliente paga-lhe diretamente
+            Cada perfil é revisto pela equipa · o cliente paga-lhe diretamente
           </span>
         </div>
         <HeroStage />
@@ -173,7 +173,7 @@ export default function ParaChefs() {
           <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Entrar leva dez minutos.</h2>
           <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-line-2 p-0">
             {[
-              ["1", "Crie a conta", "Nome, email e uma palavra-passe. Grátis no lançamento."],
+              ["1", "Crie a conta", "Nome, email e uma palavra-passe."],
               ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
               ["3", "Aprovação", "A nossa equipa revê cada perfil antes de ficar público."],
               ["4", "Partilhe o link", `Ponha ${SITE_DOMAIN}/chef/o-seu-nome na bio e receba pedidos.`],
@@ -214,7 +214,6 @@ export default function ParaChefs() {
           <Link href="/entrar?chef=1" className="btn btn-w">
             Criar o meu perfil
           </Link>
-          <span className="text-[15px] text-[#c9d6ee]">Gratuito no lançamento, sem contrato.</span>
         </div>
       </section>
 

@@ -19,7 +19,7 @@ export function ChefsCta() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/entrar?chef=1" className="btn">
-              Criar perfil grátis
+              Criar o meu perfil
             </Link>
             <Link href="/para-chefs" className="btn btn-o">
               Como funciona para chefs
