@@ -11,9 +11,12 @@ import { ChefOffers } from "@/components/chef/ChefOffers";
 import { ChefReviews } from "@/components/chef/ChefReviews";
 import { ChefSectionNav, type ChefSection } from "@/components/chef/ChefSectionNav";
 import { ChefTerms } from "@/components/chef/ChefTerms";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getChefProfile, getMonthCalendar } from "@/lib/data";
 import { fromPrice, rating } from "@/lib/format";
+import { breadcrumbJsonLd, chefBreadcrumbs, chefJsonLd } from "@/lib/seo";
 import type { ChefProfile } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/chef/[slug]">): Promise<Metadata> {
@@ -60,6 +63,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
   const chef = await getChefProfile(slug);
   if (!chef) notFound();
   const initialCalendar = await initialCalendarFor(chef.id);
+  const crumbs = chefBreadcrumbs(chef);
   // A newly approved chef may not have published an offer yet: the page must still work.
   const bookable = chef.offers.length > 0;
 
@@ -72,6 +76,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-start gap-12 px-5 pb-20 pt-7 md:gap-14 md:px-8 md:pt-10">
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-12">
           <div className="flex flex-col gap-5">
+            <Breadcrumbs items={crumbs} />
             <ChefHeader chef={chef} />
             <ChefKeyFacts chef={chef} />
           </div>
@@ -94,6 +99,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
         />
       )}
       <SiteFooter />
+      <JsonLd data={[chefJsonLd(chef), breadcrumbJsonLd(crumbs)]} />
     </div>
   );
 }

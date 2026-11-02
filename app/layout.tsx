@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Schibsted_Grotesk } from "next/font/google";
 import { publicEnv } from "@/lib/env";
 import "./globals.css";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { siteJsonLd } from "@/lib/seo";
 
 const schibsted = Schibsted_Grotesk({
   variable: "--font-schibsted",
@@ -23,7 +25,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-PT" className={`${schibsted.variable} antialiased`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <JsonLd data={siteJsonLd()} />
+      </body>
     </html>
   );
 }
