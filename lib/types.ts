@@ -102,8 +102,9 @@ export type BookingView = {
     id: string;
     slug: string;
     name: string;
-    /** Added by getBookingView, for the Chef / Cozinheiro title. */
+    /** Added by getBookingView: the Chef / Cozinheiro title and the chef's photo for the chat. */
     badges: string[];
+    portrait: string | null;
     area: string | null;
     responseHours: number | null;
     paymentMethods: string[];
@@ -114,8 +115,22 @@ export type BookingView = {
   pickupAddress: string | null;
   events: { to: BookingStatus; at: string }[];
   messages: ChatMessage[];
-  review: { id: string } | null;
+  review: BookingReviewData | null;
 };
 
 /** What the team decides about a chef's profile. */
 export type AdminDecision = "approved" | "rejected" | "suspended";
+
+/** The review row a booking view carries (booking_view returns the whole reviews row). */
+export type BookingReviewData = {
+  id: string;
+  overall: number;
+  food: number;
+  presentation: number;
+  punctuality: number;
+  communication: number;
+  value: number;
+  comment: string | null;
+  chef_reply: string | null;
+  created_at: string;
+};

@@ -27,9 +27,7 @@ function ProfilePhoto({ portrait, initials, busy, onFiles }: UploadProps & { por
         <h2 id="perfil-foto" className="d m-0 text-2xl font-normal">
           Fotografia de perfil
         </h2>
-        <p className="m-0 text-sm text-muted">
-          Uma fotografia sua, de cara visível. Aparece no seu perfil público e ajuda a equipa a confirmar que é mesmo quem cozinha.
-        </p>
+        <p className="m-0 text-sm text-muted">Uma fotografia sua, de cara visível. É a que os clientes veem no seu perfil público.</p>
         <div className="mt-1">
           <PhotoUploadButton kind="portrait" label={portrait ? "Trocar fotografia" : "Carregar fotografia"} busy={busy} onFiles={onFiles} />
         </div>
@@ -38,13 +36,64 @@ function ProfilePhoto({ portrait, initials, busy, onFiles }: UploadProps & { por
   );
 }
 
-type Props = { photos: ChefPhoto[]; userId: string | null; initials: string };
+const SELFIE_STEPS = [
+  "Tire uma selfie agora, de frente, com a cara bem visível e boa luz. Sem óculos de sol nem filtros.",
+  "A equipa compara-a com a sua fotografia de perfil, para confirmar que é a mesma pessoa.",
+  "Se não estiver nítida, pedimos-lhe outra por email. Pode trocá-la aqui quando quiser.",
+  "Quando o perfil é aprovado, a selfie é apagada. Não fica guardada.",
+];
+
+/** The private selfie the team compares with the profile photo, and what happens to it. */
+function VerificationSelfie({ selfie, approved, busy, onFiles }: UploadProps & { selfie: ChefPhoto | undefined; approved: boolean }) {
+  return (
+    <section aria-labelledby="selfie" className="box flex flex-wrap items-start gap-6 p-5 md:p-6">
+      <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-paper text-center text-[13px] text-muted">
+        {selfie?.url ? (
+          // A short-lived private link, so a plain img rather than the optimised public Photo.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={selfie.url} alt="A sua selfie de verificação" className="h-full w-full object-cover" />
+        ) : approved ? (
+          <span className="px-2 font-semibold text-ok">Verificado</span>
+        ) : (
+          <span className="px-2">Ainda sem selfie</span>
+        )}
+      </div>
+      <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 id="selfie" className="d m-0 text-2xl font-normal">
+            Selfie de verificação
+          </h2>
+          <span className="rounded-full bg-paper px-2.5 py-1 text-[12px] font-semibold text-ink-3">Privada · só a equipa vê</span>
+        </div>
+        {approved && !selfie ? (
+          <p className="m-0 text-sm text-muted">
+            A sua identidade foi confirmada e a selfie já foi apagada. Não precisa de fazer mais nada.
+          </p>
+        ) : (
+          <>
+            <ol className="m-0 flex flex-col gap-1.5 pl-5 text-sm text-ink-3">
+              {SELFIE_STEPS.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ol>
+            <div className="mt-1">
+              <PhotoUploadButton kind="selfie" label={selfie ? "Tirar outra selfie" : "Tirar selfie"} busy={busy} onFiles={onFiles} />
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+type Props = { photos: ChefPhoto[]; userId: string | null; initials: string; approved: boolean };
 
 /** Profile photo and the dish gallery: upload, describe, order, pick the cover, delete. */
-export function PhotoManager({ photos, userId, initials }: Props) {
+export function PhotoManager({ photos, userId, initials, approved }: Props) {
   const { upload, uploading, message: uploadMessage } = usePhotoUpload(userId);
   const { dishes, message, setMessage, move, remove } = useDishPhotos(photos.filter((p) => p.kind === "gallery"));
-  const portrait = photos.find((p) => p.kind === "portrait") ?? photos.find((p) => p.kind === "selfie");
+  const portrait = photos.find((p) => p.kind === "portrait");
+  const selfie = photos.find((p) => p.kind === "selfie");
   const onCaption = (r: ActionResult) => setMessage(r.ok ? null : { ok: false, text: r.error });
 
   return (
@@ -52,6 +101,7 @@ export function PhotoManager({ photos, userId, initials }: Props) {
       <FormMessage message={uploadMessage ?? message} />
 
       <ProfilePhoto portrait={portrait} initials={initials} busy={uploading} onFiles={upload} />
+      <VerificationSelfie selfie={selfie} approved={approved} busy={uploading} onFiles={upload} />
 
       <section aria-labelledby="pratos" className="flex flex-col gap-4">
         <div className="flex flex-wrap items-end justify-between gap-3">

@@ -8,7 +8,12 @@ export default async function Fotografias() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Fotografias" description="A sua cara e a sua comida: é o que os clientes veem primeiro." />
-      <PhotoManager photos={photos} userId={session.userId} initials={initials(chef?.display_name ?? "")} />
+      <PhotoManager
+        photos={photos}
+        userId={session.userId}
+        initials={initials(chef?.display_name ?? "")}
+        approved={chef?.status === "approved"}
+      />
     </div>
   );
 }

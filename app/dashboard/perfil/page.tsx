@@ -7,16 +7,13 @@ import { createClient } from "@/lib/supabase/server";
 export default async function Perfil() {
   const session = await getSession();
   const chef = await getMyChef();
-  let photos = { selfie: 1, gallery: 6 };
+  let photos = { portrait: 1, selfie: 1, gallery: 6, approved: false };
   if (!session.demo && chef) {
     const sb = await createClient();
     const { data } = await sb.from("chef_photos").select("kind").eq("chef_id", chef.id);
-    photos = {
-      // The profile photo (or, on older accounts, the verification selfie).
-      selfie: (data ?? []).filter((p) => p.kind === "portrait" || p.kind === "selfie").length,
-      gallery: (data ?? []).filter((p) => p.kind === "gallery").length,
-    };
-  } else if (!chef) photos = { selfie: 0, gallery: 0 };
+    const count = (kind: string) => (data ?? []).filter((p) => p.kind === kind).length;
+    photos = { portrait: count("portrait"), selfie: count("selfie"), gallery: count("gallery"), approved: chef.status === "approved" };
+  } else if (!chef) photos = { portrait: 0, selfie: 0, gallery: 0, approved: false };
 
   return (
     <div className="flex flex-col gap-6">

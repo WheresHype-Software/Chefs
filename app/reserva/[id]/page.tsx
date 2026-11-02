@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingChat } from "@/components/booking/BookingChat";
 import { ClientBookingActions } from "@/components/booking/ClientBookingActions";
+import { BookingReview } from "@/components/booking/BookingReview";
 import { ReviewForm } from "@/components/booking/ReviewForm";
 import { GuestLookupForm } from "@/components/booking/GuestLookup";
 import { RememberBooking } from "@/components/booking/RememberBooking";
@@ -153,10 +154,12 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
 
           <div className="flex min-w-0 flex-[2_1_520px] flex-col gap-8">
             {b.status === "completed" && !view.review && <ReviewForm id={b.id} chef={first} />}
+            {view.review && <BookingReview review={view.review} title="A sua avaliação" />}
             <BookingChat
               key={b.id}
               view={view}
               title={titledName(chef)}
+              photo={chef.portrait}
               subtitle={chef.responseHours ? `Responde normalmente em ${chef.responseHours} horas` : undefined}
             />
           </div>

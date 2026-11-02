@@ -30,6 +30,7 @@ export function demoBookingView(): BookingView {
       slug: "marta-figueiredo",
       name: "Marta Figueiredo",
       badges: ["identity", "portfolio", "certified"],
+      portrait: null,
       area: "Campo de Ourique",
       responseHours: 3,
       paymentMethods: ["mbway", "transfer", "cash"],

@@ -3,6 +3,8 @@ import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { notFound } from "next/navigation";
 import { BookingChat } from "@/components/booking/BookingChat";
+import { BookingReview } from "@/components/booking/BookingReview";
+import { ReviewReply } from "@/components/dashboard/ReviewReply";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookingView } from "@/lib/bookings";
 import { getBooking } from "@/lib/dashboard";
@@ -37,7 +39,10 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
           {b.notes && <span className="rounded-[2px] bg-paper px-3 py-2.5 text-sm text-ink-3">{b.notes}</span>}
           <RequestActions key={b.id} id={b.id} status={b.status} date={b.date} />
         </section>
-        <div className="flex min-w-0 flex-[2_1_480px] flex-col">
+        <div className="flex min-w-0 flex-[2_1_480px] flex-col gap-6">
+          {view?.review && (
+            <BookingReview review={view.review} title="Avaliação do cliente" replySlot={<ReviewReply id={view.review.id} />} />
+          )}
           {view && (
             <BookingChat key={b.id} view={{ ...view, viewer: "chef" }} title={b.client?.name ?? "Cliente"} subtitle={b.client?.email} />
           )}

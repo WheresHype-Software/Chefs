@@ -134,6 +134,7 @@ const SECTIONS: LegalSection[] = [
       <ul>
         <li>Conta e perfil: enquanto a conta estiver ativa; apagados até 30 dias depois de pedir o encerramento.</li>
         <li>Pedidos, reservas e mensagens: até 3 anos depois da data do serviço, para tratar reclamações e eventuais litígios.</li>
+        <li>Selfie de verificação: apagada quando o perfil é aprovado.</li>
         <li>Documentos de verificação: enquanto o perfil estiver ativo; apagados até 6 meses depois do encerramento.</li>
         <li>Avaliações: enquanto o perfil do chef estiver publicado, sem os contactos de quem avaliou.</li>
         <li>Links de acesso a pedidos sem conta: deixam de funcionar ao fim de 90 dias.</li>

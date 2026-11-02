@@ -21,7 +21,7 @@ function steps(chef: MyChef, p: SetupProgress): Step[] {
       done: p.activeOffers > 0,
     },
     {
-      title: "Abra dias na agenda",
+      title: "Abra os dias em que pode cozinhar",
       text: "Os clientes só podem pedir reserva nos dias que abrir. Pode abrir já os dias da semana em que costuma cozinhar.",
       href: "/dashboard/agenda",
       action: "Abrir dias",
@@ -67,7 +67,7 @@ export function SetupChecklist({ chef, progress }: { chef: MyChef; progress: Set
           style={{ width: `${(done / list.length) * 100}%` }}
         />
       </div>
-      {waiting && <p className="m-0 text-muted">A equipa responde por email. Entretanto pode afinar as ofertas e a agenda.</p>}
+      {waiting && <p className="m-0 text-muted">A equipa responde por email. Entretanto pode afinar as ofertas e a disponibilidade.</p>}
       <ol className="m-0 flex list-none flex-col p-0">
         {list.map((s) => {
           const current = s === next;

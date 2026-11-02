@@ -10,6 +10,7 @@ import { ApprovalQueue } from "@/components/admin/ApprovalQueue";
 import type { PendingChef } from "@/components/admin/PendingChefCard";
 import { TitleRequestCard } from "@/components/admin/TitleRequestCard";
 import { certificateLinks } from "@/lib/admin/certificates";
+import { selfieLink } from "@/lib/selfie";
 import { readiness } from "@/lib/admin/readiness";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { getSession } from "@/lib/dashboard";
@@ -55,8 +56,18 @@ export default async function AdminPage() {
   type WithCerts = { chef_certifications: { title: string; document_path: string | null }[] };
   const withLinks = <T extends WithCerts>(rows: T[]) =>
     Promise.all(rows.map(async (r) => ({ ...r, certificateDocs: await certificateLinks(sb, r.chef_certifications) })));
+  // The verification selfie is private: the team sees it through a short-lived link.
+  const withSelfie = <T extends { chef_photos: { url: string; kind: string }[] }>(rows: T[]) =>
+    Promise.all(
+      rows.map(async (r) => ({
+        ...r,
+        chef_photos: await Promise.all(
+          r.chef_photos.map(async (p) => (p.kind === "selfie" ? { ...p, url: (await selfieLink(sb, p.url)) ?? "" } : p)),
+        ),
+      })),
+    );
   // Complete applications first, each group oldest first (the query's order is kept within groups).
-  const pendingChefs = (await withLinks((pending.data ?? []) as unknown as Omit<PendingChef, "certificateDocs">[])).sort(
+  const pendingChefs = (await withSelfie(await withLinks((pending.data ?? []) as unknown as Omit<PendingChef, "certificateDocs">[]))).sort(
     (a, b) => Number(readiness(b).ready) - Number(readiness(a).ready),
   );
   const titleQueue = await withLinks(

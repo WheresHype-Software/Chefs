@@ -1,4 +1,5 @@
 import "server-only";
+import { selfieLink } from "@/lib/selfie";
 import { DEMO_PHOTOS } from "./demo";
 import { chefScope } from "./session";
 import type { ChefPhoto } from "./types";
@@ -14,5 +15,8 @@ export async function getMyPhotos(): Promise<ChefPhoto[]> {
     .in("kind", ["selfie", "portrait", "gallery"])
     .order("sort_order")
     .order("id");
-  return (data ?? []) as ChefPhoto[];
+  // The selfie is private: the chef gets a short-lived link to see it.
+  return Promise.all(
+    ((data ?? []) as ChefPhoto[]).map(async (p) => (p.kind === "selfie" ? { ...p, url: (await selfieLink(scope.sb, p.url)) ?? "" } : p)),
+  );
 }

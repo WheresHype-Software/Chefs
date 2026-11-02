@@ -3,12 +3,13 @@
 import { z } from "zod";
 import { getSession, type ChefPhoto } from "@/lib/dashboard";
 import { publicEnv } from "@/lib/env";
+import { isSelfiePath, removeSelfies } from "@/lib/selfie";
 import { fail, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { chefContext, done, NO_CHEF } from "./context";
 
-// Profile photo, verification selfie and captioned dish photos.
+// Profile photo and captioned dish photos (public), and the private verification selfie.
 type PhotoKind = ChefPhoto["kind"];
-const PHOTO_KINDS: PhotoKind[] = ["selfie", "portrait", "gallery"];
+const PHOTO_KINDS: PhotoKind[] = ["portrait", "gallery"];
 const PhotoId = z.string().uuid();
 const BUCKET_PATH = "/storage/v1/object/public/chef-photos/";
 const CAPTION_MAX = 160;
@@ -30,8 +31,8 @@ export async function addPhoto(url: string, kind: PhotoKind, caption?: string): 
 
   const { data: existing } = await ctx.sb.from("chef_photos").select("id, url, kind, sort_order").eq("chef_id", ctx.chef.id);
   const rows = existing ?? [];
-  // One profile photo and one selfie: a new upload replaces the old file.
-  if (kind !== "gallery") {
+  // One profile photo: a new upload replaces the old file.
+  if (kind === "portrait") {
     const old = rows.filter((r) => r.kind === kind);
     if (old.length) {
       await ctx.sb
@@ -53,6 +54,23 @@ export async function addPhoto(url: string, kind: PhotoKind, caption?: string): 
     sort_order: kind === "gallery" ? nextOrder : 0,
   });
   return error ? failWith(error, "addPhoto", "Não foi possível guardar a fotografia. Tente de novo.") : done();
+}
+
+/** Registers a verification selfie uploaded to the private chef-docs bucket; it replaces any earlier one. */
+export async function addSelfie(path: string): Promise<Result> {
+  const ctx = await chefContext();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
+  const session = await getSession();
+  if (!session.userId || !isSelfiePath(session.userId, path)) return fail(INVALID);
+  const { data, error } = await ctx.sb
+    .from("chef_photos")
+    .insert({ chef_id: ctx.chef.id, url: path, kind: "selfie" })
+    .select("id")
+    .single();
+  if (error) return failWith(error, "addSelfie", "Não foi possível guardar a selfie. Tente de novo.");
+  await removeSelfies(ctx.sb, ctx.chef.id, data.id);
+  return done();
 }
 
 export async function updatePhotoCaption(id: string, caption: string): Promise<Result> {

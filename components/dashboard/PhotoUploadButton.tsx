@@ -19,6 +19,8 @@ export function PhotoUploadButton({ kind, label, busy, onFiles, primary = false 
         type="file"
         accept="image/*"
         multiple={kind === "gallery"}
+        // On phones the selfie opens the front camera straight away.
+        capture={kind === "selfie" ? "user" : undefined}
         className="sr-only"
         onChange={(e) => {
           onFiles(kind, e.target.files);

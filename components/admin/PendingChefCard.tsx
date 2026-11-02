@@ -142,10 +142,11 @@ export function PendingChefCard({ chef: c, open, onToggle, onDecided }: Props) {
       <div className="grid gap-6 md:grid-cols-[minmax(180px,220px)_1fr]">
         <section aria-label="Fotografia do chef" className="flex flex-col gap-3">
           <h4 className="lab m-0 border-b border-line pb-2">Fotografia do chef</h4>
+          {!selfie && <span className="text-[13px] text-danger">Sem selfie de verificação</span>}
           {portrait || selfie ? (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-1">
               {portrait && <PhotoLink url={portrait.url} alt={`Fotografia de ${c.display_name}`} label="Perfil · abrir ↗" />}
-              {selfie && <PhotoLink url={selfie.url} alt={`Selfie de ${c.display_name}`} label="Selfie de verificação · abrir ↗" />}
+              {selfie && <PhotoLink url={selfie.url} alt={`Selfie de ${c.display_name}`} label="Selfie (privada) · abrir ↗" />}
             </div>
           ) : (
             <span className="flex aspect-square w-[160px] items-center justify-center rounded-[10px] bg-paper text-sm text-danger md:w-full">

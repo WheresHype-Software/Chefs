@@ -103,14 +103,10 @@ export async function submitForReview(): Promise<Result> {
     .select("id", { count: "exact", head: true })
     .eq("chef_id", ctx.chef.id)
     .eq("kind", "gallery");
-  // The profile photo is what the team compares with the dish photos (older accounts sent a selfie).
-  const { data: face } = await ctx.sb
-    .from("chef_photos")
-    .select("id")
-    .eq("chef_id", ctx.chef.id)
-    .in("kind", ["portrait", "selfie"])
-    .limit(1);
-  if (!face?.length) return fail("Falta a fotografia de perfil.");
+  // A public profile photo, and a private selfie the team compares it with.
+  const { data: faces } = await ctx.sb.from("chef_photos").select("kind").eq("chef_id", ctx.chef.id).in("kind", ["portrait", "selfie"]);
+  if (!faces?.some((f) => f.kind === "portrait")) return fail("Falta a fotografia de perfil.");
+  if (!faces.some((f) => f.kind === "selfie")) return fail("Falta a selfie de verificação, em Fotografias.");
   if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
   if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail("Indique o Instagram ou o site.");
   const { error } = await ctx.sb.from("chefs").update({ status: "pending" }).eq("id", ctx.chef.id);

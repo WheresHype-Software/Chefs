@@ -4,12 +4,27 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { usePolling } from "@/hooks/usePolling";
 import { callAction } from "@/lib/call-action";
 import { getBookingView, postMessage } from "@/lib/bookings";
-import { timeLabel } from "@/lib/format";
+import { Photo } from "@/components/ui/Photo";
+import { initials, timeLabel } from "@/lib/format";
 import type { BookingView, ChatMessage } from "@/lib/types";
 
 const POLL_MS = 8000;
 
-type Props = { view: BookingView; title: string; subtitle?: string };
+type Props = {
+  view: BookingView;
+  /** Who you're talking to ("Chef Ivo Pacheco", or the client's name for the chef). */
+  title: string;
+  subtitle?: string;
+  photo?: string | null;
+};
+
+function SendIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M4 12 20 4l-6 16-3-7z" />
+    </svg>
+  );
+}
 
 function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
   if (message.sender === "system") {
@@ -30,7 +45,7 @@ function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
 }
 
 /** Booking conversation for the client or the chef; polls for new messages while visible. */
-export function BookingChat({ view, title, subtitle }: Props) {
+export function BookingChat({ view, title, subtitle, photo }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(view.messages);
   // A server refresh (e.g. after accepting the request) brings new messages: show them right away.
   const [fromServer, setFromServer] = useState(view.messages);
@@ -43,6 +58,8 @@ export function BookingChat({ view, title, subtitle }: Props) {
   const [pending, startTransition] = useTransition();
   const list = useRef<HTMLDivElement>(null);
   const me = view.viewer === "chef" ? "chef" : "client";
+  // Only system notes so far: nobody has written yet, so say what this space is for.
+  const quiet = !messages.some((m) => m.sender !== "system");
   const id = view.booking.id;
 
   usePolling(
@@ -72,10 +89,17 @@ export function BookingChat({ view, title, subtitle }: Props) {
 
   return (
     <section aria-label="Conversa" className="box flex min-w-0 flex-col overflow-hidden">
-      <div className="flex items-center gap-3 border-b border-line px-5 py-4">
-        <span className="h-10 w-10 flex-none rounded-full bg-cobalt-soft" aria-hidden="true" />
+      <div className="flex items-center gap-3.5 border-b border-line px-5 py-4">
+        <span className="h-12 w-12 flex-none overflow-hidden rounded-[12px] bg-cobalt-soft" aria-hidden="true">
+          {photo ? (
+            <Photo photo={photo} alt="" sizes="48px" className="h-full w-full" />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-[17px] font-extrabold text-cobalt">{initials(title)}</span>
+          )}
+        </span>
         <div className="flex min-w-0 flex-col">
-          <strong className="truncate font-semibold">{title}</strong>
+          <span className="text-[13px] font-semibold text-muted">Conversa com</span>
+          <strong className="truncate text-[17px] font-bold">{title}</strong>
           {subtitle && <span className="truncate text-[13px] text-ok">{subtitle}</span>}
         </div>
       </div>
@@ -83,6 +107,15 @@ export function BookingChat({ view, title, subtitle }: Props) {
         {messages.map((m) => (
           <Bubble key={m.id} message={m} mine={m.sender === me} />
         ))}
+        {quiet && (
+          <div className="mx-auto my-auto flex max-w-[34ch] flex-col items-center gap-1.5 text-center">
+            <span className="text-[15px] font-semibold text-ink">Ainda sem mensagens</span>
+            <span className="text-[14px] text-muted">
+              Escreva aqui {me === "client" ? `ao ${title}` : "ao cliente"}: alergias, horários, morada ou o que precisar. As mensagens
+              ficam guardadas nesta reserva.
+            </span>
+          </div>
+        )}
       </div>
       {error && (
         <p role="alert" className="m-0 border-t border-line px-5 py-2 text-sm text-danger">
@@ -103,11 +136,12 @@ export function BookingChat({ view, title, subtitle }: Props) {
             maxLength={4000}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Escreva uma mensagem…"
+            placeholder={`Escreva ${me === "client" ? `ao ${title}` : "ao cliente"}…`}
             className="w-full min-w-0 flex-auto rounded-[2px] border border-line-2 px-4 py-3 text-base md:text-[15px] text-ink outline-none focus:border-cobalt"
           />
         </label>
-        <button type="submit" className="btn btn-sm shrink-0" disabled={pending || !draft.trim()}>
+        <button type="submit" className="btn btn-sm shrink-0 gap-1.5" disabled={pending || !draft.trim()}>
+          <SendIcon />
           Enviar
         </button>
       </form>

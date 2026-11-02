@@ -26,7 +26,8 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Só recebe pedidos quando pode"
+        title="Disponibilidade"
+        description="Os dias em que aceita pedidos. Os clientes só veem e pedem os dias abertos."
         actions={
           <div className="flex items-center gap-2">
             <Link href={`?mes=${shift(-1)}`} className="ctl no-underline" aria-label="Mês anterior">
@@ -43,8 +44,7 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
         <div role="status" className="flex flex-col gap-1.5 rounded-[10px] border border-cobalt/30 bg-cobalt-soft p-5">
           <span className="d text-xl">Ainda não abriu nenhum dia.</span>
           <span className="text-[15px] text-ink-3">
-            Os clientes só podem pedir reserva nos dias abertos. Escolha abaixo os dias da semana em que costuma cozinhar, ou toque em cada
-            dia do calendário.
+            Use o atalho para abrir os dias da semana em que costuma cozinhar, ou toque em cada dia do calendário.
             {progress.activeOffers === 0 && " Lembre-se de criar também uma oferta, em Ofertas."}
           </span>
         </div>

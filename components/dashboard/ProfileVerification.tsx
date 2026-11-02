@@ -6,7 +6,7 @@ import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
 import type { MyChef } from "@/lib/dashboard";
 
-export type VerificationPhotos = { selfie: number; gallery: number };
+export type VerificationPhotos = { portrait: number; selfie: number; gallery: number; approved: boolean };
 
 const STATUS_LABEL: Record<MyChef["status"], string> = {
   draft: "rascunho",
@@ -21,7 +21,9 @@ export function ProfileVerification({ chef, photos }: { chef: MyChef | null; pho
   const submit = useServerAction(submitForReview, { successMessage: "Enviado para revisão. Respondemos por email." });
   const canSubmit = chef?.status === "draft" || chef?.status === "rejected";
   const checklist: [string, boolean][] = [
-    ["Fotografia de perfil", photos.selfie > 0],
+    ["Fotografia de perfil", photos.portrait > 0],
+    // An approved profile's selfie was deleted after the check.
+    ["Selfie de verificação", photos.selfie > 0 || photos.approved],
     ["Instagram ou site", Boolean(chef?.socials.instagram || chef?.socials.website)],
     [`Fotos de pratos (${photos.gallery}/3)`, photos.gallery >= 3],
   ];
@@ -31,8 +33,8 @@ export function ProfileVerification({ chef, photos }: { chef: MyChef | null; pho
       <div className="box flex flex-col gap-3 p-6">
         <h2 className="d m-0 text-2xl font-normal">Verificação</h2>
         <span className="text-sm text-muted">
-          Uma fotografia de perfil, o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara as fotos antes de o perfil
-          ficar público.
+          Uma fotografia de perfil, uma selfie de verificação (privada), o Instagram ou site, e pelo menos três fotos de pratos. A equipa
+          compara a selfie com a fotografia de perfil antes de o perfil ficar público.
         </span>
         <ul className="m-0 list-none border-t border-line p-0 text-sm">
           {checklist.map(([label, done]) => (

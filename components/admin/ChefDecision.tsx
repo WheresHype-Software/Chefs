@@ -12,7 +12,7 @@ import type { AdminDecision as Decision } from "@/lib/types";
 export type { Decision };
 
 const BADGE_HINT: Record<Badge, string> = {
-  identity: "A pessoa da fotografia é quem diz ser.",
+  identity: "A selfie confere com a fotografia de perfil. Ao aprovar, a selfie é apagada.",
   portfolio: "Os pratos são mesmo feitos por este chef.",
   certified: "Viu um certificado de cozinha válido: passa a aparecer como Chef.",
   founder: "Entre os primeiros chefs do Ao Lume.",
@@ -21,6 +21,8 @@ const BADGE_HINT: Record<Badge, string> = {
 /** Ready-made reasons for "Pedir alterações"; each becomes a line in the email. */
 const REASONS = [
   "A fotografia de perfil não mostra a sua cara com clareza.",
+  "A selfie de verificação não está nítida: tire outra com a cara bem visível e boa luz.",
+  "A pessoa da selfie não parece ser a da fotografia de perfil.",
   "As fotografias dos pratos estão escuras ou pouco nítidas.",
   "Precisamos de pelo menos três fotografias de pratos feitos por si.",
   "O Instagram ou o site não confirmam que os pratos são seus.",

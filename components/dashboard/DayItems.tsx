@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { markFulfilled } from "@/app/dashboard/actions/agenda";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
+import { chefUpdateBooking } from "@/lib/bookings";
 import { callAction } from "@/lib/call-action";
 import type { DashBooking } from "@/lib/dashboard";
+import { isoDay } from "@/lib/format";
 import type { FulfilmentMode } from "@/lib/types";
 
 const TYPE_LABEL: Record<FulfilmentMode, string> = { home: "Em casa do cliente", delivery: "Entrega", pickup: "Levantamento" };
@@ -18,7 +21,11 @@ const TAG: Record<FulfilmentMode, string> = {
 
 export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchenArea: string }) {
   const [type, setType] = useState<FulfilmentMode | "all">("all");
-  const [done, setDone] = useState<Record<string, boolean>>(() => Object.fromEntries(items.map((i) => [i.id, Boolean(i.fulfilled_at)])));
+  const router = useRouter();
+  // A booking completed in Pedidos is done here too, and stays done.
+  const [done, setDone] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(items.map((i) => [i.id, Boolean(i.fulfilled_at) || i.status === "completed"])),
+  );
   const [, start] = useTransition();
   const [message, setMessage] = useState<FormMessageValue | null>(null);
   const count = (t: FulfilmentMode) => items.filter((i) => i.fulfilment_mode === t).length;
@@ -28,11 +35,20 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
     const next = !done[id];
     setDone((d) => ({ ...d, [id]: next }));
     setMessage(null);
+    const item = items.find((i) => i.id === id);
+    // Done on or after the service day completes the booking too, so the client gets the review request.
+    const complete = next && item?.status === "confirmed" && item.date <= isoDay(new Date());
     start(async () => {
       const result = await callAction(() => markFulfilled(id, !next));
       if (!result.ok) {
         setDone((d) => ({ ...d, [id]: !next }));
         setMessage({ ok: false, text: result.error });
+        return;
+      }
+      if (complete) {
+        const completed = await chefUpdateBooking(id, { status: "completed" });
+        if (!completed.ok) setMessage({ ok: false, text: completed.error });
+        router.refresh();
       }
     });
   }
@@ -59,7 +75,7 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
       {shown.length === 0 && (
         <div className="box flex flex-col gap-1.5 px-6 py-10 text-center">
           <span className="d text-[26px]">Dia livre</span>
-          <span className="text-muted">Sem serviços marcados. Pode bloquear este dia na agenda.</span>
+          <span className="text-muted">Sem serviços marcados. Pode fechar este dia em Disponibilidade.</span>
         </div>
       )}
 
@@ -115,15 +131,17 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
                 <Link href={`/dashboard/pedidos/${i.id}`} className="btn btn-sm btn-o">
                   Mensagem
                 </Link>
-                <button type="button" className="btn btn-sm" onClick={() => toggle(i.id)}>
-                  {isDone
-                    ? "Desfazer"
-                    : isPick
-                      ? "Marcar levantado"
-                      : i.fulfilment_mode === "delivery"
-                        ? "Marcar entregue"
-                        : "Marcar concluído"}
-                </button>
+                {i.status !== "completed" && (
+                  <button type="button" className="btn btn-sm" onClick={() => toggle(i.id)}>
+                    {isDone
+                      ? "Desfazer"
+                      : isPick
+                        ? "Marcar levantado"
+                        : i.fulfilment_mode === "delivery"
+                          ? "Marcar entregue"
+                          : "Marcar concluído"}
+                  </button>
+                )}
               </div>
             </div>
           </article>

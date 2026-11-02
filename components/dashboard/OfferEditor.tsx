@@ -54,12 +54,12 @@ function NextStepAgenda({ openDays, onClose }: { openDays: number; onClose: () =
       <span className="d text-xl">Oferta criada.</span>
       <span className="text-[15px] text-ink-3">
         {openDays > 0
-          ? `Tem ${openDays} ${openDays === 1 ? "dia aberto" : "dias abertos"} na agenda: os clientes já podem pedir esta oferta nesses dias.`
-          : "Agora abra na agenda os dias em que pode cozinhar. Os clientes só podem pedir reserva nos dias abertos."}
+          ? `Tem ${openDays} ${openDays === 1 ? "dia aberto" : "dias abertos"} em Disponibilidade: os clientes já podem pedir esta oferta nesses dias.`
+          : "Agora abra, em Disponibilidade, os dias em que pode cozinhar. Os clientes só podem pedir reserva nos dias abertos."}
       </span>
       <div className="flex flex-wrap gap-2">
         <Link href="/dashboard/agenda" className="btn btn-sm">
-          {openDays > 0 ? "Ver a agenda" : "Abrir dias na agenda"}
+          {openDays > 0 ? "Ver a disponibilidade" : "Abrir dias"}
         </Link>
         <button type="button" className="btn btn-sm btn-o" onClick={onClose}>
           Fechar
@@ -79,7 +79,8 @@ export function OfferList({ offers, openDays }: { offers: DashOffer[]; openDays:
         {created && <NextStepAgenda openDays={openDays} onClose={() => setCreated(false)} />}
         {offers.length === 0 && (
           <p className="m-0 text-muted">
-            Ainda não tem ofertas. Crie a primeira: um menu, uma caixa, uma encomenda. Depois abra na agenda os dias em que pode cozinhar.
+            Ainda não tem ofertas. Crie a primeira: um menu, uma caixa, uma encomenda. Depois abra, em Disponibilidade, os dias em que pode
+            cozinhar.
           </p>
         )}
         {offers.map((o) => (

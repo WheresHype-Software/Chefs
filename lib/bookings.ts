@@ -26,9 +26,15 @@ export async function getBookingView(id: string): Promise<BookingView | null> {
   const sb = await createClient();
   const { data, error } = await sb.rpc("booking_view", { p_booking_id: id, p_token: await guestToken(id) });
   if (error || !data) return null;
-  const view = data as Omit<BookingView, "chef"> & { chef: Omit<BookingView["chef"], "badges"> };
-  const { data: chef } = await sb.from("chefs").select("badges").eq("id", view.chef.id).maybeSingle();
-  return { ...view, chef: { ...view.chef, badges: (chef?.badges as string[] | undefined) ?? [] } };
+  const view = data as Omit<BookingView, "chef"> & { chef: Omit<BookingView["chef"], "badges" | "portrait"> };
+  const [{ data: chef }, { data: photo }] = await Promise.all([
+    sb.from("chefs").select("badges").eq("id", view.chef.id).maybeSingle(),
+    sb.from("chef_photos").select("url").eq("chef_id", view.chef.id).eq("kind", "portrait").limit(1).maybeSingle(),
+  ]);
+  return {
+    ...view,
+    chef: { ...view.chef, badges: (chef?.badges as string[] | undefined) ?? [], portrait: (photo?.url as string | undefined) ?? null },
+  };
 }
 
 const MessageBody = z.string().trim().min(1).max(4000);

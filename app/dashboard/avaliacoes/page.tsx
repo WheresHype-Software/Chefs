@@ -1,4 +1,5 @@
 import { ReviewReply } from "@/components/dashboard/ReviewReply";
+import { Stars } from "@/components/chef/ReviewList";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getReviews, requireChef } from "@/lib/dashboard";
 import { rating } from "@/lib/format";
@@ -17,20 +18,23 @@ export default async function Avaliacoes() {
         <p className="m-0 text-muted">Ainda sem avaliações. O pedido de avaliação é enviado 24 horas depois de cada reserva concluída.</p>
       )}
       {reviews.map((r) => (
-        <article key={r.id} className="box flex flex-col gap-3 p-6">
-          <div className="flex flex-wrap justify-between gap-3 text-sm">
-            <strong className="font-semibold">
-              {r.author_name} · ★ {Number(r.overall).toFixed(1).replace(".", ",")}
-            </strong>
-            <span className="text-muted">
-              {r.offer_title ? `${r.offer_title} · ` : ""}
-              {new Date(r.created_at).toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}
-            </span>
+        // The client's words lead; who, stars and when sit quietly underneath.
+        <article key={r.id} className="box flex flex-col gap-4 p-6">
+          {r.comment ? (
+            <p className="m-0 whitespace-pre-line text-[19px] leading-[1.5] text-ink [overflow-wrap:anywhere]">«{r.comment}»</p>
+          ) : (
+            <p className="m-0 text-[15px] italic text-muted">Avaliou sem deixar comentário.</p>
+          )}
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-muted">
+            <Stars value={Number(r.overall)} />
+            <span className="font-semibold text-ink-3">{r.author_name}</span>
+            <span>·</span>
+            {r.offer_title && <span>{r.offer_title} ·</span>}
+            <span>{new Date(r.created_at).toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}</span>
           </div>
-          {r.comment && <p className="m-0">{r.comment}</p>}
           {r.chef_reply ? (
-            <div className="rounded-[2px] bg-paper px-3.5 py-3 text-sm">
-              <strong className="font-semibold">A sua resposta:</strong> {r.chef_reply}
+            <div className="border-l-2 border-line-2 pl-3.5 text-[14px] text-ink-3">
+              <span className="font-semibold">A sua resposta:</span> {r.chef_reply}
             </div>
           ) : (
             <ReviewReply id={r.id} />

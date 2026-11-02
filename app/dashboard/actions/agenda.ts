@@ -3,8 +3,8 @@
 import { fail, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { chefContext, done, NO_CHEF } from "./context";
 
-/** Cycles a day: nothing -> available -> blocked -> nothing. */
-export async function cycleDay(date: string): Promise<Result> {
+/** Opens a closed day, or closes an open one. */
+export async function toggleDay(date: string): Promise<Result> {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("Data inválida");
   const ctx = await chefContext();
   if (ctx.demo) return ok();
@@ -13,9 +13,9 @@ export async function cycleDay(date: string): Promise<Result> {
   const res = !data
     ? await ctx.sb.from("availability").insert({ chef_id: ctx.chef.id, date, status: "available" })
     : data.status === "available"
-      ? await ctx.sb.from("availability").update({ status: "blocked" }).eq("id", data.id)
-      : await ctx.sb.from("availability").delete().eq("id", data.id);
-  return res.error ? failWith(res.error, "cycleDay", "Não foi possível atualizar a agenda. Tente de novo.") : done();
+      ? await ctx.sb.from("availability").delete().eq("id", data.id)
+      : await ctx.sb.from("availability").update({ status: "available" }).eq("id", data.id);
+  return res.error ? failWith(res.error, "toggleDay", "Não foi possível atualizar este dia. Tente de novo.") : done();
 }
 
 /** Marks every given weekday of a month as available. */

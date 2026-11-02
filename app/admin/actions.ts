@@ -6,6 +6,7 @@ import { getSession } from "@/lib/dashboard";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { z } from "zod";
 import { fail, failWith, ok, type ActionResult } from "@/lib/result";
+import { removeSelfies } from "@/lib/selfie";
 import { createClient } from "@/lib/supabase/server";
 import type { AdminDecision as Decision } from "@/lib/types";
 
@@ -53,6 +54,14 @@ export async function reviewChef(chefId: string, decision: Decision, note: strin
     p_badges: input.data.badges,
   });
   if (error) return failWith(error, "reviewChef", "Não foi possível guardar a decisão. Tente de novo.");
+  // Once the face is confirmed the selfie has done its job: it is not kept.
+  if (decision === "approved") {
+    try {
+      await removeSelfies(sb, chefId);
+    } catch (err) {
+      console.error("[action] reviewChef selfie:", err);
+    }
+  }
 
   // The decision is saved; a failed email must not undo it or show as an error.
   try {

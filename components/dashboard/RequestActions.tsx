@@ -56,7 +56,7 @@ export function RequestActions({ id, status, date }: { id: string; status: Booki
               Marcar concluída
             </button>
           ) : (
-            <span className="flex items-center text-sm text-muted">Pode marcar como concluída a partir de {dayLabel(date)}.</span>
+            <span className="order-last w-full text-[13px] text-muted">Pode marcar como concluída a partir de {dayLabel(date)}</span>
           ))}
         {(status === "accepted" || status === "confirmed" || status === "change_proposed") && (
           <button

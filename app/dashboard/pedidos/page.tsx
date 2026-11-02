@@ -1,83 +1,73 @@
-import Link from "next/link";
+import type { ReactNode } from "react";
+import { ActiveRow, HistoryRow } from "@/components/dashboard/BookingRows";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookings, type DashBooking } from "@/lib/dashboard";
-import { dayLabel, euro, isoDay, MODE_LABEL, STATUS_LABEL } from "@/lib/format";
+import { isoDay } from "@/lib/format";
 
-function hoursLeft(createdAt: string): number {
-  return Math.max(0, Math.round(48 - (Date.now() - new Date(createdAt).getTime()) / 3600_000));
-}
-
-function Row({ b, showActions }: { b: DashBooking; showActions: boolean }) {
+function Group({ title, hint, items, empty }: { title: string; hint?: string; items: DashBooking[]; empty?: ReactNode }) {
+  if (!items.length && !empty) return null;
   return (
-    <article className="box flex flex-wrap gap-5 p-5">
-      <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="lab text-muted">
-            {MODE_LABEL[b.fulfilment_mode]} · {b.ref}
-          </span>
-          <span className={`lab ${b.status === "requested" ? "text-danger" : "text-muted"}`}>
-            {b.status === "requested" ? `Expira em ${hoursLeft(b.created_at)} h` : STATUS_LABEL[b.status]}
-          </span>
-        </div>
-        <Link href={`/dashboard/pedidos/${b.id}`} className="d text-[26px] leading-[1.1] no-underline">
-          {b.client?.name ?? "Cliente"}
-        </Link>
-        <span className="text-sm text-ink-3">
-          {b.offer_title} · {b.guests} · {dayLabel(b.date)}
-          {b.time_label ? ` · ${b.time_label}` : ""}
-          {b.estimate ? ` · ${euro(b.estimate)}` : ""}
-        </span>
-        {b.notes && <span className="border-l border-ink pl-3 text-sm text-ink-3">{b.notes}</span>}
+    <section className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line-2 pb-2.5">
+        <h2 className="m-0 text-[17px] font-bold">
+          {title} <span className="font-normal text-muted">· {items.length}</span>
+        </h2>
+        {hint && <span className="text-[13px] text-muted">{hint}</span>}
       </div>
-      <div className="flex flex-[1_1_260px] flex-col justify-between gap-3">
-        {showActions && <RequestActions id={b.id} status={b.status} date={b.date} />}
-        <Link href={`/dashboard/pedidos/${b.id}`} className="text-sm">
-          Abrir conversa →
-        </Link>
-      </div>
-    </article>
+      {items.length === 0 ? <p className="m-0 text-muted">{empty}</p> : items.map((b) => <ActiveRow key={b.id} b={b} />)}
+    </section>
   );
 }
 
+/**
+ * Requests in the order a chef acts on them: to answer, to complete (past service days), coming
+ * up. Finished bookings fold into a quiet, collapsed history so they never crowd the work.
+ */
 export default async function Pedidos() {
-  const today = isoDay(new Date());
-  const [requests, upcoming, past] = await Promise.all([
+  const now = new Date();
+  const today = isoDay(now);
+  const yesterday = isoDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+  const [requests, toComplete, upcoming, past] = await Promise.all([
     getBookings({ statuses: ["requested", "change_proposed"] }),
+    getBookings({ to: yesterday, statuses: ["accepted", "confirmed"] }),
     getBookings({ from: today, statuses: ["accepted", "confirmed"] }),
-    getBookings({ to: today, statuses: ["completed", "declined", "cancelled", "expired"] }),
+    getBookings({ statuses: ["completed", "declined", "cancelled", "expired"] }),
   ]);
+  const history = [...past].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Pedidos" />
+      <PageHeader
+        title="Pedidos"
+        description={`${requests.length} por responder · ${upcoming.length} ${upcoming.length === 1 ? "reserva marcada" : "reservas marcadas"}`}
+      />
 
-      <section className="flex flex-col gap-3.5">
-        <h2 className="lab m-0 border-b border-line-2 pb-2.5">Por responder · {requests.length}</h2>
-        {requests.length === 0 && <p className="m-0 text-muted">Sem pedidos novos. Os pedidos expiram ao fim de 48 horas.</p>}
-        {requests.map((b) => (
-          <Row key={b.id} b={b} showActions />
-        ))}
-      </section>
+      <Group
+        title="Por responder"
+        hint="Os pedidos expiram ao fim de 48 horas."
+        items={requests}
+        empty="Sem pedidos novos. Quando um cliente pedir, aparece aqui e recebe um email."
+      />
+      <Group title="Por concluir" hint="Marque como concluída: o cliente recebe o pedido de avaliação." items={toComplete} />
+      <Group title="Próximas reservas" items={upcoming} empty="Sem reservas marcadas." />
 
-      <section className="flex flex-col gap-3.5">
-        <h2 className="lab m-0 border-b border-line-2 pb-2.5">Próximas reservas · {upcoming.length}</h2>
-        {upcoming.length === 0 && <p className="m-0 text-muted">Sem reservas marcadas.</p>}
-        {upcoming.map((b) => (
-          <Row key={b.id} b={b} showActions />
-        ))}
-      </section>
-
-      {past.length > 0 && (
-        <section className="flex flex-col gap-3.5">
-          <h2 className="lab m-0 border-b border-line-2 pb-2.5">Histórico</h2>
-          {past
-            .slice(-20)
-            .reverse()
-            .map((b) => (
-              <Row key={b.id} b={b} showActions={false} />
+      {history.length > 0 && (
+        <details className="group rounded-[12px] border border-line bg-paper">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
+            <span className="text-[16px] font-bold">
+              Histórico <span className="font-normal text-muted">· {history.length}</span>
+            </span>
+            <span className="text-[14px] text-muted">
+              <span className="group-open:hidden">Mostrar concluídos, recusados e cancelados</span>
+              <span className="hidden group-open:inline">Esconder</span>
+            </span>
+          </summary>
+          <ul className="m-0 list-none border-t border-line px-3 pb-2 pt-1">
+            {history.map((b) => (
+              <HistoryRow key={b.id} b={b} />
             ))}
-        </section>
+          </ul>
+        </details>
       )}
     </div>
   );
