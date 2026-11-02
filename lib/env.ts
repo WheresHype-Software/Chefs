@@ -1,14 +1,15 @@
 // Public configuration, safe for the browser. NEXT_PUBLIC_* values are inlined at build time,
-// so each one must be read with its literal name.
+// so each one must be read with its literal name. Fallbacks use || not ??: docker-compose passes
+// unset optional values as empty strings ("${X:-}"), and "" must count as unset.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 // Supabase's new publishable key (sb_publishable_…); the legacy anon key still works as a fallback.
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export const publicEnv = {
   supabaseUrl,
   supabaseKey,
-  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, ""),
-  mapStyleUrl: process.env.NEXT_PUBLIC_MAP_STYLE_URL ?? "https://tiles.openfreemap.org/styles/positron",
+  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+  mapStyleUrl: process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://tiles.openfreemap.org/styles/positron",
 } as const;
 
 /** True when the app is wired to a Supabase project; otherwise it runs on demo data. */
