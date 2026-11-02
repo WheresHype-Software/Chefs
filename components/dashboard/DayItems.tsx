@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { markFulfilled } from "@/app/dashboard/actions";
+import { markFulfilled } from "@/app/dashboard/actions/agenda";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
 import { callAction } from "@/lib/call-action";

@@ -66,6 +66,8 @@ export type ChefProfile = ChefCard & {
   portrait: string | null;
   gallery: { url: string | null; caption: string }[];
   reviews: Review[];
+  /** Reviews per star level, 5★ first. */
+  ratingDistribution: number[];
   categoryAverages: { label: string; value: number }[];
 };
 
@@ -109,3 +111,6 @@ export type BookingView = {
   messages: ChatMessage[];
   review: { id: string } | null;
 };
+
+/** What the team decides about a chef's profile. */
+export type AdminDecision = "approved" | "rejected" | "suspended";

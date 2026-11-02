@@ -1,11 +1,27 @@
 import Link from "next/link";
 import { Photo } from "@/components/ui/Photo";
+import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { Star } from "@/components/ui/Star";
-import { fromPrice, SERVICE_LABEL, tierLabel } from "@/lib/format";
+import { chefTitle, fromPrice, isVerifiedChef, SERVICE_LABEL, titledName } from "@/lib/format";
 import type { ChefCard } from "@/lib/types";
 
 function distanceLabel(km: number): string {
   return km < 0.5 ? "muito perto" : `a ${String(km).replace(".", ",")} km`;
+}
+
+/** Verified chefs carry a filled "Chef verificado" mark; cooks a plain "Cozinheiro" one. */
+function TitleBadge({ badges }: { badges: string[] }) {
+  const verified = isVerifiedChef(badges);
+  return (
+    <span
+      className={`absolute left-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-semibold ${
+        verified ? "bg-cobalt text-white" : "bg-white/95 text-ink"
+      }`}
+    >
+      {verified && <VerifiedIcon />}
+      {verified ? "Chef verificado" : chefTitle(badges)}
+    </span>
+  );
 }
 
 function RatingLine({ chef }: { chef: ChefCard }) {
@@ -21,7 +37,6 @@ function RatingLine({ chef }: { chef: ChefCard }) {
 
 /** A chef in the results grid: the food photo leads, then who, where and how much. */
 export function ChefTile({ chef, priority = false }: { chef: ChefCard; priority?: boolean }) {
-  const tier = tierLabel(chef.tier, chef.isNew, chef.reviewCount, chef.rating);
   return (
     <Link href={`/chef/${chef.slug}`} className="group flex flex-col gap-3 text-ink no-underline hover:text-ink">
       <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] bg-paper">
@@ -32,11 +47,11 @@ export function ChefTile({ chef, priority = false }: { chef: ChefCard; priority?
           priority={priority}
           className="h-full w-full transition-transform duration-500 ease-[var(--ease-out)] group-hover:scale-[1.03]"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[13px] font-semibold text-ink">{tier}</span>
+        <TitleBadge badges={chef.badges} />
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="m-0 text-[19px] font-bold leading-tight tracking-[-0.01em] group-hover:text-cobalt">{chef.name}</h3>
+          <h3 className="m-0 text-[19px] font-bold leading-tight tracking-[-0.01em] group-hover:text-cobalt">{titledName(chef)}</h3>
           <span className="shrink-0 text-[14px]">
             <RatingLine chef={chef} />
           </span>

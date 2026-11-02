@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { moderateReview, reviewChef } from "@/app/admin/actions";
+import { reviewChef } from "@/app/admin/actions";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
 import { useToggleList } from "@/hooks/useToggleList";
+import { BADGE_LABEL, BADGES, type Badge } from "@/lib/constants";
+import type { AdminDecision as Decision } from "@/lib/types";
 
-export type Decision = "approved" | "rejected" | "suspended";
+export type { Decision };
 
-const BADGES: [string, string, string][] = [
-  ["identity", "Identidade verificada", "A pessoa da fotografia é quem diz ser."],
-  ["portfolio", "Portefólio verificado", "Os pratos são mesmo feitos por este chef."],
-  ["certified", "Certificado", "Viu um certificado válido (ex.: HACCP)."],
-  ["founder", "Chef fundador", "Entre os primeiros chefs do Ao Lume."],
-];
+const BADGE_HINT: Record<Badge, string> = {
+  identity: "A pessoa da fotografia é quem diz ser.",
+  portfolio: "Os pratos são mesmo feitos por este chef.",
+  certified: "Viu um certificado de cozinha válido: passa a aparecer como Chef.",
+  founder: "Entre os primeiros chefs do Ao Lume.",
+};
 
 /** Ready-made reasons for "Pedir alterações"; each becomes a line in the email. */
 const REASONS = [
@@ -67,7 +69,11 @@ export function ChefDecision({ chefId, chefName, badges: initial, onDone }: Prop
 
   return (
     <div className="flex flex-col gap-5">
-      <div role="tablist" aria-label="Decisão" className="grid grid-cols-3 gap-1 rounded-[3px] border border-line-2 p-1">
+      <div
+        role="tablist"
+        aria-label="Decisão"
+        className="grid grid-cols-1 gap-1 rounded-[3px] min-[380px]:grid-cols-3 border border-line-2 p-1"
+      >
         {TABS.map(([key, label]) => (
           <button
             key={key}
@@ -95,7 +101,7 @@ export function ChefDecision({ chefId, chefName, badges: initial, onDone }: Prop
         <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
           <legend className="lab mb-2.5 p-0">Selos no perfil público</legend>
           <div className="grid gap-2 sm:grid-cols-2">
-            {BADGES.map(([key, label, hint]) => (
+            {BADGES.map((key) => (
               <label
                 key={key}
                 className={`flex cursor-pointer items-start gap-3 rounded-[3px] border px-3.5 py-3 transition-colors ${
@@ -109,8 +115,8 @@ export function ChefDecision({ chefId, chefName, badges: initial, onDone }: Prop
                   className="mt-1 accent-[var(--color-cobalt)]"
                 />
                 <span className="flex flex-col gap-0.5">
-                  <span className="text-[15px] font-semibold">{label}</span>
-                  <span className="text-[13px] text-muted">{hint}</span>
+                  <span className="text-[15px] font-semibold">{BADGE_LABEL[key]}</span>
+                  <span className="text-[13px] text-muted">{BADGE_HINT[key]}</span>
                 </span>
               </label>
             ))}
@@ -165,32 +171,6 @@ export function ChefDecision({ chefId, chefName, badges: initial, onDone }: Prop
         </button>
         <FormMessage message={message} />
       </div>
-    </div>
-  );
-}
-
-/** Keep, hide or delete a reported review. */
-export function ReviewModeration({ reviewId, reportId }: { reviewId: string; reportId: string }) {
-  const { run, pending, message } = useServerAction(moderateReview);
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-1.5">
-        <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => run(reviewId, reportId, "keep")}>
-          Manter
-        </button>
-        <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => run(reviewId, reportId, "hide")}>
-          Esconder
-        </button>
-        <button
-          type="button"
-          className="btn btn-sm btn-o !border-line-2 !text-danger"
-          disabled={pending}
-          onClick={() => confirm("Apagar a avaliação?") && run(reviewId, reportId, "delete")}
-        >
-          Apagar
-        </button>
-      </div>
-      <FormMessage message={message} />
     </div>
   );
 }

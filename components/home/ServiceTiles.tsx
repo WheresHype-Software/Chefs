@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Photo } from "@/components/ui/Photo";
 import { SERVICE_PHOTO } from "@/lib/photos";
 import type { ServiceType } from "@/lib/types";
+import { revealDelay } from "@/lib/motion";
 
 const SERVICES: [ServiceType, string, string][] = [
   ["home", "Chef em casa", "Jantares e datas especiais, cozinhados e servidos na sua cozinha."],
@@ -15,12 +16,12 @@ const SERVICES: [ServiceType, string, string][] = [
 export function ServiceTiles() {
   return (
     <section aria-labelledby="servicos-title" className="mx-auto max-w-[1280px] px-5 py-14 md:px-8 md:py-24">
-      <h2 id="servicos-title" className="d m-0 mb-6 md:mb-8 text-[clamp(28px,3.4vw,40px)] leading-[1.05]">
+      <h2 id="servicos-title" className="al-rv d m-0 mb-6 md:mb-8 text-[clamp(28px,3.4vw,40px)] leading-[1.05]">
         O que pode pedir
       </h2>
       <ul className="m-0 grid list-none grid-cols-2 gap-x-3 gap-y-6 p-0 md:gap-4 md:grid-cols-3 lg:grid-cols-5">
         {SERVICES.map(([key, title, text], i) => (
-          <li key={key} className={i === 0 ? "col-span-2 md:col-span-1" : ""}>
+          <li key={key} className={`al-rv ${i === 0 ? "col-span-2 md:col-span-1" : ""}`} style={revealDelay(i, 5)}>
             <Link href={`/procurar?servico=${key}`} className="group flex flex-col gap-3 text-ink no-underline hover:text-ink">
               <div className={`${i === 0 ? "aspect-[16/10]" : "aspect-[4/3]"} overflow-hidden rounded-[10px] bg-paper md:aspect-[4/5]`}>
                 <Photo

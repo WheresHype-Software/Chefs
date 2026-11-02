@@ -1,24 +1,14 @@
 "use client";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { Map as MLMap, Marker, StyleSpecification } from "maplibre-gl";
+import type { Map as MLMap, Marker } from "maplibre-gl";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { publicEnv } from "@/lib/env";
-import { fromPrice, initials } from "@/lib/format";
+import { LISBON, loadMapLibre, loadStyle, restyle } from "@/components/map/map-style";
+import { createPin } from "@/components/map/pin";
 import type { ChefCard } from "@/lib/types";
 
-// Free vector tiles, no API key: https://openfreemap.org
-const STYLE_URL = publicEnv.mapStyleUrl;
-const LISBON: [number, number] = [-9.155, 38.725];
 const TILT = 54;
 const BEARING = -14;
-
-// Used if the tile server can't be reached: a plain "chef's whites" canvas, pins still work.
-const OFFLINE_STYLE: StyleSpecification = {
-  version: 8,
-  sources: {},
-  layers: [{ id: "bg", type: "background", paint: { "background-color": "#F1F0EC" } }],
-};
 
 export type ChefMapHandle = {
   zoomIn: () => void;
@@ -38,37 +28,6 @@ type Props = {
   padRight: number;
 };
 
-function restyle(map: MLMap) {
-  // Push positron towards the mockup palette: warm paper ground, pale water, white roads.
-  for (const layer of map.getStyle().layers ?? []) {
-    try {
-      if (layer.type === "background") map.setPaintProperty(layer.id, "background-color", "#F1F0EC");
-      if (layer.id.startsWith("water") && layer.type === "fill") map.setPaintProperty(layer.id, "fill-color", "#E1E5E7");
-      if (/park|landcover_wood|landuse_park/.test(layer.id) && layer.type === "fill")
-        map.setPaintProperty(layer.id, "fill-color", "#E4E7E0");
-      if (layer.type === "line" && /highway|road/.test(layer.id)) map.setPaintProperty(layer.id, "line-color", "#FBFBF9");
-      if (layer.type === "symbol") map.setPaintProperty(layer.id, "text-color", "#76726B");
-    } catch {
-      // Some layers use expressions we leave untouched.
-    }
-  }
-  if (map.getSource("openmaptiles") && !map.getLayer("al-buildings")) {
-    map.addLayer({
-      id: "al-buildings",
-      type: "fill-extrusion",
-      source: "openmaptiles",
-      "source-layer": "building",
-      minzoom: 13,
-      paint: {
-        "fill-extrusion-color": "#FFFFFF",
-        "fill-extrusion-height": ["coalesce", ["get", "render_height"], 8],
-        "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0],
-        "fill-extrusion-opacity": 0.85,
-      },
-    });
-  }
-}
-
 export const ChefMap = forwardRef<ChefMapHandle, Props>(function ChefMap(
   { chefs, visible, selectedId, onPick, onInteract, home, padRight },
   ref,
@@ -87,18 +46,7 @@ export const ChefMap = forwardRef<ChefMapHandle, Props>(function ChefMap(
     let instance: MLMap | null = null;
     const pins = markers.current;
     (async () => {
-      const maplibre = await import("maplibre-gl");
-      maplibre.setWorkerUrl("/vendor/maplibre-gl-worker.mjs");
-      let style: string | StyleSpecification = STYLE_URL;
-      try {
-        const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), 4000);
-        const res = await fetch(STYLE_URL, { signal: ctrl.signal });
-        clearTimeout(t);
-        if (!res.ok) style = OFFLINE_STYLE;
-      } catch {
-        style = OFFLINE_STYLE;
-      }
+      const [maplibre, style] = await Promise.all([loadMapLibre(), loadStyle()]);
       if (cancelled || !el.current) return;
       const small = window.innerWidth < 760;
       const m = new maplibre.Map({
@@ -135,31 +83,13 @@ export const ChefMap = forwardRef<ChefMapHandle, Props>(function ChefMap(
   function syncMarkers(maplibre?: typeof import("maplibre-gl")) {
     const m = map.current;
     if (!m) return;
-    const create = (c: ChefCard, i: number) => {
-      const node = document.createElement("div");
-      node.className = "al-pin";
-      node.innerHTML = `
-        <div class="al-bub" style="animation-delay:${300 + i * 110}ms;display:flex;flex-direction:column;align-items:center">
-          <button type="button"><span class="ini d"></span><span class="price"></span></button>
-          <span class="stem"></span><span class="foot"></span>
-        </div>`;
-      const btn = node.querySelector("button")!;
-      btn.querySelector(".ini")!.textContent = initials(c.name);
-      btn.querySelector(".price")!.textContent = fromPrice(c.offers).replace("orçamento", "Orçamento");
-      btn.setAttribute("aria-label", `${c.name}, ${c.headline ?? ""}, ${c.area ?? ""}`);
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        pickRef.current(c.id);
-      });
-      return node;
-    };
     void (async () => {
-      const lib = maplibre ?? (await import("maplibre-gl"));
+      const lib = maplibre ?? (await loadMapLibre());
       const seen = new Set<string>();
       chefs.forEach((c, i) => {
         seen.add(c.id);
         if (markers.current.has(c.id)) return;
-        const node = create(c, i);
+        const node = createPin(c, (id) => pickRef.current(id), 300 + i * 110);
         const marker = new lib.Marker({ element: node, anchor: "bottom", pitchAlignment: "viewport", rotationAlignment: "viewport" })
           .setLngLat([c.lng, c.lat])
           .addTo(m);

@@ -31,7 +31,7 @@ function Row({ b, showActions }: { b: DashBooking; showActions: boolean }) {
         {b.notes && <span className="border-l border-ink pl-3 text-sm text-ink-3">{b.notes}</span>}
       </div>
       <div className="flex flex-[1_1_260px] flex-col justify-between gap-3">
-        {showActions && <RequestActions id={b.id} status={b.status} />}
+        {showActions && <RequestActions id={b.id} status={b.status} date={b.date} />}
         <Link href={`/dashboard/pedidos/${b.id}`} className="text-sm">
           Abrir conversa →
         </Link>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AzulejoTile } from "@/components/brand/Azulejo";
-import { ChefTile } from "@/components/search/ChefTile";
+import { SearchResults } from "@/components/search/SearchResults";
 import { CuisineSelect } from "@/components/search/CuisineSelect";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
@@ -24,7 +24,8 @@ function heading(q: SearchQuery, count: number): string {
 function summary(q: SearchQuery, count: number): string {
   const parts = [count === 1 ? "1 chef" : `${count} chefs`];
   if (q.date) parts.push(`livres ${dayLabel(q.date)}`);
-  return parts.join(", ");
+  const found = parts.join(", ");
+  return count ? `${found}. Abra um chef para ver o menu, os dias livres e pedir reserva, sem criar conta.` : found;
 }
 
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -41,7 +42,7 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
 
 export default async function ProcurarPage({ searchParams }: PageProps<"/procurar">) {
   const q = parseSearchQuery(await searchParams);
-  const { chefs } = await searchChefs(q);
+  const { chefs, place } = await searchChefs(q);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -83,16 +84,10 @@ export default async function ProcurarPage({ searchParams }: PageProps<"/procura
           </div>
         </section>
 
-        <section aria-label="Resultados" className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
-          {chefs.length > 0 ? (
-            <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-10 p-0 sm:grid-cols-2 lg:grid-cols-3">
-              {chefs.map((chef, i) => (
-                <li key={chef.id}>
-                  <ChefTile chef={chef} priority={i < 3} />
-                </li>
-              ))}
-            </ul>
-          ) : (
+        {chefs.length > 0 ? (
+          <SearchResults key={chefs.map((c) => c.id).join()} chefs={chefs} place={place} />
+        ) : (
+          <section aria-label="Resultados" className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
             <div className="flex flex-col items-start gap-5 md:flex-row md:items-center">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[10px]">
                 <AzulejoTile variant="glaze" />
@@ -119,8 +114,8 @@ export default async function ProcurarPage({ searchParams }: PageProps<"/procura
                 </div>
               </div>
             </div>
-          )}
-        </section>
+          </section>
+        )}
       </main>
       <SiteFooter />
     </div>

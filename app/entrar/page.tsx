@@ -8,12 +8,13 @@ export const metadata: Metadata = { title: "Entrar" };
 export default async function EntrarPage({ searchParams }: PageProps<"/entrar">) {
   const sp = await searchParams;
   const asChef = sp.chef === "1";
-  const next = typeof sp.next === "string" ? sp.next : asChef ? "/dashboard/perfil" : "/dashboard";
+  // Same-site paths only: "//host" or "/\host" would send a fresh sign-in off-site.
+  const next = typeof sp.next === "string" && /^\/(?![/\\])/.test(sp.next) ? sp.next : asChef ? "/dashboard/perfil" : "/dashboard";
   return (
     <div className="min-h-screen bg-paper">
       <SiteHeader chefs={asChef} />
       <div className="mx-auto flex max-w-[1080px] flex-wrap gap-14 px-5 py-16 md:px-8 md:py-24">
-        <div className="flex flex-[1_1_340px] flex-col gap-5">
+        <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
           <h1 className="d m-0 text-[clamp(40px,6vw,64px)] leading-none">{asChef ? "Crie o seu perfil de chef." : "Entrar no Ao Lume."}</h1>
           <p className="m-0 max-w-[460px] text-ink-3">
             {asChef
@@ -26,7 +27,7 @@ export default async function EntrarPage({ searchParams }: PageProps<"/entrar">)
             </p>
           )}
         </div>
-        <div className="box flex-[1_1_380px] p-7">
+        <div className="box min-w-0 flex-[1_1_380px] p-5 sm:p-7">
           {hasSupabase ? (
             <SignInForm next={next} asChef={asChef} />
           ) : (

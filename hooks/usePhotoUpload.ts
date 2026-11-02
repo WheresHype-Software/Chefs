@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { addPhoto } from "@/app/dashboard/actions";
+import { addPhoto } from "@/app/dashboard/actions/photos";
 import type { FormMessageValue } from "@/components/ui/FormMessage";
 import { prepareImage } from "@/lib/image";
 import { createClient, hasSupabase } from "@/lib/supabase/client";

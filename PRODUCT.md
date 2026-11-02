@@ -2,7 +2,7 @@
 
 ## What it is
 
-A Portuguese marketplace that connects people with private chefs and home cooks near them: dinners cooked in the client's home, weekly meal prep, cakes and pastry, deliveries, pickups and events. Ao Lume is a connector, not a food business. The chef sets the price and the client pays the chef directly (MB WAY, transfer or cash); the platform takes no commission.
+A Portuguese marketplace that connects people with private chefs and home cooks near them: dinners cooked in the client's home, weekly meal prep, cakes and pastry, deliveries, pickups and events. Ao Lume is a connector, not a food business. The chef sets the price and the client pays the chef directly (MB WAY, transfer or cash). It is free at launch; a per-booking commission may come later, so public pages never promise "no commission".
 
 ## Who it serves
 
@@ -20,4 +20,4 @@ A Portuguese marketplace that connects people with private chefs and home cooks 
 - Language: European Portuguese first (pt-PT), English later.
 - Claims: no invented prices, reviews, customers or statistics on public pages. Placeholder content is marked as such.
 - Photography: currently temporary Unsplash stock (`lib/photos.ts`); replace with real chefs and dishes before launch.
-- Map: parked for now; search results are a list.
+- Map: search results show as a list beside a map of chef zones (Lista / Mapa switch on phones). Travel times are estimates from distance, not routes. Tiles, geocoding and estimates are all free (OpenFreeMap, Photon, no API keys).

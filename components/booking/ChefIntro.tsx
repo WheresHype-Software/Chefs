@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { rating, tierLabel, toneFor } from "@/lib/format";
+import { chefTitle, rating, toneFor } from "@/lib/format";
 import type { ChefCard } from "@/lib/types";
 
 /** Cover photo, name, categories and bio at the top of the map's booking panel. */
@@ -23,7 +23,7 @@ export function ChefIntro({ chef, onClose }: { chef: ChefCard; onClose?: () => v
       </div>
       <div className="flex flex-col gap-2.5 px-7 pt-[26px]">
         <span className="lab text-muted">
-          {tierLabel(chef.tier, chef.isNew, chef.reviewCount, chef.rating)} · {chef.area}
+          {chefTitle(chef.badges)} · {chef.area}
         </span>
         <h2 className="d m-0 text-[40px] leading-none">{chef.name}</h2>
         <div className="flex flex-wrap gap-1.5">

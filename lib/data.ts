@@ -64,7 +64,8 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
       )
       .eq("chef_id", card.id)
       .order("created_at", { ascending: false })
-      .limit(20),
+      // Enough for honest averages and the 5★…1★ breakdown; the page shows a few at a time.
+      .limit(300),
   ]);
 
   const rv = (reviews.data ?? []) as unknown as ReviewRow[];
@@ -95,6 +96,7 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
       overall: Number(r.overall),
       reply: r.chef_reply,
     })),
+    ratingDistribution: starCounts(rv.map((r) => Number(r.overall))),
     categoryAverages: rv.length
       ? [
           { label: "Comida", value: avg("food") },
@@ -106,6 +108,13 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
       : [],
   };
 });
+
+/** How many reviews round to 5, 4, 3, 2 and 1 stars (in that order). */
+export function starCounts(overalls: number[]): number[] {
+  const counts = [0, 0, 0, 0, 0];
+  for (const o of overalls) counts[5 - Math.min(5, Math.max(1, Math.round(o)))]!++;
+  return counts;
+}
 
 export const PAYMENT_LABEL: Record<string, string> = {
   mbway: "MB WAY",

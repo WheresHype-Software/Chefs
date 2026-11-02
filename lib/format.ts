@@ -24,15 +24,27 @@ export function firstName(name: string): string {
   return name.split(/\s+/)[0] ?? name;
 }
 
+/** What the chef says they are (profile form); the public title comes from verification instead. */
 export const TIER_LABEL: Record<string, string> = {
-  professional: "Profissional",
-  home: "Chef caseira",
+  professional: "Diz ser chef profissional",
+  home: "Cozinha em casa",
 };
 
-export function tierLabel(tier: string, isNew = false, reviewCount = 0, rating: number | null = null): string {
-  if (isNew && reviewCount === 0) return "Novo talento";
-  if (reviewCount >= 25 && (rating ?? 0) >= 4.7) return "Top chef";
-  return TIER_LABEL[tier] ?? tier;
+/**
+ * "Chef" is earned: only once the team has verified a cooking certificate (the admin-only
+ * "certified" badge). Everyone else is "Cozinheiro".
+ */
+export function isVerifiedChef(badges: readonly string[]): boolean {
+  return badges.includes("certified");
+}
+
+export function chefTitle(badges: readonly string[]): "Chef" | "Cozinheiro" {
+  return isVerifiedChef(badges) ? "Chef" : "Cozinheiro";
+}
+
+/** "Chef Marta Figueiredo" or "Cozinheiro Rui Barata". */
+export function titledName(chef: { name: string; badges: readonly string[] }): string {
+  return `${chefTitle(chef.badges)} ${chef.name}`;
 }
 
 export const SERVICE_LABEL: Record<ServiceType, string> = {

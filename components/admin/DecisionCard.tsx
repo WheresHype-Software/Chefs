@@ -10,10 +10,24 @@ const DONE: Record<Decision, string> = {
   suspended: "foi suspenso. O perfil deixou de estar visível.",
 };
 
-type Props = { chefId: string; chefName: string; slug: string; badges: string[]; children: ReactNode };
+type Props = {
+  chefId: string;
+  chefName: string;
+  slug: string;
+  badges: string[];
+  /** The one-line summary shown while the card is closed (and as its header when open). */
+  summary: ReactNode;
+  open: boolean;
+  onToggle: () => void;
+  onDecided?: (decision: Decision) => void;
+  children: ReactNode;
+};
 
-/** A chef under review; once decided, it folds into a one-line confirmation so the next chef is in view. */
-export function DecisionCard({ chefId, chefName, slug, badges, children }: Props) {
+/**
+ * A chef under review: a summary row that opens into the full application and the decision.
+ * Once decided it folds into a one-line confirmation, and the queue opens the next one.
+ */
+export function DecisionCard({ chefId, chefName, slug, badges, summary, open, onToggle, onDecided, children }: Props) {
   const [done, setDone] = useState<Decision | null>(null);
 
   if (done) {
@@ -31,12 +45,37 @@ export function DecisionCard({ chefId, chefName, slug, badges, children }: Props
     );
   }
 
+  const bodyId = `candidatura-${chefId}`;
   return (
-    <article className="box flex flex-col gap-6 p-4 md:p-6">
-      {children}
-      <div className="border-t border-line pt-5">
-        <ChefDecision chefId={chefId} chefName={chefName} badges={badges} onDone={setDone} />
-      </div>
+    <article id={`chef-${chefId}`} className={`box scroll-mt-28 overflow-hidden ${open ? "ring-2 ring-cobalt/30" : ""}`}>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={bodyId}
+        onClick={onToggle}
+        className="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent p-4 text-left font-[inherit] text-ink hover:bg-paper md:px-6"
+      >
+        <span className="min-w-0 flex-1">{summary}</span>
+        <span aria-hidden="true" className={`shrink-0 text-xl text-muted transition-transform ${open ? "rotate-180" : ""}`}>
+          ⌄
+        </span>
+      </button>
+      {open && (
+        <div id={bodyId} className="flex flex-col gap-6 border-t border-line p-4 md:p-6">
+          {children}
+          <div className="border-t border-line pt-5">
+            <ChefDecision
+              chefId={chefId}
+              chefName={chefName}
+              badges={badges}
+              onDone={(d) => {
+                setDone(d);
+                onDecided?.(d);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </article>
   );
 }

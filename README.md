@@ -1,6 +1,6 @@
 # Ao Lume
 
-Private chefs and home cooks near you. Clients find chefs on a map, read their showcase, and send a booking request; chefs manage requests, chat, calendar, offers and logistics from a dashboard. Clients pay chefs directly, so the platform takes no payments and no commission.
+Private chefs and home cooks near you. Clients find chefs on a map, read their showcase, and send a booking request; chefs manage requests, chat, calendar, offers and logistics from a dashboard. Clients pay chefs directly; the platform handles no payments (free at launch, a per-booking commission may come later).
 
 Built from the project spec ("Private Chef Platform – Project Spec") and the V2 "chef's whites" mockups (Bodoni Moda + Hanken Grotesk, white, black ink, hairlines, square corners).
 
@@ -33,27 +33,38 @@ Without Supabase credentials the app runs in **demo mode**: search, chef pages a
 
 The seed adds seven demo chefs in Lisbon with no login attached. Delete them before launch.
 
+## End-to-end tests
+
+```bash
+npm run test:e2e      # headless; reuses `npm run dev` if it is already running
+npm run test:e2e:ui   # Playwright UI, step by step
+```
+
+`e2e/booking-lifecycle.spec.ts` plays the whole story in three browsers: a chef creates a profile, uploads photos and applies; an admin approves; the chef publishes an offer and opens a day; a guest books it; the chef accepts, chats, confirms the deposit and completes it; the guest reviews and the review appears on the public page.
+
+It runs against the Supabase project in `.env.local` and needs `SUPABASE_SECRET_KEY`. Setup creates confirmed `e2e-…@aolume.test` accounts with the secret key (signing up through the form would send real confirmation emails), and cleanup deletes every record tied to those accounts, including leftovers of interrupted runs. Set `E2E_KEEP_DATA=1` to keep the data for inspection. Reports land in `e2e/.report`.
+
 ## Design
 
-The visual system is documented in [DESIGN.md](DESIGN.md) and the product context in [PRODUCT.md](PRODUCT.md). Photography is temporary Unsplash stock listed in `lib/photos.ts`; replace it with real chefs and dishes before launch. The map is parked for now (components kept in `components/map`).
+The visual system is documented in [DESIGN.md](DESIGN.md) and the product context in [PRODUCT.md](PRODUCT.md). Photography is temporary Unsplash stock listed in `lib/photos.ts`; replace it with real chefs and dishes before launch. Search results (`/procurar`) show beside a map; the original full-screen home map is parked in `components/map` (`MapExplorer`).
 
 ## Project structure
 
-| Path                           | What                                                                                                                                                         |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app/`                         | Routes. Pages are server components; each feature keeps its server actions next to it (`app/actions.ts`, `app/dashboard/actions.ts`, `app/admin/actions.ts`) |
-| `app/page.tsx`                 | Home: tiled-wall hero with the search, services, how it works, best-rated chefs, chef invitation                                                             |
-| `app/procurar`                 | Search results: chefs filtered by area, service, cuisine and date                                                                                            |
-| `app/chef/[slug]`              | Chef showcase: gallery, about, experience, offers, reviews, booking form                                                                                     |
-| `app/reserva/[id]`             | Booking status, chat, cancel or accept a proposal, review once completed                                                                                     |
-| `app/para-chefs`, `app/entrar` | Marketing page for chefs; sign in (email link, password, Google, chef sign-up)                                                                               |
-| `app/dashboard/*`              | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile                                                        |
-| `app/admin`                    | Approval queue, reported reviews, weekly stats                                                                                                               |
-| `components/ui/`               | Design-system primitives: `Field`, `Switch`, `Chip`, `Stepper`, `PageHeader`, `StatGrid`, `DetailList`, `FormMessage`                                        |
-| `components/<feature>/`        | Feature components: `home/`, `search/`, `booking/`, `dashboard/`, `admin/`, `brand/` (azulejo tiles), `map/` (parked)                                        |
-| `hooks/`                       | Client hooks: `useServerAction`, `useBookingForm`, `useChefFilters`, `useMonthCalendar`, `usePolling`, `usePhotoUpload`, `useMediaQuery`, `useToggleList`    |
-| `lib/`                         | Server and shared logic: env, Supabase clients, data access with demo fallbacks, formatting, constants                                                       |
-| `supabase/`                    | Migrations (schema, RLS, functions, storage, cron) and seed data                                                                                             |
+| Path                           | What                                                                                                                                                                                                                         |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/`                         | Routes. Pages are server components; each feature keeps its server actions next to it (`app/actions.ts`, `app/dashboard/actions/` by feature, `app/admin/actions.ts`)                                                        |
+| `app/page.tsx`                 | Home: tiled-wall hero with the search, services, how it works, best-rated chefs, chef invitation                                                                                                                             |
+| `app/procurar`                 | Search results: chefs filtered by area, service, cuisine and date                                                                                                                                                            |
+| `app/chef/[slug]`              | Chef showcase: gallery, about, experience, offers, reviews, booking form                                                                                                                                                     |
+| `app/reserva/[id]`             | Booking status, chat, cancel or accept a proposal, review once completed                                                                                                                                                     |
+| `app/para-chefs`, `app/entrar` | Marketing page for chefs; sign in (email link, password, Google, chef sign-up)                                                                                                                                               |
+| `app/dashboard/*`              | Chef dashboard: overview, requests, logistics, calendar, offers, cooking categories, reviews, profile                                                                                                                        |
+| `app/admin`                    | Approval queue, reported reviews, weekly stats                                                                                                                                                                               |
+| `components/ui/`               | Design-system primitives: `Field`, `Switch`, `Chip`, `Stepper`, `PageHeader`, `StatGrid`, `DetailList`, `FormMessage`                                                                                                        |
+| `components/<feature>/`        | Feature components: `home/`, `search/`, `chef/` (showcase sections), `booking/`, `dashboard/`, `admin/`, `para-chefs/`, `brand/` (azulejo tiles), `map/` (results map; `MapExplorer` parked)                                 |
+| `hooks/`                       | Client hooks: `useServerAction`, `useBookingForm`, `useChefFilters`, `useMonthCalendar`, `usePolling`, `usePhotoUpload`, `useMediaQuery`, `useToggleList`, `useProfileForm`, `useDishPhotos`, `useMapLibre`, `useMyLocation` |
+| `lib/`                         | Server and shared logic: env, Supabase clients, data access with demo fallbacks (`lib/dashboard/` by domain), formatting, constants                                                                                          |
+| `supabase/`                    | Migrations (schema, RLS, functions, storage, cron) and seed data                                                                                                                                                             |
 
 ### Conventions
 

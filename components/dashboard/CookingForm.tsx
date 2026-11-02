@@ -1,6 +1,6 @@
 "use client";
 
-import { saveCooking } from "@/app/dashboard/actions";
+import { saveCooking } from "@/app/dashboard/actions/cooking";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Switch } from "@/components/ui/Switch";

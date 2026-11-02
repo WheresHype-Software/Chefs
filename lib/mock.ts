@@ -378,6 +378,8 @@ export function mockProfile(slug: string): ChefProfile | null {
             },
           ]
         : [],
+    // [Example data] Demo mode only.
+    ratingDistribution: c.reviewCount > 0 ? [c.reviewCount - 1, 1, 0, 0, 0] : [0, 0, 0, 0, 0],
     categoryAverages:
       c.reviewCount > 0
         ? [

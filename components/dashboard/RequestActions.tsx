@@ -5,12 +5,13 @@ import { Field } from "@/components/ui/Field";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
 import { chefUpdateBooking } from "@/lib/bookings";
+import { dayLabel, isoDay } from "@/lib/format";
 import type { BookingStatus } from "@/lib/types";
 
 type Panel = null | "decline" | "propose";
 
 /** The chef's next steps for a booking, depending on its status. */
-export function RequestActions({ id, status }: { id: string; status: BookingStatus }) {
+export function RequestActions({ id, status, date }: { id: string; status: BookingStatus; date: string }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [reason, setReason] = useState("");
   const [proposal, setProposal] = useState({ date: "", time: "", price: "" });
@@ -48,11 +49,15 @@ export function RequestActions({ id, status }: { id: string; status: BookingStat
             Sinal recebido · confirmar
           </button>
         )}
-        {status === "confirmed" && (
-          <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "completed" })}>
-            Marcar concluída
-          </button>
-        )}
+        {status === "confirmed" &&
+          // Completing unlocks the client's review, so it waits for the service day.
+          (date <= isoDay(new Date()) ? (
+            <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "completed" })}>
+              Marcar concluída
+            </button>
+          ) : (
+            <span className="flex items-center text-sm text-muted">Pode marcar como concluída a partir de {dayLabel(date)}.</span>
+          ))}
         {(status === "accepted" || status === "confirmed" || status === "change_proposed") && (
           <button
             type="button"
@@ -83,7 +88,7 @@ export function RequestActions({ id, status }: { id: string; status: BookingStat
 
       {panel === "propose" && (
         <div className="flex flex-col gap-3 rounded-[2px] bg-paper p-4">
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3.5">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(140px,100%),1fr))] gap-3.5">
             <Field label="Nova data">
               <input type="date" value={proposal.date} onChange={(e) => setProposal((p) => ({ ...p, date: e.target.value }))} />
             </Field>

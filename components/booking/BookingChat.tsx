@@ -13,11 +13,15 @@ type Props = { view: BookingView; title: string; subtitle?: string };
 
 function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
   if (message.sender === "system") {
-    return <div className="self-center rounded-[2px] bg-cobalt-soft px-3 py-[5px] text-xs text-muted">{message.body}</div>;
+    return (
+      <div className="self-center rounded-[2px] bg-cobalt-soft px-3 py-[5px] text-xs text-muted [overflow-wrap:anywhere]">
+        {message.body}
+      </div>
+    );
   }
   return (
     <div
-      className={`max-w-[75%] rounded-[3px] px-3.5 py-2.5 text-[15px] ${mine ? "self-end bg-cobalt text-white" : "self-start border border-line bg-white"}`}
+      className={`max-w-[75%] whitespace-pre-wrap rounded-[3px] px-3.5 py-2.5 text-[15px] [overflow-wrap:anywhere] ${mine ? "self-end bg-cobalt text-white" : "self-start border border-line bg-white"}`}
     >
       {message.body}
       <span className={`mt-1 block text-[11px] ${mine ? "text-right text-[#c9d6ee]" : "text-muted"}`}>{timeLabel(message.at)}</span>
@@ -70,9 +74,9 @@ export function BookingChat({ view, title, subtitle }: Props) {
     <section aria-label="Conversa" className="box flex min-w-0 flex-col overflow-hidden">
       <div className="flex items-center gap-3 border-b border-line px-5 py-4">
         <span className="h-10 w-10 flex-none rounded-full bg-cobalt-soft" aria-hidden="true" />
-        <div className="flex flex-col">
-          <strong className="font-semibold">{title}</strong>
-          {subtitle && <span className="text-[13px] text-ok">{subtitle}</span>}
+        <div className="flex min-w-0 flex-col">
+          <strong className="truncate font-semibold">{title}</strong>
+          {subtitle && <span className="truncate text-[13px] text-ok">{subtitle}</span>}
         </div>
       </div>
       <div ref={list} className="flex h-[min(460px,62vh)] flex-col gap-3 overflow-y-auto bg-paper p-4 md:p-5" aria-live="polite">

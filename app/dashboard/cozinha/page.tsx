@@ -1,7 +1,7 @@
 import { CookingForm } from "@/components/dashboard/CookingForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getCooking, getOffers, requireChef } from "@/lib/dashboard";
-import { euro, rating, tierLabel } from "@/lib/format";
+import { euro, rating, chefTitle } from "@/lib/format";
 
 export default async function Cozinha() {
   const chef = await requireChef();
@@ -14,7 +14,7 @@ export default async function Cozinha() {
         {...cooking}
         preview={{
           name: chef.display_name,
-          tier: tierLabel(chef.tier),
+          tier: chefTitle(chef.badges),
           area: chef.area_name ?? "",
           rating: rating(chef.rating_avg, chef.review_count),
           from: prices.length ? euro(Math.min(...prices)) : "orçamento",

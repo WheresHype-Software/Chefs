@@ -1,6 +1,7 @@
+import { ChefTitleCard } from "@/components/dashboard/ChefTitleCard";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { getMyChef, getSession } from "@/lib/dashboard";
+import { getMyCertificates, getMyChef, getSession } from "@/lib/dashboard";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Perfil() {
@@ -24,6 +25,14 @@ export default async function Perfil() {
         description={!chef && "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão."}
       />
       <ProfileForm chef={chef} photos={photos} />
+      {chef && (
+        <ChefTitleCard
+          name={chef.display_name}
+          badges={chef.badges}
+          certificates={await getMyCertificates()}
+          userId={session.demo ? null : session.userId}
+        />
+      )}
     </div>
   );
 }

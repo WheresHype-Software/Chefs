@@ -1,46 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Compare, HeroStage, ToolTabs } from "@/components/ParaChefsWidgets";
+import { Faq, type FaqItem } from "@/components/ui/Faq";
+import { Compare } from "@/components/para-chefs/Compare";
+import { HeroStage } from "@/components/para-chefs/HeroStage";
+import { RequestDemo } from "@/components/para-chefs/RequestDemo";
+import { ToolList } from "@/components/para-chefs/ToolList";
+import { ToolTabs } from "@/components/para-chefs/ToolTabs";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
   title: "Para chefs",
-  description: "Página de reservas, calendário, chat e avaliações para chefs privados e cozinheiros caseiros. Grátis e sem comissões.",
+  description: "Página de reservas, calendário, chat e avaliações para chefs privados e cozinheiros caseiros. Grátis no lançamento.",
 };
-
-const TOOLS: [string, string, boolean][] = [
-  ["Calendário", "Dias livres, bloqueios e área de serviço.", true],
-  ["Chat com clientes", "Uma conversa por reserva, sem perder mensagens.", true],
-  ["Ofertas e menus", "Preço fixo, por pessoa ou sob orçamento.", true],
-  ["Cancelamento", "Flexível, moderado, rígido ou à sua medida.", true],
-  ["Categorias de cozinha", "Até três, para os clientes o encontrarem nos filtros da pesquisa.", true],
-  ["Deslocações e entregas", "Moradas, raio, zonas, taxas e o percurso do dia.", true],
-  ["Levantamentos", "Horários na sua cozinha e código de confirmação.", true],
-  ["Sinal por MB WAY", "Peça o sinal sem sair da reserva.", false],
-  ["Lembretes WhatsApp", "Confirmação e lembrete da véspera para o cliente.", false],
-  ["Lista de clientes", "Quem volta, o que pediu e as suas alergias.", false],
-  ["Estatísticas", "Visitas ao perfil, pedidos e taxa de aceitação.", false],
-  ["Faturação", "Recibos e faturas ligados a cada reserva.", false],
-];
 
 const MKT = [
   ["Um link para a bio", "aolume.pt/chef/o-seu-nome substitui o formulário e o “manda mensagem”."],
   ["Kit de partilha", "Código QR, imagens para stories e cartões com as suas melhores avaliações."],
   ["Perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
   ["Avaliações verificadas", "Só quem concluiu uma reserva avalia, e pode responder a cada uma."],
-  ["Destaque para quem começa", "Novos talentos aparecem na página inicial nas primeiras semanas."],
+  ["Título de Chef verificado", "Envie um certificado de cozinha e apareça como Chef, com a marca «Chef verificado»."],
   ["Encomendas de época", "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite."],
 ];
 
-const FAQ = [
-  [
-    "Quanto custa?",
-    "No lançamento é gratuito e não há comissão por reserva. Mais tarde haverá um plano Pro opcional, com ferramentas extra e destaque pago nas pesquisas.",
-  ],
+const FAQ: FaqItem[] = [
   ["Como recebo o pagamento?", "Diretamente do cliente, por MB WAY, transferência ou dinheiro. O Ao Lume não toca no seu dinheiro."],
   [
     "Sou cozinheiro caseiro. Posso entrar?",
-    "Sim. Há perfis de chef profissional e de cozinheiro caseiro, e todos são revistos pela nossa equipa antes de aparecerem nas pesquisas.",
+    "Sim. Todos começam como Cozinheiro e são revistos pela nossa equipa antes de aparecerem nas pesquisas. Quem tem formação em cozinha envia o certificado e passa a aparecer como Chef.",
   ],
   [
     "Preciso de licenças?",
@@ -79,15 +65,30 @@ export default function ParaChefs() {
             </a>
           </div>
           <span className="al-in text-sm text-muted" style={{ animationDelay: "340ms" }}>
-            Sem comissões · o cliente paga-lhe diretamente
+            Grátis no lançamento · o cliente paga-lhe diretamente
           </span>
         </div>
         <HeroStage />
       </section>
 
+      <section id="demo" aria-labelledby="demo-title" className="scroll-mt-16 border-y border-line bg-paper">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-10 px-5 py-14 md:px-10 md:py-24">
+          <div className="al-rv flex max-w-[760px] flex-col gap-3">
+            <h2 id="demo-title" className="d m-0 text-[clamp(32px,5vw,56px)] leading-none">
+              Experimente: assim chega uma reserva.
+            </h2>
+            <p className="m-0 text-lg text-ink-3">
+              Os clientes encontram-no no Ao Lume ou pelo seu link, escolhem um menu e um dia livre e enviam o pedido. Faça de chef e leve
+              este pedido de exemplo até ao fim.
+            </p>
+          </div>
+          <RequestDemo />
+        </div>
+      </section>
+
       <Compare />
 
-      <section id="ferramenta" className="bg-paper">
+      <section id="ferramenta" className="scroll-mt-16 bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[760px] flex-col gap-4">
             <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
@@ -96,25 +97,20 @@ export default function ParaChefs() {
         </div>
       </section>
 
-      <section className="mx-auto flex max-w-[1280px] flex-col gap-12 px-5 py-14 md:px-10 md:py-[120px]">
-        <div className="al-rv flex flex-wrap items-end justify-between gap-5">
-          <h2 className="d m-0 max-w-[760px] text-[clamp(32px,6vw,68px)] leading-none">O essencial de quem cozinha por conta própria.</h2>
-          <span className="lab text-muted">Grátis no lançamento · Pro mais tarde</span>
+      <section
+        aria-labelledby="ferramentas-title"
+        className="mx-auto flex max-w-[1280px] flex-col gap-10 px-5 py-14 md:px-10 md:py-[120px]"
+      >
+        <div className="al-rv flex max-w-[760px] flex-col gap-3">
+          <h2 id="ferramentas-title" className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
+            O essencial de quem cozinha por conta própria.
+          </h2>
+          <p className="m-0 text-lg text-ink-3">Tudo o que precisa para receber e organizar pedidos já está incluído.</p>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-line-2">
-          {TOOLS.map(([t, d, free]) => (
-            <div key={t} className="al-rv flex flex-col gap-1.5 border-b border-line pb-5 pt-5 md:gap-2.5 md:pb-[30px] md:pr-7 md:pt-7">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="d text-xl leading-[1.15] md:text-2xl">{t}</span>
-                <span className={`lab whitespace-nowrap ${free ? "text-ink" : "text-muted"}`}>{free ? "Grátis" : "Pro"}</span>
-              </div>
-              <span className="text-[15px] text-muted">{d}</span>
-            </div>
-          ))}
-        </div>
+        <ToolList />
       </section>
 
-      <section id="marketing" className="bg-cobalt-deep text-white">
+      <section id="marketing" className="scroll-mt-16 bg-cobalt-deep text-white">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
             <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
@@ -135,18 +131,15 @@ export default function ParaChefs() {
             <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] gap-px border border-[#2a4a86] bg-[#2a4a86]">
               <div className="flex flex-col gap-2 bg-cobalt-deep p-[26px]">
                 <span className="lab text-[#c9d6ee]">À entrada</span>
-                <span className="d text-[30px]">Novo talento</span>
-                <span className="text-sm text-[#c9d6ee]">Destaque na página inicial nas primeiras semanas.</span>
-              </div>
-              <div className="flex flex-col gap-2 bg-cobalt-deep p-[26px]">
-                <span className="lab text-[#c9d6ee]">5 reservas · 4,5 ou mais</span>
-                <span className="d text-[30px]">Chef em ascensão</span>
-                <span className="text-sm text-[#c9d6ee]">Sobe nas pesquisas dos clientes da sua zona.</span>
+                <span className="d text-[30px]">Cozinheiro</span>
+                <span className="text-sm text-[#c9d6ee]">Todos começam aqui e recebem pedidos desde o primeiro dia.</span>
               </div>
               <div className="flex flex-col gap-2 bg-white p-[26px] text-ink">
-                <span className="lab text-muted">25 reservas · 4,7 ou mais</span>
-                <span className="d text-[30px]">Top chef</span>
-                <span className="text-sm text-ink-3">Aparece primeiro e entra nas seleções Ao Lume.</span>
+                <span className="lab text-muted">Com certificado verificado</span>
+                <span className="d text-[30px]">Chef</span>
+                <span className="text-sm text-ink-3">
+                  Envie um certificado de cozinha no painel. Depois de verificado, aparece como Chef, com a marca «Chef verificado».
+                </span>
               </div>
             </div>
           </div>
@@ -155,24 +148,23 @@ export default function ParaChefs() {
 
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-14 md:px-10 md:py-[120px]">
         <div className="al-rv flex min-w-0 flex-[1_1_420px] flex-col gap-[18px]">
-          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">O dinheiro é seu. Todo.</h2>
+          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Recebe diretamente do cliente.</h2>
           <p className="m-0 max-w-[520px] text-lg text-ink-3">
-            O Ao Lume liga-o ao cliente e organiza a reserva. Preço, sinal e regras de cancelamento são definidos por si, e o cliente
-            paga-lhe diretamente.
+            O Ao Lume liga-o ao cliente e organiza a reserva. O dinheiro não passa por nós: o cliente paga-lhe a si.
           </p>
         </div>
-        <div className="al-rv grid min-w-0 flex-[1_1_420px] grid-cols-[repeat(auto-fit,minmax(min(190px,100%),1fr))] border-t border-line-2">
-          <div className="flex flex-col gap-2 pr-6 pt-6">
-            <span className="lab">Ao Lume</span>
-            <span className="d text-[clamp(64px,9vw,104px)] leading-none">0 %</span>
-            <span className="text-sm text-muted">de comissão por reserva</span>
-          </div>
-          <div className="flex flex-col gap-2 pt-6 text-muted">
-            <span className="lab">Plataformas internacionais</span>
-            <span className="d text-[clamp(64px,9vw,104px)] leading-none line-through decoration-1">20 %</span>
-            <span className="text-sm">ou mais, por reserva, mais taxas</span>
-          </div>
-        </div>
+        <ul className="al-rv m-0 grid min-w-0 flex-[1_1_420px] list-none grid-cols-[repeat(auto-fit,minmax(min(180px,100%),1fr))] gap-px border border-line bg-line p-0">
+          {[
+            ["Preço", "Fixo, por pessoa ou sob orçamento. Decide você."],
+            ["Sinal", "A percentagem que quiser, para confirmar a data."],
+            ["Pagamento", "MB WAY, transferência ou dinheiro, como combinarem."],
+          ].map(([t, d]) => (
+            <li key={t} className="flex flex-col gap-1.5 bg-white p-5">
+              <strong className="text-[18px]">{t}</strong>
+              <span className="text-[15px] text-muted">{d}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="border-t border-line">
@@ -180,7 +172,7 @@ export default function ParaChefs() {
           <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Entrar leva dez minutos.</h2>
           <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-line-2 p-0">
             {[
-              ["1", "Crie a conta", "Nome, email e o tipo de perfil: profissional ou caseiro."],
+              ["1", "Crie a conta", "Nome, email e uma palavra-passe. Grátis no lançamento."],
               ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
               ["3", "Aprovação", "A nossa equipa revê cada perfil antes de ficar público."],
               ["4", "Partilhe o link", "Ponha aolume.pt/chef/o-seu-nome na bio e receba pedidos."],
@@ -200,26 +192,13 @@ export default function ParaChefs() {
         </div>
       </section>
 
-      <section id="perguntas" className="bg-paper">
+      <section id="perguntas" className="scroll-mt-16 bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-wrap gap-12 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="flex-[1_1_280px]">
             <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Perguntas</h2>
           </div>
-          <div className="min-w-0 flex-[2_1_520px] border-t border-line-2">
-            {FAQ.map(([q, a]) => (
-              <details key={q} className="group border-b border-line-2 py-[18px]">
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                  <span className="d text-[22px] leading-[1.2]">{q}</span>
-                  <span
-                    aria-hidden="true"
-                    className="text-2xl font-light leading-none transition-transform duration-300 group-open:rotate-45"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="mb-1.5 mt-2.5 max-w-[640px] text-base text-ink-3">{a}</p>
-              </details>
-            ))}
+          <div className="min-w-0 flex-[2_1_520px]">
+            <Faq items={FAQ} />
           </div>
         </div>
       </section>

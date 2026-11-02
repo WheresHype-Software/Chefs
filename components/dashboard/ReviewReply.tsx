@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { replyToReview, reportReview } from "@/app/dashboard/actions";
+import { replyToReview, reportReview } from "@/app/dashboard/actions/reviews";
 import { Field } from "@/components/ui/Field";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";

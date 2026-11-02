@@ -107,7 +107,7 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
       )}
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(160px,100%),1fr))] gap-3.5">
-        <Field label="Nome" className="sm:col-span-2">
+        <Field label="Nome" className="col-span-full">
           <input
             type="text"
             autoComplete="name"
@@ -152,8 +152,8 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
       <div
         className={`booking-summary sticky bottom-0 z-10 flex flex-col gap-2.5 border-t border-line bg-white pb-[max(14px,env(safe-area-inset-bottom))] pt-3 ${bleed ? "-mx-7 px-7" : ""}`}
       >
-        <div className="flex items-center gap-4">
-          <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="flex min-w-[8rem] flex-1 flex-col">
             <span className="d num text-[22px] leading-tight">{form.estimate == null ? "Sob orçamento" : euro(form.estimate)}</span>
             <span className="truncate text-[13px] text-muted">
               {form.day
@@ -163,7 +163,7 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
                   : `${euro(offer.price)} × ${form.guests}`}
             </span>
           </div>
-          <button type="submit" className="btn shrink-0" disabled={!form.ready || form.pending}>
+          <button type="submit" className="btn grow sm:grow-0" disabled={!form.ready || form.pending}>
             {form.pending ? "A enviar…" : form.ctaLabel}
           </button>
         </div>

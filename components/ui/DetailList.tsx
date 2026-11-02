@@ -16,8 +16,8 @@ export function DetailList({ items: all, variant = "plain" }: Props) {
       <dl className="m-0 flex flex-col border-t border-line-2 text-[15px]">
         {items.map(([label, value]) => (
           <div key={label} className="flex justify-between gap-3 border-b border-line py-3 last:border-b-0">
-            <dt className="lab text-muted">{label}</dt>
-            <dd className="m-0 text-right">{value}</dd>
+            <dt className="lab shrink-0 text-muted">{label}</dt>
+            <dd className="m-0 min-w-0 text-right [overflow-wrap:anywhere]">{value}</dd>
           </div>
         ))}
       </dl>
@@ -27,8 +27,8 @@ export function DetailList({ items: all, variant = "plain" }: Props) {
     <dl className="m-0 flex flex-col gap-3 text-[15px]">
       {items.map(([label, value]) => (
         <div key={label} className="flex justify-between gap-3">
-          <dt className="text-muted">{label}</dt>
-          <dd className="m-0 text-right">{value}</dd>
+          <dt className="shrink-0 text-muted">{label}</dt>
+          <dd className="m-0 min-w-0 text-right [overflow-wrap:anywhere]">{value}</dd>
         </div>
       ))}
     </dl>

@@ -1,78 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
-import { saveProfile, submitForReview } from "@/app/dashboard/actions";
-import { AddressSearch, type Place } from "@/components/AddressSearch";
+import { AddressSearch } from "@/components/AddressSearch";
+import { ProfileVerification, type VerificationPhotos } from "@/components/dashboard/ProfileVerification";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
-import { useServerAction } from "@/hooks/useServerAction";
+import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
-import { firstPlace } from "@/lib/geocode";
 import { slugify } from "@/lib/slug";
-
-type Photos = { selfie: number; gallery: number };
-
-const STATUS_LABEL: Record<MyChef["status"], string> = {
-  draft: "rascunho",
-  pending: "em revisão",
-  approved: "aprovado",
-  rejected: "alterações pedidas",
-  suspended: "suspenso",
-};
-
-function initialForm(chef: MyChef | null) {
-  return {
-    display_name: chef?.display_name ?? "",
-    slug: chef?.slug ?? "",
-    tier: chef?.tier ?? ("home" as MyChef["tier"]),
-    headline: chef?.headline ?? "",
-    bio: chef?.bio ?? "",
-    area_name: chef?.area_name ?? "",
-    service_radius_km: Number(chef?.service_radius_km ?? 10) as number | null,
-    instagram: chef?.socials.instagram ?? "",
-    website: chef?.socials.website ?? "",
-    years_experience: chef?.years_experience ?? (null as number | null),
-    deposit_percent: chef?.deposit_percent ?? (30 as number | null),
-  };
-}
 
 /** Public profile details: name, link, tier, bio, base area and service radius. */
 function ProfileDetails({ chef }: { chef: MyChef | null }) {
-  const [form, setForm] = useState(() => initialForm(chef));
-  const [areaQuery, setAreaQuery] = useState(chef?.area_name ?? "");
-  const [place, setPlace] = useState<Place | null>(
-    chef?.lat && chef?.lng ? { label: chef.area_name ?? "", lat: chef.lat, lng: chef.lng } : null,
-  );
-  const [locating, setLocating] = useState(false);
-  const { run, pending, message, setMessage } = useServerAction(saveProfile, { successMessage: "Perfil guardado." });
-  const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((f) => ({ ...f, [key]: value }));
-
-  async function save() {
-    // Typed a zone without picking a suggestion: look it up instead of refusing.
-    let base = place;
-    if (!base && areaQuery.trim()) {
-      setLocating(true);
-      base = await firstPlace(areaQuery);
-      setLocating(false);
-      if (base) setPlace(base);
-    }
-    if (!base) {
-      setMessage({ ok: false, text: 'Não encontrámos essa zona. Escreva o bairro e a cidade, por exemplo "Alvalade, Lisboa".' });
-      return;
-    }
-    run({
-      ...form,
-      slug: form.slug || slugify(form.display_name),
-      area_name: form.area_name || areaQuery.split(",")[0]!.trim(),
-      service_radius_km: form.service_radius_km ?? 10,
-      years_experience: form.years_experience ?? undefined,
-      deposit_percent: form.deposit_percent ?? undefined,
-      lat: base.lat,
-      lng: base.lng,
-    });
-  }
+  const { form, set, areaQuery, typeArea, pickArea, save, busy, locating, message } = useProfileForm(chef);
 
   return (
     <form
@@ -83,7 +22,7 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
       }}
     >
       <h2 className="d m-0 text-2xl font-normal">A sua página</h2>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
         <Field label="Nome público">
           <input
             required
@@ -121,20 +60,14 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
           placeholder="A sua história, o que cozinha, como trabalha."
         />
       </Field>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
         <div className="field lab">
           Zona de base
           <AddressSearch
             label="Zona de base"
             value={areaQuery}
-            onChange={(v) => {
-              setAreaQuery(v);
-              setPlace(null);
-            }}
-            onSelect={(p) => {
-              setPlace(p);
-              set("area_name", p.label.split(",")[0]!.trim());
-            }}
+            onChange={typeArea}
+            onSelect={pickArea}
             placeholder="Bairro ou freguesia"
             inputClassName="w-full"
           />
@@ -157,67 +90,18 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
         </Field>
       </div>
       <FormMessage message={message} />
-      <button type="submit" className="btn self-start" disabled={pending || locating}>
+      <button type="submit" className="btn self-start" disabled={busy}>
         {locating ? "A procurar a zona…" : chef ? "Guardar perfil" : "Criar perfil"}
       </button>
     </form>
   );
 }
 
-/** Checklist, photo uploads and "send for review". */
-function Verification({ chef, photos }: { chef: MyChef | null; photos: Photos }) {
-  const submit = useServerAction(submitForReview, { successMessage: "Enviado para revisão. Respondemos por email." });
-  const canSubmit = chef?.status === "draft" || chef?.status === "rejected";
-  const checklist: [string, boolean][] = [
-    ["Fotografia de perfil", photos.selfie > 0],
-    ["Instagram ou site", Boolean(chef?.socials.instagram || chef?.socials.website)],
-    [`Fotos de pratos (${photos.gallery}/3)`, photos.gallery >= 3],
-  ];
-
-  return (
-    <aside className="flex min-w-0 flex-[2_1_300px] flex-col gap-3.5">
-      <div className="box flex flex-col gap-3 p-6">
-        <h2 className="d m-0 text-2xl font-normal">Verificação</h2>
-        <span className="text-sm text-muted">
-          Uma fotografia de perfil, o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara as fotos antes de o perfil
-          ficar público.
-        </span>
-        <ul className="m-0 list-none border-t border-line p-0 text-sm">
-          {checklist.map(([label, done]) => (
-            <li key={label} className="flex justify-between border-b border-line py-2.5">
-              <span>{label}</span>
-              <span className={done ? "text-ok" : "text-muted"}>{done ? "Feito" : "Em falta"}</span>
-            </li>
-          ))}
-        </ul>
-        {chef ? (
-          <Link href="/dashboard/fotos" className="btn btn-sm btn-o">
-            Gerir fotografias
-          </Link>
-        ) : (
-          <span className="text-sm text-muted">Guarde o perfil primeiro; depois carregue as fotografias.</span>
-        )}
-        <span className="lab mt-2 text-muted">Estado: {STATUS_LABEL[chef?.status ?? "draft"]}</span>
-        {chef?.status === "rejected" && chef.verification_notes && <span className="text-sm text-danger">{chef.verification_notes}</span>}
-        {canSubmit && (
-          <button type="button" className="btn" disabled={submit.pending} onClick={() => submit.run()}>
-            Enviar para revisão
-          </button>
-        )}
-        <FormMessage message={submit.message} />
-        <span className="text-xs text-muted">
-          Ao enviar, aceita os termos para chefs: é responsável pela legalidade, higiene, impostos e pagamentos do seu serviço.
-        </span>
-      </div>
-    </aside>
-  );
-}
-
-export function ProfileForm({ chef, photos }: { chef: MyChef | null; photos: Photos }) {
+export function ProfileForm({ chef, photos }: { chef: MyChef | null; photos: VerificationPhotos }) {
   return (
     <div className="flex flex-wrap items-start gap-6">
       <ProfileDetails chef={chef} />
-      <Verification chef={chef} photos={photos} />
+      <ProfileVerification chef={chef} photos={photos} />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
 import { DASHBOARD_NAV } from "@/lib/dashboard-nav";
-import { tierLabel } from "@/lib/format";
+import { chefTitle } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Painel", robots: { index: false } };
 
@@ -48,7 +48,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
               )}
               {chef && (
                 <span className="text-sm text-muted">
-                  {chef.display_name} · {tierLabel(chef.tier)}
+                  {chef.display_name} · {chefTitle(chef.badges)}
                   {status ? ` · ${status}` : ""}
                 </span>
               )}
@@ -64,7 +64,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
 
       <nav
         aria-label="Painel"
-        className="box-border hidden min-h-screen flex-[0_0_250px] flex-col gap-0.5 border-r border-line bg-white px-4 py-6 md:flex"
+        className="box-border hidden flex-[0_0_250px] md:sticky md:top-0 md:h-screen md:overflow-y-auto flex-col gap-0.5 border-r border-line bg-white px-4 py-6 md:flex"
       >
         <div className="flex items-baseline justify-between px-3.5 pb-5">
           {brand}
@@ -75,7 +75,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           <div className="mt-auto flex flex-col gap-1 border-t border-line px-3.5 pt-[18px]">
             <span className="d text-xl">{chef.display_name}</span>
             <span className="text-[13px] text-muted">
-              {tierLabel(chef.tier)} · {chef.area_name}
+              {chefTitle(chef.badges)} · {chef.area_name}
             </span>
             {chef.status === "approved" ? (
               <Link href={`/chef/${chef.slug}`} className="mt-1.5 text-[13px]">
@@ -99,7 +99,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           </span>
         )}
       </nav>
-      <main className="box-border flex min-w-0 flex-1 flex-col gap-7 px-4 pb-14 pt-6 md:px-11 md:pb-[72px] md:pt-9">{children}</main>
+      <main className="box-border flex w-full min-w-0 max-w-[1240px] flex-1 flex-col gap-7 px-4 pb-14 pt-6 md:px-11 md:pb-[72px] md:pt-9">
+        {children}
+      </main>
     </div>
   );
 }

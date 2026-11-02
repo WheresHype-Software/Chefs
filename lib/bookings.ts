@@ -6,6 +6,7 @@ import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
 import { demoBookingView } from "@/lib/demo-booking";
 import { fail, failWith, ok, type ActionResult } from "@/lib/result";
+import { lisbonToday, sendReviewRequest } from "@/lib/review-request";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 import type { BookingStatus, BookingView } from "@/lib/types";
 
@@ -87,6 +88,11 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   const parsed = ChefUpdateInput.safeParse(update);
   if (!parsedId.success || !parsed.success) return fail("Dados inválidos.");
   const sb = await createClient();
+  // Completion unlocks the review, so it only counts once the service day has come.
+  if (parsed.data.status === "completed") {
+    const { data: booking } = await sb.from("bookings").select("date").eq("id", id).maybeSingle();
+    if (booking && booking.date > lisbonToday()) return fail("Só pode marcar como concluída a partir do dia do serviço.");
+  }
   // select() returns the row, so "nothing was updated" (not this chef's booking) is caught too.
   const { data, error } = await sb.from("bookings").update(parsed.data).eq("id", id).select("id").maybeSingle();
   revalidatePath("/dashboard", "layout");
@@ -95,6 +101,7 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   }
   if (error) return failWith(error, "chefUpdateBooking", "Não foi possível atualizar a reserva. Tente de novo.");
   if (!data) return failWith({ id }, "chefUpdateBooking no row", "Não encontrámos este pedido. Atualize a página.");
+  if (parsed.data.status === "completed") await sendReviewRequest(id);
   return ok();
 }
 

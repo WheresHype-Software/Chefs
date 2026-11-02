@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { cycleDay, openWeekdays } from "@/app/dashboard/actions";
+import { cycleDay, openWeekdays } from "@/app/dashboard/actions/agenda";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
 import { useToggleList } from "@/hooks/useToggleList";
@@ -81,7 +81,12 @@ export function AgendaGrid({
               {w}
             </Chip>
           ))}
-          <button type="button" className="btn btn-sm" disabled={!weekdays.items.length || pending} onClick={fillWeekdays}>
+          <button
+            type="button"
+            className="btn btn-sm whitespace-normal"
+            disabled={!weekdays.items.length || pending}
+            onClick={fillWeekdays}
+          >
             Marcar disponíveis este mês
           </button>
         </div>

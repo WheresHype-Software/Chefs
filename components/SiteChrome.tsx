@@ -1,12 +1,20 @@
 import Link from "next/link";
 import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
 import { MobileMenu } from "@/components/MobileMenu";
+import { PanToss } from "@/components/brand/PanToss";
 
-export function Wordmark({ suffix }: { suffix?: string }) {
+/** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
+export function Wordmark({ suffix, animated = false }: { suffix?: string; animated?: boolean }) {
   return (
     <span className="flex items-center gap-2">
-      <TileMark />
-      <span className="wordmark text-[22px] leading-none text-ink">ao lume</span>
+      {animated ? (
+        <PanToss />
+      ) : (
+        <>
+          <TileMark />
+          <span className="wordmark text-[22px] leading-none text-ink">ao lume</span>
+        </>
+      )}
       {suffix && <span className="hidden whitespace-nowrap text-sm font-medium text-muted sm:inline">{suffix}</span>}
     </span>
   );
@@ -33,7 +41,7 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
   const home = chefs ? "/para-chefs" : "/";
   const brand = (
     <Link href={home} className="no-underline" aria-label="Ao Lume, página inicial">
-      <Wordmark suffix={chefs ? "para chefs" : undefined} />
+      <Wordmark suffix={chefs ? "para chefs" : undefined} animated />
     </Link>
   );
   const primary = chefs ? { href: "/entrar?chef=1", label: "Criar perfil" } : { href: "/entrar", label: "Entrar" };
@@ -48,12 +56,12 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
         <div className="flex items-center gap-1">
           <nav aria-label="Principal" className="hidden items-center gap-1 text-[15px] font-medium md:flex">
             {nav.map((item) => (
-              <Link key={item.href} href={item.href} className="rounded-md px-3 py-2 no-underline hover:bg-paper">
+              <Link key={item.href} href={item.href} className="rounded-md px-2 py-2 no-underline hover:bg-paper lg:px-3">
                 {item.label}
               </Link>
             ))}
             {chefs && (
-              <Link href={secondary.href} className="rounded-md px-3 py-2 no-underline hover:bg-paper">
+              <Link href={secondary.href} className="rounded-md px-2 py-2 no-underline hover:bg-paper lg:px-3">
                 {secondary.label}
               </Link>
             )}

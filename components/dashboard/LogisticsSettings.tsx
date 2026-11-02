@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { saveLogistics } from "@/app/dashboard/actions";
+import { saveLogistics } from "@/app/dashboard/actions/logistics";
 import { ToggleChipList, type ToggleItem } from "@/components/dashboard/ToggleChipList";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
@@ -124,7 +124,7 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
         <div className="flex flex-col border-t border-line">
           <SettingRow label="Janelas">
             <input
-              className="w-44 border-0 border-b border-line-3 bg-transparent py-1 text-right text-sm outline-none focus:border-ink"
+              className="w-full min-w-0 max-w-44 border-0 border-b border-line-3 bg-transparent py-1 text-right text-sm outline-none focus:border-ink"
               value={windows}
               onChange={(e) => setWindows(e.target.value)}
               placeholder="12:00-14:00, 19:00-21:00"

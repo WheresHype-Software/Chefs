@@ -65,3 +65,14 @@ export const SERVICE_FILTERS: [ServiceFilter, string][] = [
   ["pickup", "Levantamento"],
   ["events", "Eventos"],
 ];
+
+/** Trust badges the team can give a chef on approval (mirrors the chefs.badges values). */
+export const BADGES = ["identity", "portfolio", "certified", "founder"] as const;
+export type Badge = (typeof BADGES)[number];
+
+export const BADGE_LABEL: Record<Badge, string> = {
+  identity: "Identidade verificada",
+  portfolio: "Portefólio verificado",
+  certified: "Certificado",
+  founder: "Chef fundador",
+};

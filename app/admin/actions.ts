@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { BADGES } from "@/lib/constants";
 import { getSession } from "@/lib/dashboard";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { z } from "zod";
 import { fail, failWith, ok, type ActionResult } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
-
-type Decision = "approved" | "rejected" | "suspended";
+import type { AdminDecision as Decision } from "@/lib/types";
 
 /** RLS already blocks non-admins; this check fails fast with a clear message. */
 async function isAdmin(): Promise<boolean> {
@@ -19,7 +19,7 @@ const ReviewInput = z.object({
   chefId: z.string().uuid(),
   decision: z.enum(["approved", "rejected", "suspended"]),
   note: z.string().trim().max(1000),
-  badges: z.array(z.enum(["identity", "portfolio", "certified", "founder"])).max(4),
+  badges: z.array(z.enum(BADGES)).max(BADGES.length),
 });
 
 const EMAIL: Record<Decision, { subject: string; body: (name: string, slug: string, note: string) => string }> = {
@@ -65,7 +65,8 @@ export async function reviewChef(chefId: string, decision: Decision, note: strin
   } catch (err) {
     console.error("[action] reviewChef email:", err);
   }
-  revalidatePath("/admin");
+  // No revalidatePath("/admin"): re-rendering would drop the card before DecisionCard folds it into
+  // its confirmation. The queue and stats catch up on the next visit.
   return ok();
 }
 
@@ -90,5 +91,93 @@ export async function moderateReview(reviewId: string, reportId: string, action:
   } = await sb.auth.getUser();
   await sb.from("admin_logs").insert({ admin_id: user?.id, action: `review_${action}`, target: reviewId });
   revalidatePath("/admin");
+  return ok();
+}
+
+/**
+ * Grants the "Chef" title: adds the admin-only "certified" badge (the chef keeps their status and
+ * other badges), marks their certificates verified and tells them by email.
+ */
+export async function verifyChefTitle(chefId: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return fail("Sem permissão.");
+  if (!z.string().uuid().safeParse(chefId).success) return fail("Pedido inválido.");
+  const sb = await createClient();
+  const { data: chef } = await sb.from("chefs").select("status, badges, display_name, profiles(email)").eq("id", chefId).single();
+  if (!chef) return fail("Chef não encontrado.");
+  const { error } = await sb.rpc("admin_review_chef", {
+    p_chef_id: chefId,
+    p_status: chef.status,
+    p_note: null,
+    p_badges: [...new Set([...(chef.badges as string[]), "certified"])],
+  });
+  if (error) return failWith(error, "verifyChefTitle", "Não foi possível verificar o chef. Tente de novo.");
+  await sb.from("chef_certifications").update({ verified: true }).eq("chef_id", chefId);
+
+  try {
+    const email = (chef.profiles as unknown as { email: string } | null)?.email;
+    if (email) {
+      await sendEmail({
+        to: email,
+        subject: "Já aparece como Chef no Ao Lume",
+        text: `Olá ${chef.display_name},\n\nVerificámos o seu certificado. A partir de agora aparece aos clientes como Chef ${chef.display_name}, com a marca «Chef verificado».\n\nAo Lume`,
+      });
+    }
+  } catch (err) {
+    console.error("[action] verifyChefTitle email:", err);
+  }
+  return ok();
+}
+
+/**
+ * Approves several complete applications at once, with the identity and portfolio badges (never
+ * "certified": the Chef title is always checked one by one). Each chef gets the usual email.
+ */
+export async function approveChefs(chefIds: string[]): Promise<ActionResult> {
+  if (!(await isAdmin())) return fail("Sem permissão.");
+  const ids = z.array(z.string().uuid()).min(1).max(50).safeParse(chefIds);
+  if (!ids.success) return fail("Pedido inválido.");
+  let approved = 0;
+  for (const id of ids.data) {
+    const r = await reviewChef(id, "approved", "", ["identity", "portfolio"]);
+    if (r.ok) approved++;
+  }
+  revalidatePath("/admin");
+  return approved === ids.data.length ? ok() : fail(`Aprovados ${approved} de ${ids.data.length}. Atualize a página e veja os restantes.`);
+}
+
+const TitleRefusal = z.object({ chefId: z.string().uuid(), reason: z.string().trim().min(3).max(800) });
+
+/**
+ * Refuses a request for the Chef title: the certificates are removed (so the chef can send a
+ * better one), the chef gets the reason by email, and the decision is logged.
+ */
+export async function refuseChefTitle(chefId: string, reason: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return fail("Sem permissão.");
+  const input = TitleRefusal.safeParse({ chefId, reason });
+  if (!input.success) return fail("Escreva o motivo: o chef recebe-o por email.");
+  const sb = await createClient();
+  const { data: chef } = await sb.from("chefs").select("display_name, profiles(email)").eq("id", chefId).single();
+  if (!chef) return fail("Chef não encontrado.");
+  const { error } = await sb.from("chef_certifications").delete().eq("chef_id", chefId).eq("verified", false);
+  if (error) return failWith(error, "refuseChefTitle", "Não foi possível recusar o pedido. Tente de novo.");
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  await sb
+    .from("admin_logs")
+    .insert({ admin_id: user?.id, action: "chef_title_refused", target: chefId, details: { reason: input.data.reason } });
+
+  try {
+    const email = (chef.profiles as unknown as { email: string } | null)?.email;
+    if (email) {
+      await sendEmail({
+        to: email,
+        subject: "O seu certificado no Ao Lume",
+        text: `Olá ${chef.display_name},\n\nNão conseguimos verificar o certificado que enviou:\n${input.data.reason}\n\nPode enviar outro em ${siteUrl("/dashboard/perfil")}.\n\nAo Lume`,
+      });
+    }
+  } catch (err) {
+    console.error("[action] refuseChefTitle email:", err);
+  }
   return ok();
 }

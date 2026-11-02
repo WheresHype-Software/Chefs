@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingChat } from "@/components/booking/BookingChat";
-import { ClientBookingActions, ReviewForm } from "@/components/booking/ClientBookingActions";
+import { ClientBookingActions } from "@/components/booking/ClientBookingActions";
+import { ReviewForm } from "@/components/booking/ReviewForm";
 import { GuestLookupForm } from "@/components/booking/GuestLookup";
 import { RememberBooking } from "@/components/booking/RememberBooking";
 import { StatusSteps } from "@/components/booking/StatusSteps";

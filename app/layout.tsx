@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s · Ao Lume",
   },
   description:
-    "Encontre chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas da semana, pastelaria, entregas e eventos. Sem comissões.",
+    "Encontre chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas da semana, pastelaria, entregas e eventos. Peça sem criar conta e pague diretamente ao chef.",
   openGraph: { siteName: "Ao Lume", locale: "pt_PT", type: "website" },
 };
 
