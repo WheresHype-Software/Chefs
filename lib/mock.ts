@@ -3,7 +3,7 @@ import { isoDay } from "./format";
 import { PHOTOS, photoUrl, type StockPhoto } from "./photos";
 import type { Calendar, ChefCard, ChefProfile, Offer } from "./types";
 
-type Seed = Omit<ChefCard, "distanceKm" | "offers" | "cover" | "promoted" | "badges"> & {
+type Seed = Omit<ChefCard, "distanceKm" | "offers" | "cover" | "portrait" | "promoted" | "badges"> & {
   offers: Omit<Offer, "id" | "leadHours" | "minGuests" | "maxGuests">[];
   weekdays: number[]; // 0 = Sunday
 };
@@ -300,6 +300,7 @@ export const MOCK_CHEFS: ChefCard[] = SEEDS.map(({ weekdays: _w, offers, ...c })
   ...c,
   distanceKm: null,
   cover: photoUrl(COVERS[c.slug] ?? PHOTOS.table),
+  portrait: null,
   promoted: false,
   badges: ["identity", "portfolio"],
   offers: offers.map((o, i) => ({

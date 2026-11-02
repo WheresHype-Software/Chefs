@@ -1,10 +1,11 @@
+import { Photo } from "@/components/ui/Photo";
 import { firstName } from "@/lib/format";
 import type { ChefProfile } from "@/lib/types";
 
 // Profiles store language codes; show them as words.
 const LANGUAGE: Record<string, string> = { pt: "português", en: "inglês", es: "espanhol", fr: "francês", it: "italiano", de: "alemão" };
 
-/** "Sobre": bio, experience and languages, then "Percurso" (experience and certifications) when there is any. */
+/** "Sobre": the chef's photo beside their specialty, bio, experience and languages, then "Percurso" (experience and certifications) when there is any. */
 export function ChefAbout({ chef }: { chef: ChefProfile }) {
   const first = firstName(chef.name);
   const extra = [
@@ -13,14 +14,32 @@ export function ChefAbout({ chef }: { chef: ChefProfile }) {
   ].filter(Boolean);
   return (
     <>
-      <section id="sobre" aria-labelledby="sobre-title" className="flex scroll-mt-32 flex-col gap-3.5">
-        <h2 id="sobre-title" className="d m-0 text-[32px]">
-          Sobre {first}
-        </h2>
-        <p className="m-0 max-w-[680px] text-[17px] leading-relaxed">
-          {chef.bio || `${first} ainda não escreveu sobre si. Veja os menus e os pratos abaixo.`}
-        </p>
-        {extra.length > 0 && <p className="m-0 text-[15px] text-muted">{extra.join(" · ")}</p>}
+      <section
+        id="sobre"
+        aria-labelledby="sobre-title"
+        className={`grid scroll-mt-32 gap-6 ${chef.portrait ? "sm:grid-cols-[minmax(0,220px)_minmax(0,1fr)] sm:items-start md:gap-8" : ""}`}
+      >
+        {/* People book a person, not a menu: their face, large, beside their own words. */}
+        {chef.portrait && (
+          <div className="aspect-[4/5] w-full max-w-[260px] overflow-hidden rounded-[12px] bg-paper">
+            <Photo
+              photo={chef.portrait}
+              alt={`Fotografia de ${chef.name}`}
+              sizes="(min-width: 640px) 220px, 260px"
+              className="h-full w-full"
+            />
+          </div>
+        )}
+        <div className="flex min-w-0 flex-col gap-3.5">
+          <h2 id="sobre-title" className="d m-0 text-[32px]">
+            Sobre {first}
+          </h2>
+          {chef.headline && <p className="m-0 border-l-2 border-cobalt pl-3.5 text-[19px] font-semibold leading-snug">{chef.headline}</p>}
+          <p className="m-0 max-w-[680px] whitespace-pre-line text-[17px] leading-relaxed">
+            {chef.bio || `${first} ainda não escreveu sobre si. Veja os menus e os pratos abaixo.`}
+          </p>
+          {extra.length > 0 && <p className="m-0 text-[15px] text-muted">{extra.join(" · ")}</p>}
+        </div>
       </section>
 
       {(chef.experience.length > 0 || chef.certifications.length > 0) && (

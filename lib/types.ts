@@ -40,6 +40,8 @@ export type ChefCard = {
   categories: string[];
   services: ServiceType[];
   cover: string | null;
+  /** The chef's profile photo (added by lib/data, not by chefs_near). */
+  portrait: string | null;
   offers: Offer[];
 };
 

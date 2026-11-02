@@ -11,8 +11,26 @@ export const getChefs = cache(async (lat?: number, lng?: number): Promise<ChefCa
     p_lng: lng ?? null,
   });
   if (error) throw new Error(`chefs_near: ${error.message}`);
-  return (data ?? []) as ChefCard[];
+  return withPortraits((data ?? []) as Omit<ChefCard, "portrait">[]);
 });
+
+/**
+ * Adds each chef's profile photo to search results (chefs_near returns only the dish cover), so
+ * cards can show the person. One query for the whole list; verification selfies stay private.
+ */
+export async function withPortraits(chefs: Omit<ChefCard, "portrait">[]): Promise<ChefCard[]> {
+  if (!chefs.length) return [];
+  const { data } = await createAnonClient()
+    .from("chef_photos")
+    .select("chef_id, url")
+    .eq("kind", "portrait")
+    .in(
+      "chef_id",
+      chefs.map((c) => c.id),
+    );
+  const byChef = new Map((data ?? []).map((p) => [p.chef_id as string, p.url as string]));
+  return chefs.map((c) => ({ ...c, portrait: byChef.get(c.id) ?? null }));
+}
 
 export async function getCalendar(chefId: string, from: Date, to: Date): Promise<Calendar> {
   if (!hasSupabase) return mockCalendar(chefId, from, to);
