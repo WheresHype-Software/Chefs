@@ -35,7 +35,7 @@ const SECTIONS: LegalSection[] = [
         </p>
         <p>
           <strong>Dados técnicos:</strong> endereço IP e registos de acesso, necessários para a segurança do serviço, e os cookies descritos
-          na secção 8.
+          em <a href="#cookies">Cookies e armazenamento no dispositivo</a>.
         </p>
         <p>
           <strong>Alergias e restrições alimentares:</strong> só se as indicar nas notas do pedido. São dados de saúde: tratamo-los com base
@@ -67,9 +67,31 @@ const SECTIONS: LegalSection[] = [
           <strong>Segurança e prevenção de fraude</strong> (registos de acesso, limites de pedidos): interesse legítimo.
         </li>
         <li>
-          <strong>Cumprir obrigações legais</strong>, como responder a autoridades: obrigação legal (art. 6.º, n.º 1, alínea c)).
+          <strong>Cumprir obrigações legais</strong>, como responder a autoridades e, no caso dos cozinheiros e chefs, comunicar à
+          Autoridade Tributária a informação exigida pela Lei n.º 36/2023 (DAC7): obrigação legal (art. 6.º, n.º 1, alínea c)).
         </li>
       </ul>
+    ),
+  },
+  {
+    id: "interessados",
+    title: "Pessoas interessadas em cozinhar no Ao Lume",
+    body: (
+      <>
+        <p>
+          Se deixar o seu contacto num formulário de inscrição (por exemplo, num anúncio no Facebook ou Instagram), recebemos o nome,
+          telefone, email, a zona, o que cozinha, se já vende e, se o indicar, o link do Instagram ou Facebook.
+        </p>
+        <p>
+          Usamos estes dados apenas para o contactar, explicar o Ao Lume e ajudar a criar o seu perfil, porque foi isso que pediu
+          (diligências pré-contratuais, art. 6.º, n.º 1, alínea b) do RGPD). Os formulários dos anúncios são da Meta Platforms Ireland, que
+          nos entrega os dados.
+        </p>
+        <p>
+          Se criar perfil, os dados passam a ser tratados como dados de conta. Se não avançar, apagamo-los até 12 meses depois do último
+          contacto, ou antes, se nos pedir.
+        </p>
+      </>
     ),
   },
   {

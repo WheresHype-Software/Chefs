@@ -77,5 +77,5 @@ export const BADGE_LABEL: Record<Badge, string> = {
   identity: "Identidade verificada",
   portfolio: "Portefólio verificado",
   certified: "Certificado",
-  founder: "Chef fundador",
+  founder: "Fundador",
 };

@@ -122,18 +122,37 @@ const SECTIONS: LegalSection[] = [
   },
   {
     id: "chefs",
-    title: "Obrigações dos chefs",
+    title: "Responsabilidade e obrigações dos cozinheiros e chefs",
     body: (
-      <ul>
-        <li>
-          Cumprir as regras aplicáveis à sua atividade: início de atividade nas Finanças, faturação, licenças necessárias e normas de
-          higiene e segurança alimentar (Regulamento (CE) n.º 852/2004 e HACCP).
-        </li>
-        <li>Publicar apenas informação verdadeira e fotografias de pratos feitos por si.</li>
-        <li>Responder aos pedidos, cumprir as reservas aceites e respeitar a política de cancelamento que publicou.</li>
-        <li>Usar os dados dos clientes apenas para preparar e prestar o serviço reservado.</li>
-        <li>Recomendamos ter seguro de responsabilidade civil adequado à atividade.</li>
-      </ul>
+      <>
+        <p>
+          Cada cozinheiro ou chef trabalha por conta própria e é <strong>o único responsável pela sua atividade</strong> e pelo cumprimento
+          das regras que se lhe aplicam. O Ao Lume não verifica nem garante esse cumprimento. Em especial, cabe a cada um:
+        </p>
+        <ul>
+          <li>
+            O seu enquadramento fiscal e a emissão de faturas ou recibos aos clientes, com atividade aberta nas Finanças ou, quando a lei o
+            permita, através de ato isolado.
+          </li>
+          <li>As licenças, registos ou comunicações exigidos para preparar e vender alimentos, incluindo quando cozinha em casa.</li>
+          <li>
+            As regras de higiene e segurança alimentar (Regulamento (CE) n.º 852/2004 e HACCP) e a informação sobre alergénios (Regulamento
+            (UE) n.º 1169/2011).
+          </li>
+        </ul>
+        <p>
+          A informação que o Ao Lume dá sobre estas regras é geral e não substitui o aconselhamento de um contabilista ou das entidades
+          competentes. Nos termos da Lei n.º 36/2023 (DAC7), o Ao Lume pode ter de pedir dados de identificação fiscal aos cozinheiros e
+          chefs e comunicar à Autoridade Tributária informação sobre a atividade feita através da plataforma.
+        </p>
+        <p>Além disso, cada cozinheiro ou chef compromete-se a:</p>
+        <ul>
+          <li>Publicar apenas informação verdadeira e fotografias de pratos feitos por si.</li>
+          <li>Responder aos pedidos, cumprir as reservas aceites e respeitar a política de cancelamento que publicou.</li>
+          <li>Usar os dados dos clientes apenas para preparar e prestar o serviço reservado.</li>
+        </ul>
+        <p>Recomendamos ter seguro de responsabilidade civil adequado à atividade.</p>
+      </>
     ),
   },
   {
