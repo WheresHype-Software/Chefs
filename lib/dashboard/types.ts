@@ -102,6 +102,7 @@ export type SetupProgress = {
 
 export type DashReview = {
   id: string;
+  booking_id: string | null;
   author_name: string;
   created_at: string;
   overall: number;

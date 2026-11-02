@@ -42,7 +42,7 @@ export default async function AdminPage() {
     // Approved cooks who sent a certificate and are not "Chef" yet.
     sb
       .from("chefs")
-      .select("id, display_name, slug, chef_certifications!inner(title, document_path)")
+      .select("id, display_name, slug, badges, chef_certifications!inner(title, document_path)")
       .eq("status", "approved")
       .not("badges", "cs", "{certified}")
       .order("display_name"),
@@ -71,7 +71,7 @@ export default async function AdminPage() {
     (a, b) => Number(readiness(b).ready) - Number(readiness(a).ready),
   );
   const titleQueue = await withLinks(
-    (titleRequests.data ?? []) as unknown as ({ id: string; display_name: string; slug: string } & WithCerts)[],
+    (titleRequests.data ?? []) as unknown as ({ id: string; display_name: string; slug: string; badges: string[] } & WithCerts)[],
   );
 
   const reqRows = requests.data ?? [];
@@ -111,7 +111,9 @@ export default async function AdminPage() {
       <section id="titulos" className="flex scroll-mt-16 flex-col gap-4">
         <h2 className="lab m-0 border-b border-line-2 pb-2.5">Pedidos de título de Chef · {titleQueue.length}</h2>
         {titleQueue.length ? (
-          titleQueue.map((c) => <TitleRequestCard key={c.id} chefId={c.id} name={c.display_name} slug={c.slug} docs={c.certificateDocs} />)
+          titleQueue.map((c) => (
+            <TitleRequestCard key={c.id} chefId={c.id} name={c.display_name} slug={c.slug} badges={c.badges} docs={c.certificateDocs} />
+          ))
         ) : (
           <p className="m-0 text-muted">Nenhum certificado por verificar.</p>
         )}

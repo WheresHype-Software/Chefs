@@ -16,6 +16,7 @@ function initialForm(chef: MyChef | null) {
     display_name: chef?.display_name ?? "",
     slug: chef?.slug ?? "",
     tier: chef?.tier ?? ("home" as MyChef["tier"]),
+    cook_form: (chef?.badges.includes("cozinheira") ? "cozinheira" : "cozinheiro") as "cozinheiro" | "cozinheira",
     headline: chef?.headline ?? "",
     bio: chef?.bio ?? "",
     area_name: chef?.area_name ?? "",

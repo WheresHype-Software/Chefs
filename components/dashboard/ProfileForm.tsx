@@ -44,14 +44,25 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
             placeholder="o-seu-nome"
           />
         </Field>
-        <Field label="Perfil">
-          <select value={form.tier} onChange={(e) => set("tier", e.target.value as MyChef["tier"])}>
-            <option value="home">Cozinheiro caseiro</option>
-            <option value="professional">Chef profissional</option>
+        <Field label="Como quer aparecer" hint="Com certificado verificado, passa a aparecer como Chef.">
+          <select value={form.cook_form} onChange={(e) => set("cook_form", e.target.value as typeof form.cook_form)}>
+            <option value="cozinheiro">Cozinheiro</option>
+            <option value="cozinheira">Cozinheira</option>
           </select>
         </Field>
-        <Field label="Especialidade (uma linha)">
-          <input maxLength={80} value={form.headline} onChange={(e) => set("headline", e.target.value)} placeholder="Petiscos e eventos" />
+        <Field label="Perfil">
+          <select value={form.tier} onChange={(e) => set("tier", e.target.value as MyChef["tier"])}>
+            <option value="home">{form.cook_form === "cozinheira" ? "Cozinheira caseira" : "Cozinheiro caseiro"}</option>
+            <option value="professional">Profissional de cozinha</option>
+          </select>
+        </Field>
+        <Field label="Uma frase para o seu perfil" hint="Aparece por baixo do seu nome. Até 80 caracteres.">
+          <input
+            maxLength={80}
+            value={form.headline}
+            onChange={(e) => set("headline", e.target.value)}
+            placeholder="Cozinha alentejana para jantares em casa"
+          />
         </Field>
       </div>
       <Field label="Sobre si">

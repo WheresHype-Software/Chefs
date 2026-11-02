@@ -45,7 +45,9 @@ const SUBMIT: Record<Decision, string> = {
 type Props = { chefId: string; chefName: string; badges: string[]; onDone: (decision: Decision) => void };
 
 /** Approve, ask for changes or suspend a chef: badges, reasons, the message the chef gets, and one clear action. */
-export function ChefDecision({ chefId, chefName, badges: initial, onDone }: Props) {
+export function ChefDecision({ chefId, chefName, badges: current, onDone }: Props) {
+  // Only the team's badges; "cozinheira" is the chef's own choice and the database keeps it.
+  const initial = current.filter((b): b is Badge => (BADGES as readonly string[]).includes(b));
   const [decision, setDecision] = useState<Decision>("approved");
   const badges = useToggleList(initial.length ? initial : ["identity", "portfolio"]);
   const reasons = useToggleList<string>([]);

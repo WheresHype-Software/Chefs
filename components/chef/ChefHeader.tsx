@@ -2,7 +2,7 @@ import { ICONS } from "@/components/chef/icons";
 import { Photo } from "@/components/ui/Photo";
 import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { BADGE_LABEL, type Badge } from "@/lib/constants";
-import { initials, isVerifiedChef, titledName } from "@/lib/format";
+import { chefTitle, initials, isVerifiedChef, titledName } from "@/lib/format";
 import type { ChefProfile } from "@/lib/types";
 
 /** The chef's face, large (the only place it appears on the page), title and badges, name, and where/rating/Instagram. */
@@ -36,10 +36,10 @@ export function ChefHeader({ chef }: { chef: ChefProfile }) {
             className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-semibold ${verified ? "bg-cobalt text-white" : "bg-white text-ink ring-1 ring-line-2"}`}
           >
             {verified && <VerifiedIcon size={13} />}
-            {verified ? "Chef verificado" : "Cozinheiro"}
+            {verified ? "Chef verificado" : chefTitle(chef.badges)}
           </li>
           {chef.badges
-            .filter((b) => b !== "certified")
+            .filter((b) => b !== "certified" && b in BADGE_LABEL)
             .map((b) => (
               <li key={b} className="flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[13px] text-ink-3 ring-1 ring-line-2">
                 <span className="text-cobalt [&_svg]:h-3.5 [&_svg]:w-3.5">{ICONS.check}</span>

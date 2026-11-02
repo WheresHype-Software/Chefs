@@ -32,14 +32,16 @@ export const TIER_LABEL: Record<string, string> = {
 
 /**
  * "Chef" is earned: only once the team has verified a cooking certificate (the admin-only
- * "certified" badge). Everyone else is "Cozinheiro".
+ * "certified" badge). Everyone else is "Cozinheiro" or "Cozinheira", as they chose (mirrored
+ * into badges as "cozinheira" by the database).
  */
 export function isVerifiedChef(badges: readonly string[]): boolean {
   return badges.includes("certified");
 }
 
-export function chefTitle(badges: readonly string[]): "Chef" | "Cozinheiro" {
-  return isVerifiedChef(badges) ? "Chef" : "Cozinheiro";
+export function chefTitle(badges: readonly string[]): "Chef" | "Cozinheiro" | "Cozinheira" {
+  if (isVerifiedChef(badges)) return "Chef";
+  return badges.includes("cozinheira") ? "Cozinheira" : "Cozinheiro";
 }
 
 /** "Chef Marta Figueiredo" or "Cozinheiro Rui Barata". */

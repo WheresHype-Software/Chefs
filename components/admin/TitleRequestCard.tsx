@@ -1,5 +1,6 @@
 "use client";
 
+import { chefTitle } from "@/lib/format";
 import Link from "next/link";
 import { useState } from "react";
 import { refuseChefTitle, verifyChefTitle } from "@/app/admin/actions";
@@ -16,10 +17,10 @@ const REASONS = [
   "Não é um certificado de formação em cozinha.",
 ];
 
-type Props = { chefId: string; name: string; slug: string; docs: CertificateDoc[] };
+type Props = { chefId: string; name: string; slug: string; badges: string[]; docs: CertificateDoc[] };
 
 /** A cook asking to be called "Chef": see the certificate, then verify or refuse with a reason. */
-export function TitleRequestCard({ chefId, name, slug, docs }: Props) {
+export function TitleRequestCard({ chefId, name, slug, badges, docs }: Props) {
   const [done, setDone] = useState<"verified" | "refused" | null>(null);
   const [refusing, setRefusing] = useState(false);
   const [reason, setReason] = useState("");
@@ -42,7 +43,9 @@ export function TitleRequestCard({ chefId, name, slug, docs }: Props) {
   return (
     <article className="box flex flex-col gap-4 p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="m-0 text-[18px] font-bold">Cozinheiro {name}</h3>
+        <h3 className="m-0 text-[18px] font-bold">
+          {chefTitle(badges)} {name}
+        </h3>
         <Link href={`/chef/${slug}`} target="_blank" className="text-sm font-semibold">
           Ver perfil ↗
         </Link>

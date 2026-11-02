@@ -15,6 +15,7 @@ const ProfileInput = z.object({
     .toLowerCase()
     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Use letras, números e hífenes"),
   tier: z.enum(["professional", "home"]),
+  cook_form: z.enum(["cozinheiro", "cozinheira"]),
   headline: z.string().trim().max(80).optional(),
   bio: z.string().trim().max(2000).optional(),
   area_name: z.string().trim().min(2).max(80),
@@ -35,7 +36,7 @@ const ProfileInput = z.object({
 const PROFILE_LABELS: Record<string, string> = {
   display_name: "Nome público",
   slug: "O link só pode ter letras, números e hífenes.",
-  headline: "Especialidade",
+  headline: "Frase de apresentação",
   bio: "Sobre si",
   area_name: "Zona de base",
   service_radius_km: "Raio de serviço",
@@ -58,6 +59,7 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
     display_name: p.display_name,
     slug: p.slug,
     tier: p.tier,
+    cook_form: p.cook_form,
     headline: p.headline || null,
     bio: p.bio || null,
     area_name: p.area_name,
@@ -68,9 +70,15 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
     ...(p.languages ? { languages: p.languages } : {}),
     ...(p.lat != null && p.lng != null ? { base_location: `SRID=4326;POINT(${p.lng} ${p.lat})` } : {}),
   };
-  const { error } = ctx.chef
-    ? await ctx.sb.from("chefs").update(row).eq("id", ctx.chef.id)
-    : await ctx.sb.from("chefs").insert({ ...row, profile_id: session.userId });
+  const write = (values: Partial<typeof row>) =>
+    ctx.chef
+      ? ctx.sb.from("chefs").update(values).eq("id", ctx.chef.id)
+      : ctx.sb.from("chefs").insert({ ...values, profile_id: session.userId });
+  let { error } = await write(row);
+  // Until migration 20261102000001 adds chefs.cook_form, save everything else.
+  if (error?.code === "PGRST204" && error.message.includes("cook_form")) {
+    ({ error } = await write({ ...row, cook_form: undefined }));
+  }
   if (error) {
     if (error.code === "23505") return fail("Esse link já está a ser usado. Escolha outro.");
     return failWith(error, "saveProfile", "Não foi possível guardar o perfil. Tente de novo.");

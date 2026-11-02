@@ -8,7 +8,7 @@ export async function getReviews(): Promise<DashReview[]> {
   if (scope.demo) return DEMO_REVIEWS;
   const { data } = await scope.sb
     .from("reviews")
-    .select("id, author_name, created_at, overall, comment, chef_reply, bookings(offer_title)")
+    .select("id, booking_id, author_name, created_at, overall, comment, chef_reply, bookings(offer_title)")
     .eq("chef_id", scope.chef.id)
     .order("created_at", { ascending: false });
   return (data ?? []).map((r) => ({

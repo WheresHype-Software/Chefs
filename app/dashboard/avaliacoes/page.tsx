@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ReviewReply } from "@/components/dashboard/ReviewReply";
 import { Stars } from "@/components/chef/ReviewList";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -31,6 +32,14 @@ export default async function Avaliacoes() {
             <span>·</span>
             {r.offer_title && <span>{r.offer_title} ·</span>}
             <span>{new Date(r.created_at).toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}</span>
+            {r.booking_id && (
+              <>
+                <span>·</span>
+                <Link href={`/dashboard/pedidos/${r.booking_id}`} className="font-semibold">
+                  Ver pedido →
+                </Link>
+              </>
+            )}
           </div>
           {r.chef_reply ? (
             <div className="border-l-2 border-line-2 pl-3.5 text-[14px] text-ink-3">

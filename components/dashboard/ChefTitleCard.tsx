@@ -5,7 +5,7 @@ import { Field } from "@/components/ui/Field";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { useCertificateUpload } from "@/hooks/useCertificateUpload";
-import { isVerifiedChef } from "@/lib/format";
+import { chefTitle, isVerifiedChef } from "@/lib/format";
 
 type Props = { name: string; badges: string[]; certificates: { id: string; title: string }[]; userId: string | null };
 
@@ -40,9 +40,12 @@ export function ChefTitleCard({ name, badges, certificates, userId }: Props) {
           Título de Chef
         </h2>
         <p className="m-0 text-sm text-muted">
-          Hoje aparece como <strong className="text-ink">Cozinheiro {name}</strong>. Se tem formação em cozinha, envie um certificado (curso
-          de cozinha, escola de hotelaria, diploma profissional). Depois de a equipa o verificar, passa a aparecer como{" "}
-          <strong className="text-ink">Chef {name}</strong>, com a marca «Chef verificado».
+          Hoje aparece como{" "}
+          <strong className="text-ink">
+            {chefTitle(badges)} {name}
+          </strong>
+          . Se tem formação em cozinha, envie um certificado (curso de cozinha, escola de hotelaria, diploma profissional). Depois de a
+          equipa o verificar, passa a aparecer como <strong className="text-ink">Chef {name}</strong>, com a marca «Chef verificado».
         </p>
       </div>
 

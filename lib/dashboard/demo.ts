@@ -190,6 +190,7 @@ export const DEMO_COOKING: Cooking = {
 export const DEMO_REVIEWS: DashReview[] = [
   {
     id: "rv1",
+    booking_id: null,
     author_name: "Inês B.",
     created_at: new Date(Date.now() - 6 * 86400_000).toISOString(),
     overall: 5,
@@ -199,6 +200,7 @@ export const DEMO_REVIEWS: DashReview[] = [
   },
   {
     id: "rv2",
+    booking_id: null,
     author_name: "Pedro C.",
     created_at: new Date(Date.now() - 20 * 86400_000).toISOString(),
     overall: 4.6,
