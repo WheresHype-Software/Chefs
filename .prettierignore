@@ -3,3 +3,5 @@ node_modules
 public/vendor
 package-lock.json
 supabase
+e2e/.report
+e2e/.results

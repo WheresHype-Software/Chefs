@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Copied from node_modules by scripts/copy-maplibre-worker.mjs
     "public/vendor/**",
+    // Playwright output (npm run test:e2e)
+    "e2e/.report/**",
+    "e2e/.results/**",
   ]),
 ]);
 
