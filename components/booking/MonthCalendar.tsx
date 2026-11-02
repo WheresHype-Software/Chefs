@@ -14,12 +14,25 @@ type Props = {
   failed?: boolean;
   onRetry?: () => void;
   canGoBack: boolean;
+  /** No free days in the coming months: say so instead of "this month". */
+  noneSoon?: boolean;
 };
 
 const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"];
 
 /** Month grid of a chef's free days: outlined = available, struck = booked. */
-export function MonthCalendar({ year, month, calendar, selected, onSelect, onShift, canGoBack, failed = false, onRetry }: Props) {
+export function MonthCalendar({
+  year,
+  month,
+  calendar,
+  selected,
+  onSelect,
+  onShift,
+  canGoBack,
+  failed = false,
+  onRetry,
+  noneSoon = false,
+}: Props) {
   const lead = (new Date(year, month, 1).getDay() + 6) % 7; // Monday first
   const days = new Date(year, month + 1, 0).getDate();
   const available = new Set(calendar?.available ?? []);
@@ -28,7 +41,7 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onShi
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex items-baseline justify-between border-b border-line pb-2.5">
-        <h3 className="m-0 text-[15px] font-semibold">Data</h3>
+        <h3 className="step-title required m-0 text-[15px] font-semibold">Dia</h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -88,6 +101,8 @@ export function MonthCalendar({ year, month, calendar, selected, onSelect, onShi
             </button>
           )}
         </p>
+      ) : noneSoon && calendar && available.size === 0 ? (
+        <p className="m-0 text-sm text-ink-3">Sem dias livres nos próximos meses. Volte a ver em breve.</p>
       ) : calendar && available.size === 0 ? (
         <p className="m-0 flex flex-wrap items-center gap-x-2 text-sm text-ink-3">
           Sem dias livres neste mês.

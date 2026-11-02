@@ -38,9 +38,19 @@ export function useBookingForm(
   const maxGuests = offer.maxGuests ?? 200;
   const needsAddress = offer.mode === "home" || offer.mode === "delivery";
   const estimate = offer.priceModel === "quote" || offer.price == null ? null : offer.price * guests;
-  const missingContact = !contact.name.trim() || !contact.email.trim() || !contact.phone.trim();
-  const ready = Boolean(day && time && !missingContact && (!needsAddress || address.trim()));
-  const ctaLabel = !day ? "Escolha um dia" : !time ? "Escolha a hora" : !ready ? "Complete os seus dados" : "Pedir reserva";
+  const missing = {
+    day: !day,
+    time: !time,
+    address: needsAddress && !address.trim(),
+    name: !contact.name.trim(),
+    email: !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact.email.trim()),
+    phone: !contact.phone.trim(),
+  };
+  const ready = !Object.values(missing).some(Boolean);
+  // After a submit with gaps, each missing field is highlighted until it's filled.
+  const [attempted, setAttempted] = useState(false);
+  const invalid = (field: keyof typeof missing) => attempted && missing[field];
+  const ctaLabel = "Pedir reserva";
 
   function chooseOffer(index: number) {
     const next = chef.offers[index]!;
@@ -58,8 +68,12 @@ export function useBookingForm(
     setContact((c) => ({ ...c, [field]: value }));
   }
 
-  function submit() {
-    if (!ready || !day || !time) return;
+  /** False (and fields highlighted) when something is missing. */
+  function submit(): boolean {
+    if (!ready || !day || !time) {
+      setAttempted(true);
+      return false;
+    }
     setError(null);
     startTransition(async () => {
       const result = await callAction(() =>
@@ -79,6 +93,7 @@ export function useBookingForm(
         setSent({ id: result.bookingId, ref: result.ref, link: result.link, privateLink: result.privateLink, emailed: result.emailed });
       else setError(result.error);
     });
+    return true;
   }
 
   return {
@@ -101,6 +116,8 @@ export function useBookingForm(
     needsAddress,
     estimate,
     ready,
+    missing,
+    invalid,
     ctaLabel,
     submit,
     pending,

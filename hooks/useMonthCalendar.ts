@@ -25,6 +25,23 @@ export function useMonthCalendar(chefId: string, initial?: MonthCalendarData) {
     initial && initialKey ? { key: initialKey, data: initial.calendar } : null,
   );
   const hasCurrent = loaded?.key === key;
+  const [userMoved, setUserMoved] = useState(false);
+  const [skipped, setSkipped] = useState(0);
+  const [noneSoon, setNoneSoon] = useState(false);
+
+  // An empty month says "nothing here" when the next one may be full: skip ahead on our own,
+  // during render (no effect), at most three months, and never once the person has navigated.
+  // If all are empty, come back to this month and say there are no free days soon.
+  if (!userMoved && !noneSoon && hasCurrent && loaded.data && loaded.data.available.length === 0) {
+    if (skipped < 3) {
+      setSkipped(skipped + 1);
+      const d = new Date(month.year, month.month + 1, 1);
+      setMonth({ year: d.getFullYear(), month: d.getMonth() });
+    } else {
+      setNoneSoon(true);
+      setMonth({ year: now.getFullYear(), month: now.getMonth() });
+    }
+  }
 
   useEffect(() => {
     if (hasCurrent) return;
@@ -42,6 +59,7 @@ export function useMonthCalendar(chefId: string, initial?: MonthCalendarData) {
   }, [chefId, month.year, month.month, key, hasCurrent]);
 
   function shift(delta: number) {
+    setUserMoved(true);
     setMonth(({ year, month: m }) => {
       const d = new Date(year, m + delta, 1);
       return { year: d.getFullYear(), month: d.getMonth() };
@@ -53,6 +71,8 @@ export function useMonthCalendar(chefId: string, initial?: MonthCalendarData) {
     calendar: hasCurrent ? loaded.data : null,
     failed: hasCurrent && loaded.data === null,
     canGoBack: month.year > now.getFullYear() || month.month > now.getMonth(),
+    /** No free days in this month or the next three. */
+    noneSoon,
     retry: () => setAttempt((n) => n + 1),
     shift,
   };

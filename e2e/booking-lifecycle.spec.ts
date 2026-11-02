@@ -123,8 +123,8 @@ test.describe.serial("booking lifecycle", () => {
     if (target.isNextMonth) await form.getByRole("button", { name: "Mês seguinte" }).click();
     await form.getByRole("button", { name: `${target.day}, disponível`, exact: true }).click();
     await form.getByRole("button", { name: "20:00", exact: true }).click();
-    await form.getByLabel("Nome", { exact: true }).fill(run.client.name);
-    await form.getByLabel("Email", { exact: true }).fill(run.client.email);
+    await form.getByLabel(/^Nome/).fill(run.client.name);
+    await form.getByLabel(/^Email/).fill(run.client.email);
     await form.getByLabel("Telemóvel").fill(run.client.phone);
     await form.getByLabel("Notas para o chef").fill("Sem glúten, por favor.");
     await expect(form.getByText(`${run.offer.price * run.offer.guests} €`)).toBeVisible();

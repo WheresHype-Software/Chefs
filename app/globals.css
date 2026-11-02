@@ -894,3 +894,38 @@ html:has(.menu-sheet[open]) {
     animation-name: pan-toss-hop-again;
   }
 }
+
+/* Booking form steps: each step title gets its number from a counter, so the order holds when a
+   step (the address, for pickups) is not shown. */
+.booking-form {
+  counter-reset: booking-step;
+}
+.booking-form .step-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.booking-form .step-title::before {
+  counter-increment: booking-step;
+  content: counter(booking-step);
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-cobalt);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.booking-form .step-title.required::after {
+  content: "*";
+  color: var(--color-danger);
+}
+.field :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--color-danger);
+  background: #fdf3f2;
+}

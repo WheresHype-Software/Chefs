@@ -14,6 +14,9 @@ type Props = {
   inputClassName?: string;
   icon?: boolean;
   label: string;
+  /** Let people use what they typed when it isn't among the suggestions (a full street address). */
+  allowCustom?: boolean;
+  invalid?: boolean;
 };
 
 function Spinner() {
@@ -33,7 +36,18 @@ function Spinner() {
 }
 
 /** Address or zone field with suggestions from Photon (lib/geocode), shown as you type. */
-export function AddressSearch({ value, onChange, onSelect, placeholder, className, inputClassName, icon, label }: Props) {
+export function AddressSearch({
+  value,
+  onChange,
+  onSelect,
+  placeholder,
+  className,
+  inputClassName,
+  icon,
+  label,
+  allowCustom = false,
+  invalid = false,
+}: Props) {
   const [items, setItems] = useState<Place[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -98,6 +112,7 @@ export function AddressSearch({ value, onChange, onSelect, placeholder, classNam
           value={value}
           placeholder={placeholder}
           aria-busy={loading}
+          aria-invalid={invalid || undefined}
           className={`${inputClassName ?? ""} ${loading ? "pr-8" : ""}`}
           onChange={(e) => {
             typed.current = true;
@@ -133,7 +148,7 @@ export function AddressSearch({ value, onChange, onSelect, placeholder, classNam
           role="listbox"
           className="absolute left-0 right-0 top-full z-20 mt-1 min-w-[min(320px,calc(100vw-40px))] border border-line bg-white shadow-[0_18px_40px_rgba(17,17,16,.12)]"
         >
-          {items.length === 0 && (
+          {items.length === 0 && !(allowCustom && !loading) && (
             <li role="option" aria-selected={false} aria-disabled className="px-4 py-3 text-sm text-muted">
               {loading ? "A procurar zonas…" : "Nenhuma zona encontrada. Experimente o bairro e a cidade, por exemplo «Alvalade, Lisboa»."}
             </li>
@@ -152,6 +167,20 @@ export function AddressSearch({ value, onChange, onSelect, placeholder, classNam
               {p.label}
             </li>
           ))}
+          {allowCustom && !loading && value.trim().length >= 3 && (
+            <li
+              role="option"
+              aria-selected={false}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                typed.current = false;
+                setOpen(false);
+              }}
+              className="cursor-pointer px-4 py-3 text-sm text-cobalt hover:bg-paper"
+            >
+              {items.length ? "Não está na lista? " : ""}Usar «{value.trim()}»
+            </li>
+          )}
         </ul>
       )}
     </div>
