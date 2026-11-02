@@ -29,7 +29,7 @@ export async function searchPlaces(q: string, { limit = 5, init }: { limit?: num
  */
 async function nominatim(q: string, init?: RequestInit): Promise<Place | null> {
   const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=pt&accept-language=pt&q=${encodeURIComponent(q)}`;
-  const headers = typeof window === "undefined" ? { "User-Agent": "AoLume/1.0 (https://chefs.whereshype.com)" } : undefined;
+  const headers = typeof window === "undefined" ? { "User-Agent": "AoLume/1.0 (https://aolume.com)" } : undefined;
   const res = await fetch(url, { ...init, headers });
   if (!res.ok) return null;
   const [hit] = (await res.json()) as { lat: string; lon: string; display_name: string }[];

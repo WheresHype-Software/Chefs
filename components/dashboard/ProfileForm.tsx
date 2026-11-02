@@ -8,6 +8,7 @@ import { FormMessage } from "@/components/ui/FormMessage";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
 import { slugify } from "@/lib/slug";
+import { SITE_DOMAIN } from "@/lib/constants";
 
 /** Public profile details: name, link, tier, bio, base area and service radius. */
 function ProfileDetails({ chef }: { chef: MyChef | null }) {
@@ -32,7 +33,7 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
             onBlur={() => !form.slug && set("slug", slugify(form.display_name))}
           />
         </Field>
-        <Field label="Link" hint={`aolume.pt/chef/${form.slug || "o-seu-nome"}`}>
+        <Field label="Link" hint={`${SITE_DOMAIN}/chef/${form.slug || "o-seu-nome"}`}>
           <input
             required
             maxLength={60}

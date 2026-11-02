@@ -7,6 +7,7 @@ import { RequestDemo } from "@/components/para-chefs/RequestDemo";
 import { ToolList } from "@/components/para-chefs/ToolList";
 import { ToolTabs } from "@/components/para-chefs/ToolTabs";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { SITE_DOMAIN } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Para chefs",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 const MKT = [
-  ["Um link para a bio", "aolume.pt/chef/o-seu-nome substitui o formulário e o “manda mensagem”."],
+  ["Um link para a bio", `${SITE_DOMAIN}/chef/o-seu-nome substitui o formulário e o “manda mensagem”.`],
   ["Kit de partilha", "Código QR, imagens para stories e cartões com as suas melhores avaliações."],
   ["Perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
   ["Avaliações verificadas", "Só quem concluiu uma reserva avalia, e pode responder a cada uma."],
@@ -175,7 +176,7 @@ export default function ParaChefs() {
               ["1", "Crie a conta", "Nome, email e uma palavra-passe. Grátis no lançamento."],
               ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
               ["3", "Aprovação", "A nossa equipa revê cada perfil antes de ficar público."],
-              ["4", "Partilhe o link", "Ponha aolume.pt/chef/o-seu-nome na bio e receba pedidos."],
+              ["4", "Partilhe o link", `Ponha ${SITE_DOMAIN}/chef/o-seu-nome na bio e receba pedidos.`],
             ].map(([n, t, d]) => (
               <li key={n} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-[26px]">
                 <span

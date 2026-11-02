@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AgendaPreview, ChatPreview, PagePreview, RequestsPreview } from "./ToolPreviews";
+import { SITE_DOMAIN } from "@/lib/constants";
 
 const TABS = [
   {
@@ -10,7 +11,7 @@ const TABS = [
     title: "A sua montra, pronta a partilhar",
     text: "Fotos, menus, preços e avaliações num link curto que cabe na bio do Instagram.",
     points: [
-      "Link próprio: aolume.pt/chef/o-seu-nome",
+      `Link próprio: ${SITE_DOMAIN}/chef/o-seu-nome`,
       "Preço fixo, por pessoa ou sob orçamento",
       "Pagamento e cancelamento visíveis para o cliente",
     ],

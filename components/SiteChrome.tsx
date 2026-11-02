@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
 import { MobileMenu } from "@/components/MobileMenu";
 import { PanToss } from "@/components/brand/PanToss";
+import { SITE_DOMAIN } from "@/lib/constants";
 
 /** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
 export function Wordmark({ suffix, animated = false }: { suffix?: string; animated?: boolean }) {
@@ -129,6 +130,14 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
             Privacidade
           </Link>
         </nav>
+      </div>
+      <div className="border-t border-white/15">
+        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-5 text-[14px] text-[#c9d6ee] md:px-8">
+          <span>© {new Date().getFullYear()} Ao Lume</span>
+          <a href={`https://${SITE_DOMAIN}`} className="font-semibold text-white no-underline hover:underline">
+            {SITE_DOMAIN}
+          </a>
+        </div>
       </div>
     </footer>
   );

@@ -1,6 +1,9 @@
 import type { ServiceType } from "./types";
 
 /** Cooking categories (mirrors cuisine_categories: seed.sql plus migration 8), in display order. */
+/** The site's public address, as shown to people (links in copy, footer). URLs use NEXT_PUBLIC_SITE_URL. */
+export const SITE_DOMAIN = "aolume.com";
+
 export const CUISINES = [
   "Portuguesa",
   "Petiscos",
