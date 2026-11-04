@@ -25,7 +25,7 @@ export function CookieBanner() {
         </h2>
         <p className="m-0 text-[14px] leading-relaxed text-ink-3">
           Utilizamos cookies necessários ao funcionamento do site e, com a sua autorização, cookies da Meta para medir a eficácia dos nossos
-          anúncios no Facebook e no Instagram. Pode mudar a sua escolha a qualquer momento.{" "}
+          anúncios no Facebook e no Instagram. Pode mudar a sua escolha a qualquer momento, em «Cookies», no fundo da página.{" "}
           <Link href="/privacidade#cookies" className="underline">
             Saiba mais
           </Link>
