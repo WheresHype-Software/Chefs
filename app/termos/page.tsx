@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage, type LegalSection } from "@/components/LegalPage";
 import { SITE_DOMAIN } from "@/lib/constants";
-import { COMPANY, COMPLAINTS_BOOK_URL } from "@/lib/legal";
+import { COMPANY, COMPLAINTS_BOOK_URL, EMAIL } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Termos e condições",
@@ -17,7 +17,8 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         O Ao Lume ({SITE_DOMAIN}) é explorado pela <strong>{COMPANY.name}</strong>, NIF {COMPANY.nif}, com sede em {COMPANY.address}.
-        Contacto: {COMPANY.email}.
+        Contacto: <a href={`mailto:${EMAIL.contact}`}>{EMAIL.contact}</a>. Para ajuda com um pedido:{" "}
+        <a href={`mailto:${EMAIL.support}`}>{EMAIL.support}</a>.
       </p>
     ),
   },
@@ -213,12 +214,12 @@ const SECTIONS: LegalSection[] = [
     body: (
       <>
         <p>
-          Pode denunciar conteúdos ilegais ou que violem estes termos para {COMPANY.email}, indicando o endereço da página e o motivo.
-          Analisamos cada denúncia e informamos quem a fez da decisão.
+          Pode denunciar conteúdos ilegais ou que violem estes termos para <a href={`mailto:${EMAIL.legal}`}>{EMAIL.legal}</a>, indicando o
+          endereço da página e o motivo. Analisamos cada denúncia e informamos quem a fez da decisão.
         </p>
         <p>
           Podemos ocultar conteúdos, recusar perfis ou suspender contas que violem estes termos ou a lei. Comunicamos a decisão e o motivo a
-          quem for afetado, que pode responder para {COMPANY.email}.
+          quem for afetado, que pode responder para <a href={`mailto:${EMAIL.legal}`}>{EMAIL.legal}</a>.
         </p>
       </>
     ),

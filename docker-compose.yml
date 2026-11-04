@@ -24,6 +24,7 @@ services:
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
 
 networks:
   sites_proxy:

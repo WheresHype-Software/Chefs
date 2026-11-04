@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { getSession } from "@/lib/dashboard";
+import { notifyAdmin, siteUrl } from "@/lib/email";
 import { fail, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { chefContext, done, NO_CHEF } from "./context";
 
@@ -26,5 +27,20 @@ export async function addCertificate(title: string, path: string): Promise<Resul
     title: parsed.data.title,
     document_path: parsed.data.path,
   });
-  return error ? failWith(error, "addCertificate", "Não foi possível guardar o certificado. Tente de novo.") : done("/dashboard/perfil");
+  if (error) return failWith(error, "addCertificate", "Não foi possível guardar o certificado. Tente de novo.");
+
+  await notifyAdmin({
+    subject: `Certificado para verificar: ${ctx.chef.display_name}`,
+    preheader: `${ctx.chef.display_name} enviou «${parsed.data.title}» e pede o título de Chef.`,
+    heading: "Um certificado espera verificação",
+    lead: `${ctx.chef.display_name} enviou um certificado de cozinha. Depois de o confirmar, passa a aparecer como Chef, com a marca «Chef verificado».`,
+    facts: [
+      ["Quem envia", ctx.chef.display_name],
+      ["Certificado", parsed.data.title],
+      ["Perfil público", siteUrl(`/chef/${ctx.chef.slug}`)],
+    ],
+    cta: { label: "Abrir os pedidos de título", href: "/admin#titulos" },
+    footnote: "O documento está num armazenamento privado: só abre pelo link da administração.",
+  });
+  return done("/dashboard/perfil");
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPage, type LegalSection } from "@/components/LegalPage";
 import { SITE_DOMAIN } from "@/lib/constants";
-import { COMPANY } from "@/lib/legal";
+import { COMPANY, EMAIL } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Política de privacidade",
@@ -16,7 +16,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         <strong>{COMPANY.name}</strong>, NIF {COMPANY.nif}, com sede em {COMPANY.address}, que explora o Ao Lume ({SITE_DOMAIN}). Para
-        qualquer questão sobre os seus dados: {COMPANY.email}.
+        qualquer questão sobre os seus dados: <a href={`mailto:${EMAIL.privacy}`}>{EMAIL.privacy}</a>.
       </p>
     ),
   },
@@ -67,6 +67,10 @@ const SECTIONS: LegalSection[] = [
           <strong>Segurança e prevenção de fraude</strong> (registos de acesso, limites de pedidos): interesse legítimo.
         </li>
         <li>
+          <strong>Medir os nossos anúncios</strong> no Facebook e no Instagram, se aceitar o aviso de cookies: consentimento (art. 6.º, n.º
+          1, alínea a)). Pode retirá-lo quando quiser, em <a href="#cookies">Cookies</a>.
+        </li>
+        <li>
           <strong>Cumprir obrigações legais</strong>, como responder a autoridades e, no caso dos cozinheiros e chefs, comunicar à
           Autoridade Tributária a informação exigida pela Lei n.º 36/2023 (DAC7): obrigação legal (art. 6.º, n.º 1, alínea c)).
         </li>
@@ -112,7 +116,12 @@ const SECTIONS: LegalSection[] = [
           <li>Komoot (Photon): sugestões de moradas e zonas; recebe o texto que escreve na pesquisa.</li>
           <li>OpenFreeMap: mapas; recebe o seu endereço IP ao carregar o mapa.</li>
         </ul>
-        <p>Não vendemos dados pessoais nem os partilhamos para publicidade.</p>
+        <p>
+          <strong>Com a Meta Platforms Ireland</strong>, apenas se aceitar o aviso de cookies: o pixel comunica-lhe que visitou o site, com
+          o endereço IP e o identificador do cookie, para medirmos os nossos anúncios. Nessa recolha somos responsáveis conjuntos com a
+          Meta, que depois trata os dados como responsável própria. Sem a sua autorização, o pixel não chega a carregar e nada é comunicado.
+        </p>
+        <p>Não vendemos dados pessoais. Só os partilhamos para publicidade se aceitar o aviso de cookies.</p>
       </>
     ),
   },
@@ -121,9 +130,9 @@ const SECTIONS: LegalSection[] = [
     title: "Transferências para fora do EEE",
     body: (
       <p>
-        Alguns prestadores podem tratar dados fora do Espaço Económico Europeu, por exemplo nos Estados Unidos. Nesses casos, a
-        transferência é feita com as garantias previstas no RGPD, como as cláusulas contratuais-tipo da Comissão Europeia ou o Quadro de
-        Privacidade de Dados UE-EUA.
+        Alguns prestadores podem tratar dados fora do Espaço Económico Europeu, por exemplo nos Estados Unidos (é o caso da Meta, se aceitar
+        o aviso de cookies). Nesses casos, a transferência é feita com as garantias previstas no RGPD, como as cláusulas contratuais-tipo da
+        Comissão Europeia ou o Quadro de Privacidade de Dados UE-EUA.
       </p>
     ),
   },
@@ -152,8 +161,8 @@ const SECTIONS: LegalSection[] = [
           tratamento baseado em interesse legítimo e retirar o consentimento a qualquer momento, sem afetar o tratamento já feito.
         </p>
         <p>
-          Para exercer estes direitos, escreva para {COMPANY.email}. Respondemos no prazo de um mês. Tem também o direito de apresentar
-          reclamação à Comissão Nacional de Proteção de Dados (
+          Para exercer estes direitos, escreva para <a href={`mailto:${EMAIL.privacy}`}>{EMAIL.privacy}</a>. Respondemos no prazo de um mês.
+          Tem também o direito de apresentar reclamação à Comissão Nacional de Proteção de Dados (
           <a href="https://www.cnpd.pt" target="_blank" rel="noopener noreferrer">
             www.cnpd.pt
           </a>
@@ -175,10 +184,19 @@ const SECTIONS: LegalSection[] = [
         </ul>
         <p>
           Com a sua autorização, usamos também o Pixel da Meta (Facebook e Instagram) para medir se os nossos anúncios funcionam, por
-          exemplo quantas pessoas criam conta depois de ver um anúncio. Só é ativado se carregar em «Aceitar» no aviso de cookies, e
-          pode mudar a sua escolha a qualquer momento em «Cookies», no fundo de cada página. A Meta trata estes dados de acordo com a
-          sua própria política de privacidade.
+          exemplo quantas pessoas criam conta depois de ver um anúncio. Só é ativado se carregar em «Aceitar» no aviso de cookies, e pode
+          mudar a sua escolha a qualquer momento em «Cookies», no fundo de cada página. A Meta trata estes dados de acordo com a sua própria
+          política de privacidade.
         </p>
+        <ul>
+          <li>
+            Cookies da Meta: <strong>_fbp</strong> e, se vier de um anúncio, <strong>_fbc</strong>. Duram cerca de três meses.
+          </li>
+          <li>
+            A sua resposta ao aviso fica guardada só neste navegador (<strong>aolume-consent</strong>), para não voltarmos a perguntar.
+          </li>
+        </ul>
+        <p>Não usamos cookies de análise de audiências.</p>
       </>
     ),
   },

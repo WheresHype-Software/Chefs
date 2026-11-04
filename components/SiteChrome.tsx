@@ -5,7 +5,7 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { PanToss } from "@/components/brand/PanToss";
 import { SITE_DOMAIN } from "@/lib/constants";
 import { publicEnv } from "@/lib/env";
-import { COMPANY, COMPLAINTS_BOOK_URL } from "@/lib/legal";
+import { COMPANY, COMPLAINTS_BOOK_URL, EMAIL } from "@/lib/legal";
 
 /** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
 export function Wordmark({ suffix, animated = false }: { suffix?: string; animated?: boolean }) {
@@ -105,6 +105,9 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">
             Chefs e cozinheiros caseiros perto de si. O serviço, os preços e os pagamentos são combinados diretamente com cada chef.
           </p>
+          <a href={`mailto:${EMAIL.support}`} className="text-[15px] text-[#c9d6ee] no-underline hover:text-white">
+            {EMAIL.support}
+          </a>
         </div>
         <nav aria-label="Para clientes" className="flex flex-col text-[15px]">
           <span className="mb-1 font-semibold">Clientes</span>

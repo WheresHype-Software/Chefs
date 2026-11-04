@@ -1,4 +1,5 @@
 import "server-only";
+import { renderEmail, type EmailDoc } from "./email-template";
 import { serverEnv } from "./env.server";
 
 export { siteUrl } from "./env";
@@ -23,4 +24,17 @@ export async function sendEmail(mail: Mail): Promise<boolean> {
   });
   if (!res.ok) console.error(`[email] Resend ${res.status}: ${await res.text()}`);
   return res.ok;
+}
+
+/**
+ * Tells the team something is waiting in /admin (a profile sent for review, a certificate to
+ * check). Best effort: whatever happens here must never undo what the chef just did.
+ */
+export async function notifyAdmin(doc: EmailDoc & { subject: string }): Promise<void> {
+  try {
+    const { html, text } = renderEmail({ tag: "Administração", ...doc });
+    await sendEmail({ to: serverEnv.adminEmail, subject: doc.subject, text, html });
+  } catch (err) {
+    console.error("[email] notifyAdmin:", err);
+  }
 }

@@ -2,6 +2,8 @@
 
 import { z } from "zod";
 import { getSession } from "@/lib/dashboard";
+import { notifyAdmin } from "@/lib/email";
+import { TIER_LABEL } from "@/lib/format";
 import { LANGUAGES } from "@/lib/languages";
 import { fail, failInvalid, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
@@ -118,5 +120,24 @@ export async function submitForReview(): Promise<Result> {
   if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
   if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail("Indique o Instagram ou o site.");
   const { error } = await ctx.sb.from("chefs").update({ status: "pending" }).eq("id", ctx.chef.id);
-  return error ? failWith(error, "submitForReview", "Não foi possível enviar para revisão. Tente de novo.") : done();
+  if (error) return failWith(error, "submitForReview", "Não foi possível enviar para revisão. Tente de novo.");
+
+  const chef = ctx.chef;
+  const portfolio = chef.socials.instagram ? `Instagram @${chef.socials.instagram.replace(/^@/, "")}` : (chef.socials.website ?? "—");
+  await notifyAdmin({
+    subject: `Perfil para verificar: ${chef.display_name}`,
+    preheader: `${chef.display_name}, ${chef.area_name ?? "zona por indicar"}, espera aprovação.`,
+    heading: "Um perfil espera verificação",
+    lead: `${chef.display_name} enviou o perfil para revisão. Compare a selfie com a fotografia de perfil, veja os pratos e o trabalho anterior, e aprove ou peça alterações.`,
+    facts: [
+      ["Nome público", chef.display_name],
+      ["Como se descreve", TIER_LABEL[chef.tier] ?? chef.tier],
+      ["Zona", `${chef.area_name ?? "—"} · ${chef.service_radius_km} km à volta`],
+      ["Fotos de pratos", String(count ?? 0)],
+      ["Trabalho anterior", portfolio],
+    ],
+    cta: { label: "Abrir a fila de aprovação", href: "/admin#aprovar" },
+    footnote: "A selfie de verificação é privada: abre-se por um link temporário, dentro da administração.",
+  });
+  return done();
 }
