@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { trackPixel } from "@/lib/meta-pixel";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup";
@@ -60,6 +61,8 @@ export function SignInForm({ next, asChef }: { next: string; asChef: boolean }) 
           },
         });
         if (error) throw error;
+        // Ads measurement: no-op unless the visitor accepted cookies.
+        trackPixel("CompleteRegistration", { content_name: asChef ? "chef" : "client" });
         if (data.session) go();
         else setMsg({ ok: true, text: `Conta criada. Confirme o email que enviámos para ${email}.` });
       }

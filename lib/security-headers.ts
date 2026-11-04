@@ -14,15 +14,17 @@ export function securityHeaders(): { key: string; value: string }[] {
   const supabaseWs = supabase?.replace(/^http/, "ws");
   const mapStyle = origin(process.env.NEXT_PUBLIC_MAP_STYLE_URL) ?? "https://tiles.openfreemap.org";
   const sources = (...items: (string | null | undefined | false)[]) => items.filter(Boolean).join(" ");
+  // Meta Pixel: its script, and the beacon it sends (only loaded after cookie consent).
+  const pixel = Boolean(process.env.NEXT_PUBLIC_META_PIXEL_ID);
 
   const csp = [
     "default-src 'self'",
     // Next.js inlines its bootstrap script; 'unsafe-eval' only for dev tooling.
-    `script-src ${sources("'self'", "'unsafe-inline'", dev && "'unsafe-eval'")}`,
+    `script-src ${sources("'self'", "'unsafe-inline'", dev && "'unsafe-eval'", pixel && "https://connect.facebook.net")}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src ${sources("'self'", "data:", "blob:", supabase, mapStyle, "https://images.unsplash.com")}`,
+    `img-src ${sources("'self'", "data:", "blob:", supabase, mapStyle, "https://images.unsplash.com", pixel && "https://www.facebook.com")}`,
     "font-src 'self' data:",
-    `connect-src ${sources("'self'", supabase, supabaseWs, mapStyle, "https://photon.komoot.io", "https://nominatim.openstreetmap.org", dev && "ws:")}`,
+    `connect-src ${sources("'self'", supabase, supabaseWs, mapStyle, "https://photon.komoot.io", "https://nominatim.openstreetmap.org", pixel && "https://www.facebook.com", pixel && "https://connect.facebook.net", dev && "ws:")}`,
     "worker-src 'self' blob:",
     "frame-ancestors 'none'",
     "base-uri 'self'",

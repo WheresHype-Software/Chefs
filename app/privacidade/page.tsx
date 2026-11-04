@@ -167,13 +167,18 @@ const SECTIONS: LegalSection[] = [
     title: "Cookies e armazenamento no dispositivo",
     body: (
       <>
-        <p>Usamos apenas o estritamente necessário para o site funcionar, por isso não pedimos consentimento para cookies:</p>
+        <p>Para o site funcionar usamos apenas o estritamente necessário, sem pedir consentimento:</p>
         <ul>
           <li>Cookies de sessão, para manter a sessão iniciada.</li>
           <li>Um cookie por pedido feito sem conta, para abrir esse pedido neste dispositivo.</li>
           <li>Uma lista dos seus pedidos recentes, guardada só no seu navegador, para os encontrar em «Acompanhar pedido».</li>
         </ul>
-        <p>Não usamos cookies de publicidade nem de análise.</p>
+        <p>
+          Com a sua autorização, usamos também o Pixel da Meta (Facebook e Instagram) para medir se os nossos anúncios funcionam, por
+          exemplo quantas pessoas criam conta depois de ver um anúncio. Só é ativado se carregar em «Aceitar» no aviso de cookies, e
+          pode mudar a sua escolha a qualquer momento em «Cookies», no fundo de cada página. A Meta trata estes dados de acordo com a
+          sua própria política de privacidade.
+        </p>
       </>
     ),
   },

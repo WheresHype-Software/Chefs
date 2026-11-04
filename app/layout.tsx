@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Schibsted_Grotesk } from "next/font/google";
 import { publicEnv } from "@/lib/env";
 import "./globals.css";
+import { CookieBanner } from "@/components/analytics/CookieBanner";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteJsonLd } from "@/lib/seo";
 
@@ -28,6 +30,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         {children}
         <JsonLd data={siteJsonLd()} />
+        {publicEnv.metaPixelId && (
+          <>
+            <MetaPixel id={publicEnv.metaPixelId} />
+            <CookieBanner />
+          </>
+        )}
       </body>
     </html>
   );

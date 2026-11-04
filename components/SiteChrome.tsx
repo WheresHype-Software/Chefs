@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";
 import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
 import { MobileMenu } from "@/components/MobileMenu";
 import { PanToss } from "@/components/brand/PanToss";
 import { SITE_DOMAIN } from "@/lib/constants";
+import { publicEnv } from "@/lib/env";
 import { COMPANY, COMPLAINTS_BOOK_URL } from "@/lib/legal";
 
 /** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
@@ -142,6 +144,9 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
             <a href={COMPLAINTS_BOOK_URL} target="_blank" rel="noopener noreferrer" className="text-[#c9d6ee] underline hover:text-white">
               Livro de Reclamações
             </a>
+            {publicEnv.metaPixelId && (
+              <CookieSettingsButton className="cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-[14px] text-[#c9d6ee] underline hover:text-white" />
+            )}
             <a href={`https://${SITE_DOMAIN}`} className="font-semibold text-white no-underline hover:underline">
               {SITE_DOMAIN}
             </a>

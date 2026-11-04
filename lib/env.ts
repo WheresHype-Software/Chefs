@@ -10,6 +10,8 @@ export const publicEnv = {
   supabaseKey,
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
   mapStyleUrl: process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://tiles.openfreemap.org/styles/positron",
+  // Meta (Facebook/Instagram) Pixel, for measuring ads. Unset = no pixel and no cookie banner.
+  metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID || "",
 } as const;
 
 /** True when the app is wired to a Supabase project; otherwise it runs on demo data. */
