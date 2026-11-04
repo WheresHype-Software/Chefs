@@ -21,21 +21,21 @@ export function CookieBanner() {
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h2 id="cookies-title" className="m-0 text-[16px] font-bold leading-snug">
-          Cookies
+          Utilizamos cookies
         </h2>
         <p className="m-0 text-[14px] leading-relaxed text-ink-3">
-          Usamos cookies essenciais para o site funcionar. Com a sua autorização, usamos também cookies da Meta para medir os nossos
-          anúncios no Facebook e no Instagram. Pode mudar de ideias a qualquer momento.{" "}
+          Utilizamos cookies necessários ao funcionamento do site e, com a sua autorização, cookies da Meta para medir a eficácia dos nossos
+          anúncios no Facebook e no Instagram. Pode mudar a sua escolha a qualquer momento.{" "}
           <Link href="/privacidade#cookies" className="underline">
-            Saber mais
+            Saiba mais
           </Link>
         </p>
       </div>
       <div className="flex shrink-0 gap-2">
-        <button type="button" className="btn btn-sm btn-o flex-1 sm:flex-none" onClick={() => setConsent("denied")}>
-          Recusar
+        <button type="button" className="btn btn-sm btn-o flex-1 sm:w-[112px] sm:flex-none" onClick={() => setConsent("denied")}>
+          Rejeitar
         </button>
-        <button type="button" className="btn btn-sm flex-1 sm:flex-none" onClick={() => setConsent("granted")}>
+        <button type="button" className="btn btn-sm btn-o flex-1 sm:w-[112px] sm:flex-none" onClick={() => setConsent("granted")}>
           Aceitar
         </button>
       </div>
