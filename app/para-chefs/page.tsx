@@ -4,6 +4,7 @@ import { Faq, type FaqItem } from "@/components/ui/Faq";
 import { Compare } from "@/components/para-chefs/Compare";
 import { FeeCalculator } from "@/components/para-chefs/FeeCalculator";
 import { HeroStage } from "@/components/para-chefs/HeroStage";
+import { MarketingTiles } from "@/components/para-chefs/MarketingTiles";
 import { Promises } from "@/components/para-chefs/Promises";
 import { RequestDemo } from "@/components/para-chefs/RequestDemo";
 import { ToolList } from "@/components/para-chefs/ToolList";
@@ -19,15 +20,6 @@ export const metadata: Metadata = {
   description:
     "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. O cliente paga o sinal na app; pagamos-te depois do serviço.",
 };
-
-const MKT = [
-  ["Um link para a bio", `${SITE_DOMAIN}/chef/o-seu-nome substitui o formulário e o “manda mensagem”.`],
-  ["Kit de partilha", "Código QR, imagens para stories e cartões com as suas melhores avaliações."],
-  ["Perto de quem procura", "Clientes da sua zona encontram-no sem saberem o seu nome."],
-  ["Avaliações verificadas", "Só quem concluiu uma reserva avalia, e pode responder a cada uma."],
-  ["Título de Chef verificado", "Envie um certificado de cozinha e apareça como Chef, com a marca «Chef verificado»."],
-  ["Encomendas de época", "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite."],
-];
 
 const FAQ: FaqItem[] = [
   [
@@ -194,16 +186,7 @@ export default async function ParaChefs() {
               Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
             </p>
           </div>
-          {/* Grout lines rather than a bare list: each piece reads as its own tile. */}
-          <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-px border border-[#2a4a86] bg-[#2a4a86] p-0">
-            {MKT.map(([t, d], i) => (
-              <li key={t} className="al-rv flex flex-col gap-2.5 bg-cobalt-deep p-6 md:p-7" style={revealDelay(i)}>
-                <span aria-hidden="true" className="h-[3px] w-9 bg-yolk" />
-                <span className="d text-[21px] leading-[1.15] md:text-[23px]">{t}</span>
-                <span className="text-[15px] leading-relaxed text-[#c9d6ee]">{d}</span>
-              </li>
-            ))}
-          </ul>
+          <MarketingTiles />
 
           <div className="al-rv flex flex-col gap-7">
             <div className="flex flex-col gap-2.5">

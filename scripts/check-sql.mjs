@@ -8,7 +8,8 @@
 //   node scripts/check-sql.mjs supabase/migrations/*.sql
 import fs from "node:fs";
 
-const files = process.argv.slice(2);
+// npm passes the pattern quoted, so expand it here rather than relying on the shell.
+const files = process.argv.slice(2).flatMap((arg) => (arg.includes("*") ? [...fs.globSync(arg)].sort() : [arg]));
 if (!files.length) {
   console.error("usage: node scripts/check-sql.mjs <file.sql> [...]");
   process.exit(2);
