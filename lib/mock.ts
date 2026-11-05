@@ -6,6 +6,8 @@ import type { Calendar, ChefCard, ChefProfile, Offer } from "./types";
 type Seed = Omit<ChefCard, "distanceKm" | "offers" | "cover" | "portrait" | "dishes" | "promoted" | "badges"> & {
   offers: Omit<Offer, "id" | "leadHours" | "minGuests" | "maxGuests">[];
   weekdays: number[]; // 0 = Sunday
+  /** Mirrors chefs.form in the database: it decides "Cozinheira" or "Cozinheiro". */
+  fem?: boolean;
 };
 
 const SEEDS: Seed[] = [
@@ -13,6 +15,7 @@ const SEEDS: Seed[] = [
     id: "c-marta",
     slug: "marta-figueiredo",
     name: "Marta Figueiredo",
+    fem: true,
     tier: "professional",
     headline: "Portuguesa contemporânea",
     area: "Campo de Ourique",
@@ -91,6 +94,7 @@ const SEEDS: Seed[] = [
     id: "c-ines",
     slug: "ines-cordeiro",
     name: "Inês Cordeiro",
+    fem: true,
     tier: "home",
     headline: "Marmitas semanais",
     area: "Alvalade",
@@ -130,6 +134,7 @@ const SEEDS: Seed[] = [
     id: "c-joana",
     slug: "joana-lopes",
     name: "Joana Lopes",
+    fem: true,
     tier: "home",
     headline: "Pastelaria caseira",
     area: "Benfica",
@@ -208,6 +213,7 @@ const SEEDS: Seed[] = [
     id: "c-carla",
     slug: "carla-nunes",
     name: "Carla Nunes",
+    fem: true,
     tier: "home",
     headline: "Petiscos e eventos",
     area: "Alfama",
@@ -296,14 +302,14 @@ const COVERS: Record<string, StockPhoto> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const MOCK_CHEFS: ChefCard[] = SEEDS.map(({ weekdays: _w, offers, ...c }) => ({
+export const MOCK_CHEFS: ChefCard[] = SEEDS.map(({ weekdays: _w, fem, offers, ...c }) => ({
   ...c,
   distanceKm: null,
   cover: photoUrl(COVERS[c.slug] ?? PHOTOS.table),
   portrait: null,
   dishes: [photoUrl(COVERS[c.slug] ?? PHOTOS.table)],
   promoted: false,
-  badges: ["identity", "portfolio"],
+  badges: fem ? ["identity", "portfolio", "cozinheira"] : ["identity", "portfolio"],
   offers: offers.map((o, i) => ({
     ...o,
     id: `${c.id}-o${i}`,
@@ -351,11 +357,14 @@ export function mockProfile(slug: string): ChefProfile | null {
       { place: "Por conta própria", role: "Chef privada", years: "2020–hoje" },
     ],
     certifications: [{ title: "Formação HACCP", issuer: "[Entidade]", verified: true }],
-    portrait: null,
+    portrait: photoUrl(PHOTOS.cooking),
+    // Five photos: enough for the mosaic the chef page draws from tablets up.
     gallery: [
       { url: c.cover, caption: c.offers[0]!.title },
-      { url: photoUrl(PHOTOS.cooking), caption: "Na cozinha" },
-      { url: photoUrl(PHOTOS.table), caption: "Mesa posta" },
+      { url: photoUrl(PHOTOS.plated), caption: "Empratado à mesa" },
+      { url: photoUrl(PHOTOS.grill), caption: "No carvão" },
+      { url: photoUrl(PHOTOS.spread), caption: "Mesa posta" },
+      { url: photoUrl(PHOTOS.salad), caption: "Da época" },
     ],
     reviews:
       c.reviewCount > 0

@@ -1,13 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { AgendaPreview, ChatPreview, PagePreview, RequestsPreview } from "./ToolPreviews";
+import agendaShot from "@/public/para-chefs/agenda.png";
+import avaliacoesShot from "@/public/para-chefs/avaliacoes.png";
+import conversaShot from "@/public/para-chefs/conversa.png";
+import paginaShot from "@/public/para-chefs/pagina.png";
+import pedidosShot from "@/public/para-chefs/pedidos.png";
+import { AppShot } from "./AppShot";
+import { BrowserShot } from "./BrowserShot";
 import { SITE_DOMAIN } from "@/lib/constants";
 
 const TABS = [
   {
     label: "Página",
-    Preview: PagePreview,
+    shot: paginaShot,
+    browser: "/chef/marta-figueiredo",
+    alt: "O topo da página pública de uma chef: cinco fotografias de pratos, o nome, as marcas de verificação e a caixa de pedir reserva.",
     title: "A sua montra, pronta a partilhar",
     text: "Fotos, menus, preços e avaliações num link curto que cabe na bio do Instagram.",
     points: [
@@ -18,7 +26,8 @@ const TABS = [
   },
   {
     label: "Pedidos",
-    Preview: RequestsPreview,
+    shot: pedidosShot,
+    alt: "A lista de pedidos no telemóvel, cada um com data, pessoas, valor e os botões de aceitar, propor alteração ou recusar.",
     title: "Aceitar, recusar ou propor outra data",
     text: "Cada pedido chega com data, número de pessoas, morada e restrições. Responde com um toque.",
     points: [
@@ -29,7 +38,8 @@ const TABS = [
   },
   {
     label: "Agenda",
-    Preview: AgendaPreview,
+    shot: agendaShot,
+    alt: "O calendário de disponibilidade no telemóvel, com dias abertos a verde, fechados a branco e com reserva a azul.",
     title: "Só recebe pedidos quando pode",
     text: "Marque os dias livres, bloqueie férias e defina até onde se desloca. Só aparece a clientes dentro da sua área.",
     points: [
@@ -39,11 +49,20 @@ const TABS = [
     ],
   },
   {
-    label: "Chat",
-    Preview: ChatPreview,
+    label: "Conversa",
+    shot: conversaShot,
+    alt: "A conversa de uma reserva no telemóvel, com as mensagens do cliente e do chef e a caixa de escrita.",
     title: "Tudo combinado num só sítio",
     text: "Menu, alergias, sinal e hora de chegada ficam na conversa da reserva.",
     points: ["Uma conversa por reserva", "Partilha de fotos e menus", "Histórico sempre disponível"],
+  },
+  {
+    label: "Avaliações",
+    shot: avaliacoesShot,
+    alt: "As avaliações recebidas no telemóvel, com estrelas, o nome do cliente e a resposta do chef.",
+    title: "A reputação fica consigo",
+    text: "Só quem concluiu uma reserva avalia. Responde uma vez a cada avaliação e denuncia as abusivas.",
+    points: ["Só de clientes com reserva concluída", "Uma resposta pública sua por avaliação", "Média e total visíveis no seu perfil"],
   },
 ];
 
@@ -75,11 +94,13 @@ export function ToolTabs() {
             ))}
           </ul>
         </div>
-        <div
-          className="box box-border flex min-h-[340px] min-w-0 flex-[1_1_420px] flex-col justify-center gap-3 p-[26px]"
-          aria-hidden="true"
-        >
-          <cur.Preview key={tab} />
+        <div className={`flex min-w-0 flex-col items-center gap-3.5 ${cur.browser ? "flex-[1_1_520px]" : "flex-[1_1_340px]"}`}>
+          {cur.browser ? (
+            <BrowserShot key={tab} src={cur.shot} alt={cur.alt} url={cur.browser} />
+          ) : (
+            <AppShot key={tab} src={cur.shot} alt={cur.alt} />
+          )}
+          <span className="text-[13px] text-muted">Ecrãs da aplicação, com dados de demonstração.</span>
         </div>
       </div>
     </>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Faq, type FaqItem } from "@/components/ui/Faq";
 import { Compare } from "@/components/para-chefs/Compare";
 import { HeroStage } from "@/components/para-chefs/HeroStage";
+import { Promises } from "@/components/para-chefs/Promises";
 import { RequestDemo } from "@/components/para-chefs/RequestDemo";
 import { ToolList } from "@/components/para-chefs/ToolList";
 import { ToolTabs } from "@/components/para-chefs/ToolTabs";
@@ -11,7 +12,8 @@ import { SITE_DOMAIN } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Para chefs",
-  description: "Página de reservas, calendário, chat e avaliações para chefs privados e cozinheiros caseiros.",
+  description:
+    "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. Sem comissões: recebe 100% do que cobra.",
 };
 
 const MKT = [
@@ -24,6 +26,10 @@ const MKT = [
 ];
 
 const FAQ: FaqItem[] = [
+  [
+    "Quanto custa?",
+    "Nada, no lançamento. Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo, e não cobramos comissão sobre o que cobra ao cliente. Se vierem a existir planos pagos, avisamos com pelo menos 15 dias de antecedência.",
+  ],
   ["Como recebo o pagamento?", "Diretamente do cliente, por MB WAY, transferência ou dinheiro. O Ao Lume não toca no seu dinheiro."],
   [
     "Sou cozinheiro caseiro. Posso entrar?",
@@ -47,16 +53,17 @@ export default function ParaChefs() {
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-14 px-5 pb-[72px] pt-[88px] md:px-10">
         <div className="flex min-w-0 flex-[1_1_520px] flex-col gap-7">
           <h1 className="d al-in m-0 text-[clamp(48px,8.4vw,104px)] leading-[.94] tracking-[-0.02em]" style={{ animationDelay: "80ms" }}>
-            Cozinhe.
+            Viva da sua
             <br />
-            As reservas
-            <br />
-            <span className="text-cobalt">tratamos nós.</span>
+            <span className="text-cobalt">cozinha.</span>
           </h1>
           <p className="al-in m-0 max-w-[500px] text-lg text-ink-3" style={{ animationDelay: "180ms" }}>
-            Troque o Google Forms, as mensagens no Instagram e o caderno de encomendas por uma página de reservas com calendário, chat e
-            avaliações.
+            Montra, clientes novos, pedidos, agenda e avaliações, num só sítio. Jantares em casa, eventos, marmitas, bolos ou salgados:
+            escolhe o que faz, quando e por quanto.
           </p>
+          <div className="al-in" style={{ animationDelay: "220ms" }}>
+            <Promises />
+          </div>
           <div className="al-in flex flex-wrap gap-2.5" style={{ animationDelay: "260ms" }}>
             <Link href="/entrar?chef=1" className="btn">
               Criar o meu perfil
@@ -70,6 +77,57 @@ export default function ParaChefs() {
           </span>
         </div>
         <HeroStage />
+      </section>
+
+      <section id="ferramenta" className="scroll-mt-16 bg-paper">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
+          <div className="al-rv flex max-w-[760px] flex-col gap-4">
+            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
+          </div>
+          <ToolTabs />
+        </div>
+      </section>
+
+      <section aria-labelledby="zona-title" className="border-y border-line bg-yolk-soft">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-9 px-5 py-14 md:px-10 md:py-20">
+          <div className="al-rv flex max-w-[760px] flex-col gap-3">
+            <h2 id="zona-title" className="d m-0 text-[clamp(32px,5vw,56px)] leading-none">
+              Chegue primeiro à sua zona.
+            </h2>
+            <p className="m-0 max-w-[620px] text-lg text-ink-3">
+              O Ao Lume abre zona a zona. Em cada área, os primeiros perfis aprovados são os que recebem os pedidos e os que acumulam as
+              primeiras avaliações.
+            </p>
+          </div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] gap-px border border-line-2 bg-line-2">
+            <div className="flex flex-col gap-2 bg-white p-[26px]">
+              <strong className="d text-[22px]">Posição na sua área</strong>
+              <span className="text-[15px] text-ink-3">
+                Cada chef define o raio onde trabalha e aparece a quem procura dentro dele. A maior parte das zonas do país ainda não tem um
+                único chef aprovado.
+              </span>
+            </div>
+            <div className="flex flex-col gap-2 bg-white p-[26px]">
+              <strong className="d text-[22px]">Reputação leva tempo</strong>
+              <span className="text-[15px] text-ink-3">
+                As avaliações só chegam a quem já recebeu reservas. Quem começa primeiro constrói a reputação que decide as escolhas dos
+                clientes seguintes.
+              </span>
+            </div>
+            <div className="flex flex-col gap-2 bg-white p-[26px]">
+              <strong className="d text-[22px]">Sem custo no lançamento</strong>
+              <span className="text-[15px] text-ink-3">
+                Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Qualquer alteração às condições é comunicada com 15
+                dias de antecedência.
+              </span>
+            </div>
+          </div>
+          <div className="al-rv">
+            <Link href="/entrar?chef=1" className="btn">
+              Criar o meu perfil
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section id="demo" aria-labelledby="demo-title" className="scroll-mt-16 border-y border-line bg-paper">
@@ -89,15 +147,6 @@ export default function ParaChefs() {
 
       <Compare />
 
-      <section id="ferramenta" className="scroll-mt-16 bg-paper">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
-          <div className="al-rv flex max-w-[760px] flex-col gap-4">
-            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
-          </div>
-          <ToolTabs />
-        </div>
-      </section>
-
       <section
         aria-labelledby="ferramentas-title"
         className="mx-auto flex max-w-[1280px] flex-col gap-10 px-5 py-14 md:px-10 md:py-[120px]"
@@ -106,7 +155,10 @@ export default function ParaChefs() {
           <h2 id="ferramentas-title" className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
             O essencial de quem cozinha por conta própria.
           </h2>
-          <p className="m-0 text-lg text-ink-3">Tudo o que precisa para receber e organizar pedidos já está incluído.</p>
+          <p className="m-0 text-lg text-ink-3">
+            Jantares em casa, eventos, marmitas da semana, bolos e salgados ou encomendas de época: tudo o que precisa para receber e
+            organizar pedidos já está incluído.
+          </p>
         </div>
         <ToolList />
       </section>
@@ -149,9 +201,10 @@ export default function ParaChefs() {
 
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-14 md:px-10 md:py-[120px]">
         <div className="al-rv flex min-w-0 flex-[1_1_420px] flex-col gap-[18px]">
-          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Recebe diretamente do cliente.</h2>
+          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Recebe 100% do que cobra.</h2>
           <p className="m-0 max-w-[520px] text-lg text-ink-3">
-            O Ao Lume liga-o ao cliente e organiza a reserva. O dinheiro não passa por nós: o cliente paga-lhe a si.
+            Não cobramos comissão sobre o seu trabalho. O Ao Lume liga-o ao cliente e organiza a reserva; o dinheiro não passa por nós, o
+            cliente paga-lhe a si.
           </p>
         </div>
         <ul className="al-rv m-0 grid min-w-0 flex-[1_1_420px] list-none grid-cols-[repeat(auto-fit,minmax(min(180px,100%),1fr))] gap-px border border-line bg-line p-0">
@@ -170,10 +223,10 @@ export default function ParaChefs() {
 
       <section className="border-t border-line">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
-          <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Entrar leva dez minutos.</h2>
+          <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Criar o perfil leva poucos minutos.</h2>
           <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-line-2 p-0">
             {[
-              ["1", "Crie a conta", "Nome, email e uma palavra-passe."],
+              ["1", "Crie a conta", "Nome, email e uma palavra-passe. Poucos minutos."],
               ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
               ["3", "Aprovação", "A nossa equipa revê cada perfil antes de ficar público."],
               ["4", "Partilhe o link", `Ponha ${SITE_DOMAIN}/chef/o-seu-nome na bio e receba pedidos.`],
@@ -214,6 +267,9 @@ export default function ParaChefs() {
           <Link href="/entrar?chef=1" className="btn btn-w">
             Criar o meu perfil
           </Link>
+          <div className="flex justify-center">
+            <Promises tone="white" />
+          </div>
         </div>
       </section>
 

@@ -20,7 +20,7 @@ export const DEMO_CHEF: MyChef = {
   slug: "carla-nunes",
   display_name: "Carla Nunes",
   tier: "home",
-  badges: ["identity", "portfolio"],
+  badges: ["identity", "portfolio", "cozinheira"],
   headline: "Petiscos e eventos",
   bio: "Petiscos de Lisboa para festas em casa: pastéis de bacalhau, bifanas, salada de polvo.",
   area_name: "Alfama",
