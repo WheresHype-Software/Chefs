@@ -30,15 +30,22 @@ const CLIENT_NAV: NavItem[] = [
   { href: "/procurar", label: "Procurar chefs" },
   { href: "/#como", label: "Como funciona" },
   { href: "/pedido", label: "Acompanhar pedido" },
-  { href: "/para-chefs", label: "Sou chef" },
 ];
 
 const CHEF_NAV: NavItem[] = [
   { href: "/para-chefs#ferramenta", label: "Ferramenta" },
   { href: "/para-chefs#marketing", label: "Marketing" },
   { href: "/para-chefs#perguntas", label: "Perguntas" },
-  { href: "/", label: "Sou cliente" },
 ];
+
+/** Changing side (client ↔ chef) is still navigation, just the only one that matters: bold. */
+function AudienceSwitch({ href, label, className = "" }: NavItem & { className?: string }) {
+  return (
+    <Link href={href} className={`rounded-md px-2 py-2 font-bold text-ink no-underline hover:bg-paper lg:px-3 ${className}`}>
+      {label}
+    </Link>
+  );
+}
 
 export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
   const nav = chefs ? CHEF_NAV : CLIENT_NAV;
@@ -52,25 +59,28 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
   const secondary = chefs
     ? { href: "/entrar?next=/dashboard", label: "Entrar" }
     : { href: "/entrar?chef=1", label: "Criar perfil de chef" };
+  const other: NavItem = chefs ? { href: "/", label: "Sou cliente" } : { href: "/para-chefs", label: "Sou chef" };
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur-[6px]">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-5 md:px-8">
         {brand}
         <div className="flex items-center gap-1">
-          <nav aria-label="Principal" className="hidden items-center gap-1 text-[15px] font-medium md:flex">
+          <nav aria-label="Principal" className="hidden items-center gap-1 text-[15px] font-medium text-ink-2 md:flex">
             {nav.map((item) => (
               <Link key={item.href} href={item.href} className="rounded-md px-2 py-2 no-underline hover:bg-paper lg:px-3">
                 {item.label}
               </Link>
             ))}
-            {chefs && (
-              <Link href={secondary.href} className="rounded-md px-2 py-2 no-underline hover:bg-paper lg:px-3">
-                {secondary.label}
-              </Link>
-            )}
+            <AudienceSwitch {...other} />
           </nav>
-          <Link href={primary.href} className="btn btn-sm md:ml-2">
+          <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-line md:block lg:mx-2" />
+          {chefs && (
+            <Link href={secondary.href} className="btn btn-o btn-sm hidden md:inline-flex">
+              {secondary.label}
+            </Link>
+          )}
+          <Link href={primary.href} className="btn btn-sm ml-2">
             {primary.label}
           </Link>
           <MobileMenu
@@ -84,6 +94,7 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
                 <Link href={secondary.href} className="btn btn-o w-full">
                   {secondary.label}
                 </Link>
+                <AudienceSwitch {...other} className="mt-1 self-start text-[17px]" />
               </>
             }
           />
