@@ -18,6 +18,8 @@ export type CreatedPayment = {
   entity: string | null;
   /** When the client can no longer pay it. */
   expiresAt: string | null;
+  /** Card only: the provider's hosted form, where the browser has to be sent. */
+  redirectUrl?: string | null;
 };
 
 /** The states we care about. Anything we do not recognise is "unknown", never "paid". */
@@ -50,6 +52,16 @@ export type CreateMultibancoInput = {
   phone?: string | null;
 };
 
+export type CreateCardInput = {
+  identifier: string;
+  amountCents: number;
+  /** Where the provider sends the browser back, by outcome. */
+  successUrl: string;
+  failUrl: string;
+  backUrl: string;
+  email?: string | null;
+};
+
 export type StatusQuery = {
   reference?: string | null;
   entity?: string | null;
@@ -69,6 +81,7 @@ export interface PaymentProvider {
   readonly name: string;
   createMbway(input: CreateMbwayInput): Promise<ProviderResult<CreatedPayment>>;
   createMultibanco(input: CreateMultibancoInput): Promise<ProviderResult<CreatedPayment>>;
+  createCard(input: CreateCardInput): Promise<ProviderResult<CreatedPayment>>;
   status(query: StatusQuery): Promise<ProviderResult<ProviderStatus>>;
   refund(input: RefundInput): Promise<ProviderResult<{ refundId: string | null }>>;
 }

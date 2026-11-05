@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
+import { cardPaymentsPossible, siteUrl } from "@/lib/env";
 import { isValidIban, normaliseIban, normalisePhone } from "@/lib/fiscal";
 import { maskPhone } from "@/lib/crypto";
 import { toCents } from "@/lib/money";
-import { announceReference } from "@/lib/payments/confirm";
+import { announceReference, findPayment, syncPayment } from "@/lib/payments/confirm";
 import { eupago } from "@/lib/payments/eupago";
 import { canEncrypt, encrypt } from "@/lib/payments/secrets";
 import { callerIp, rateLimit } from "@/lib/rate-limit";
@@ -27,7 +28,7 @@ import { headers } from "next/headers";
  */
 
 const BookingId = z.string().regex(UUID_RE);
-const Method = z.enum(["mbway", "multibanco"]);
+const Method = z.enum(["mbway", "multibanco", "card"]);
 
 export type PaymentState = {
   bookingStatus: string;
@@ -43,6 +44,8 @@ export type PaymentState = {
     reference: string | null;
     expiresAt: string | null;
     phoneMasked: string | null;
+    /** Card only: the provider's hosted form. */
+    redirectUrl: string | null;
     createdAt: string;
   } | null;
 };
@@ -94,6 +97,7 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
           reference: method === "multibanco" ? "100 502 152" : null,
           expiresAt: new Date(Date.now() + (method === "mbway" ? 5 * 60_000 : 43 * 3600_000)).toISOString(),
           phoneMasked: method === "mbway" ? maskPhone(phone ?? "912345678") : null,
+          redirectUrl: null,
           createdAt: new Date().toISOString(),
         },
       },
@@ -104,6 +108,10 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
   // One person, one booking: a handful of attempts an hour is generous and stops a loop.
   const limit = rateLimit(`deposit:${id}:${callerIp(await headers())}`, 10, 3600);
   if (!limit.allowed) return { ok: false, error: "Demasiadas tentativas. Aguarde alguns minutos e tente de novo." };
+
+  if (method === "card" && !cardPaymentsPossible) {
+    return { ok: false, error: "O pagamento com cartão só funciona no site publicado. Use MB WAY ou referência Multibanco." };
+  }
 
   let normalisedPhone: string | null = null;
   if (method === "mbway") {
@@ -151,15 +159,25 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
   // The identifier comes back to us on the webhook, so make it the one thing we need: our own id.
   const identifier = row.id;
 
+  const back = siteUrl(`/reserva/${id}`);
   const created =
     method === "mbway"
       ? await eupago.createMbway({ identifier, amountCents, phone: normalisedPhone!, email: client?.email, name: client?.name })
-      : await eupago.createMultibanco({
-          identifier,
-          amountCents,
-          expiresOn: (row.bookings?.deposit_due_at ?? new Date(Date.now() + 3 * 86400_000).toISOString()).slice(0, 10),
-          email: client?.email,
-        });
+      : method === "card"
+        ? await eupago.createCard({
+            identifier,
+            amountCents,
+            successUrl: `${back}?pagamento=ok`,
+            failUrl: `${back}?pagamento=falhou`,
+            backUrl: back,
+            email: client?.email,
+          })
+        : await eupago.createMultibanco({
+            identifier,
+            amountCents,
+            expiresOn: (row.bookings?.deposit_due_at ?? new Date(Date.now() + 3 * 86400_000).toISOString()).slice(0, 10),
+            email: client?.email,
+          });
 
   if (!created.ok) {
     // Only the server may decide a payment failed, so this goes through the secret-key client.
@@ -176,6 +194,7 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
       mb_entity: created.data.entity,
       mb_reference: method === "multibanco" ? created.data.providerReference : null,
       mb_expires_at: method === "multibanco" ? created.data.expiresAt : null,
+      redirect_url: created.data.redirectUrl ?? null,
       expires_at: created.data.expiresAt,
     })
     .eq("id", row.id);
@@ -259,4 +278,29 @@ export async function submitRefundIban(id: string, input: z.infer<typeof RefundI
   }
   revalidatePath(`/reserva/${id}`);
   return { ok: true };
+}
+
+/**
+ * Asks EuPago, now, what became of this booking's payment, and applies the answer.
+ *
+ * The webhook is the normal path, but a client coming back from the card form has every right to
+ * see the result immediately rather than wait for a notification to land. Authorised by the
+ * booking itself, rate limited, and it decides nothing: the provider does.
+ */
+export async function refreshPaymentState(id: string): Promise<PaymentState | null> {
+  if (isDemo(id)) return DEMO_STATE;
+  if (!BookingId.safeParse(id).success) return null;
+
+  // getPaymentState is the authorisation: it only answers for a booking this caller can open.
+  const state = await getPaymentState(id);
+  if (!state?.payment || state.payment.status === "paid") return state;
+
+  const limit = rateLimit(`refresh:${id}`, 20, 600);
+  if (!limit.allowed) return state;
+
+  const admin = createAdminClient();
+  if (!admin) return state;
+  const payment = await findPayment({ id: state.payment.id });
+  if (payment) await syncPayment(payment, "poll");
+  return getPaymentState(id);
 }

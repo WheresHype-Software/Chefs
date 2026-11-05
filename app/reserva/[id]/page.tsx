@@ -13,6 +13,7 @@ import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, PAYMENT_LABEL } from "@/lib/data";
 import { getBookingView } from "@/lib/bookings";
+import { cardPaymentsPossible } from "@/lib/env";
 import { getPaymentState, getRefundAwaitingIban } from "@/lib/deposit";
 import { dayLabel, euro, titledFirst, titledName, MODE_LABEL, shortStamp, STATUS_LABEL } from "@/lib/format";
 import type { BookingStatus } from "@/lib/types";
@@ -149,6 +150,7 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             initial={paymentState}
             chefFirstName={first}
             bookingValue={b.booking_value ?? b.quoted_price ?? b.estimate}
+            cardAvailable={cardPaymentsPossible}
           />
         )}
         {refundWaiting && <RefundIban bookingId={b.id} refund={refundWaiting} />}

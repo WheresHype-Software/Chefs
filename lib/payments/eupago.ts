@@ -5,6 +5,7 @@ import { toEuros } from "../money";
 import { normaliseWord as normalise, readStatus } from "./status";
 import type {
   CreatedPayment,
+  CreateCardInput,
   CreateMbwayInput,
   CreateMultibancoInput,
   PaymentProvider,
@@ -145,6 +146,15 @@ const TridResponse = z.object({
     .optional(),
 });
 
+const CardResponse = z.object({
+  transactionStatus: z.string().optional(),
+  transactionID: z.string().optional(),
+  reference: z.union([z.string(), z.number()]).optional(),
+  redirectUrl: z.string().optional(),
+  code: z.string().optional(),
+  text: z.string().optional(),
+});
+
 const RefundResponse = z.object({
   transactionStatus: z.string().optional(),
   refundId: z.union([z.string(), z.number()]).optional(),
@@ -228,6 +238,47 @@ export const eupago: PaymentProvider = {
         providerTransactionId: str(parsed.data.transacao),
         entity: str(parsed.data.entidade),
         expiresAt: input.expiresOn,
+      },
+    };
+  },
+
+  /**
+   * Card: the client never types a number on our page. EuPago returns the address of their own
+   * secure form, with 3D Secure, and the browser goes there. We only learn the outcome the same
+   * way as everything else: by asking.
+   */
+  async createCard(input: CreateCardInput): Promise<ProviderResult<CreatedPayment>> {
+    if (!serverEnv.eupago.apiKey) return providerError("createCard", "no API key", "not_configured");
+    const res = await postJson(
+      "/api/v1.02/creditcard/create",
+      {
+        payment: {
+          identifier: input.identifier,
+          amount: { value: toEuros(input.amountCents), currency: "EUR" },
+          successUrl: input.successUrl,
+          failUrl: input.failUrl,
+          backUrl: input.backUrl,
+          lang: "PT",
+        },
+        customer: { notify: true, email: input.email ?? undefined },
+      },
+      apiKeyHeader(),
+    );
+    if (!res.ok) return res;
+    const parsed = CardResponse.safeParse(res.data);
+    if (!parsed.success) return providerError("createCard shape", res.data);
+    if (normalise(parsed.data.transactionStatus) !== "success" || !parsed.data.redirectUrl) {
+      return providerError("createCard rejected", parsed.data, parsed.data.code);
+    }
+    return {
+      ok: true,
+      data: {
+        providerReference: str(parsed.data.reference),
+        providerTransactionId: str(parsed.data.transactionID),
+        entity: null,
+        // The hosted form stays up for a day by default; we do not promise longer than an hour.
+        expiresAt: new Date(Date.now() + 60 * 60_000).toISOString(),
+        redirectUrl: parsed.data.redirectUrl,
       },
     };
   },

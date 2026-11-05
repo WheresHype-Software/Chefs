@@ -24,6 +24,13 @@ export function supabaseConfig(): { url: string; key: string } {
   return { url: supabaseUrl, key: supabaseKey };
 }
 
+/**
+ * EuPago refuses anything but https for the addresses it sends the card payer back to, so on
+ * a plain http origin (localhost) the card form cannot be opened at all. Better to not offer
+ * it than to offer a button that always fails.
+ */
+export const cardPaymentsPossible = publicEnv.siteUrl.startsWith("https://");
+
 export function siteUrl(path = ""): string {
   return publicEnv.siteUrl + path;
 }

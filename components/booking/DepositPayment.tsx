@@ -6,7 +6,7 @@ import { Field } from "@/components/ui/Field";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { usePolling } from "@/hooks/usePolling";
 import { callAction } from "@/lib/call-action";
-import { cancelDepositPayment, getPaymentState, startDepositPayment, type PaymentState } from "@/lib/deposit";
+import { cancelDepositPayment, getPaymentState, refreshPaymentState, startDepositPayment, type PaymentState } from "@/lib/deposit";
 import { euro } from "@/lib/format";
 import type { PaymentMethod } from "@/lib/types";
 
@@ -14,9 +14,17 @@ type Props = {
   bookingId: string;
   initial: PaymentState;
   chefFirstName: string;
+  /** False on an http origin, where the provider refuses to open its card form. */
+  cardAvailable: boolean;
   /** The whole booking, so the client can see what the signal is a part of. */
   bookingValue: number | null;
 };
+
+const METHODS: [PaymentMethod, string][] = [
+  ["mbway", "MB WAY"],
+  ["multibanco", "Referência Multibanco"],
+  ["card", "Cartão"],
+];
 
 /** "4:58", or null once it has run out. */
 function countdown(until: string | null, now: number): string | null {
@@ -49,7 +57,7 @@ function Reference({ entity, reference, amount }: { entity: string | null; refer
  * payment is doing — never the provider — so a slow or hostile answer from EuPago cannot be made
  * to look like a payment.
  */
-export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue }: Props) {
+export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue, cardAvailable }: Props) {
   const router = useRouter();
   const [state, setState] = useState(initial);
   const [method, setMethod] = useState<PaymentMethod>("mbway");
@@ -68,6 +76,19 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [waiting, payment?.method]);
+
+  useEffect(() => {
+    const outcome = new URLSearchParams(window.location.search).get("pagamento");
+    if (!outcome) return;
+    // Tidy the address bar, then confirm with the provider rather than trust the redirect.
+    window.history.replaceState(null, "", window.location.pathname);
+    void (async () => {
+      if (outcome === "ok") await checkNow();
+      else if (outcome === "falhou") setError("O pagamento com cartão não foi aceite. Pode tentar de novo.");
+    })();
+    // Runs once, on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   usePolling(
     async () => {
@@ -95,6 +116,27 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
     }
     setState(result.state);
     setNow(Date.now());
+    const url = result.state.payment?.redirectUrl;
+    if (url) window.location.href = url;
+  }
+
+  // Coming back from the card form, or simply impatient: ask the provider rather than wait for
+  // the notification to arrive.
+  async function checkNow() {
+    setBusy(true);
+    setError(null);
+    try {
+      const fresh = await refreshPaymentState(bookingId);
+      if (fresh) {
+        setState(fresh);
+        if (fresh.depositStatus === "paid") router.refresh();
+      }
+    } catch (err) {
+      console.error("[deposit] checkNow:", err);
+      setError("Não conseguimos confirmar agora. Tente dentro de momentos.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function startOver() {
@@ -153,9 +195,9 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
           {!waiting && (
             <>
               <div className="flex flex-wrap gap-2.5" role="group" aria-label="Como quer pagar">
-                {(["mbway", "multibanco"] as const).map((m) => (
+                {METHODS.filter(([m]) => m !== "card" || cardAvailable).map(([m, label]) => (
                   <button key={m} type="button" className="chip" aria-pressed={method === m} onClick={() => setMethod(m)} disabled={busy}>
-                    {m === "mbway" ? "MB WAY" : "Referência Multibanco"}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -208,6 +250,25 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
               <div className="flex flex-wrap gap-2.5">
                 <button type="button" className="btn btn-o btn-sm" onClick={() => void startOver()} disabled={busy}>
                   {left ? "Pagar de outra forma" : "Tentar de novo"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {waiting && payment?.method === "card" && (
+            <div className="flex flex-col gap-3">
+              <p className="m-0">Abrimos a página segura da EuPago para pagar {euro(payment.amount)} com cartão.</p>
+              <div className="flex flex-wrap gap-2.5">
+                {payment.redirectUrl && (
+                  <a href={payment.redirectUrl} className="btn btn-sm">
+                    Continuar o pagamento
+                  </a>
+                )}
+                <button type="button" className="btn btn-o btn-sm" onClick={() => void checkNow()} disabled={busy}>
+                  {busy ? "A verificar…" : "Já paguei, verificar"}
+                </button>
+                <button type="button" className="btn btn-o btn-sm" onClick={() => void startOver()} disabled={busy}>
+                  Pagar de outra forma
                 </button>
               </div>
             </div>
