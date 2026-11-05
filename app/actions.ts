@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { failInvalid } from "@/lib/result";
 import { createAnonClient, createClient, hasSupabase } from "@/lib/supabase/server";
 import { titledName } from "@/lib/format";
+import { paymentsLive } from "@/lib/settings";
 
 const BookingInput = z.object({
   offerId: z.string().min(1),
@@ -109,7 +110,10 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
       `Olá ${b.name.split(" ")[0]},\n\n` +
       `O seu pedido foi enviado a ${chefName}. Tem 48 horas para responder.\n\n` +
       `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(emailLink)}\n\n` +
-      `Ainda não paga nada: o pagamento é combinado diretamente com o chef.\n\nAo Lume`,
+      ((await paymentsLive())
+        ? `Ainda não paga nada. Se ${chefName} aceitar, pedimos-lhe um sinal para confirmar a reserva; o restante valor é combinado diretamente com o chef.`
+        : `Ainda não paga nada: o pagamento é combinado diretamente com o chef.`) +
+      `\n\nAo Lume`,
   }).catch((err) => {
     console.error("[action] requestBooking client email:", err);
     return false;
