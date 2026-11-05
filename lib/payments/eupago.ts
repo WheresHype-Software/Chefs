@@ -170,7 +170,9 @@ export const eupago: PaymentProvider = {
         payment: {
           identifier: input.identifier,
           amount: { value: toEuros(input.amountCents), currency: "EUR" },
-          customerPhone: `+351${input.phone}`,
+          // Nine digits, no country code. Their own documented example (+351912345678) is
+          // rejected by their sandbox with CUSTOMERPHONE_INVALID; this form returns 201.
+          customerPhone: input.phone,
           countryCode: "+351",
         },
         customer: { notify: true, name: input.name ?? undefined, email: input.email ?? undefined },
