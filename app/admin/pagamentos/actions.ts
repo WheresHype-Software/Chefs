@@ -390,14 +390,15 @@ const Settings = z.object({
   deposit_margin_percent: z.number().min(0).max(100),
   deposit_due_hours: z.number().int().min(1).max(720),
   payout_hold_hours: z.number().int().min(0).max(2160),
-  reason: Reason,
+  // Optional: the log already keeps who changed what, when, and from which values to which.
+  reason: z.string().trim().max(500).optional(),
 });
 
 export async function saveSettings(input: z.infer<typeof Settings>): Promise<ActionResult> {
   const admin = await requireAdmin();
   if (!admin) return fail(NO_PERMISSION);
   const parsed = Settings.safeParse(input);
-  if (!parsed.success) return fail("Verifique os valores e escreva o motivo da alteração.");
+  if (!parsed.success) return fail("Verifique os valores.");
   const { reason, ...values } = parsed.data;
 
   const { data: before } = await admin.sb.from("platform_settings").select("*").eq("id", 1).maybeSingle();
@@ -406,7 +407,7 @@ export async function saveSettings(input: z.infer<typeof Settings>): Promise<Act
     .update({ ...values, updated_by: admin.adminId })
     .eq("id", 1);
   if (error) return failWith(error, "saveSettings", "Não foi possível guardar as definições.");
-  await log(admin, "settings.updated", "platform_settings", { before, after: values, reason });
+  await log(admin, "settings.updated", "platform_settings", { before, after: values, reason: reason || null });
   revalidatePath("/", "layout");
   return ok();
 }
