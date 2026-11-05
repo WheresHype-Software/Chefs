@@ -210,7 +210,7 @@ export const DEMO_REVIEWS: DashReview[] = [
   },
 ];
 
-export const DEMO_SETUP: SetupProgress = { profilePhoto: true, dishPhotos: 3, activeOffers: 3, openDays: 12 };
+export const DEMO_SETUP: SetupProgress = { profilePhoto: true, dishPhotos: 3, activeOffers: 3, openDays: 12, billing: "missing" };
 
 /** Thursdays to Sundays open. */
 export function demoAvailability(from: string, to: string): AvailabilityDay[] {

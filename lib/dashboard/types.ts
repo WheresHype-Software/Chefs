@@ -98,6 +98,8 @@ export type SetupProgress = {
   activeOffers: number;
   /** Open days from today on. */
   openDays: number;
+  /** "off" while payments are disabled, so the step is not shown at all. */
+  billing: "off" | "missing" | "done";
 };
 
 export type DashReview = {
