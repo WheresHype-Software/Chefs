@@ -187,7 +187,9 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
   if (!sb) return;
   const { data } = await sb
     .from("bookings")
-    .select("ref, date, time_label, deposit_amount, deposit_due_at, deposit_status, chefs(display_name), clients(email, name)")
+    .select(
+      "ref, date, time_label, booking_value, quoted_price, estimate, deposit_amount, deposit_due_at, deposit_status, offer_title, guests, chefs(display_name), clients(email, name)",
+    )
     .eq("id", bookingId)
     .maybeSingle();
   if (!data) return;
@@ -196,20 +198,31 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
     ref: string;
     date: string;
     time_label: string | null;
+    booking_value: string | number | null;
+    quoted_price: string | number | null;
+    estimate: string | number | null;
     deposit_amount: string | number | null;
     deposit_due_at: string | null;
     deposit_status: string;
+    offer_title: string;
+    guests: number;
     chefs: { display_name: string } | null;
     clients: { email: string; name: string | null } | null;
   };
   if (booking.deposit_status !== "due" || !booking.clients?.email || !Number(booking.deposit_amount)) return;
 
   const deadline = booking.deposit_due_at ? new Date(booking.deposit_due_at) : null;
+  const deposit = Number(booking.deposit_amount);
+  const total = Number(booking.booking_value ?? booking.quoted_price ?? booking.estimate ?? 0);
+  const rest = Math.round((total - deposit) * 100) / 100;
+
   const facts: [string, string][] = [
-    ["Reserva", booking.ref],
-    ["Quando", `${booking.date}${booking.time_label ? ` · ${booking.time_label}` : ""}`],
-    ["Sinal", euro(Number(booking.deposit_amount))],
+    ["Reserva", `${booking.ref} · ${booking.offer_title}`],
+    ["Quando", `${booking.date}${booking.time_label ? ` · ${booking.time_label}` : ""} · ${booking.guests} pessoas`],
   ];
+  if (total > 0) facts.push(["Valor do serviço", euro(total)]);
+  facts.push(["A pagar agora (sinal)", euro(deposit)]);
+  if (total > 0 && rest > 0) facts.push(["Depois, ao chef", euro(rest)]);
   if (deadline) facts.push(["Pague até", deadline.toLocaleString("pt-PT", { dateStyle: "long", timeStyle: "short" })]);
 
   const doc = renderEmail({
@@ -245,6 +258,9 @@ async function announcePaid(bookingId: string): Promise<void> {
     date: string;
     time_label: string | null;
     offer_title: string;
+    booking_value: string | number | null;
+    quoted_price: string | number | null;
+    estimate: string | number | null;
     deposit_amount: string | number | null;
     payout_amount: string | number | null;
     guests: number;
@@ -255,6 +271,9 @@ async function announcePaid(bookingId: string): Promise<void> {
   const when = `${booking.date}${booking.time_label ? ` · ${booking.time_label}` : ""}`;
   const chefEmail = booking.chefs?.profiles?.email;
   const clientEmail = booking.clients?.email;
+  const paid = Number(booking.deposit_amount ?? 0);
+  const total = Number(booking.booking_value ?? booking.quoted_price ?? booking.estimate ?? 0);
+  const owed = Math.round((total - paid) * 100) / 100;
 
   if (clientEmail) {
     const doc = renderEmail({
@@ -262,11 +281,16 @@ async function announcePaid(bookingId: string): Promise<void> {
       heading: "Sinal recebido, reserva confirmada",
       lead: `${booking.chefs?.display_name ?? "O chef"} já sabe que está tudo confirmado.`,
       facts: [
-        ["Reserva", booking.ref],
-        ["Quando", when],
-        ["Sinal pago", euro(Number(booking.deposit_amount ?? 0))],
+        ["Reserva", `${booking.ref} · ${booking.offer_title}`],
+        ["Quando", `${when} · ${booking.guests} pessoas`],
+        ...(total > 0 ? ([["Valor do serviço", euro(total)]] as [string, string][]) : []),
+        ["Sinal pago", euro(paid)],
+        ...(total > 0 && owed > 0 ? ([["Falta pagar ao chef, no dia", euro(owed)]] as [string, string][]) : []),
       ],
-      paragraphs: ["O restante valor do serviço é combinado e pago diretamente ao chef."],
+      paragraphs: [
+        `A data está garantida. ${booking.chefs?.display_name ?? "O chef"} combina consigo o restante valor, que é pago diretamente a ele no dia do serviço.`,
+        "Guarde este email: a ligação abaixo abre a reserva e a conversa com o chef.",
+      ],
       cta: { label: "Ver a reserva", href: siteUrl(`/reserva/${bookingId}`) },
     });
     await sendEmail({ to: clientEmail, subject: `Reserva ${booking.ref} confirmada`, text: doc.text, html: doc.html }).catch((err) =>
