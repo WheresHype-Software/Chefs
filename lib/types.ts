@@ -4,6 +4,27 @@ export type PriceModel = "fixed" | "per_person" | "quote";
 export type ChefTier = "professional" | "home";
 export type BookingStatus = "requested" | "accepted" | "change_proposed" | "declined" | "confirmed" | "completed" | "cancelled" | "expired";
 
+// --- Money -----------------------------------------------------------------
+export type PaymentMethod = "mbway" | "multibanco" | "card";
+export type PaymentStatus = "created" | "pending" | "paid" | "failed" | "expired" | "refunded" | "partially_refunded";
+/** Where the signal stands on a booking. "not_required" covers every booking made before payments. */
+export type DepositStatus = "not_required" | "due" | "pending" | "paid" | "overdue" | "refunded" | "partially_refunded";
+export type RefundStatus = "requested" | "needs_iban" | "manual_pending" | "sent" | "done" | "failed";
+export type PayoutStatus = "due" | "held" | "batched" | "paid" | "cancelled";
+export type BatchStatus = "draft" | "exported" | "paid" | "cancelled";
+export type LedgerKind = "deposit_in" | "commission" | "payout" | "refund" | "adjustment";
+
+/** The amounts frozen on a booking when the chef accepts. Euros, as the database stores them. */
+export type BookingMoney = {
+  bookingValue: number | null;
+  depositAmount: number | null;
+  commissionAmount: number | null;
+  payoutAmount: number | null;
+  depositStatus: DepositStatus;
+  depositDueAt: string | null;
+  depositPaidAt: string | null;
+};
+
 export type Offer = {
   id: string;
   title: string;
@@ -97,6 +118,14 @@ export type BookingView = {
     proposed_time: string | null;
     pickup_code: string | null;
     created_at: string;
+    // Money, present once the chef has accepted and payments are on.
+    booking_value: number | null;
+    deposit_amount: number | null;
+    commission_amount: number | null;
+    payout_amount: number | null;
+    deposit_status: DepositStatus;
+    deposit_due_at: string | null;
+    deposit_paid_at: string | null;
   };
   chef: {
     id: string;

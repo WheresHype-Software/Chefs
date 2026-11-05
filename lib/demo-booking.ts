@@ -24,6 +24,14 @@ export function demoBookingView(): BookingView {
       proposed_time: null,
       pickup_code: null,
       created_at: at(5),
+      // 330 € at a 30 % signal: 99 € paid through the app, 12 % commission, 59,40 € to the chef.
+      booking_value: 330,
+      deposit_amount: 99,
+      commission_amount: 39.6,
+      payout_amount: 59.4,
+      deposit_status: "due",
+      deposit_due_at: new Date(Date.now() + 43 * 3600_000).toISOString(),
+      deposit_paid_at: null,
     },
     chef: {
       id: "c-marta",

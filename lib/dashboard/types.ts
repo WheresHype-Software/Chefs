@@ -112,3 +112,43 @@ export type DashReview = {
 };
 
 export type ChefPhoto = { id: string; url: string; kind: "selfie" | "portrait" | "gallery"; caption: string | null };
+
+/** The chef's fiscal identity and bank details. The IBAN itself is never in this shape. */
+export type ChefBilling = {
+  entity_type: "individual" | "company";
+  legal_name: string | null;
+  nif: string | null;
+  vat_regime: "normal" | "isento_art53";
+  address_line: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country: string;
+  birth_date: string | null;
+  birth_place: string | null;
+  company_reg_number: string | null;
+  iban_last4: string | null;
+  iban_holder: string | null;
+  iban_bic: string | null;
+  iban_changed_at: string | null;
+  iban_approved_at: string | null;
+  iban_pending_last4: string | null;
+  iban_pending_expires_at: string | null;
+  payout_hold_until: string | null;
+  commission_percent_override: number | null;
+  verified_at: string | null;
+};
+
+/** Everything that has to be true before money may leave for this chef (chef_payout_readiness). */
+export type PayoutReadiness = {
+  hasFiscal: boolean;
+  hasDac7: boolean;
+  hasIban: boolean;
+  ibanApproved: boolean;
+  ibanPending: boolean;
+  onHold: boolean;
+  holdUntil: string | null;
+  agreementVersion: number | null;
+  requiredAgreementVersion: number;
+  blocked: boolean;
+  blockedReason: string | null;
+};

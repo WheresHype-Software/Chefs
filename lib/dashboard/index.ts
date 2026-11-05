@@ -11,6 +11,7 @@ export { getMyPhotos } from "./photos";
 export { getMyCertificates, type MyCertificate } from "./certificates";
 export { getReviews } from "./reviews";
 export { getSetupProgress } from "./setup";
+export { getBilling, type BillingView } from "./billing";
 export type {
   Role,
   Session,
@@ -24,4 +25,6 @@ export type {
   SetupProgress,
   DashReview,
   ChefPhoto,
+  ChefBilling,
+  PayoutReadiness,
 } from "./types";

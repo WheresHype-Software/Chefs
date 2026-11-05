@@ -1,11 +1,10 @@
 import "server-only";
 import { cache } from "react";
-import { MOCK_CHEFS, mockCalendar, mockProfile } from "./mock";
 import { createAnonClient, hasSupabase } from "./supabase/server";
 import type { Calendar, ChefCard, ChefProfile } from "./types";
 
 export const getChefs = cache(async (lat?: number, lng?: number): Promise<ChefCard[]> => {
-  if (!hasSupabase) return MOCK_CHEFS;
+  if (!hasSupabase) return [];
   const { data, error } = await createAnonClient().rpc("chefs_near", {
     p_lat: lat ?? null,
     p_lng: lng ?? null,
@@ -48,7 +47,7 @@ export async function withPhotos(chefs: Omit<ChefCard, "portrait" | "dishes">[])
 }
 
 export async function getCalendar(chefId: string, from: Date, to: Date): Promise<Calendar> {
-  if (!hasSupabase) return mockCalendar(chefId, from, to);
+  if (!hasSupabase) return { available: [], booked: [] };
   const { data, error } = await createAnonClient().rpc("chef_calendar", {
     p_chef_id: chefId,
     p_from: from.toISOString().slice(0, 10),
@@ -79,7 +78,7 @@ type ReviewRow = {
 };
 
 export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | null> => {
-  if (!hasSupabase) return mockProfile(slug);
+  if (!hasSupabase) return null;
   const sb = createAnonClient();
   const card = (await getChefs()).find((c) => c.slug === slug);
   if (!card) return null;
