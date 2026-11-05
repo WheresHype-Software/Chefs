@@ -66,7 +66,7 @@ export async function getPaymentState(id: string): Promise<PaymentState | null> 
   if (isDemo(id)) return DEMO_STATE;
   if (!BookingId.safeParse(id).success) return null;
   const sb = await createClient();
-  const { data, error } = await sb.rpc("payment_state", { p_booking_id: id, p_token: await guestToken(id) });
+  const { data, error } = await sb.rpc("payment_state", { p_booking: id, p_token: await guestToken(id) });
   if (error || !data) return null;
   return data as PaymentState;
 }
