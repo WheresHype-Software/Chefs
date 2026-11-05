@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { formatIban, ibanLast4, isPortugueseIban, isValidIban, isValidNif, isValidPostalCode, normalisePhone } from "./fiscal.ts";
+import { formatIban, ibanLast4, isPortugueseIban, isValidIban, isValidNif, isValidPostalCode, normalisePhone } from "./fiscal";
 
 test("a NIF is accepted only when its check digit adds up", () => {
   // Real check digits, computed by the modulo-11 rule.
