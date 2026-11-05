@@ -4,7 +4,7 @@
 -- (com 3D Secure) para onde o browser do cliente é enviado. Esse endereço tem de ser guardado,
 -- senão um cliente que feche o separador a meio não tem como voltar ao pagamento que começou.
 
-alter table public.payments add column redirect_url text;
+alter table public.payments add column if not exists redirect_url text;
 
 -- O estado do pagamento passa a incluir para onde continuar, e deixa de ser preciso adivinhar.
 create or replace function public.payment_state(p_booking uuid, p_token text default null) returns jsonb

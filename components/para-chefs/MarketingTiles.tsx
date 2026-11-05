@@ -45,7 +45,7 @@ const ICONS: Record<string, ReactNode> = {
   ),
 };
 
-type Tile = { icon: keyof typeof ICONS; title: string; text: string; showLink?: boolean };
+type Tile = { icon: keyof typeof ICONS; title: string; text: string; showLink?: boolean; warm?: boolean };
 
 const TILES: Tile[] = [
   { icon: "link", title: "Um link para a bio", text: "Substitui o formulário e o “manda mensagem”.", showLink: true },
@@ -60,18 +60,29 @@ const TILES: Tile[] = [
   { icon: "season", title: "Encomendas de época", text: "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite." },
 ];
 
+/**
+ * The wall: six tiles with grout between them, and exactly one warm one, as DESIGN.md asks. The
+ * warm tile is the aspirational one — the title a chef earns — so the eye lands on the thing
+ * worth wanting instead of wandering over six identical slabs.
+ */
 export function MarketingTiles() {
   return (
-    <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(270px,100%),1fr))] gap-px border border-[#2a4a86] bg-[#2a4a86] p-0">
+    <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(270px,100%),1fr))] gap-px bg-[#2a4a86] p-0">
       {TILES.map((t, i) => (
-        <li key={t.title} className="al-rv flex flex-col gap-3 bg-cobalt-deep p-6 md:p-7" style={revealDelay(i)}>
-          <span aria-hidden="true" className="text-yolk">
+        <li
+          key={t.title}
+          className={`al-rv flex flex-col gap-3 p-6 transition-colors duration-200 md:p-7 ${
+            t.warm ? "bg-yolk text-ink" : "bg-[#16357f] text-white hover:bg-[#1a3e8f]"
+          }`}
+          style={revealDelay(i)}
+        >
+          <span aria-hidden="true" className={t.warm ? "text-ink" : "text-[#8fb0e8]"}>
             {ICONS[t.icon]}
           </span>
           <span className="d text-[21px] leading-[1.15] md:text-[23px]">{t.title}</span>
-          <span className="text-[15px] leading-relaxed text-[#c9d6ee]">{t.text}</span>
+          <span className={`text-[15px] leading-relaxed ${t.warm ? "text-ink-3" : "text-[#d4e0f5]"}`}>{t.text}</span>
           {t.showLink && (
-            <span className="num mt-1 w-fit border border-[#2a4a86] bg-[#0d2559] px-3 py-1.5 text-[14px] text-white">
+            <span className="num mt-1 w-fit bg-[#0c2663] px-3 py-1.5 text-[14px] text-white">
               {SITE_DOMAIN}/chef/<span className="text-yolk">o-seu-nome</span>
             </span>
           )}

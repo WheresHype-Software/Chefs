@@ -1,5 +1,5 @@
 -- Ao Lume: correções aos pagamentos, contabilidade do chef e pagamento com cartão.
--- Correr uma vez no SQL editor. Numa só transação: ou entra tudo, ou nada.
+-- Seguro de correr mais do que uma vez: nada aqui falha por já existir.
 
 begin;
 
@@ -161,12 +161,12 @@ end $$;
 -- Por isso vive na reserva e não em ledger_entries, e só o chef dessa reserva lhe pode tocar.
 
 alter table public.bookings
-  add column rest_paid_at timestamptz,
-  add column rest_paid_amount numeric(10, 2) check (rest_paid_amount is null or rest_paid_amount >= 0);
+  add column if not exists rest_paid_at timestamptz,
+  add column if not exists rest_paid_amount numeric(10, 2);
 
-create index bookings_rest_paid_idx on public.bookings (chef_id, rest_paid_at);
+create index if not exists bookings_rest_paid_idx on public.bookings (chef_id, rest_paid_at);
 
-create function public.chef_set_rest_paid(p_booking uuid, p_paid boolean, p_amount numeric default null) returns void
+create or replace function public.chef_set_rest_paid(p_booking uuid, p_paid boolean, p_amount numeric default null) returns void
 language plpgsql security definer set search_path = public as $$
 declare b public.bookings; v_chef uuid := public.my_chef_id();
 begin
@@ -188,7 +188,7 @@ end $$;
 -- The chef's own bookkeeping, so their session may call it; the function checks it is theirs.
 
 /** What the chef is owed and by whom, booking by booking and in total. */
-create function public.chef_money_summary(p_chef uuid) returns jsonb
+create or replace function public.chef_money_summary(p_chef uuid) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare v jsonb;
 begin
@@ -226,7 +226,7 @@ end $$;
 -- (com 3D Secure) para onde o browser do cliente é enviado. Esse endereço tem de ser guardado,
 -- senão um cliente que feche o separador a meio não tem como voltar ao pagamento que começou.
 
-alter table public.payments add column redirect_url text;
+alter table public.payments add column if not exists redirect_url text;
 
 -- O estado do pagamento passa a incluir para onde continuar, e deixa de ser preciso adivinhar.
 create or replace function public.payment_state(p_booking uuid, p_token text default null) returns jsonb

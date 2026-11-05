@@ -59,8 +59,6 @@ export const revalidate = 3600;
 export default async function ParaChefs() {
   const settings = await getPublicSettings();
   const pct = String(settings.commissionPercent).replace(".", ",");
-  // Said from the chef's side: 88% reads very differently from 12%, and both are the same fact.
-  const keepsPct = String(Math.round((100 - settings.commissionPercent) * 10) / 10).replace(".", ",");
   return (
     <div>
       <SiteHeader chefs />
@@ -182,7 +180,7 @@ export default async function ParaChefs() {
         <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
             <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
-            <p className="m-0 max-w-[600px] text-lg text-[#c9d6ee]">
+            <p className="m-0 max-w-[600px] text-lg text-[#d4e0f5]">
               Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
             </p>
           </div>
@@ -191,19 +189,19 @@ export default async function ParaChefs() {
           <div className="al-rv flex flex-col gap-7">
             <div className="flex flex-col gap-2.5">
               <h3 className="d m-0 text-[clamp(28px,4vw,42px)] leading-none">O seu percurso</h3>
-              <p className="m-0 max-w-[560px] text-[#c9d6ee]">
+              <p className="m-0 max-w-[560px] text-[#d4e0f5]">
                 Recebe pedidos desde o dia em que for aprovado. O título de Chef vem depois, se tiver formação em cozinha.
               </p>
             </div>
-            <ol className="m-0 grid list-none gap-px border border-[#2a4a86] bg-[#2a4a86] p-0 md:grid-cols-[1fr_auto_1fr]">
-              <li className="flex flex-col gap-2.5 bg-cobalt-deep p-7 md:p-8">
-                <span className="lab text-[#c9d6ee]">Passo 1 · à entrada</span>
+            <ol className="m-0 grid list-none gap-px bg-[#2a4a86] p-0 md:grid-cols-[1fr_auto_1fr]">
+              <li className="flex flex-col gap-2.5 bg-[#16357f] p-7 md:p-8">
+                <span className="lab text-[#8fb0e8]">Passo 1 · à entrada</span>
                 <span className="d text-[clamp(28px,4vw,36px)] leading-none">Cozinheiro</span>
-                <span className="text-[15px] leading-relaxed text-[#c9d6ee]">
+                <span className="text-[15px] leading-relaxed text-[#d4e0f5]">
                   Todos começam aqui. A página fica pública depois da revisão da equipa e os pedidos entram desde o primeiro dia.
                 </span>
               </li>
-              <li aria-hidden="true" className="flex items-center justify-center bg-cobalt-deep px-6 py-4 md:px-5">
+              <li aria-hidden="true" className="flex items-center justify-center bg-[#16357f] px-6 py-4 md:px-5">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yolk">
                   <path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" className="hidden md:block" />
                   <path d="M12 4v15m0 0 5.5-5.5M12 19l-5.5-5.5" className="md:hidden" />
@@ -230,17 +228,17 @@ export default async function ParaChefs() {
           <div className="al-rv flex min-w-0 flex-[1_1_440px] flex-col gap-6">
             <div className="flex flex-col gap-[18px]">
               <span className="inline-flex w-fit items-center gap-2 bg-yolk-soft px-3 py-1.5 text-[14px] font-semibold text-ink">
-                Entrar não custa nada
+                Sem mensalidades
               </span>
               <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
-                Fica com {keepsPct}%
+                Só paga por cada
                 <br />
-                do que cobra.
+                serviço garantido.
               </h2>
               <p className="m-0 max-w-[520px] text-lg text-ink-3">
-                Não há mensalidade nem custo por pedido. Quando aceita uma reserva, o cliente paga o sinal aqui, descontamos a nossa
-                comissão de {pct}% e entregamos-lhe o resto depois do serviço, com um documento que explica a conta. O restante valor
-                combina-o consigo, como sempre.
+                Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a data
+                fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva, não há
+                nada a pagar.
               </p>
             </div>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
