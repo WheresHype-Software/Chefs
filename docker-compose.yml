@@ -25,6 +25,24 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      # --- Pagamentos ---------------------------------------------------------
+      # Sem PAYMENTS_ENABLED aqui, a aplicação trata os pagamentos como desligados mesmo que a
+      # base de dados diga o contrário — e uma reserva aceite fica sem forma de ser paga.
+      PAYMENTS_ENABLED: ${PAYMENTS_ENABLED:-false}
+      EUPAGO_ENV: ${EUPAGO_ENV:-sandbox}
+      EUPAGO_API_KEY: ${EUPAGO_API_KEY:-}
+      EUPAGO_WEBHOOK_SECRET: ${EUPAGO_WEBHOOK_SECRET:-}
+      EUPAGO_WEBHOOK_ENCRYPTION_KEY: ${EUPAGO_WEBHOOK_ENCRYPTION_KEY:-}
+      EUPAGO_CLIENT_ID: ${EUPAGO_CLIENT_ID:-}
+      EUPAGO_CLIENT_SECRET: ${EUPAGO_CLIENT_SECRET:-}
+      # Cifra os IBAN guardados. Perder esta chave torna-os ilegíveis: guarde uma cópia.
+      PAYOUT_ENCRYPTION_KEY: ${PAYOUT_ENCRYPTION_KEY:-}
+      # Conta de onde saem as transferências para os chefs (ficheiro SEPA).
+      PLATFORM_ACCOUNT_NAME: ${PLATFORM_ACCOUNT_NAME:-}
+      PLATFORM_IBAN: ${PLATFORM_IBAN:-}
+      PLATFORM_BIC: ${PLATFORM_BIC:-}
+      # Segredo do endpoint de reconciliação, chamado pelo cron.
+      RECONCILE_SECRET: ${RECONCILE_SECRET:-}
 
 networks:
   sites_proxy:
