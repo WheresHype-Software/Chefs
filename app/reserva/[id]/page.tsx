@@ -143,7 +143,14 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             })}
           />
         )}
-        {paymentState && <DepositPayment bookingId={b.id} initial={paymentState} chefFirstName={first} />}
+        {paymentState && (
+          <DepositPayment
+            bookingId={b.id}
+            initial={paymentState}
+            chefFirstName={first}
+            bookingValue={b.booking_value ?? b.quoted_price ?? b.estimate}
+          />
+        )}
         {refundWaiting && <RefundIban bookingId={b.id} refund={refundWaiting} />}
         {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: titledName(chef), date: b.date }} />}
 
