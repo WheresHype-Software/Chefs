@@ -1,5 +1,7 @@
 import "server-only";
+import { getSettings } from "../settings";
 import { chefScope } from "./session";
+import type { ChefMoneySummary } from "./types";
 
 /** What the chef is owed, what is on its way, and what has already been paid. */
 export type PayoutSummary = {
@@ -132,5 +134,39 @@ export async function getPayouts(): Promise<PayoutsView> {
       amount: Number(d.snapshot?.amounts?.payout ?? 0),
       bookingRef: d.snapshot?.booking?.ref ?? null,
     })),
+  };
+}
+
+const NO_MONEY: ChefMoneySummary = {
+  depositsReceived: 0,
+  commissionPaid: 0,
+  restOwed: 0,
+  restPaid: 0,
+  awaitingDeposit: 0,
+  restToConfirm: 0,
+};
+
+/**
+ * The chef's own books: what came through the app and what clients still owe them directly.
+ * Returns zeros rather than throwing when payments are off or the function is not there yet —
+ * a dashboard should not fall over because of a panel it cannot fill.
+ */
+export async function getChefMoney(): Promise<ChefMoneySummary | null> {
+  const settings = await getSettings();
+  if (!settings.paymentsEnabled) return null;
+  const scope = await chefScope();
+  if (scope.demo) {
+    return { depositsReceived: 388.8, commissionPaid: 19.44, restOwed: 151.2, restPaid: 604, awaitingDeposit: 1, restToConfirm: 2 };
+  }
+  const { data, error } = await scope.sb.rpc("chef_money_summary", { p_chef: scope.chef.id });
+  if (error || !data) return NO_MONEY;
+  const r = data as Record<string, string | number>;
+  return {
+    depositsReceived: Number(r.depositsReceived),
+    commissionPaid: Number(r.commissionPaid),
+    restOwed: Number(r.restOwed),
+    restPaid: Number(r.restPaid),
+    awaitingDeposit: Number(r.awaitingDeposit),
+    restToConfirm: Number(r.restToConfirm),
   };
 }

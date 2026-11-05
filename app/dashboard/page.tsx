@@ -3,8 +3,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { redirect } from "next/navigation";
 import { SetupChecklist } from "@/components/dashboard/SetupChecklist";
-import { getBookings, getMyChef, getSession, getSetupProgress } from "@/lib/dashboard";
-import { dayLabel, isoDay, longDay, rating } from "@/lib/format";
+import { getBookings, getChefMoney, getMyChef, getPayouts, getSession, getSetupProgress } from "@/lib/dashboard";
+import { dayLabel, euro, isoDay, longDay, rating } from "@/lib/format";
 
 export default async function Overview() {
   const session = await getSession();
@@ -17,11 +17,14 @@ export default async function Overview() {
   const today = isoDay(new Date());
   const in7 = new Date();
   in7.setDate(in7.getDate() + 6);
-  const [requests, week, progress] = await Promise.all([
+  const [requests, week, progress, money] = await Promise.all([
     getBookings({ statuses: ["requested"] }),
     getBookings({ from: today, to: isoDay(in7), statuses: ["accepted", "confirmed"] }),
     getSetupProgress(),
+    getChefMoney(),
   ]);
+  // Only worth a query once there is money to show.
+  const payouts = money ? await getPayouts() : null;
   const byDay = new Map<string, number>();
   week.forEach((b) => byDay.set(b.date, (byDay.get(b.date) ?? 0) + 1));
   const busiest = [...byDay.entries()].sort((a, b) => b[1] - a[1])[0];
@@ -41,6 +44,36 @@ export default async function Overview() {
           ["Avaliação", rating(chef.rating_avg, chef.review_count).replace("★ ", "")],
         ]}
       />
+
+      {money && payouts && (
+        <section aria-labelledby="dinheiro" className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 id="dinheiro" className="lab m-0 text-muted">
+              Dinheiro
+            </h2>
+            <Link href="/dashboard/pagamentos" className="text-sm">
+              Ver pagamentos
+            </Link>
+          </div>
+          <StatGrid
+            size="md"
+            items={[
+              ["A receber de nós", euro(payouts.summary.balance)],
+              ["Clientes devem-te", euro(money.restOwed)],
+              ["Sinais recebidos este ano", euro(money.depositsReceived)],
+              ["Comissão este ano", euro(money.commissionPaid)],
+            ]}
+          />
+          {(money.awaitingDeposit > 0 || money.restToConfirm > 0) && (
+            <p className="m-0 text-sm text-muted">
+              {money.awaitingDeposit > 0 &&
+                `${money.awaitingDeposit} ${money.awaitingDeposit === 1 ? "reserva à espera" : "reservas à espera"} do sinal. `}
+              {money.restToConfirm > 0 &&
+                `${money.restToConfirm} ${money.restToConfirm === 1 ? "reserva por confirmar" : "reservas por confirmar"} se o cliente já te pagou o resto.`}
+            </p>
+          )}
+        </section>
+      )}
 
       {requests.length > 0 && (
         <section className="box flex flex-col p-6">

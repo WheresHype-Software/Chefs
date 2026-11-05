@@ -3,12 +3,13 @@ import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { notFound } from "next/navigation";
 import { BookingChat } from "@/components/booking/BookingChat";
+import { BookingMoney } from "@/components/dashboard/BookingMoney";
 import { BookingReview } from "@/components/booking/BookingReview";
 import { ReviewReply } from "@/components/dashboard/ReviewReply";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookingView } from "@/lib/bookings";
 import { getBooking } from "@/lib/dashboard";
-import { dayLabel, euro, MODE_LABEL, STATUS_LABEL } from "@/lib/format";
+import { dayLabel, MODE_LABEL, STATUS_LABEL } from "@/lib/format";
 
 export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pedidos/[id]">) {
   const { id } = await params;
@@ -22,7 +23,6 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
     ["Pessoas / unidades", String(b.guests)],
     isPickup ? ["Código de levantamento", b.pickup_code ?? "Gerado ao aceitar"] : ["Morada", b.address ?? "—"],
     !!b.distance_km && ["Distância", `${String(b.distance_km).replace(".", ",")} km`],
-    ["Estimativa", b.estimate ? euro(b.estimate) : "Sob orçamento"],
     ["Telemóvel", b.client?.phone ?? "—"],
     ["Email", b.client?.email ?? "—"],
   ];
@@ -40,6 +40,7 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
           <RequestActions key={b.id} id={b.id} status={b.status} date={b.date} />
         </section>
         <div className="flex min-w-0 flex-[2_1_480px] flex-col gap-6">
+          <BookingMoney booking={b} />
           {view?.review && (
             <BookingReview review={view.review} title="Avaliação do cliente" replySlot={<ReviewReply id={view.review.id} />} />
           )}

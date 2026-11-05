@@ -12,7 +12,7 @@ export { getMyCertificates, type MyCertificate } from "./certificates";
 export { getReviews } from "./reviews";
 export { getSetupProgress } from "./setup";
 export { getBilling, type BillingView } from "./billing";
-export { getPayouts, type PayoutsView, type PayoutRow, type PayoutDocumentRow, type PayoutSummary } from "./payouts";
+export { getPayouts, getChefMoney, type PayoutsView, type PayoutRow, type PayoutDocumentRow, type PayoutSummary } from "./payouts";
 export type {
   Role,
   Session,
@@ -28,4 +28,5 @@ export type {
   ChefPhoto,
   ChefBilling,
   PayoutReadiness,
+  ChefMoneySummary,
 } from "./types";
