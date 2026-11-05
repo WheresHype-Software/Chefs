@@ -2,11 +2,15 @@ import { ChefTitleCard } from "@/components/dashboard/ChefTitleCard";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyCertificates, getMyChef, getSession } from "@/lib/dashboard";
+import { requiredDepositPercent } from "@/lib/money";
+import { getSettings, moneyRules } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Perfil() {
   const session = await getSession();
   const chef = await getMyChef();
+  const settings = await getSettings();
+  const minDeposit = settings.paymentsEnabled ? requiredDepositPercent(moneyRules(settings)) : 0;
   let photos = { portrait: 1, selfie: 1, gallery: 6, approved: false };
   if (!session.demo && chef) {
     const sb = await createClient();
@@ -21,7 +25,7 @@ export default async function Perfil() {
         title={chef ? "O seu perfil" : "Crie o seu perfil de chef"}
         description={!chef && "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão."}
       />
-      <ProfileForm chef={chef} photos={photos} />
+      <ProfileForm chef={chef} photos={photos} minDeposit={minDeposit} />
       {chef && (
         <ChefTitleCard
           name={chef.display_name}

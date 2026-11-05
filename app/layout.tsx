@@ -16,11 +16,11 @@ const schibsted = Schibsted_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.siteUrl),
   title: {
-    default: "Ao Lume — chefs privados e comida caseira perto de si",
+    default: "Ao Lume · chefs privados e comida caseira perto de si",
     template: "%s · Ao Lume",
   },
   description:
-    "Encontre chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas da semana, pastelaria, entregas e eventos. Peça sem criar conta e pague diretamente ao chef.",
+    "Encontre chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas da semana, pastelaria, entregas e eventos. Peça sem criar conta e pague só depois de o chef aceitar.",
   openGraph: { siteName: "Ao Lume", locale: "pt_PT", type: "website" },
 };
 

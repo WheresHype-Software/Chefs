@@ -34,7 +34,10 @@ const SECTIONS: LegalSection[] = [
         <ul>
           <li>O Ao Lume não presta serviços de cozinha ou restauração e não é parte no contrato entre o cliente e o chef.</li>
           <li>Os chefs não são trabalhadores nem representantes do Ao Lume: definem os seus menus, preços, disponibilidade e condições.</li>
-          <li>O Ao Lume não recebe nem processa pagamentos: o cliente paga diretamente ao chef.</li>
+          <li>
+            O Ao Lume recebe o sinal da reserva em nome do chef, com mandato expresso dele, e entrega-lho deduzida a sua comissão. O
+            restante valor do serviço é pago diretamente ao chef.
+          </li>
         </ul>
       </>
     ),
@@ -92,14 +95,35 @@ const SECTIONS: LegalSection[] = [
     body: (
       <ul>
         <li>
-          O cliente paga ao chef, pelos meios que o chef aceita (MB WAY, transferência ou numerário). O chef pode pedir um sinal para
-          confirmar a data.
+          <strong>Sinal.</strong> Depois de o chef aceitar o pedido, o cliente paga um sinal através da plataforma, por MB WAY ou por
+          referência Multibanco. O valor do sinal é definido pelo chef e mostrado antes do pagamento. A reserva só fica confirmada quando o
+          sinal entra.
         </li>
-        <li>Recibos e faturas são emitidos pelo chef, que é responsável pelas suas obrigações fiscais.</li>
-        <li>Usar o Ao Lume é gratuito para clientes.</li>
         <li>
-          Para chefs, o Ao Lume é gratuito no lançamento. Planos pagos ou comissões, se vierem a existir, só se aplicam depois de
-          comunicados com pelo menos 15 dias de antecedência.
+          <strong>Em nome de quem recebemos.</strong> O Ao Lume recebe o sinal em nome e por conta do chef, ao abrigo do mandato que este
+          aceita no contrato de intermediação de pagamentos. O dinheiro do sinal é do chef, não nosso, exceto a parte correspondente à
+          comissão.
+        </li>
+        <li>
+          <strong>Restante valor.</strong> O resto do preço do serviço é combinado e pago diretamente ao chef, pelos meios que ele aceita
+          (MB WAY, transferência ou numerário).
+        </li>
+        <li>
+          <strong>Comissão.</strong> O Ao Lume cobra ao chef uma comissão sobre o valor da reserva, deduzida ao sinal. A percentagem em
+          vigor está no painel do chef e alterações são comunicadas com pelo menos 30 dias de antecedência. Para o cliente, usar o Ao Lume
+          continua a não ter custo: não há taxa de serviço sobre o sinal.
+        </li>
+        <li>
+          <strong>Pagamento ao chef.</strong> Concluído o serviço e decorrido o prazo de retenção indicado no painel, transferimos ao chef o
+          sinal deduzido da comissão, com um documento que identifica as partes e discrimina os valores. Esse documento não é uma fatura.
+        </li>
+        <li>
+          <strong>Faturas.</strong> A fatura do serviço ao cliente é emitida pelo chef, responsável pelas suas obrigações fiscais. A fatura
+          da comissão é emitida pelo Ao Lume ao chef.
+        </li>
+        <li>
+          <strong>Processamento.</strong> Os pagamentos são processados pela EuPago, instituição de pagamento autorizada pelo Banco de
+          Portugal. O Ao Lume não guarda dados de cartão.
         </li>
       </ul>
     ),
@@ -112,6 +136,12 @@ const SECTIONS: LegalSection[] = [
         <p>
           Cada chef define a sua política de cancelamento, que aparece no perfil e no pedido antes de o enviar. O cancelamento é feito na
           página do pedido e o chef é avisado.
+        </p>
+        <p>
+          <strong>Devolução do sinal.</strong> Se o chef cancelar depois de aceitar, ou não comparecer, o sinal é devolvido por inteiro e a
+          comissão não é cobrada. Se for o cliente a cancelar, aplica-se a política do chef. Quando o pagamento foi feito por MB WAY ou
+          cartão, a devolução segue pelo mesmo meio; quando foi por referência Multibanco, pedimos o IBAN na página da reserva do cliente.
+          Nunca por email, mensagem ou telefone.
         </p>
         <p>
           Quando o chef atua como profissional, o cliente tem os direitos que a lei de defesa do consumidor lhe dá. O direito de livre

@@ -13,7 +13,7 @@ import { slugify } from "@/lib/slug";
 import { SITE_DOMAIN } from "@/lib/constants";
 
 /** Public profile details: name, link, tier, bio, base area and service radius. */
-function ProfileDetails({ chef }: { chef: MyChef | null }) {
+function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit: number }) {
   const { form, set, areaQuery, typeArea, pickArea, save, busy, locating, message } = useProfileForm(chef);
 
   return (
@@ -99,7 +99,16 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
         <Field label="Anos de experiência">
           <NumberInput min={0} max={70} value={form.years_experience} onChange={(v) => set("years_experience", v)} />
         </Field>
-        <Field label="Sinal pedido (%)">
+        <Field
+          label="Sinal pedido (%)"
+          hint={
+            minDeposit > 0
+              ? (form.deposit_percent ?? 0) > 0 && (form.deposit_percent ?? 0) < minDeposit
+                ? `Tem de ser pelo menos ${minDeposit}%.`
+                : `O cliente paga-o na app. Mínimo ${minDeposit}%.`
+              : "O cliente paga-o na app para confirmar a reserva."
+          }
+        >
           <NumberInput min={0} max={100} emptyValue={0} value={form.deposit_percent} onChange={(v) => set("deposit_percent", v)} />
         </Field>
       </div>
@@ -128,10 +137,19 @@ function ProfileDetails({ chef }: { chef: MyChef | null }) {
   );
 }
 
-export function ProfileForm({ chef, photos }: { chef: MyChef | null; photos: VerificationPhotos }) {
+export function ProfileForm({
+  chef,
+  photos,
+  minDeposit = 0,
+}: {
+  chef: MyChef | null;
+  photos: VerificationPhotos;
+  /** Smallest signal the platform accepts; 0 while payments are off. */
+  minDeposit?: number;
+}) {
   return (
     <div className="flex flex-wrap items-start gap-6">
-      <ProfileDetails chef={chef} />
+      <ProfileDetails chef={chef} minDeposit={minDeposit} />
       <ProfileVerification chef={chef} photos={photos} />
     </div>
   );

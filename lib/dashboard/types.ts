@@ -1,4 +1,4 @@
-import type { BookingStatus, FulfilmentMode, PriceModel, ServiceType } from "../types";
+import type { BookingStatus, DepositStatus, FulfilmentMode, PriceModel, ServiceType } from "../types";
 
 export type Role = "client" | "chef" | "admin";
 
@@ -40,9 +40,20 @@ export type DashBooking = {
   distance_km: number | null;
   notes: string | null;
   estimate: number | null;
+  quoted_price: number | null;
   pickup_code: string | null;
   fulfilled_at: string | null;
   created_at: string;
+  // Money, present once the chef has accepted and payments are on.
+  booking_value: number | null;
+  deposit_amount: number | null;
+  commission_amount: number | null;
+  payout_amount: number | null;
+  deposit_status: DepositStatus;
+  deposit_paid_at: string | null;
+  /** The chef's own note that the client settled the rest, outside the platform. */
+  rest_paid_at: string | null;
+  rest_paid_amount: number | null;
   client: { name: string | null; phone: string | null; email: string } | null;
 };
 
@@ -98,6 +109,8 @@ export type SetupProgress = {
   activeOffers: number;
   /** Open days from today on. */
   openDays: number;
+  /** "off" while payments are disabled, so the step is not shown at all. */
+  billing: "off" | "missing" | "done";
 };
 
 export type DashReview = {
@@ -112,3 +125,53 @@ export type DashReview = {
 };
 
 export type ChefPhoto = { id: string; url: string; kind: "selfie" | "portrait" | "gallery"; caption: string | null };
+
+/** The chef's fiscal identity and bank details. The IBAN itself is never in this shape. */
+export type ChefBilling = {
+  entity_type: "individual" | "company";
+  legal_name: string | null;
+  nif: string | null;
+  vat_regime: "normal" | "isento_art53";
+  address_line: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country: string;
+  birth_date: string | null;
+  birth_place: string | null;
+  company_reg_number: string | null;
+  iban_last4: string | null;
+  iban_holder: string | null;
+  iban_bic: string | null;
+  iban_changed_at: string | null;
+  iban_approved_at: string | null;
+  iban_pending_last4: string | null;
+  iban_pending_expires_at: string | null;
+  payout_hold_until: string | null;
+  commission_percent_override: number | null;
+  verified_at: string | null;
+};
+
+/** Everything that has to be true before money may leave for this chef (chef_payout_readiness). */
+export type PayoutReadiness = {
+  hasFiscal: boolean;
+  hasDac7: boolean;
+  hasIban: boolean;
+  ibanApproved: boolean;
+  ibanPending: boolean;
+  onHold: boolean;
+  holdUntil: string | null;
+  agreementVersion: number | null;
+  requiredAgreementVersion: number;
+  blocked: boolean;
+  blockedReason: string | null;
+};
+
+/** The chef's own books: what came through the app, what the clients still owe them directly. */
+export type ChefMoneySummary = {
+  depositsReceived: number;
+  commissionPaid: number;
+  restOwed: number;
+  restPaid: number;
+  awaitingDeposit: number;
+  restToConfirm: number;
+};

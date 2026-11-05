@@ -56,7 +56,7 @@ export default async function CityPage({ params }: PageProps<"/chefs/[cidade]">)
             <h1 className="d m-0 text-[clamp(30px,4vw,48px)] leading-[1.05]">Chefs privados e cozinheiros em {city.name}</h1>
             <p className="m-0 max-w-[70ch] text-[17px] text-ink-3">
               {chefs.length
-                ? `${chefs.length === 1 ? "1 chef cozinha" : `${chefs.length} chefs cozinham`} em ${city.name}: jantares em sua casa, marmitas para a semana, bolos e eventos. Veja menus, preços e dias livres, e peça a reserva sem criar conta. Paga diretamente ao chef.`
+                ? `${chefs.length === 1 ? "1 chef cozinha" : `${chefs.length} chefs cozinham`} em ${city.name}: jantares em sua casa, marmitas para a semana, bolos e eventos. Veja menus, preços e dias livres, e peça a reserva sem criar conta. Só paga depois de o chef aceitar.`
                 : `Ainda não há chefs a cozinhar em ${city.name}. O Ao Lume está a abrir zona a zona.`}
             </p>
           </div>

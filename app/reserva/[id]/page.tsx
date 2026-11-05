@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingChat } from "@/components/booking/BookingChat";
+import { DepositPayment } from "@/components/booking/DepositPayment";
+import { RefundIban } from "@/components/booking/RefundIban";
 import { ClientBookingActions } from "@/components/booking/ClientBookingActions";
 import { BookingReview } from "@/components/booking/BookingReview";
 import { ReviewForm } from "@/components/booking/ReviewForm";
@@ -11,6 +13,8 @@ import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CANCELLATION_LABEL, PAYMENT_LABEL } from "@/lib/data";
 import { getBookingView } from "@/lib/bookings";
+import { cardPaymentsPossible } from "@/lib/env";
+import { getPaymentState, getRefundAwaitingIban } from "@/lib/deposit";
 import { dayLabel, euro, titledFirst, titledName, MODE_LABEL, shortStamp, STATUS_LABEL } from "@/lib/format";
 import type { BookingStatus } from "@/lib/types";
 
@@ -18,8 +22,8 @@ export const metadata: Metadata = { title: "A sua reserva", robots: { index: fal
 
 const STEPS: { key: BookingStatus; label: string; hint: string }[] = [
   { key: "requested", label: "Pedido enviado", hint: "O chef tem 48 horas para responder" },
-  { key: "accepted", label: "Aceite pelo chef", hint: "Depois combina o sinal com o chef" },
-  { key: "confirmed", label: "Confirmado", hint: "Quando o chef receber o sinal" },
+  { key: "accepted", label: "Aceite pelo chef", hint: "Pague o sinal para confirmar" },
+  { key: "confirmed", label: "Confirmado", hint: "Assim que o sinal entrar" },
   { key: "completed", label: "Concluído", hint: "Depois do serviço poderá avaliar" },
 ];
 
@@ -72,12 +76,19 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
   const first = titledFirst(chef);
   const reached = (k: BookingStatus) => view.events.find((e) => e.to === k);
   const currentIdx = STEPS.findIndex((s) => s.key === (b.status === "change_proposed" ? "requested" : b.status));
-  const deposit = chef.depositPercent && b.estimate ? Math.round((b.estimate * chef.depositPercent) / 100) : null;
+  // Once the chef accepts, the amounts are frozen on the booking; before that, an estimate.
+  const deposit = b.deposit_amount ?? (chef.depositPercent && b.estimate ? Math.round((b.estimate * chef.depositPercent) / 100) : null);
   const ended = ["declined", "cancelled", "expired"].includes(b.status);
+  const awaitingDeposit = b.status === "accepted" && ["due", "pending", "overdue"].includes(b.deposit_status);
+  const paymentState = awaitingDeposit && view.viewer === "client" ? await getPaymentState(id) : null;
+  // A refund we could not push back the way it came waits here for the client's account.
+  const refundWaiting = view.viewer === "client" ? await getRefundAwaitingIban(id) : null;
 
   const intro: Record<BookingStatus, string> = {
     requested: `${first} tem 48 horas para aceitar, recusar ou propor outra data. Ainda não paga nada.`,
-    accepted: "Combine o sinal diretamente com o chef. Quando o chef o marcar como recebido, a reserva fica confirmada.",
+    accepted: awaitingDeposit
+      ? "Falta pagar o sinal. Assim que o pagamento entrar, a reserva fica confirmada."
+      : "Combine o sinal diretamente com o chef. Quando o chef o marcar como recebido, a reserva fica confirmada.",
     change_proposed: "Veja a proposta abaixo. Se lhe servir, aceite e a reserva segue.",
     confirmed: "Está tudo combinado. Recebe um lembrete na véspera.",
     completed: "Conte como correu. A sua avaliação ajuda outros clientes e o chef.",
@@ -101,7 +112,8 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
       : ["Morada", b.address ?? "—"],
     !!b.pickup_code && ["Código de levantamento", b.pickup_code],
     ["Estimativa", b.quoted_price ? euro(b.quoted_price) : b.estimate ? euro(b.estimate) : "Sob orçamento"],
-    deposit !== null && [`Sinal (${chef.depositPercent} %)`, euro(deposit)],
+    deposit !== null && [b.deposit_amount != null ? "Sinal" : `Sinal (${chef.depositPercent} %)`, euro(deposit)],
+    b.deposit_status === "paid" && ["Sinal pago", b.deposit_paid_at ? shortStamp(b.deposit_paid_at) : "sim"],
     ["Pagamento", chef.paymentMethods.map((m) => PAYMENT_LABEL[m] ?? m).join(" · ")],
     view.policy && ["Cancelamento", view.policy.text ?? CANCELLATION_LABEL[view.policy.preset] ?? ""],
   ];
@@ -132,6 +144,16 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             })}
           />
         )}
+        {paymentState && (
+          <DepositPayment
+            bookingId={b.id}
+            initial={paymentState}
+            chefFirstName={first}
+            bookingValue={b.booking_value ?? b.quoted_price ?? b.estimate}
+            cardAvailable={cardPaymentsPossible}
+          />
+        )}
+        {refundWaiting && <RefundIban bookingId={b.id} refund={refundWaiting} />}
         {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: titledName(chef), date: b.date }} />}
 
         <div className="flex flex-wrap items-start gap-8">
@@ -148,7 +170,10 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             )}
             <ClientBookingActions key={b.id} id={b.id} status={b.status} />
             <span className="text-xs text-muted">
-              {STATUS_LABEL[b.status]} · O serviço, preços e pagamentos são combinados diretamente com o chef.
+              {STATUS_LABEL[b.status]} ·{" "}
+              {b.deposit_amount != null
+                ? "O sinal é pago na app; o restante valor é combinado diretamente com o chef."
+                : "O serviço, preços e pagamentos são combinados diretamente com o chef."}
             </span>
           </section>
 

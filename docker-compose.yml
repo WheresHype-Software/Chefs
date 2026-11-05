@@ -25,6 +25,24 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      # --- Pagamentos ---------------------------------------------------------
+      # Ligar ou desligar os pagamentos faz-se em /admin/pagamentos, não aqui: as regras que
+      # decidem dinheiro são triggers na base de dados, e um trigger não lê uma variável de
+      # ambiente. O que fica aqui é o que o servidor precisa para conseguir cobrar.
+      EUPAGO_ENV: ${EUPAGO_ENV:-sandbox}
+      EUPAGO_API_KEY: ${EUPAGO_API_KEY:-}
+      EUPAGO_WEBHOOK_SECRET: ${EUPAGO_WEBHOOK_SECRET:-}
+      EUPAGO_WEBHOOK_ENCRYPTION_KEY: ${EUPAGO_WEBHOOK_ENCRYPTION_KEY:-}
+      EUPAGO_CLIENT_ID: ${EUPAGO_CLIENT_ID:-}
+      EUPAGO_CLIENT_SECRET: ${EUPAGO_CLIENT_SECRET:-}
+      # Cifra os IBAN guardados. Perder esta chave torna-os ilegíveis: guarde uma cópia.
+      PAYOUT_ENCRYPTION_KEY: ${PAYOUT_ENCRYPTION_KEY:-}
+      # Conta de onde saem as transferências para os chefs (ficheiro SEPA).
+      PLATFORM_ACCOUNT_NAME: ${PLATFORM_ACCOUNT_NAME:-}
+      PLATFORM_IBAN: ${PLATFORM_IBAN:-}
+      PLATFORM_BIC: ${PLATFORM_BIC:-}
+      # Segredo do endpoint de reconciliação, chamado pelo cron.
+      RECONCILE_SECRET: ${RECONCILE_SECRET:-}
 
 networks:
   sites_proxy:

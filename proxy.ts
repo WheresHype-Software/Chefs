@@ -56,6 +56,9 @@ async function refreshSession(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function proxy(request: NextRequest) {
+  // Payment callbacks arrive from EuPago with no cookies and must not wait on a session refresh.
+  if (request.nextUrl.pathname.startsWith("/api/payments/")) return NextResponse.next();
+
   const tokenRedirect = captureBookingToken(request);
   if (tokenRedirect) return tokenRedirect;
   if (!hasSupabase) return NextResponse.next(); // demo mode

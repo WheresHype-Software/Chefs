@@ -34,6 +34,19 @@ const SECTIONS: LegalSection[] = [
           disponibilidade, definições de deslocação e entregas, e documentos enviados para verificação (por exemplo, certificados).
         </p>
         <p>
+          <strong>Pagamentos:</strong> o valor, o método e o estado de cada pagamento, a referência da EuPago e, no caso do MB WAY, o
+          telemóvel usado (guardado mascarado). Não guardamos dados de cartão: o pagamento é processado pela EuPago.
+        </p>
+        <p>
+          <strong>Dados fiscais e bancários dos chefs:</strong> nome legal, NIF, morada fiscal, regime de IVA, IBAN e titular da conta e,
+          por imposição legal, data e local de nascimento (empresários em nome individual) ou número de registo comercial (sociedades). O
+          IBAN é guardado cifrado e nunca é mostrado por inteiro na plataforma.
+        </p>
+        <p>
+          <strong>Dados bancários de clientes:</strong> apenas quando é preciso devolver um pagamento feito por referência Multibanco, que o
+          banco não permite reverter. Pedimos o IBAN na página da reserva, guardamo-lo cifrado e apagamo-lo assim que a devolução é feita.
+        </p>
+        <p>
           <strong>Dados técnicos:</strong> endereço IP e registos de acesso, necessários para a segurança do serviço, e os cookies descritos
           em <a href="#cookies">Cookies e armazenamento no dispositivo</a>.
         </p>
@@ -55,6 +68,19 @@ const SECTIONS: LegalSection[] = [
         </li>
         <li>
           <strong>Contas e perfis de chef</strong>, incluindo a publicação do perfil: execução do contrato.
+        </li>
+        <li>
+          <strong>Receber o sinal, descontar a comissão e pagar ao chef</strong>, incluindo os documentos de pagamento: execução do contrato
+          (art. 6.º, n.º 1, alínea b) do RGPD).
+        </li>
+        <li>
+          <strong>Cumprir obrigações fiscais e contabilísticas</strong> e comunicar anualmente à Autoridade Tributária os dados e os
+          montantes dos chefs exigidos pelo Decreto-Lei n.º 20/2022 (DAC7): obrigação legal (alínea c). Estes dados não podem ser apagados a
+          pedido enquanto durar o prazo legal, e informamos cada chef do que foi comunicado.
+        </li>
+        <li>
+          <strong>Prevenir fraude</strong> nos pagamentos, nomeadamente verificar alterações de IBAN: interesse legítimo (alínea f) em não
+          deixar que o dinheiro de um chef seja desviado.
         </li>
         <li>
           <strong>Verificar chefs</strong> (fotografias, redes sociais e certificados) e <strong>moderar avaliações</strong>: interesse
@@ -126,6 +152,17 @@ const SECTIONS: LegalSection[] = [
     ),
   },
   {
+    id: "pagamentos-terceiros",
+    title: "Quem processa os pagamentos",
+    body: (
+      <p>
+        Os pagamentos são processados pela <strong>EuPago</strong> (Moving Forward Together, S.A.), instituição de pagamento autorizada e
+        supervisionada pelo Banco de Portugal, que trata os dados necessários à operação como responsável pelo seu próprio tratamento. As
+        transferências para os chefs são feitas pelo nosso banco. A Autoridade Tributária recebe o que a lei nos obriga a comunicar.
+      </p>
+    ),
+  },
+  {
     id: "transferencias",
     title: "Transferências para fora do EEE",
     body: (
@@ -147,6 +184,12 @@ const SECTIONS: LegalSection[] = [
         <li>Documentos de verificação: enquanto o perfil estiver ativo; apagados até 6 meses depois do encerramento.</li>
         <li>Avaliações: enquanto o perfil do chef estiver publicado, sem os contactos de quem avaliou.</li>
         <li>Links de acesso a pedidos sem conta: deixam de funcionar ao fim de 90 dias.</li>
+        <li>
+          Pagamentos, documentos de pagamento e dados fiscais dos chefs: <strong>10 anos</strong>, como exige a lei fiscal e contabilística
+          portuguesa. Este prazo prevalece sobre um pedido de apagamento.
+        </li>
+        <li>IBAN de cliente dado para uma devolução: apagado assim que a devolução é feita.</li>
+        <li>Mensagens de apoio: até 3 anos depois de fechadas.</li>
         <li>Registos de acesso: até 12 meses.</li>
       </ul>
     ),

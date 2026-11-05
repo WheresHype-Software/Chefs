@@ -1,15 +1,17 @@
 # Ao Lume
 
-Private chefs and home cooks near you. Clients find chefs on a map, read their showcase, and send a booking request; chefs manage requests, chat, calendar, offers and logistics from a dashboard. Clients pay chefs directly; the platform handles no payments (free at launch, a per-booking commission may come later).
+Private chefs and home cooks near you. Clients find chefs on a map, read their showcase, and send a booking request; chefs manage requests, chat, calendar, offers and logistics from a dashboard. When a chef accepts, the client pays the deposit through the app (EuPago); the platform keeps a commission and pays the chef after the service.
 
 Built from the project spec ("Private Chef Platform – Project Spec") and the V2 "chef's whites" mockups (Bodoni Moda + Hanken Grotesk, white, black ink, hairlines, square corners).
 
 ## Stack
 
 - Next.js 16 (App Router, server actions), TypeScript, Tailwind CSS 4
+- EuPago for payments (MB WAY, Multibanco references, refunds); SEPA files for paying chefs
 - Supabase: Postgres + PostGIS, Auth, Storage, pg_cron, Row Level Security
 - MapLibre GL + OpenFreeMap tiles (free, no API key) and Photon geocoding (free, OpenStreetMap data)
 - Resend for email (optional)
+- Unit tests with `node --test` (`npm test`), end-to-end with Playwright
 
 ## Run it
 
@@ -39,6 +41,8 @@ The seed adds seven demo chefs in Lisbon with no login attached. Delete them bef
 npm run test:e2e      # headless; reuses `npm run dev` if it is already running
 npm run test:e2e:ui   # Playwright UI, step by step
 ```
+
+These run with `PAYMENTS_ENABLED` off (the default). Payment records are append-only, so a run that created them could not clean up after itself — exercising the payment flow needs its own disposable Supabase project.
 
 `e2e/booking-lifecycle.spec.ts` plays the whole story in three browsers: a chef creates a profile, uploads photos and applies; an admin approves; the chef publishes an offer and opens a day; a guest books it; the chef accepts, chats, confirms the deposit and completes it; the guest reviews and the review appears on the public page.
 
@@ -75,6 +79,58 @@ The visual system is documented in [DESIGN.md](DESIGN.md) and the product contex
 - **One commit per feature**, with conventional prefixes (`feat`, `refactor`, `fix`, `chore`, `docs`).
 - `npm run lint`, `npm run typecheck` and `npm run format:check` before pushing.
 
+## Payments
+
+The client pays the chef's deposit through the app; the platform keeps a commission on the booking
+value and transfers the rest to the chef after the service. The whole design, including the legal
+points that need a lawyer's sign-off, is in [docs/specs/pagamentos-marketplace.md](docs/specs/pagamentos-marketplace.md).
+
+**The flow.** Chef accepts → the amounts are frozen on the booking → client pays by MB WAY or
+Multibanco reference → EuPago notifies us → booking confirmed → service happens → the money waits
+out the hold period → an admin builds a payout batch, downloads a SEPA file, pays at the bank and
+records it → each chef gets a payment document.
+
+**One switch**, `payments_enabled` in `platform_settings`, flipped from `/admin/pagamentos`.
+With it off the site behaves exactly as it did before: no payment step, no deposit on a booking,
+every existing test still passes. It is deliberately not an environment variable as well — the
+rules that decide money are database triggers, and a trigger cannot read one. Two switches could
+disagree, and when they did the result was a booking whose signal was owed, could not be paid, and
+could not be confirmed.
+
+**Setting it up**
+
+1. Fill in the `EUPAGO_*`, `PAYOUT_ENCRYPTION_KEY` and `PLATFORM_IBAN` values from `.env.example`.
+   Generate the encryption key with
+   `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` and keep a copy:
+   without it the stored IBANs are unreadable.
+2. In the EuPago backoffice, point **Realtime Webhooks 2.0** at
+   `https://<your-domain>/api/payments/eupago/webhook` and copy the signing secret into
+   `EUPAGO_WEBHOOK_SECRET`.
+3. Run the new migrations (`20261105000001` … `20261105000007`).
+4. Schedule the catch-up job, which settles payments whose webhook never arrived:
+   `curl -XPOST -H "x-reconcile-secret: $RECONCILE_SECRET" https://<your-domain>/api/payments/reconcile`
+   every few minutes.
+5. Make yourself an admin, set the commission in `/admin/pagamentos`, and switch payments on there when you are ready.
+
+**Why a person is in the loop.** EuPago's payout endpoints are read-only — there is no API that
+sends money to a chef's IBAN. The app builds the batch and the bank file; a human uploads it and
+confirms. That is also the last check before money leaves the company.
+
+**What protects the money**
+
+- No amount ever comes from the browser: every figure is computed in the database and frozen on
+  the booking when the chef accepts.
+- A webhook is only a nudge. Whatever it says, and whether or not its signature checks out, the
+  state is confirmed by asking EuPago directly before anything moves.
+- `payment_events`, `ledger_entries` and `payout_documents` are append-only at the grant _and_
+  trigger level. A mistake is corrected with a new row, never an edited one.
+- IBANs are encrypted by the application (AES-256-GCM, key outside the database), shown only as
+  the last four digits, and decrypted solely while a bank file is being built.
+- Changing an IBAN takes a confirmation link, warns the old address, freezes payouts for 72 hours,
+  and the first transfer to a new account waits for an admin. This is the attack that actually
+  happens to marketplaces.
+- Every admin action that touches money needs a written reason and lands in `admin_logs`.
+
 ## Security
 
 - Every table has Row Level Security; see the next section for the rules.
@@ -104,4 +160,5 @@ Address search uses Photon, which is free but rate-limited and shared. Before la
 - Email reminders: 24 h before a booking, and the review reminder. The cron jobs exist for expiry and auto-complete only
 - Dishes library, promotions, past-bookings showcase on the profile, client favourites
 - Share kit (QR code, story images), paid boosts
-- Final terms and privacy policy (placeholders, to be reviewed by a Portuguese lawyer)
+- Final terms and privacy policy (updated for payments, still to be reviewed by a Portuguese lawyer)
+- A certified invoicing provider: the commission invoice to the chef is not issued yet (see the spec)

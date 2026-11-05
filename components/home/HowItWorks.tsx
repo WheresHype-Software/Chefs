@@ -2,7 +2,10 @@ import { revealDelay } from "@/lib/motion";
 const STEPS: [string, string][] = [
   ["Encontre quem cozinha perto", "Pesquise pela sua zona ou explore o mapa, e veja menus, preços e avaliações de quem já reservou."],
   ["Peça a reserva", "Escolha o dia livre e diga o que precisa. Não precisa de criar conta e ainda não paga nada."],
-  ["Combine e receba", "O chef confirma, falam no chat da reserva e paga-lhe diretamente, por MB WAY, transferência ou em dinheiro."],
+  [
+    "Pague o sinal e está feito",
+    "Quando o chef aceita, paga aqui o sinal por MB WAY ou Multibanco e a reserva fica confirmada. O resto combina com o chef, no dia.",
+  ],
 ];
 
 /** Three steps on a cobalt band; the numbers carry the order. */
@@ -15,7 +18,7 @@ export function HowItWorks() {
             Como funciona
           </h2>
           <p className="m-0 max-w-[34ch] text-[17px] text-[#d6e1f5]">
-            O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço e o cliente paga-lhe diretamente.
+            O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço; o sinal é pago aqui e o resto diretamente ao chef.
           </p>
         </div>
         <ol className="m-0 grid list-none gap-8 p-0 md:grid-cols-3 md:gap-6">

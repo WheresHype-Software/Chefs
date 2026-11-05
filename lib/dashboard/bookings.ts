@@ -5,7 +5,9 @@ import { chefScope } from "./session";
 import type { DashBooking } from "./types";
 
 const BOOKING_COLUMNS =
-  "id, ref, status, offer_title, fulfilment_mode, date, time_label, guests, address, distance_km, notes, estimate, pickup_code, fulfilled_at, created_at, client:clients(name, phone, email)";
+  "id, ref, status, offer_title, fulfilment_mode, date, time_label, guests, address, distance_km, notes, estimate, quoted_price, pickup_code, fulfilled_at, created_at, " +
+  "booking_value, deposit_amount, commission_amount, payout_amount, deposit_status, deposit_paid_at, rest_paid_at, rest_paid_amount, " +
+  "client:clients(name, phone, email)";
 
 export async function getBookings(opts: { from?: string; to?: string; statuses?: BookingStatus[] } = {}): Promise<DashBooking[]> {
   const scope = await chefScope();

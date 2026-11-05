@@ -5,6 +5,8 @@ import { getSession } from "@/lib/dashboard";
 import { notifyAdmin } from "@/lib/email";
 import { TIER_LABEL } from "@/lib/format";
 import { LANGUAGES } from "@/lib/languages";
+import { requiredDepositPercent } from "@/lib/money";
+import { getSettings, moneyRules } from "@/lib/settings";
 import { fail, failInvalid, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
 import { chefContext, done, NO_CHEF } from "./context";
@@ -54,6 +56,18 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   const p = parsed.data;
+
+  // The signal has to leave room for the commission, or the chef would be paid nothing.
+  // The database enforces this too; catching it here is what makes it a sentence and not a crash.
+  const settings = await getSettings();
+  if (settings.paymentsEnabled && (p.deposit_percent ?? 0) > 0) {
+    const min = requiredDepositPercent(moneyRules(settings));
+    if (p.deposit_percent! < min) {
+      return fail(
+        `O sinal tem de ser pelo menos ${min}%: é o que cobre a nossa comissão de ${String(settings.commissionPercent).replace(".", ",")}% e ainda te deixa receber alguma coisa.`,
+      );
+    }
+  }
   const session = await getSession();
   if (!ctx.chef && session.role === "client")
     return fail("Esta é uma conta de cliente. Para ter um perfil de chef, crie uma conta de chef.");

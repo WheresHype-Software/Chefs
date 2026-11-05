@@ -61,6 +61,11 @@ async function testUserIds() {
 /**
  * Removes everything E2E runs created: this run's records and any left by a crashed run.
  * Only touches rows tied to e2e-…@aolume.test accounts or e2e-chef-… slugs.
+ *
+ * Note: payments, the ledger and payment documents are append-only by design — the database
+ * refuses to delete them, even with the secret key — and bookings cannot be deleted while a
+ * payment points at them. So these tests must run with PAYMENTS_ENABLED off (the default), where
+ * no such rows are created. Testing the payment flow needs its own disposable project.
  */
 export async function cleanupTestData() {
   const sb = admin();

@@ -37,6 +37,18 @@ function steps(chef: MyChef, p: SetupProgress): Step[] {
       action: chef.status === "rejected" ? "Rever e reenviar" : "Enviar para revisão",
       done: sent,
     },
+    // Only once payments are on: before that there is nothing to pay and nothing to ask for.
+    ...(p.billing === "off"
+      ? []
+      : [
+          {
+            title: "Dados de faturação",
+            text: "Nome legal, NIF, morada fiscal, IBAN e o contrato. Sem isto podemos receber o sinal por ti, mas não to podemos transferir.",
+            href: "/dashboard/faturacao",
+            action: "Preencher faturação",
+            done: p.billing === "done",
+          },
+        ]),
   ];
 }
 
@@ -50,12 +62,20 @@ export function SetupChecklist({ chef, progress }: { chef: MyChef; progress: Set
   if (done === list.length && chef.status === "approved") return null;
   const next = list.find((s) => !s.done);
   const waiting = !next && chef.status === "pending";
+  // Bookable already, and the only thing left is the paperwork that lets us pay them.
+  const onlyBilling = chef.status === "approved" && list.filter((s) => !s.done).length === 1 && next?.href === "/dashboard/faturacao";
 
   return (
     <section aria-labelledby="setup-title" className="box flex flex-col gap-5 p-5 md:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="setup-title" className="d m-0 text-2xl font-normal">
-          {waiting ? "O seu perfil está em revisão" : chef.status === "approved" ? "Falta pouco para receber reservas" : "Primeiros passos"}
+          {waiting
+            ? "O seu perfil está em revisão"
+            : onlyBilling
+              ? "Falta a faturação para te podermos pagar"
+              : chef.status === "approved"
+                ? "Falta pouco para receber reservas"
+                : "Primeiros passos"}
         </h2>
         <span className="text-sm text-muted">
           {done} de {list.length}
@@ -68,6 +88,12 @@ export function SetupChecklist({ chef, progress }: { chef: MyChef; progress: Set
         />
       </div>
       {waiting && <p className="m-0 text-muted">A equipa responde por email. Entretanto pode afinar as ofertas e a disponibilidade.</p>}
+      {onlyBilling && (
+        <p className="m-0 text-muted">
+          Já podes receber pedidos. O sinal que os clientes pagarem fica à tua ordem. Só não to conseguimos transferir enquanto não
+          tivermos os teus dados fiscais, o IBAN e o contrato aceite. Não se perde nada: fica à tua espera.
+        </p>
+      )}
       <ol className="m-0 flex list-none flex-col p-0">
         {list.map((s) => {
           const current = s === next;

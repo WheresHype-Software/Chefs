@@ -217,7 +217,7 @@ export function BookingForm({ chef, initialOfferId, initialAddress, initialCalen
         </div>
         <FormMessage message={form.error ? { ok: false, text: form.error } : null} />
       </div>
-      <span className="-mt-4 text-center text-xs text-muted">Ainda não paga nada · paga diretamente ao chef</span>
+      <span className="-mt-4 text-center text-xs text-muted">Ainda não paga nada · só depois de o chef aceitar</span>
     </form>
   );
 }

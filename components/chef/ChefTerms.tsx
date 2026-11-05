@@ -4,12 +4,22 @@ import { titledFirst } from "@/lib/format";
 import type { ChefProfile } from "@/lib/types";
 
 /** This chef's rules for money and cancellation, in plain words, right after the menus. */
-export function ChefTerms({ chef }: { chef: ChefProfile }) {
+export function ChefTerms({ chef, paymentsOn = false }: { chef: ChefProfile; paymentsOn?: boolean }) {
   const first = titledFirst(chef);
   const rows = [
-    ["Quando paga", `Nada ao enviar o pedido. Só depois de ${first} aceitar, diretamente a ${first}.`],
-    chef.paymentMethods.length > 0 && ["Como paga", chef.paymentMethods.join(" · ")],
-    chef.depositPercent && ["Sinal", `${chef.depositPercent} % para confirmar a data; o resto como combinarem.`],
+    [
+      "Quando paga",
+      paymentsOn
+        ? `Nada ao enviar o pedido. Se ${first} aceitar, paga aqui o sinal para confirmar a data.`
+        : `Nada ao enviar o pedido. Só depois de ${first} aceitar, diretamente a ${first}.`,
+    ],
+    chef.paymentMethods.length > 0 && ["Como paga o resto", chef.paymentMethods.join(" · ")],
+    chef.depositPercent && [
+      "Sinal",
+      paymentsOn
+        ? `${chef.depositPercent} % do valor, pago na app por MB WAY ou Multibanco. O resto combina com ${first}.`
+        : `${chef.depositPercent} % para confirmar a data; o resto como combinarem.`,
+    ],
     chef.cancellation && ["Cancelamento", chef.cancellation.text ?? CANCELLATION_LABEL[chef.cancellation.preset] ?? "Política do chef"],
   ].filter((r): r is [string, string] => Array.isArray(r));
   return (
@@ -27,7 +37,11 @@ export function ChefTerms({ chef }: { chef: ChefProfile }) {
           </div>
         ))}
       </dl>
-      <p className="m-0 text-[13px] text-muted">O serviço e o pagamento são combinados diretamente com o chef.</p>
+      <p className="m-0 text-[13px] text-muted">
+        {paymentsOn
+          ? "O sinal é pago no Ao Lume e entregue ao chef depois do serviço. O restante valor é combinado diretamente com o chef."
+          : "O serviço e o pagamento são combinados diretamente com o chef."}
+      </p>
     </ChefSection>
   );
 }

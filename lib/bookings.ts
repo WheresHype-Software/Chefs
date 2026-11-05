@@ -6,6 +6,7 @@ import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
 import { demoBookingView } from "@/lib/demo-booking";
 import { fail, failWith, ok, type ActionResult } from "@/lib/result";
+import { announceDepositDue } from "@/lib/payments/confirm";
 import { lisbonToday, sendReviewRequest } from "@/lib/review-request";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 import type { BookingStatus, BookingView } from "@/lib/types";
@@ -111,6 +112,8 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   if (error) return failWith(error, "chefUpdateBooking", "Não foi possível atualizar a reserva. Tente de novo.");
   if (!data) return failWith({ id }, "chefUpdateBooking no row", "Não encontrámos este pedido. Atualize a página.");
   if (parsed.data.status === "completed") await sendReviewRequest(id);
+  // Accepting puts a signal on the clock: the client has to be told, or it expires unseen.
+  if (parsed.data.status === "accepted") await announceDepositDue(id).catch((err) => console.error("[bookings] deposit email:", err));
   return ok();
 }
 
