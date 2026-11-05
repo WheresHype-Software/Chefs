@@ -3,7 +3,7 @@ import { cache } from "react";
 import { serverEnv } from "./env.server";
 import type { MoneyRules } from "./money";
 import { toCents } from "./money";
-import { createClient, hasSupabase } from "./supabase/server";
+import { createAnonClient, createClient, hasSupabase } from "./supabase/server";
 
 /** The one row of `platform_settings`, in the shapes the app uses. */
 export type PlatformSettings = {
@@ -31,6 +31,31 @@ export const getSettings = cache(async (): Promise<PlatformSettings> => {
   if (!hasSupabase) return { ...DEFAULT_SETTINGS, paymentsEnabled: true };
   const sb = await createClient();
   const { data } = await sb
+    .from("platform_settings")
+    .select(
+      "payments_enabled, commission_percent, commission_min, deposit_margin_percent, deposit_due_hours, payout_hold_hours, agreement_version",
+    )
+    .eq("id", 1)
+    .maybeSingle();
+  if (!data) return DEFAULT_SETTINGS;
+  return {
+    paymentsEnabled: data.payments_enabled,
+    commissionPercent: Number(data.commission_percent),
+    commissionMin: Number(data.commission_min),
+    depositMarginPercent: Number(data.deposit_margin_percent),
+    depositDueHours: data.deposit_due_hours,
+    payoutHoldHours: data.payout_hold_hours,
+    agreementVersion: data.agreement_version,
+  };
+});
+
+/**
+ * The same settings, read without a session, so a public page can state the commission without
+ * becoming dynamic on every request. Pages that use it should set their own revalidate window.
+ */
+export const getPublicSettings = cache(async (): Promise<PlatformSettings> => {
+  if (!hasSupabase) return DEFAULT_SETTINGS;
+  const { data } = await createAnonClient()
     .from("platform_settings")
     .select(
       "payments_enabled, commission_percent, commission_min, deposit_margin_percent, deposit_due_hours, payout_hold_hours, agreement_version",

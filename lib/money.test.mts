@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { bookingValueCents, computeBookingMoney, percentOf, requiredDepositPercent, toCents, toEuros } from "./money.ts";
+import { bookingValueCents, computeBookingMoney, percentOf, requiredDepositPercent, toCents, toEuros } from "./money";
 
 const RULES = { commissionPercent: 12, commissionMinCents: 300, depositMarginPercent: 5 };
 
