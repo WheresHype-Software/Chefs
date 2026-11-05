@@ -48,7 +48,7 @@ begin
 
   update public.payout_batches set total = v_total, chef_count = v_chefs where id = v_batch;
   return v_batch;
-end $;
+end $$;
 
 /** The bank file has been generated and downloaded. */
 create function public.mark_batch_exported(p_batch uuid, p_sepa_path text, p_csv_path text) returns void

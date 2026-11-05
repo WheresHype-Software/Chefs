@@ -206,7 +206,7 @@ end $$;
  * shown to the chef as a checklist, so nobody has to guess why a transfer is waiting.
  */
 create function public.chef_payout_readiness(p_chef uuid) returns jsonb
-language plpgsql stable security definer set search_path = public as $
+language plpgsql stable security definer set search_path = public as $$
 declare v_result jsonb;
 begin
   -- Security definer: without this check, any id would reveal another chef's standing.
@@ -237,7 +237,7 @@ begin
   where c.id = p_chef;
 
   return v_result;
-end $;
+end $$;
 
 /** True only when every condition above is met. The batch builder calls this and nothing else. */
 create function public.chef_can_be_paid(p_chef uuid) returns boolean
