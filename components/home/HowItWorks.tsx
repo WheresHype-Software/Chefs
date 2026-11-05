@@ -2,7 +2,10 @@ import { revealDelay } from "@/lib/motion";
 const STEPS: [string, string][] = [
   ["Encontre quem cozinha perto", "Pesquise pela sua zona ou explore o mapa, e veja menus, preços e avaliações de quem já reservou."],
   ["Peça a reserva", "Escolha o dia livre e diga o que precisa. Não precisa de criar conta e ainda não paga nada."],
-  ["Combine e receba", "O chef confirma, falam no chat da reserva e paga-lhe diretamente, por MB WAY, transferência ou em dinheiro."],
+  [
+    "Pague o sinal e está feito",
+    "Quando o chef aceita, paga aqui o sinal por MB WAY ou Multibanco e a reserva fica confirmada. O resto combina com o chef, no dia.",
+  ],
 ];
 
 /** Three steps on a cobalt band; the numbers carry the order. */

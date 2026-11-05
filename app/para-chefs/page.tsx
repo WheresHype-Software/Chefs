@@ -9,11 +9,12 @@ import { ToolList } from "@/components/para-chefs/ToolList";
 import { ToolTabs } from "@/components/para-chefs/ToolTabs";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE_DOMAIN } from "@/lib/constants";
+import { getPublicSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Para chefs",
   description:
-    "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. Sem comissões: recebe 100% do que cobra.",
+    "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. O cliente paga o sinal na app; pagamos-te depois do serviço.",
 };
 
 const MKT = [
@@ -28,9 +29,20 @@ const MKT = [
 const FAQ: FaqItem[] = [
   [
     "Quanto custa?",
-    "Nada, no lançamento. Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo, e não cobramos comissão sobre o que cobra ao cliente. Se vierem a existir planos pagos, avisamos com pelo menos 15 dias de antecedência.",
+    "Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Só cobramos quando ganha: uma comissão sobre o valor da reserva, descontada ao sinal que o cliente paga na app. A percentagem em vigor está sempre no seu painel, e qualquer alteração é avisada com pelo menos 30 dias.",
   ],
-  ["Como recebo o pagamento?", "Diretamente do cliente, por MB WAY, transferência ou dinheiro. O Ao Lume não toca no seu dinheiro."],
+  [
+    "Como recebo o pagamento?",
+    "O sinal é pago pelo cliente na app e fica à sua ordem. Depois de concluir o serviço, transferimo-lo para o seu IBAN já com a comissão descontada, acompanhado de um documento com os seus dados fiscais, o sinal recebido, a comissão e o valor transferido. O restante valor do serviço continua a ser combinado e pago diretamente entre si e o cliente.",
+  ],
+  [
+    "E se eu cancelar depois de aceitar?",
+    "O sinal é devolvido por inteiro ao cliente e não cobramos comissão nenhuma. Cancelamentos repetidos são tidos em conta na sua conta.",
+  ],
+  [
+    "Que dados preciso de dar?",
+    "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7) — e dizemos-lhe sempre o que foi comunicado.",
+  ],
   [
     "Sou cozinheiro caseiro. Posso entrar?",
     "Sim. Todos começam como Cozinheiro e são revistos pela nossa equipa antes de aparecerem nas pesquisas. Quem tem formação em cozinha envia o certificado e passa a aparecer como Chef.",
@@ -45,7 +57,14 @@ const FAQ: FaqItem[] = [
   ],
 ];
 
-export default function ParaChefs() {
+// The commission is a business setting, so the page states whatever it actually is, and is
+// rebuilt hourly rather than on every visit.
+export const revalidate = 3600;
+
+export default async function ParaChefs() {
+  const settings = await getPublicSettings();
+  const pct = String(settings.commissionPercent).replace(".", ",");
+  const min = String(settings.commissionMin).replace(".", ",");
   return (
     <div>
       <SiteHeader chefs />
@@ -201,17 +220,19 @@ export default function ParaChefs() {
 
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-14 md:px-10 md:py-[120px]">
         <div className="al-rv flex min-w-0 flex-[1_1_420px] flex-col gap-[18px]">
-          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Recebe 100% do que cobra.</h2>
+          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">O sinal é pago na app.</h2>
           <p className="m-0 max-w-[520px] text-lg text-ink-3">
-            Não cobramos comissão sobre o seu trabalho. O Ao Lume liga-o ao cliente e organiza a reserva; o dinheiro não passa por nós, o
-            cliente paga-lhe a si.
+            Quando aceita um pedido, o cliente paga o sinal aqui — deixa de andar atrás de quem desaparece depois de marcar. Ficamos com uma
+            comissão de {pct}% do valor da reserva (mínimo {min} €) e transferimos-lhe o resto depois do serviço, com um documento que
+            explica a conta. O restante valor combina-o diretamente com o cliente, como sempre.
           </p>
         </div>
         <ul className="al-rv m-0 grid min-w-0 flex-[1_1_420px] list-none grid-cols-[repeat(auto-fit,minmax(min(180px,100%),1fr))] gap-px border border-line bg-line p-0">
           {[
             ["Preço", "Fixo, por pessoa ou sob orçamento. Decide você."],
-            ["Sinal", "A percentagem que quiser, para confirmar a data."],
-            ["Pagamento", "MB WAY, transferência ou dinheiro, como combinarem."],
+            ["Sinal", "A percentagem que quiser. O cliente paga-o na app, por MB WAY ou Multibanco."],
+            ["Resto do valor", "Combinado diretamente consigo, como sempre: MB WAY, transferência ou dinheiro."],
+            ["Quando recebe", `Transferimos ${settings.payoutHoldHours} horas depois de concluir o serviço.`],
           ].map(([t, d]) => (
             <li key={t} className="flex flex-col gap-1.5 bg-white p-5">
               <strong className="text-[18px]">{t}</strong>

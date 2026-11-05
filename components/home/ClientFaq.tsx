@@ -9,7 +9,7 @@ const QUESTIONS: FaqItem[] = [
   ["Quanto custa?", "O preço é o do chef e aparece no perfil antes de pedir. Enviar um pedido não custa nada."],
   [
     "Como e quando pago?",
-    "Só depois de o chef aceitar o pedido. Paga diretamente ao chef, por MB WAY, transferência ou em dinheiro, como combinarem. Alguns chefs pedem um sinal para confirmar a data.",
+    "Só depois de o chef aceitar o pedido. Nessa altura paga aqui o sinal, por MB WAY ou referência Multibanco, e a reserva fica confirmada. O restante valor combina-o diretamente com o chef, no dia.",
   ],
   [
     "E se o chef não puder?",

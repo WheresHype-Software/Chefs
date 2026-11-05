@@ -1,5 +1,5 @@
 /** The three promises the chef ads lead with, repeated where the chef decides. */
-const PROMISES = ["Recebe 100% do que cobra", "Decide o menu, os dias e o preço", "Perfil criado em poucos minutos"];
+const PROMISES = ["O sinal é pago na app", "Decide o menu, os dias e o preço", "Perfil criado em poucos minutos"];
 
 export function Promises({ tone = "ink" }: { tone?: "ink" | "white" }) {
   const dark = tone === "white";

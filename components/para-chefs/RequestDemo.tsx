@@ -9,7 +9,7 @@ const STEPS = [
   { title: "Aceita ou propõe outra data", text: "Tem 48 horas para responder. O cliente vê a resposta na página do pedido." },
   { title: "Combinam no chat", text: "Uma conversa por reserva: alergias, horários, morada. Tudo fica registado." },
   {
-    title: "Recebe o sinal e confirma",
+    title: "O cliente paga o sinal",
     text: "O cliente paga-lhe diretamente, por MB WAY, transferência ou dinheiro. A data fica marcada na agenda.",
   },
   { title: "Recebe a avaliação", text: "Depois do serviço, o cliente avalia. Só quem reservou pode avaliar, e pode responder." },
@@ -87,7 +87,7 @@ export function RequestDemo() {
 
           <div className="flex min-h-[150px] flex-col gap-2 rounded-[8px] bg-paper p-3">
             <Bubble from="client">É o aniversário da minha mãe. Uma pessoa é vegetariana.</Bubble>
-            {step >= 2 && <Bubble from="chef">Combinado! Faço um arroz de cogumelos para ela. Sinal de 90 € por MB WAY?</Bubble>}
+            {step >= 2 && <Bubble from="chef">Combinado! Faço um arroz de cogumelos para ela. O sinal de 90 € é pago aqui na app.</Bubble>}
             {step >= 2 && <Bubble from="client">Perfeito, já enviei.</Bubble>}
             {step >= 3 && (
               <span className="al-in self-center rounded-full bg-cobalt-soft px-3 py-1 text-[12px] text-ink-3">

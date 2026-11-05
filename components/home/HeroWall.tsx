@@ -21,7 +21,7 @@ const TILES: (Tile & { mobile?: boolean })[] = [
 ];
 
 /** What makes asking safe, said where people decide to search. */
-const PROMISES = ["Sem criar conta", "Só paga depois de o chef aceitar", "Paga diretamente ao chef"];
+const PROMISES = ["Sem criar conta", "Só paga depois de o chef aceitar", "Sinal pago em segurança na app"];
 
 function Check() {
   return (
@@ -79,8 +79,8 @@ export function HeroWall() {
               Chefs e cozinheiros caseiros perto de si.
             </h1>
             <p className="al-in m-0 max-w-[52ch] text-[17px] leading-relaxed text-ink-3 [animation-delay:120ms] md:text-[18px]">
-              Jantares cozinhados em sua casa, marmitas para a semana, bolos e petiscos para levantar. Escolha, peça a reserva e pague
-              diretamente ao chef.
+              Jantares cozinhados em sua casa, marmitas para a semana, bolos e petiscos para levantar. Escolha, peça a reserva e só paga
+              depois de o chef aceitar.
             </p>
           </div>
           <div className="al-in [animation-delay:220ms]">
