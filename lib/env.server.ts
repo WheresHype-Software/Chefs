@@ -11,8 +11,8 @@ export const serverEnv = {
   adminEmail: process.env.ADMIN_EMAIL || EMAIL.verification,
 
   // --- Payments -------------------------------------------------------------
-  // The hard kill switch. Payments also have to be enabled in platform_settings; both must be on.
-  paymentsEnabled: (process.env.PAYMENTS_ENABLED || "").toLowerCase() === "true",
+  // Whether payments are on is a business decision and lives in platform_settings, not here.
+  // What lives here is what the server needs in order to be able to take one at all.
   eupago: {
     env: (process.env.EUPAGO_ENV || "sandbox") as "sandbox" | "production",
     apiKey: process.env.EUPAGO_API_KEY,

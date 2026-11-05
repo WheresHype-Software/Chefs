@@ -1,6 +1,5 @@
 import "server-only";
 import { cache } from "react";
-import { serverEnv } from "./env.server";
 import type { MoneyRules } from "./money";
 import { toCents } from "./money";
 import { createAnonClient, createClient, hasSupabase } from "./supabase/server";
@@ -75,12 +74,16 @@ export const getPublicSettings = cache(async (): Promise<PlatformSettings> => {
 });
 
 /**
- * Whether money actually moves. Two switches have to agree: the environment one (a deploy-level
- * kill switch nobody can flip from a browser) and the database one (the admin's own control).
+ * Whether money actually moves.
+ *
+ * One switch, and it is the row in the database. There used to be a second one in the
+ * environment, meant as a deploy-level kill switch — but the rules that decide money are database
+ * triggers, and a trigger cannot read an environment variable. The two could disagree, and when
+ * they did the result was a booking whose signal was owed, could not be paid, and could not be
+ * confirmed. A safety mechanism that fails that way is not one.
  */
 export async function paymentsLive(): Promise<boolean> {
   if (!hasSupabase) return true; // demo mode shows the flow without touching anything
-  if (!serverEnv.paymentsEnabled) return false;
   return (await getSettings()).paymentsEnabled;
 }
 

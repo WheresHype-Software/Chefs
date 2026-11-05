@@ -17,7 +17,7 @@ import type { PlatformSettings } from "@/lib/settings";
  * The preview underneath is not decoration: a commission percentage is abstract until you see
  * what a real dinner would pay.
  */
-export function PaymentSettingsForm({ settings, envEnabled }: { settings: PlatformSettings; envEnabled: boolean }) {
+export function PaymentSettingsForm({ settings, providerReady }: { settings: PlatformSettings; providerReady: boolean }) {
   const [form, setForm] = useState({ ...settings });
   const { run, pending, message } = useServerAction(saveSettings, { successMessage: "Definições guardadas." });
   const set = <K extends keyof PlatformSettings>(key: K, value: PlatformSettings[K]) => setForm((f) => ({ ...f, [key]: value }));
@@ -35,9 +35,9 @@ export function PaymentSettingsForm({ settings, envEnabled }: { settings: Platfo
         <div className="flex flex-col">
           <span className="font-semibold">Pagamentos ligados</span>
           <span className="text-sm text-muted">
-            {envEnabled
-              ? "O interruptor do servidor está ligado; este decide o resto."
-              : "PAYMENTS_ENABLED está desligado no servidor: nada se move, ligue-o aí primeiro."}
+            {providerReady
+              ? "Com isto ligado, o cliente passa a pagar o sinal na app assim que o chef aceita."
+              : "A EuPago ainda não está configurada no servidor, por isso nada pode ser cobrado mesmo com isto ligado."}
           </span>
         </div>
         <Switch checked={form.paymentsEnabled} label="Pagamentos ligados" onChange={(v) => set("paymentsEnabled", v)} />

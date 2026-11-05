@@ -12,7 +12,7 @@ import { RefundQueue } from "@/components/admin/RefundQueue";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { getAdminPayments } from "@/lib/admin/payments";
 import { getSession } from "@/lib/dashboard";
-import { serverEnv } from "@/lib/env.server";
+import { hasEupago } from "@/lib/env.server";
 import { euro } from "@/lib/format";
 import { hasSupabase } from "@/lib/supabase/server";
 
@@ -60,10 +60,10 @@ export default async function AdminPagamentos() {
         ]}
       />
 
-      {!serverEnv.paymentsEnabled && (
+      {!hasEupago && (
         <p className="box m-0 border-2 border-cobalt p-4 text-sm">
-          <strong>PAYMENTS_ENABLED está desligado no servidor.</strong> Nada é cobrado nem transferido, mesmo que as definições abaixo digam
-          o contrário. É o interruptor que não se liga a partir do browser.
+          <strong>A EuPago ainda não está configurada.</strong> Falta a chave de API ou a chave de cifra no servidor, por isso nenhum
+          pagamento pode ser iniciado, mesmo com os pagamentos ligados aqui.
         </p>
       )}
 
@@ -73,7 +73,7 @@ export default async function AdminPagamentos() {
       <PaymentsTable payments={view.payments} />
       <PayoutDocumentList documents={view.documents} />
       <Dac7Export years={years} />
-      <PaymentSettingsForm settings={view.settings} envEnabled={serverEnv.paymentsEnabled} />
+      <PaymentSettingsForm settings={view.settings} providerReady={hasEupago} />
     </AdminShell>
   );
 }

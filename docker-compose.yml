@@ -26,9 +26,9 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       # --- Pagamentos ---------------------------------------------------------
-      # Sem PAYMENTS_ENABLED aqui, a aplicação trata os pagamentos como desligados mesmo que a
-      # base de dados diga o contrário — e uma reserva aceite fica sem forma de ser paga.
-      PAYMENTS_ENABLED: ${PAYMENTS_ENABLED:-false}
+      # Ligar ou desligar os pagamentos faz-se em /admin/pagamentos, não aqui: as regras que
+      # decidem dinheiro são triggers na base de dados, e um trigger não lê uma variável de
+      # ambiente. O que fica aqui é o que o servidor precisa para conseguir cobrar.
       EUPAGO_ENV: ${EUPAGO_ENV:-sandbox}
       EUPAGO_API_KEY: ${EUPAGO_API_KEY:-}
       EUPAGO_WEBHOOK_SECRET: ${EUPAGO_WEBHOOK_SECRET:-}

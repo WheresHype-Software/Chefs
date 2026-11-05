@@ -90,9 +90,12 @@ Multibanco reference → EuPago notifies us → booking confirmed → service ha
 out the hold period → an admin builds a payout batch, downloads a SEPA file, pays at the bank and
 records it → each chef gets a payment document.
 
-**Two switches.** `PAYMENTS_ENABLED` in the environment, and `payments_enabled` in
-`platform_settings`. Both must be on. With either off the site behaves exactly as it did before:
-no payment step, no deposit on a booking, every existing test still passes.
+**One switch**, `payments_enabled` in `platform_settings`, flipped from `/admin/pagamentos`.
+With it off the site behaves exactly as it did before: no payment step, no deposit on a booking,
+every existing test still passes. It is deliberately not an environment variable as well — the
+rules that decide money are database triggers, and a trigger cannot read one. Two switches could
+disagree, and when they did the result was a booking whose signal was owed, could not be paid, and
+could not be confirmed.
 
 **Setting it up**
 
@@ -107,7 +110,7 @@ no payment step, no deposit on a booking, every existing test still passes.
 4. Schedule the catch-up job, which settles payments whose webhook never arrived:
    `curl -XPOST -H "x-reconcile-secret: $RECONCILE_SECRET" https://<your-domain>/api/payments/reconcile`
    every few minutes.
-5. Make yourself an admin and set the commission in `/admin/pagamentos` before switching anything on.
+5. Make yourself an admin, set the commission in `/admin/pagamentos`, and switch payments on there when you are ready.
 
 **Why a person is in the loop.** EuPago's payout endpoints are read-only — there is no API that
 sends money to a chef's IBAN. The app builds the batch and the bank file; a human uploads it and
