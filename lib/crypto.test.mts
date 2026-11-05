@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { test } from "node:test";
-import { decryptSecret, encryptSecret, maskIban, maskPhone, readKey, safeEqual, sha256 } from "./crypto.ts";
+import { decryptSecret, encryptSecret, maskIban, maskPhone, readKey, safeEqual, sha256 } from "./crypto";
 
 const key = randomBytes(32);
 

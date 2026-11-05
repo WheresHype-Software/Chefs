@@ -1,5 +1,5 @@
 import "server-only";
-import { EMAIL } from "./legal";
+import { COMPANY, EMAIL } from "./legal";
 
 // Secrets: never import this module from client code. || not ??: compose passes unset values as "".
 export const serverEnv = {
@@ -23,6 +23,14 @@ export const serverEnv = {
     clientId: process.env.EUPAGO_CLIENT_ID,
     clientSecret: process.env.EUPAGO_CLIENT_SECRET,
   },
+  /** The company account the chef payouts leave from, for the SEPA file. */
+  platformAccount: {
+    name: process.env.PLATFORM_ACCOUNT_NAME || COMPANY.name,
+    iban: process.env.PLATFORM_IBAN,
+    bic: process.env.PLATFORM_BIC,
+  },
+  /** Shared secret for the reconciliation endpoint, called from cron. */
+  reconcileSecret: process.env.RECONCILE_SECRET,
   /** Encrypts IBANs at rest. Read lazily: the app must boot without it when payments are off. */
   payoutEncryptionKey: process.env.PAYOUT_ENCRYPTION_KEY,
 } as const;
