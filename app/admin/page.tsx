@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { MobileMenu } from "@/components/MobileMenu";
-import { SignOutButton } from "@/components/SignOutButton";
-import { Wordmark } from "@/components/SiteChrome";
 import { notFound } from "next/navigation";
 import { ReviewModeration } from "@/components/admin/ReviewModeration";
 import { AdminQueueNav } from "@/components/admin/AdminQueueNav";
+import { AdminShell } from "@/components/admin/AdminShell";
 import { ApprovalQueue } from "@/components/admin/ApprovalQueue";
 import type { PendingChef } from "@/components/admin/PendingChefCard";
 import { TitleRequestCard } from "@/components/admin/TitleRequestCard";
@@ -21,9 +18,9 @@ export const metadata: Metadata = { title: "Administração", robots: { index: f
 export default async function AdminPage() {
   if (!hasSupabase) {
     return (
-      <Shell>
+      <AdminShell title="Administração">
         <p className="m-0 text-muted">A administração liga-se quando o projeto Supabase estiver configurado.</p>
-      </Shell>
+      </AdminShell>
     );
   }
   const session = await getSession();
@@ -84,7 +81,7 @@ export default async function AdminPage() {
     : { data: [] };
 
   return (
-    <Shell>
+    <AdminShell title="Administração">
       <AdminQueueNav
         queues={[
           { id: "aprovar", label: "Perfis por aprovar", count: pendingChefs.length },
@@ -138,42 +135,6 @@ export default async function AdminPage() {
           );
         })}
       </section>
-    </Shell>
-  );
-}
-
-function Shell({ children }: { children: React.ReactNode }) {
-  const brand = (
-    <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
-      <Wordmark />
-    </Link>
-  );
-  return (
-    <div className="min-h-screen bg-paper">
-      <header className="border-b border-line bg-white">
-        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between px-5 md:px-8">
-          {brand}
-          <MobileMenu
-            brand={brand}
-            links={[
-              { href: "/admin", label: "Administração" },
-              { href: "/dashboard", label: "Painel" },
-              { href: "/", label: "Página inicial" },
-            ]}
-            actions={<SignOutButton block />}
-          />
-          <div className="hidden items-baseline gap-5 text-sm md:flex">
-            <Link href="/dashboard" className="text-muted no-underline hover:text-ink">
-              Painel
-            </Link>
-            <SignOutButton />
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto flex max-w-[1240px] flex-col gap-8 px-5 py-10 md:px-8">
-        <h1 className="d m-0 text-[clamp(34px,5vw,52px)] leading-none">Administração</h1>
-        {children}
-      </main>
-    </div>
+    </AdminShell>
   );
 }
