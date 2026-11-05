@@ -134,6 +134,9 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           <Link href="/entrar" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
             Entrar
           </Link>
+          <Link href="/apoio" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
+            Apoio
+          </Link>
         </nav>
         <nav aria-label="Para chefs" className="flex flex-col text-[15px]">
           <span className="mb-1 font-semibold">{chefs ? "Ao Lume" : "Chefs"}</span>
