@@ -30,7 +30,8 @@ export default async function EntrarPage({ searchParams }: PageProps<"/entrar">)
             </p>
             {sp.erro === "link" && (
               <p role="alert" className="m-0 text-sm text-danger">
-                O link de confirmação expirou ou já foi usado. Entre com o email e a palavra-passe.
+                Esta ligação expirou ou já foi usada. Entre com o email e a palavra-passe, ou peça uma nova em «Esqueceu-se da
+                palavra-passe?».
               </p>
             )}
           </div>
