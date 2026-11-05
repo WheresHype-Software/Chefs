@@ -24,7 +24,7 @@ export default function ApoioPage() {
         <div className="flex flex-col gap-3">
           <h1 className="d m-0 text-[clamp(32px,5vw,48px)] leading-[1.05]">Como podemos ajudar?</h1>
           <p className="m-0 max-w-[62ch] text-muted">
-            Escreva-nos e respondemos normalmente no mesmo dia útil. Se for sobre uma reserva, indique o número do pedido — poupa-nos uma
+            Escreva-nos e respondemos normalmente no mesmo dia útil. Se for sobre uma reserva, indique o número do pedido: poupa-nos uma
             troca de emails.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function ApoioPage() {
               <dt className="m-0 font-semibold">O chef cancelou. Recebo o dinheiro de volta?</dt>
               <dd className="m-0 text-muted">
                 Sim, o sinal é devolvido por inteiro. Se pagou por MB WAY ou cartão, volta pelo mesmo caminho; se pagou por referência
-                Multibanco, pedimos-lhe o IBAN na página da sua reserva — nunca por email nem por telefone.
+                Multibanco, pedimos-lhe o IBAN na página da sua reserva. Nunca por email nem por telefone.
               </dd>
             </div>
             <div>

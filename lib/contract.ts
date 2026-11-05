@@ -20,7 +20,7 @@ export const CONTRACT_VERSION = 1;
 export const CONTRACT_TITLE = "Contrato de intermediação de pagamentos";
 
 export function contractText(): string {
-  return `${CONTRACT_TITLE} — versão ${CONTRACT_VERSION}
+  return `${CONTRACT_TITLE}, versão ${CONTRACT_VERSION}
 
 Entre ${COMPANY.name}, NIF ${COMPANY.nif}, com sede em ${COMPANY.address}, que explora a plataforma Ao Lume
 (adiante "Ao Lume"), e o profissional que aceita este contrato na sua conta (adiante "o chef").

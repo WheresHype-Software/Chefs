@@ -10,7 +10,7 @@ const STEPS = [
   { title: "Combinam no chat", text: "Uma conversa por reserva: alergias, horários, morada. Tudo fica registado." },
   {
     title: "O cliente paga o sinal",
-    text: "O cliente paga-lhe diretamente, por MB WAY, transferência ou dinheiro. A data fica marcada na agenda.",
+    text: "O cliente paga o sinal na app e a data fica marcada na agenda. O resto do valor combina consigo, no dia.",
   },
   { title: "Recebe a avaliação", text: "Depois do serviço, o cliente avalia. Só quem reservou pode avaliar, e pode responder." },
 ] as const;

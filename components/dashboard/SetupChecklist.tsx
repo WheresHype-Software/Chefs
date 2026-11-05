@@ -90,7 +90,7 @@ export function SetupChecklist({ chef, progress }: { chef: MyChef; progress: Set
       {waiting && <p className="m-0 text-muted">A equipa responde por email. Entretanto pode afinar as ofertas e a disponibilidade.</p>}
       {onlyBilling && (
         <p className="m-0 text-muted">
-          Já podes receber pedidos. O sinal que os clientes pagarem fica à tua ordem — só não to conseguimos transferir enquanto não
+          Já podes receber pedidos. O sinal que os clientes pagarem fica à tua ordem. Só não to conseguimos transferir enquanto não
           tivermos os teus dados fiscais, o IBAN e o contrato aceite. Não se perde nada: fica à tua espera.
         </p>
       )}

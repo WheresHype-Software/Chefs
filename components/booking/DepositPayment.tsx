@@ -181,7 +181,7 @@ export function DepositPayment({ bookingId, initial, chefFirstName }: Props) {
         <div className="flex flex-col gap-3">
           <Reference entity={payment.entity} reference={payment.reference} amount={payment.amount} />
           <p className="m-0 text-sm text-muted">
-            Enviámos-lhe estes dados por email. A reserva fica confirmada automaticamente assim que o pagamento entrar — pode fechar esta
+            Enviámos-lhe estes dados por email. A reserva fica confirmada automaticamente assim que o pagamento entrar. Pode fechar esta
             página.
           </p>
           <button type="button" className="btn btn-o btn-sm self-start" onClick={() => void startOver()} disabled={busy}>

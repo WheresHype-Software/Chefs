@@ -18,6 +18,7 @@ import { getChefProfile, getMonthCalendar } from "@/lib/data";
 import { fromPrice, rating, titledName } from "@/lib/format";
 import { breadcrumbJsonLd, chefBreadcrumbs, chefJsonLd } from "@/lib/seo";
 import type { ChefProfile } from "@/lib/types";
+import { paymentsLive } from "@/lib/settings";
 
 export async function generateMetadata({ params }: PageProps<"/chef/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -85,7 +86,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/che
             <ChefCuisines chef={chef} />
             <ChefOffers offers={chef.offers} />
             {/* The rules sit right after the menus, so they are read before choosing. */}
-            <ChefTerms chef={chef} />
+            <ChefTerms chef={chef} paymentsOn={await paymentsLive()} />
             <ChefReviews chef={chef} />
           </main>
 

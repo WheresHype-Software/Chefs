@@ -39,7 +39,7 @@ export function RefundIban({ bookingId, refund }: { bookingId: string; refund: P
       <div className="flex flex-col gap-1.5">
         <h2 className="d m-0 text-[28px]">Vamos devolver-lhe {euro(refund.amount)}</h2>
         <p className="m-0 text-muted">
-          {refund.reason}. Como pagou por referência Multibanco, o banco não permite devolver pelo mesmo caminho — precisamos de uma conta
+          {refund.reason}. Como pagou por referência Multibanco, o banco não permite devolver pelo mesmo caminho: precisamos de uma conta
           para onde transferir.
         </p>
       </div>
@@ -68,7 +68,7 @@ export function RefundIban({ bookingId, refund }: { bookingId: string; refund: P
       </form>
 
       <p className="m-0 text-xs text-muted">
-        Só lhe pedimos o IBAN aqui, nesta página. Nunca o pedimos por email, por telefone ou por mensagem — se alguém o fizer em nome do Ao
+        Só lhe pedimos o IBAN aqui, nesta página. Nunca o pedimos por email, por telefone ou por mensagem. Se alguém o fizer em nome do Ao
         Lume, não responda e avise-nos.
       </p>
     </section>

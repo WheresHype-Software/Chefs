@@ -39,7 +39,7 @@ export function Dac7Export({ years }: { years: number[] }) {
       <h2 className="d m-0 text-[22px] font-normal">Comunicação à Autoridade Tributária (DAC7)</h2>
       <p className="m-0 max-w-[70ch] text-sm text-muted">
         A lei obriga-nos a comunicar, até 31 de janeiro, quem vendeu através da plataforma e quanto recebeu. Isto gera a folha para o
-        contabilista entregar — e diz quem ainda tem dados em falta, enquanto há tempo de os pedir.
+        contabilista entregar, e diz quem ainda tem dados em falta enquanto há tempo de os pedir.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <label className="field lab !flex-row !items-center gap-2">

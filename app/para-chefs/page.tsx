@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Faq, type FaqItem } from "@/components/ui/Faq";
 import { Compare } from "@/components/para-chefs/Compare";
+import { FeeCalculator } from "@/components/para-chefs/FeeCalculator";
 import { HeroStage } from "@/components/para-chefs/HeroStage";
 import { Promises } from "@/components/para-chefs/Promises";
 import { RequestDemo } from "@/components/para-chefs/RequestDemo";
@@ -9,6 +10,8 @@ import { ToolList } from "@/components/para-chefs/ToolList";
 import { ToolTabs } from "@/components/para-chefs/ToolTabs";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE_DOMAIN } from "@/lib/constants";
+import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
+import { revealDelay } from "@/lib/motion";
 import { getPublicSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
@@ -41,7 +44,7 @@ const FAQ: FaqItem[] = [
   ],
   [
     "Que dados preciso de dar?",
-    "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7) — e dizemos-lhe sempre o que foi comunicado.",
+    "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7), e dizemos-lhe sempre o que foi comunicado.",
   ],
   [
     "Sou cozinheiro caseiro. Posso entrar?",
@@ -64,7 +67,8 @@ export const revalidate = 3600;
 export default async function ParaChefs() {
   const settings = await getPublicSettings();
   const pct = String(settings.commissionPercent).replace(".", ",");
-  const min = String(settings.commissionMin).replace(".", ",");
+  // Said from the chef's side: 88% reads very differently from 12%, and both are the same fact.
+  const keepsPct = String(Math.round((100 - settings.commissionPercent) * 10) / 10).replace(".", ",");
   return (
     <div>
       <SiteHeader chefs />
@@ -92,7 +96,7 @@ export default async function ParaChefs() {
             </a>
           </div>
           <span className="al-in text-sm text-muted" style={{ animationDelay: "340ms" }}>
-            Cada perfil é revisto pela equipa · o cliente paga-lhe diretamente
+            Cada perfil é revisto pela equipa · o sinal é pago na app
           </span>
         </div>
         <HeroStage />
@@ -183,63 +187,110 @@ export default async function ParaChefs() {
       </section>
 
       <section id="marketing" className="scroll-mt-16 bg-cobalt-deep text-white">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-14 md:px-10 md:py-[120px]">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
             <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
             <p className="m-0 max-w-[600px] text-lg text-[#c9d6ee]">
               Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
             </p>
           </div>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-x-10 border-t border-white">
-            {MKT.map(([t, d]) => (
-              <div key={t} className="al-rv flex flex-col gap-2 border-b border-[#2a4a86] pb-6 pt-6 md:gap-3 md:pb-[34px] md:pt-7">
-                <span className="d text-[22px] leading-[1.12] md:text-[26px]">{t}</span>
-                <span className="text-[15px] text-[#c9d6ee]">{d}</span>
-              </div>
+          {/* Grout lines rather than a bare list: each piece reads as its own tile. */}
+          <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-px border border-[#2a4a86] bg-[#2a4a86] p-0">
+            {MKT.map(([t, d], i) => (
+              <li key={t} className="al-rv flex flex-col gap-2.5 bg-cobalt-deep p-6 md:p-7" style={revealDelay(i)}>
+                <span aria-hidden="true" className="h-[3px] w-9 bg-yolk" />
+                <span className="d text-[21px] leading-[1.15] md:text-[23px]">{t}</span>
+                <span className="text-[15px] leading-relaxed text-[#c9d6ee]">{d}</span>
+              </li>
             ))}
-          </div>
-          <div className="al-rv flex flex-col gap-[26px]">
-            <h3 className="d m-0 text-[clamp(30px,4vw,44px)]">O seu percurso</h3>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] gap-px border border-[#2a4a86] bg-[#2a4a86]">
-              <div className="flex flex-col gap-2 bg-cobalt-deep p-[26px]">
-                <span className="lab text-[#c9d6ee]">À entrada</span>
-                <span className="d text-[30px]">Cozinheiro</span>
-                <span className="text-sm text-[#c9d6ee]">Todos começam aqui e recebem pedidos desde o primeiro dia.</span>
-              </div>
-              <div className="flex flex-col gap-2 bg-white p-[26px] text-ink">
-                <span className="lab text-muted">Com certificado verificado</span>
-                <span className="d text-[30px]">Chef</span>
-                <span className="text-sm text-ink-3">
-                  Envie um certificado de cozinha no painel. Depois de verificado, aparece como Chef, com a marca «Chef verificado».
-                </span>
-              </div>
+          </ul>
+
+          <div className="al-rv flex flex-col gap-7">
+            <div className="flex flex-col gap-2.5">
+              <h3 className="d m-0 text-[clamp(28px,4vw,42px)] leading-none">O seu percurso</h3>
+              <p className="m-0 max-w-[560px] text-[#c9d6ee]">
+                Recebe pedidos desde o dia em que for aprovado. O título de Chef vem depois, se tiver formação em cozinha.
+              </p>
             </div>
+            <ol className="m-0 grid list-none gap-px border border-[#2a4a86] bg-[#2a4a86] p-0 md:grid-cols-[1fr_auto_1fr]">
+              <li className="flex flex-col gap-2.5 bg-cobalt-deep p-7 md:p-8">
+                <span className="lab text-[#c9d6ee]">Passo 1 · à entrada</span>
+                <span className="d text-[clamp(28px,4vw,36px)] leading-none">Cozinheiro</span>
+                <span className="text-[15px] leading-relaxed text-[#c9d6ee]">
+                  Todos começam aqui. A página fica pública depois da revisão da equipa e os pedidos entram desde o primeiro dia.
+                </span>
+              </li>
+              <li aria-hidden="true" className="flex items-center justify-center bg-cobalt-deep px-6 py-4 md:px-5">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yolk">
+                  <path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" className="hidden md:block" />
+                  <path d="M12 4v15m0 0 5.5-5.5M12 19l-5.5-5.5" className="md:hidden" />
+                </svg>
+              </li>
+              <li className="flex flex-col gap-2.5 bg-white p-7 text-ink md:p-8">
+                <span className="lab flex items-center gap-1.5 text-cobalt">
+                  <VerifiedIcon size={15} />
+                  Passo 2 · com certificado
+                </span>
+                <span className="d text-[clamp(28px,4vw,36px)] leading-none">Chef</span>
+                <span className="text-[15px] leading-relaxed text-ink-3">
+                  Envie um certificado de cozinha no painel. Depois de verificado, passa a aparecer como Chef, com o selo ao lado do nome em
+                  todas as pesquisas.
+                </span>
+              </li>
+            </ol>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-14 px-5 py-14 md:px-10 md:py-[120px]">
-        <div className="al-rv flex min-w-0 flex-[1_1_420px] flex-col gap-[18px]">
-          <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">O sinal é pago na app.</h2>
-          <p className="m-0 max-w-[520px] text-lg text-ink-3">
-            Quando aceita um pedido, o cliente paga o sinal aqui — deixa de andar atrás de quem desaparece depois de marcar. Ficamos com uma
-            comissão de {pct}% do valor da reserva (mínimo {min} €) e transferimos-lhe o resto depois do serviço, com um documento que
-            explica a conta. O restante valor combina-o diretamente com o cliente, como sempre.
-          </p>
+      <section id="quanto-custa" className="scroll-mt-16 border-y border-line bg-paper">
+        <div className="mx-auto flex max-w-[1280px] flex-wrap items-start gap-12 px-5 py-14 md:px-10 md:py-[110px]">
+          <div className="al-rv flex min-w-0 flex-[1_1_440px] flex-col gap-6">
+            <div className="flex flex-col gap-[18px]">
+              <span className="inline-flex w-fit items-center gap-2 bg-yolk-soft px-3 py-1.5 text-[14px] font-semibold text-ink">
+                Entrar não custa nada
+              </span>
+              <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
+                Fica com {keepsPct}%
+                <br />
+                do que cobra.
+              </h2>
+              <p className="m-0 max-w-[520px] text-lg text-ink-3">
+                Não há mensalidade nem custo por pedido. Quando aceita uma reserva, o cliente paga o sinal aqui, descontamos a nossa
+                comissão de {pct}% e entregamos-lhe o resto depois do serviço, com um documento que explica a conta. O restante valor
+                combina-o consigo, como sempre.
+              </p>
+            </div>
+            <ul className="m-0 flex list-none flex-col gap-3 p-0">
+              {[
+                ["Deixa de andar atrás de quem marca e desaparece", "O sinal confirma a data. Sem sinal, não há reserva."],
+                ["Não tem de pedir dinheiro a ninguém", "O pedido do sinal parte de nós, não de si."],
+                ["O dinheiro é seu desde o primeiro minuto", "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."],
+              ].map(([t, d], i) => (
+                <li key={t} className="al-rv flex gap-3.5 border-t border-line pt-3.5" style={revealDelay(i)}>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    className="mt-1 shrink-0 text-cobalt"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12.5 10 17 19 7" />
+                  </svg>
+                  <span className="flex flex-col gap-0.5">
+                    <strong className="text-[17px]">{t}</strong>
+                    <span className="text-[15px] text-muted">{d}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="al-rv min-w-0 flex-[1_1_380px]">
+            <FeeCalculator commissionPercent={settings.commissionPercent} commissionMin={settings.commissionMin} depositPercent={30} />
+          </div>
         </div>
-        <ul className="al-rv m-0 grid min-w-0 flex-[1_1_420px] list-none grid-cols-[repeat(auto-fit,minmax(min(180px,100%),1fr))] gap-px border border-line bg-line p-0">
-          {[
-            ["Preço", "Fixo, por pessoa ou sob orçamento. Decide você."],
-            ["Sinal", "A percentagem que quiser. O cliente paga-o na app, por MB WAY ou Multibanco."],
-            ["Resto do valor", "Combinado diretamente consigo, como sempre: MB WAY, transferência ou dinheiro."],
-            ["Quando recebe", `Transferimos ${settings.payoutHoldHours} horas depois de concluir o serviço.`],
-          ].map(([t, d]) => (
-            <li key={t} className="flex flex-col gap-1.5 bg-white p-5">
-              <strong className="text-[18px]">{t}</strong>
-              <span className="text-[15px] text-muted">{d}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className="border-t border-line">

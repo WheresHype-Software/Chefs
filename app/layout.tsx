@@ -16,7 +16,7 @@ const schibsted = Schibsted_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.siteUrl),
   title: {
-    default: "Ao Lume — chefs privados e comida caseira perto de si",
+    default: "Ao Lume · chefs privados e comida caseira perto de si",
     template: "%s · Ao Lume",
   },
   description:

@@ -39,7 +39,7 @@ export default async function NovaPalavraPasse() {
           <NewPasswordForm next={next} />
         </div>
         <p className="m-0 text-sm text-muted">
-          Não foi você que pediu? <Link href="/apoio">Fale connosco</Link> — alguém pode ter tentado entrar na sua conta.
+          Não foi você que pediu? <Link href="/apoio">Fale connosco</Link>. Alguém pode ter tentado entrar na sua conta.
         </p>
       </main>
     </div>

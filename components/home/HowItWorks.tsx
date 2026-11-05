@@ -18,7 +18,7 @@ export function HowItWorks() {
             Como funciona
           </h2>
           <p className="m-0 max-w-[34ch] text-[17px] text-[#d6e1f5]">
-            O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço e o cliente paga-lhe diretamente.
+            O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço; o sinal é pago aqui e o resto diretamente ao chef.
           </p>
         </div>
         <ol className="m-0 grid list-none gap-8 p-0 md:grid-cols-3 md:gap-6">

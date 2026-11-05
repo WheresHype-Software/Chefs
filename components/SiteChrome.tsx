@@ -114,7 +114,7 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
         <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <span className="wordmark text-[26px] text-white">ao lume</span>
           <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">
-            Chefs e cozinheiros caseiros perto de si. O serviço, os preços e os pagamentos são combinados diretamente com cada chef.
+            Chefs e cozinheiros caseiros perto de si. O sinal da reserva é pago na app; o serviço e o restante valor são combinados com cada chef.
           </p>
           <a href={`mailto:${EMAIL.support}`} className="text-[15px] text-[#c9d6ee] no-underline hover:text-white">
             {EMAIL.support}

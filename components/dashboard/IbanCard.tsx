@@ -83,7 +83,7 @@ export function IbanCard({ billing, holderSuggestion }: Props) {
             <Field
               label="IBAN"
               required
-              hint={typed.length > 8 ? (looksValid ? formatIban(typed) : "Ainda não confere — verifica os dígitos.") : "PT50 …"}
+              hint={typed.length > 8 ? (looksValid ? formatIban(typed) : "Ainda não confere. Verifica os dígitos.") : "PT50 …"}
             >
               <input required maxLength={42} value={iban} onChange={(e) => setIban(e.target.value)} autoComplete="off" />
             </Field>

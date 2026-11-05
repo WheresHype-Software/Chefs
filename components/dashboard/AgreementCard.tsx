@@ -42,14 +42,14 @@ export function AgreementCard({ text, version, acceptedVersion, highlights, comm
         {highlights.map((h) => (
           <li key={h} className="flex gap-2.5">
             <span aria-hidden="true" className="text-muted">
-              —
+              ·
             </span>
             <span>{h}</span>
           </li>
         ))}
         <li className="flex gap-2.5">
           <span aria-hidden="true" className="text-muted">
-            —
+            ·
           </span>
           <span>
             Comissão em vigor: <strong className="num">{pct}%</strong> do valor da reserva, com um mínimo de{" "}

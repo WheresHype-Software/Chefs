@@ -140,8 +140,8 @@ const SECTIONS: LegalSection[] = [
         <p>
           <strong>Devolução do sinal.</strong> Se o chef cancelar depois de aceitar, ou não comparecer, o sinal é devolvido por inteiro e a
           comissão não é cobrada. Se for o cliente a cancelar, aplica-se a política do chef. Quando o pagamento foi feito por MB WAY ou
-          cartão, a devolução segue pelo mesmo meio; quando foi por referência Multibanco, pedimos o IBAN na página da reserva do cliente —
-          nunca por email, mensagem ou telefone.
+          cartão, a devolução segue pelo mesmo meio; quando foi por referência Multibanco, pedimos o IBAN na página da reserva do cliente.
+          Nunca por email, mensagem ou telefone.
         </p>
         <p>
           Quando o chef atua como profissional, o cliente tem os direitos que a lei de defesa do consumidor lhe dá. O direito de livre
