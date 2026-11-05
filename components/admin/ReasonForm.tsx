@@ -23,12 +23,18 @@ type Props = {
  */
 export function ReasonForm({ label, placeholder, submitLabel, danger, busy, message, extra, optional = false, onSubmit }: Props) {
   const [reason, setReason] = useState("");
+  const [tooShort, setTooShort] = useState(false);
 
   return (
     <form
       className="flex flex-col gap-2.5 border-t border-line pt-3"
       onSubmit={(e) => {
         e.preventDefault();
+        if (!optional && reason.trim().length < 3) {
+          setTooShort(true);
+          return;
+        }
+        setTooShort(false);
         onSubmit(reason.trim());
       }}
     >
@@ -51,7 +57,7 @@ export function ReasonForm({ label, placeholder, submitLabel, danger, busy, mess
         >
           {busy ? "A processar…" : submitLabel}
         </button>
-        <FormMessage message={message ?? null} />
+        <FormMessage message={message ?? (tooShort ? { ok: false, text: "Escreva o motivo antes de continuar." } : null)} />
       </div>
     </form>
   );

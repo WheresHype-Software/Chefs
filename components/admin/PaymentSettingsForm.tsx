@@ -19,7 +19,8 @@ import type { PlatformSettings } from "@/lib/settings";
 export function PaymentSettingsForm({ settings, envEnabled }: { settings: PlatformSettings; envEnabled: boolean }) {
   const [form, setForm] = useState({ ...settings });
   const [reason, setReason] = useState("");
-  const { run, pending, message } = useServerAction(saveSettings, { successMessage: "Definições guardadas." });
+  const { run, pending, message, setMessage } = useServerAction(saveSettings, { successMessage: "Definições guardadas." });
+  const [tooShort, setTooShort] = useState(false);
   const set = <K extends keyof PlatformSettings>(key: K, value: PlatformSettings[K]) => setForm((f) => ({ ...f, [key]: value }));
 
   // A 300 € dinner at the minimum signal this setting allows.
@@ -47,6 +48,12 @@ export function PaymentSettingsForm({ settings, envEnabled }: { settings: Platfo
         className="flex flex-col gap-4"
         onSubmit={(e) => {
           e.preventDefault();
+          if (reason.trim().length < 3) {
+            setTooShort(true);
+            setMessage(null);
+            return;
+          }
+          setTooShort(false);
           run({
             payments_enabled: form.paymentsEnabled,
             commission_percent: form.commissionPercent,
@@ -116,15 +123,22 @@ export function PaymentSettingsForm({ settings, envEnabled }: { settings: Platfo
           <strong className="num">{euro(Math.max(0, deposit - commission))}</strong>.
         </p>
 
-        <Field label="Motivo da alteração" required>
-          <input required minLength={3} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} />
+        <Field label="Motivo da alteração" required hint="Fica no registo, com os valores antes e depois. Basta uma frase.">
+          <input
+            required
+            minLength={3}
+            maxLength={500}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Baixámos a comissão para o lançamento"
+          />
         </Field>
 
         <div className="flex flex-wrap items-center gap-4">
-          <button className="btn btn-sm" disabled={pending || reason.trim().length < 3}>
+          <button className="btn btn-sm" disabled={pending}>
             {pending ? "A guardar…" : "Guardar definições"}
           </button>
-          <FormMessage message={message} />
+          <FormMessage message={message ?? (tooShort ? { ok: false, text: "Escreva o motivo da alteração antes de guardar." } : null)} />
         </div>
       </form>
     </section>
