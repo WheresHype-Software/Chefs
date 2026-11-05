@@ -11,6 +11,8 @@ type Props = {
   busy?: boolean;
   message?: FormMessageValue | null;
   extra?: ReactNode;
+  /** Some actions explain themselves — putting a chef back on the site, say. */
+  optional?: boolean;
   onSubmit: (reason: string) => void;
 };
 
@@ -19,7 +21,7 @@ type Props = {
  * input-and-button in every panel, every such action opens one of these — which also makes the
  * rule visible: if there is no box to type in, the action does not change money.
  */
-export function ReasonForm({ label, placeholder, submitLabel, danger, busy, message, extra, onSubmit }: Props) {
+export function ReasonForm({ label, placeholder, submitLabel, danger, busy, message, extra, optional = false, onSubmit }: Props) {
   const [reason, setReason] = useState("");
 
   return (
@@ -43,7 +45,10 @@ export function ReasonForm({ label, placeholder, submitLabel, danger, busy, mess
         />
       </label>
       <div className="flex flex-wrap items-center gap-3">
-        <button className={`btn btn-sm ${danger ? "btn-o !border-line-2 !text-danger" : ""}`} disabled={busy || reason.trim().length < 3}>
+        <button
+          className={`btn btn-sm ${danger ? "btn-o !border-line-2 !text-danger" : ""}`}
+          disabled={busy || (!optional && reason.trim().length < 3)}
+        >
           {busy ? "A processar…" : submitLabel}
         </button>
         <FormMessage message={message ?? null} />

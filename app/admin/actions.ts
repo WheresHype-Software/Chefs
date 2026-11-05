@@ -79,6 +79,52 @@ export async function reviewChef(chefId: string, decision: Decision, note: strin
   return ok();
 }
 
+const Visibility = z.object({
+  chefId: z.string().uuid(),
+  hidden: z.boolean(),
+  note: z.string().trim().max(500),
+});
+
+/**
+ * Takes a chef off the site, or puts them back.
+ *
+ * Separate from reviewChef on purpose: that one carries the badges from the approval card, and
+ * calling it from a list — where the badges are not on screen — would quietly wipe a chef's
+ * verified title. Here the badges are left exactly as they are.
+ *
+ * Hiding needs a reason, because the chef is told what it was.
+ */
+export async function setChefVisibility(chefId: string, hidden: boolean, note: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return fail("Sem permissão.");
+  const input = Visibility.safeParse({ chefId, hidden, note });
+  if (!input.success) return fail("Pedido inválido. Atualize a página e tente de novo.");
+  if (hidden && input.data.note.length < 3) return fail("Escreva o motivo: o chef recebe-o por email.");
+
+  const sb = await createClient();
+  const { error } = await sb.rpc("admin_review_chef", {
+    p_chef_id: chefId,
+    p_status: hidden ? "suspended" : "approved",
+    p_note: input.data.note || null,
+    p_badges: null, // leave the chef's badges alone
+  });
+  if (error) return failWith(error, "setChefVisibility", "Não foi possível guardar. Tente de novo.");
+
+  // Saved. A failed email must not look like a failed decision.
+  try {
+    const { data } = await sb.from("chefs").select("display_name, slug, profiles(email)").eq("id", chefId).single();
+    const email = (data?.profiles as unknown as { email: string } | null)?.email;
+    if (email && data) {
+      const tpl = EMAIL[hidden ? "suspended" : "approved"];
+      await sendEmail({ to: email, subject: tpl.subject, text: tpl.body(data.display_name, data.slug, input.data.note) });
+    }
+  } catch (err) {
+    console.error("[action] setChefVisibility email:", err);
+  }
+
+  revalidatePath("/admin");
+  return ok();
+}
+
 export async function moderateReview(reviewId: string, reportId: string, action: "keep" | "hide" | "delete"): Promise<ActionResult> {
   if (!(await isAdmin())) return fail("Sem permissão.");
   if (!z.string().uuid().safeParse(reviewId).success || !z.string().uuid().safeParse(reportId).success) return fail("Pedido inválido.");

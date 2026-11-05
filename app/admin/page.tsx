@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ReviewModeration } from "@/components/admin/ReviewModeration";
 import { AdminQueueNav } from "@/components/admin/AdminQueueNav";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { ChefRoster, type RosterChef } from "@/components/admin/ChefRoster";
 import { ApprovalQueue } from "@/components/admin/ApprovalQueue";
 import type { PendingChef } from "@/components/admin/PendingChefCard";
 import { TitleRequestCard } from "@/components/admin/TitleRequestCard";
@@ -11,6 +12,8 @@ import { selfieLink } from "@/lib/selfie";
 import { readiness } from "@/lib/admin/readiness";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { getSession } from "@/lib/dashboard";
+import { requiredDepositPercent } from "@/lib/money";
+import { getSettings, moneyRules } from "@/lib/settings";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Administração", robots: { index: false } };
@@ -28,7 +31,7 @@ export default async function AdminPage() {
   const sb = await createClient();
 
   const weekAgo = new Date(new Date().getTime() - 7 * 86400_000).toISOString();
-  const [pending, titleRequests, reports, chefsApproved, requests, completed, reviews] = await Promise.all([
+  const [pending, titleRequests, reports, chefsApproved, requests, completed, reviews, roster] = await Promise.all([
     sb
       .from("chefs")
       .select(
@@ -48,6 +51,15 @@ export default async function AdminPage() {
     sb.from("bookings").select("status", { count: "exact" }).gte("created_at", weekAgo),
     sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "completed").gte("completed_at", weekAgo),
     sb.from("reviews").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+    // Everything the approval queue no longer shows, so there is somewhere to manage it.
+    sb
+      .from("chefs")
+      .select(
+        "id, display_name, slug, status, area_name, badges, deposit_percent, rating_avg, review_count, completed_bookings, chef_photos(kind), offers(active)",
+      )
+      .neq("status", "pending")
+      .order("status")
+      .order("display_name"),
   ]);
 
   type WithCerts = { chef_certifications: { title: string; document_path: string | null }[] };
@@ -71,6 +83,20 @@ export default async function AdminPage() {
     (titleRequests.data ?? []) as unknown as ({ id: string; display_name: string; slug: string; badges: string[] } & WithCerts)[],
   );
 
+  const settings = await getSettings();
+  const minDeposit = settings.paymentsEnabled ? requiredDepositPercent(moneyRules(settings)) : 0;
+  const rosterChefs: RosterChef[] = (
+    (roster.data ?? []) as unknown as (Omit<RosterChef, "photos" | "activeOffers" | "minDeposit"> & {
+      chef_photos: { kind: string }[];
+      offers: { active: boolean }[];
+    })[]
+  ).map((c) => ({
+    ...c,
+    photos: (c.chef_photos ?? []).filter((p) => p.kind !== "selfie").length,
+    activeOffers: (c.offers ?? []).filter((o) => o.active).length,
+    minDeposit,
+  }));
+
   const reqRows = requests.data ?? [];
   const answered = reqRows.filter((r) => !["requested", "expired"].includes(r.status)).length;
   const accepted = reqRows.filter((r) => ["accepted", "confirmed", "completed"].includes(r.status)).length;
@@ -87,6 +113,7 @@ export default async function AdminPage() {
           { id: "aprovar", label: "Perfis por aprovar", count: pendingChefs.length },
           { id: "titulos", label: "Títulos de Chef", count: titleQueue.length },
           { id: "denuncias", label: "Denúncias", count: reports.data?.length ?? 0 },
+          { id: "chefs", label: "Chefs no site", count: rosterChefs.filter((c) => c.status === "approved").length },
         ]}
       />
       <StatGrid
@@ -114,6 +141,14 @@ export default async function AdminPage() {
         ) : (
           <p className="m-0 text-muted">Nenhum certificado por verificar.</p>
         )}
+      </section>
+
+      <section id="chefs" className="flex scroll-mt-16 flex-col gap-4">
+        <h2 className="lab m-0 border-b border-line-2 pb-2.5">
+          Chefs · {rosterChefs.filter((c) => c.status === "approved").length} no site,{" "}
+          {rosterChefs.filter((c) => c.status !== "approved").length} escondidos
+        </h2>
+        <ChefRoster chefs={rosterChefs} />
       </section>
 
       <section id="denuncias" className="flex scroll-mt-16 flex-col gap-4">
