@@ -176,11 +176,11 @@ export default async function ParaChefs() {
         <ToolList />
       </section>
 
-      <section id="marketing" className="scroll-mt-16 bg-cobalt-deep text-white">
+      <section id="marketing" className="scroll-mt-16 border-y border-line bg-white">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
             <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
-            <p className="m-0 max-w-[600px] text-lg text-[#d4e0f5]">
+            <p className="m-0 max-w-[600px] text-lg text-ink-3">
               Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
             </p>
           </div>
@@ -189,20 +189,20 @@ export default async function ParaChefs() {
           <div className="al-rv flex flex-col gap-7">
             <div className="flex flex-col gap-2.5">
               <h3 className="d m-0 text-[clamp(28px,4vw,42px)] leading-none">O seu percurso</h3>
-              <p className="m-0 max-w-[560px] text-[#d4e0f5]">
+              <p className="m-0 max-w-[560px] text-ink-3">
                 Recebe pedidos desde o dia em que for aprovado. O título de Chef vem depois, se tiver formação em cozinha.
               </p>
             </div>
-            <ol className="m-0 grid list-none gap-px bg-[#2a4a86] p-0 md:grid-cols-[1fr_auto_1fr]">
-              <li className="flex flex-col gap-2.5 bg-[#16357f] p-7 md:p-8">
-                <span className="lab text-[#8fb0e8]">Passo 1 · à entrada</span>
+            <ol className="m-0 grid list-none gap-px border border-line bg-line p-0 md:grid-cols-[1fr_auto_1fr]">
+              <li className="flex flex-col gap-2.5 bg-paper p-7 md:p-8">
+                <span className="lab text-muted">Passo 1 · à entrada</span>
                 <span className="d text-[clamp(28px,4vw,36px)] leading-none">Cozinheiro</span>
-                <span className="text-[15px] leading-relaxed text-[#d4e0f5]">
+                <span className="text-[15px] leading-relaxed text-ink-3">
                   Todos começam aqui. A página fica pública depois da revisão da equipa e os pedidos entram desde o primeiro dia.
                 </span>
               </li>
-              <li aria-hidden="true" className="flex items-center justify-center bg-[#16357f] px-6 py-4 md:px-5">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yolk">
+              <li aria-hidden="true" className="flex items-center justify-center bg-white px-6 py-4 md:px-5">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-cobalt">
                   <path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" className="hidden md:block" />
                   <path d="M12 4v15m0 0 5.5-5.5M12 19l-5.5-5.5" className="md:hidden" />
                 </svg>
