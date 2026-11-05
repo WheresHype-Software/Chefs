@@ -57,11 +57,14 @@ export default async function Overview() {
           </div>
           <StatGrid
             size="md"
+            // Only money coming in. A yearly commission total would be the one figure that makes
+            // a small percentage feel like a bill, and the chef can see it per booking anyway,
+            // on the booking itself and on the document that comes with each payment.
             items={[
               ["A receber de nós", euro(payouts.summary.balance)],
               ["Clientes devem-te", euro(money.restOwed)],
-              ["Sinais recebidos este ano", euro(money.depositsReceived)],
-              ["Comissão este ano", euro(money.commissionPaid)],
+              ["Recebido de nós este ano", euro(payouts.summary.paidThisYear)],
+              ["Recebido dos clientes este ano", euro(money.restPaid)],
             ]}
           />
           {(money.awaitingDeposit > 0 || money.restToConfirm > 0) && (
