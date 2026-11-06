@@ -8,6 +8,7 @@ import { ApprovalQueue } from "@/components/admin/ApprovalQueue";
 import type { PendingChef } from "@/components/admin/PendingChefCard";
 import { TitleRequestCard } from "@/components/admin/TitleRequestCard";
 import { certificateLinks } from "@/lib/admin/certificates";
+import { emailHealth } from "@/lib/admin/health";
 import { selfieLink } from "@/lib/selfie";
 import { readiness } from "@/lib/admin/readiness";
 import { StatGrid } from "@/components/ui/StatGrid";
@@ -85,7 +86,7 @@ export default async function AdminPage() {
     (titleRequests.data ?? []) as unknown as ({ id: string; display_name: string; slug: string; badges: string[] } & WithCerts)[],
   );
 
-  const settings = await getSettings();
+  const [settings, mail] = await Promise.all([getSettings(), emailHealth()]);
   const minDeposit = settings.paymentsEnabled ? requiredDepositPercent(moneyRules(settings)) : 0;
   const rosterChefs: RosterChef[] = (
     (roster.data ?? []) as unknown as (Omit<RosterChef, "photos" | "activeOffers" | "minDeposit"> & {
@@ -123,6 +124,13 @@ export default async function AdminPage() {
           { id: "chefs", label: "Chefs no site", count: rosterChefs.filter((c) => c.status === "approved").length },
         ]}
       />
+      {mail.state !== "ok" && (
+        <p className="box m-0 border-2 border-cobalt p-4 text-sm">
+          <strong>{mail.state === "off" ? "Os emails não estão a ser enviados." : "Os emails estão a falhar."}</strong> {mail.detail} Isto
+          afeta tudo: avisos de pedidos novos, aprovações, pagamentos e apoio.
+        </p>
+      )}
+
       <StatGrid
         size="md"
         items={[
