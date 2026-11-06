@@ -1,5 +1,6 @@
 import "server-only";
 import { sendEmail, siteUrl } from "./email";
+import { renderEmail } from "./email-template";
 import { chefTitle } from "./format";
 import { createAdminClient } from "./supabase/admin";
 
@@ -28,21 +29,17 @@ export async function sendReviewRequest(bookingId: string): Promise<void> {
     const { data: token } = await admin.rpc("new_guest_token", { p_client_id: b.client_id });
     if (!token) return;
     const who = `${chefTitle(chef.badges)} ${chef.display_name}`;
-    await sendEmail({
-      to: client.email,
-      subject: `Como correu com ${who}?`,
-      text: [
-        `Olá ${client.name?.split(" ")[0] ?? ""},`.trim(),
-        "",
-        `Esperamos que tenha gostado de «${b.offer_title}».`,
-        `Em 10 segundos pode avaliar ${who}: basta escolher as estrelas.`,
-        siteUrl(`/reserva/${bookingId}?t=${token}`),
-        "",
-        "A sua avaliação ajuda outras pessoas a escolher. Tem 14 dias para avaliar.",
-        "",
-        "Ao Lume",
-      ].join("\n"),
+    const doc = renderEmail({
+      preheader: `Dez segundos para avaliar ${who}.`,
+      heading: `Como correu com ${who}?`,
+      lead: `Esperamos que tenha gostado de «${b.offer_title}».`,
+      paragraphs: [
+        "Avaliar leva dez segundos: basta escolher as estrelas. A sua avaliação ajuda outras pessoas a escolher, e só quem concluiu uma reserva pode escrever uma.",
+      ],
+      cta: { label: `Avaliar ${who}`, href: siteUrl(`/reserva/${bookingId}?t=${token}`) },
+      footnote: "Tem 14 dias para avaliar.",
     });
+    await sendEmail({ to: client.email, subject: `Como correu com ${who}?`, text: doc.text, html: doc.html });
   } catch (err) {
     console.error("[review request]", err);
   }

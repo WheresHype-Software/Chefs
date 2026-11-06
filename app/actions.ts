@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking-token";
 import { sendEmail, siteUrl } from "@/lib/email";
+import { renderEmail } from "@/lib/email-template";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { failInvalid } from "@/lib/result";
 import { createAnonClient, createClient, hasSupabase } from "@/lib/supabase/server";
@@ -103,17 +104,29 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   const link = `/reserva/${r.bookingId}`;
   const emailLink = `${link}?t=${r.token}`;
   // The booking exists from here on: email problems are logged, never shown as a failed request.
+  const live = await paymentsLive();
+  const clientDoc = renderEmail({
+    preheader: `${chefName} tem 48 horas para responder ao seu pedido.`,
+    heading: `Pedido enviado a ${chefName}`,
+    lead: `Olá ${b.name.split(" ")[0]}. O seu pedido seguiu e ${chefName} tem 48 horas para aceitar, recusar ou propor outra data.`,
+    facts: [
+      ["Pedido", r.ref],
+      ["Quando", `${b.date} · ${b.time}`],
+      ["Pessoas / unidades", String(b.guests)],
+    ],
+    paragraphs: [
+      live
+        ? `Ainda não paga nada. Se ${chefName} aceitar, pedimos-lhe um sinal para confirmar a data; o restante valor é combinado diretamente com o chef.`
+        : "Ainda não paga nada: o pagamento é combinado diretamente com o chef.",
+    ],
+    cta: { label: "Acompanhar o pedido", href: siteUrl(emailLink) },
+    footnote: "Guarde este email: a ligação acima é a sua forma de abrir o pedido e falar com o chef, sem criar conta.",
+  });
   const emailed = await sendEmail({
     to: b.email,
     subject: `Pedido ${r.ref} enviado a ${chefName}`,
-    text:
-      `Olá ${b.name.split(" ")[0]},\n\n` +
-      `O seu pedido foi enviado a ${chefName}. Tem 48 horas para responder.\n\n` +
-      `Acompanhe o pedido e converse com o chef aqui (guarde este link):\n${siteUrl(emailLink)}\n\n` +
-      ((await paymentsLive())
-        ? `Ainda não paga nada. Se ${chefName} aceitar, pedimos-lhe um sinal para confirmar a reserva; o restante valor é combinado diretamente com o chef.`
-        : `Ainda não paga nada: o pagamento é combinado diretamente com o chef.`) +
-      `\n\nAo Lume`,
+    text: clientDoc.text,
+    html: clientDoc.html,
   }).catch((err) => {
     console.error("[action] requestBooking client email:", err);
     return false;
@@ -128,14 +141,21 @@ async function notifyChef(bookingId: string, ref: string, b: z.infer<typeof Book
   const { data } = await admin.from("bookings").select("offer_title, chefs(display_name, profiles(email))").eq("id", bookingId).single();
   const chef = data?.chefs as unknown as { display_name: string; profiles: { email: string } | null } | null;
   if (!chef?.profiles?.email) return;
-  await sendEmail({
-    to: chef.profiles.email,
-    subject: `Novo pedido ${ref}: ${data?.offer_title} · ${b.guests} · ${b.date}`,
-    text:
-      `Olá ${chef.display_name.split(" ")[0]},\n\nTem um novo pedido de ${b.name} para ${b.date} (${b.time}), ${b.guests} pessoas/unidades.\n` +
-      (b.notes ? `\nNotas: ${b.notes}\n` : "") +
-      `\nResponda em 48 horas: ${siteUrl(`/dashboard/pedidos/${bookingId}`)}\n\nAo Lume`,
+  const doc = renderEmail({
+    preheader: `${b.name} quer reservar ${data?.offer_title} para ${b.date}.`,
+    heading: "Tem um pedido novo",
+    lead: `Olá ${chef.display_name.split(" ")[0]}. ${b.name} enviou um pedido e está à espera da sua resposta.`,
+    facts: [
+      ["Serviço", data?.offer_title ?? "—"],
+      ["Quando", `${b.date} · ${b.time}`],
+      ["Pessoas / unidades", String(b.guests)],
+      ...((b.address ? [["Onde", b.address]] : []) as [string, string][]),
+    ],
+    paragraphs: b.notes ? [`O que o cliente escreveu: «${b.notes}»`] : [],
+    cta: { label: "Responder ao pedido", href: siteUrl(`/dashboard/pedidos/${bookingId}`) },
+    footnote: "Tem 48 horas para aceitar, recusar ou propor outra data. Depois disso o pedido expira sozinho.",
   });
+  await sendEmail({ to: chef.profiles.email, subject: `Novo pedido ${ref}: ${data?.offer_title}`, text: doc.text, html: doc.html });
 }
 
 const LookupInput = z.object({

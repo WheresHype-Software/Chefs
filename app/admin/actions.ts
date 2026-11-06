@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { BADGES } from "@/lib/constants";
 import { getSession } from "@/lib/dashboard";
 import { sendEmail, siteUrl } from "@/lib/email";
+import { renderEmail, type EmailDoc } from "@/lib/email-template";
 import { z } from "zod";
 import { fail, failWith, ok, type ActionResult } from "@/lib/result";
 import { removeSelfies } from "@/lib/selfie";
@@ -23,21 +24,40 @@ const ReviewInput = z.object({
   badges: z.array(z.enum(BADGES)).max(BADGES.length),
 });
 
-const EMAIL: Record<Decision, { subject: string; body: (name: string, slug: string, note: string) => string }> = {
+/** A decisão da equipa, no mesmo desenho de todos os outros emails. */
+const EMAIL: Record<Decision, { subject: string; doc: (name: string, slug: string, note: string) => EmailDoc }> = {
   approved: {
     subject: "O seu perfil Ao Lume foi aprovado",
-    body: (name, slug, note) =>
-      `Olá ${name},\n\nO seu perfil já está publicado: ${siteUrl(`/chef/${slug}`)}\nPartilhe o link na bio do Instagram.${note ? `\n\n${note}` : ""}\n\nAo Lume`,
+    doc: (name, slug, note) => ({
+      preheader: "A sua página já está pública.",
+      heading: "O seu perfil está publicado",
+      lead: `Olá ${name}. A partir de agora aparece nas pesquisas da sua zona e pode receber pedidos.`,
+      paragraphs: [
+        `Ponha a ligação na bio do Instagram: é mais fácil de partilhar do que um formulário, e já leva consigo os menus, os preços e as avaliações.`,
+        ...(note ? [note] : []),
+      ],
+      cta: { label: "Ver a minha página", href: siteUrl(`/chef/${slug}`) },
+    }),
   },
   rejected: {
     subject: "O seu perfil Ao Lume precisa de alterações",
-    body: (name, _slug, note) =>
-      `Olá ${name},\n\nRevimos o seu perfil e precisamos de algumas alterações:\n${note}\n\nAtualize em ${siteUrl("/dashboard/perfil")} e volte a enviar.\n\nAo Lume`,
+    doc: (name, _slug, note) => ({
+      preheader: "Faltam alguns acertos antes de publicarmos.",
+      heading: "Precisamos de algumas alterações",
+      lead: `Olá ${name}. Revimos o seu perfil e falta pouco.`,
+      paragraphs: [note, "Depois de atualizar, volte a enviar para revisão. Respondemos normalmente no mesmo dia útil."],
+      cta: { label: "Atualizar o perfil", href: siteUrl("/dashboard/perfil") },
+    }),
   },
   suspended: {
     subject: "O seu perfil Ao Lume foi suspenso",
-    body: (name, _slug, note) =>
-      `Olá ${name},\n\nO seu perfil deixou de estar visível no Ao Lume.\nMotivo: ${note}\n\nSe tiver dúvidas, responda a este email.\n\nAo Lume`,
+    doc: (name, _slug, note) => ({
+      preheader: "A sua página deixou de estar visível.",
+      heading: "O seu perfil deixou de estar visível",
+      lead: `Olá ${name}.`,
+      facts: [["Motivo", note]],
+      paragraphs: ["As reservas que já tinha mantêm-se. Se achar que há um engano, responda a este email e vemos outra vez."],
+    }),
   },
 };
 
@@ -69,7 +89,8 @@ export async function reviewChef(chefId: string, decision: Decision, note: strin
     const email = (data?.profiles as unknown as { email: string } | null)?.email;
     if (email && data) {
       const tpl = EMAIL[decision];
-      await sendEmail({ to: email, subject: tpl.subject, text: tpl.body(data.display_name, data.slug, input.data.note) });
+      const rendered = renderEmail(tpl.doc(data.display_name, data.slug, input.data.note));
+      await sendEmail({ to: email, subject: tpl.subject, text: rendered.text, html: rendered.html });
     }
   } catch (err) {
     console.error("[action] reviewChef email:", err);
@@ -115,7 +136,8 @@ export async function setChefVisibility(chefId: string, hidden: boolean, note: s
     const email = (data?.profiles as unknown as { email: string } | null)?.email;
     if (email && data) {
       const tpl = EMAIL[hidden ? "suspended" : "approved"];
-      await sendEmail({ to: email, subject: tpl.subject, text: tpl.body(data.display_name, data.slug, input.data.note) });
+      const rendered = renderEmail(tpl.doc(data.display_name, data.slug, input.data.note));
+      await sendEmail({ to: email, subject: tpl.subject, text: rendered.text, html: rendered.html });
     }
   } catch (err) {
     console.error("[action] setChefVisibility email:", err);
@@ -157,7 +179,7 @@ export async function verifyChefTitle(chefId: string): Promise<ActionResult> {
   if (!(await isAdmin())) return fail("Sem permissão.");
   if (!z.string().uuid().safeParse(chefId).success) return fail("Pedido inválido.");
   const sb = await createClient();
-  const { data: chef } = await sb.from("chefs").select("status, badges, display_name, profiles(email)").eq("id", chefId).single();
+  const { data: chef } = await sb.from("chefs").select("status, badges, display_name, slug, profiles(email)").eq("id", chefId).single();
   if (!chef) return fail("Chef não encontrado.");
   const { error } = await sb.rpc("admin_review_chef", {
     p_chef_id: chefId,
@@ -171,11 +193,16 @@ export async function verifyChefTitle(chefId: string): Promise<ActionResult> {
   try {
     const email = (chef.profiles as unknown as { email: string } | null)?.email;
     if (email) {
-      await sendEmail({
-        to: email,
-        subject: "Já aparece como Chef no Ao Lume",
-        text: `Olá ${chef.display_name},\n\nVerificámos o seu certificado. A partir de agora aparece aos clientes como Chef ${chef.display_name}, com a marca «Chef verificado».\n\nAo Lume`,
+      const doc = renderEmail({
+        preheader: "O seu certificado foi verificado.",
+        heading: `Já aparece como Chef ${chef.display_name}`,
+        lead: `Olá ${chef.display_name}. Verificámos o seu certificado de cozinha.`,
+        paragraphs: [
+          "A partir de agora aparece aos clientes como Chef, com o selo «Chef verificado» ao lado do nome em todas as pesquisas.",
+        ],
+        cta: { label: "Ver a minha página", href: siteUrl(`/chef/${chef.slug}`) },
       });
+      await sendEmail({ to: email, subject: "Já aparece como Chef no Ao Lume", text: doc.text, html: doc.html });
     }
   } catch (err) {
     console.error("[action] verifyChefTitle email:", err);
@@ -225,11 +252,17 @@ export async function refuseChefTitle(chefId: string, reason: string): Promise<A
   try {
     const email = (chef.profiles as unknown as { email: string } | null)?.email;
     if (email) {
-      await sendEmail({
-        to: email,
-        subject: "O seu certificado no Ao Lume",
-        text: `Olá ${chef.display_name},\n\nNão conseguimos verificar o certificado que enviou:\n${input.data.reason}\n\nPode enviar outro em ${siteUrl("/dashboard/perfil")}.\n\nAo Lume`,
+      const doc = renderEmail({
+        preheader: "Não conseguimos verificar o certificado.",
+        heading: "O certificado que enviou",
+        lead: `Olá ${chef.display_name}. Não conseguimos verificar o certificado que nos enviou.`,
+        facts: [["Porquê", input.data.reason]],
+        paragraphs: [
+          "Pode enviar outro quando quiser. Continua a receber pedidos entretanto: o título de Chef é um extra, não um requisito.",
+        ],
+        cta: { label: "Enviar outro certificado", href: siteUrl("/dashboard/perfil") },
       });
+      await sendEmail({ to: email, subject: "O seu certificado no Ao Lume", text: doc.text, html: doc.html });
     }
   } catch (err) {
     console.error("[action] refuseChefTitle email:", err);
