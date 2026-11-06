@@ -25,7 +25,16 @@ export const emailHealth = cache(async (): Promise<EmailHealth> => {
       cache: "no-store",
     });
     if (res.status === 401 || res.status === 400) {
-      return { state: "broken", detail: "A Resend recusa a chave (401). Nenhum email está a ser entregue, em lado nenhum." };
+      // A sending-only key is refused here but works perfectly for the one thing we use it for.
+      // Treating that as broken would be worse than not checking at all.
+      const body = (await res.json().catch(() => ({}))) as { name?: string };
+      if (body.name === "restricted_api_key") {
+        return {
+          state: "ok",
+          detail: `A enviar de ${serverEnv.emailFrom}. A chave só permite enviar, por isso o domínio não é verificado aqui.`,
+        };
+      }
+      return { state: "broken", detail: "A Resend recusa a chave. Nenhum email está a ser entregue, em lado nenhum." };
     }
     if (!res.ok) return { state: "broken", detail: `A Resend respondeu ${res.status}. Os envios podem estar a falhar.` };
 
