@@ -20,14 +20,18 @@ const storagePath = (url: string) => url.slice(url.indexOf(BUCKET_PATH) + BUCKET
 
 const cleanCaption = (caption: string | undefined) => caption?.trim().slice(0, CAPTION_MAX) || null;
 
-export async function addPhoto(url: string, kind: PhotoKind, caption?: string): Promise<Result> {
+/** The saved row comes back, so the gallery can show the photo without waiting for a refresh. */
+export type AddPhotoResult = { ok: true; photo: ChefPhoto | null } | { ok: false; error: string };
+
+export async function addPhoto(url: string, kind: PhotoKind, caption?: string): Promise<AddPhotoResult> {
   const ctx = await chefContext();
-  if (ctx.demo) return ok();
-  if (!ctx.chef) return fail(NO_CHEF);
+  if (ctx.demo) return { ok: true, photo: null };
+  // Spelled out rather than fail(): the richer return type cannot be narrowed from ActionResult.
+  if (!ctx.chef) return { ok: false, error: NO_CHEF };
   // Only accept files the chef uploaded to their own folder in our bucket.
   const session = await getSession();
   const prefix = `${publicEnv.supabaseUrl}${BUCKET_PATH}${session.userId}/`;
-  if (!url.startsWith(prefix) || !PHOTO_KINDS.includes(kind)) return fail(INVALID);
+  if (!url.startsWith(prefix) || !PHOTO_KINDS.includes(kind)) return { ok: false, error: INVALID };
 
   const { data: existing } = await ctx.sb.from("chef_photos").select("id, url, kind, sort_order").eq("chef_id", ctx.chef.id);
   const rows = existing ?? [];
@@ -46,14 +50,23 @@ export async function addPhoto(url: string, kind: PhotoKind, caption?: string): 
     }
   }
   const nextOrder = Math.max(-1, ...rows.filter((r) => r.kind === "gallery").map((r) => r.sort_order)) + 1;
-  const { error } = await ctx.sb.from("chef_photos").insert({
-    chef_id: ctx.chef.id,
-    url,
-    kind,
-    caption: cleanCaption(caption),
-    sort_order: kind === "gallery" ? nextOrder : 0,
-  });
-  return error ? failWith(error, "addPhoto", "Não foi possível guardar a fotografia. Tente de novo.") : done();
+  const { data: saved, error } = await ctx.sb
+    .from("chef_photos")
+    .insert({
+      chef_id: ctx.chef.id,
+      url,
+      kind,
+      caption: cleanCaption(caption),
+      sort_order: kind === "gallery" ? nextOrder : 0,
+    })
+    .select("id, url, kind, caption, sort_order")
+    .single();
+  if (error) {
+    const failure = failWith(error, "addPhoto", "Não foi possível guardar a fotografia. Tente de novo.");
+    return failure.ok ? { ok: true, photo: null } : failure;
+  }
+  done();
+  return { ok: true, photo: saved as unknown as ChefPhoto };
 }
 
 /** Registers a verification selfie uploaded to the private chef-docs bucket; it replaces any earlier one. */

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { DishPhotoCard } from "@/components/dashboard/DishPhotoCard";
 import { PhotoUploadButton } from "@/components/dashboard/PhotoUploadButton";
 import { FormMessage } from "@/components/ui/FormMessage";
@@ -90,9 +91,24 @@ type Props = { photos: ChefPhoto[]; userId: string | null; initials: string; app
 
 /** Profile photo and the dish gallery: upload, describe, order, pick the cover, delete. */
 export function PhotoManager({ photos, userId, initials, approved }: Props) {
-  const { upload, uploading, message: uploadMessage } = usePhotoUpload(userId);
-  const { dishes, message, setMessage, move, remove } = useDishPhotos(photos.filter((p) => p.kind === "gallery"));
-  const portrait = photos.find((p) => p.kind === "portrait");
+  // Photos that have been saved but that this page has not been re-rendered to include yet.
+  const [justAdded, setJustAdded] = useState<ChefPhoto[]>([]);
+  const {
+    upload,
+    uploading,
+    progress,
+    message: uploadMessage,
+  } = usePhotoUpload(userId, (photo) => setJustAdded((list) => [...list, photo]));
+
+  const gallery = useMemo(() => {
+    const server = photos.filter((p) => p.kind === "gallery");
+    const known = new Set(server.map((p) => p.url));
+    // Once the server knows about one, its own copy wins and the local one drops out.
+    return [...server, ...justAdded.filter((p) => !known.has(p.url))];
+  }, [photos, justAdded]);
+
+  const { dishes, message, setMessage, move, remove } = useDishPhotos(gallery);
+  const portrait = justAdded.findLast((p) => p.kind === "portrait") ?? photos.find((p) => p.kind === "portrait");
   const selfie = photos.find((p) => p.kind === "selfie");
   const onCaption = (r: ActionResult) => setMessage(r.ok ? null : { ok: false, text: r.error });
 
@@ -114,7 +130,7 @@ export function PhotoManager({ photos, userId, initials, approved }: Props) {
               pelo menos três para enviar o perfil para revisão.
             </p>
           </div>
-          <PhotoUploadButton kind="gallery" label="Adicionar fotografias" busy={uploading} onFiles={upload} primary />
+          <PhotoUploadButton kind="gallery" label="Adicionar fotografias" busy={uploading} progress={progress} onFiles={upload} primary />
         </div>
 
         {dishes.length === 0 ? (

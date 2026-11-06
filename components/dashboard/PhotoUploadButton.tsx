@@ -6,15 +6,17 @@ type Props = {
   kind: UploadKind;
   label: string;
   busy: boolean;
+  /** How many of how many are done, while a batch is in flight. */
+  progress?: { done: number; total: number } | null;
   onFiles: (kind: UploadKind, files: FileList | null) => void;
   primary?: boolean;
 };
 
 /** File picker styled as a button; the label keeps it keyboard- and screen-reader-friendly. */
-export function PhotoUploadButton({ kind, label, busy, onFiles, primary = false }: Props) {
+export function PhotoUploadButton({ kind, label, busy, progress, onFiles, primary = false }: Props) {
   return (
     <label className={`btn btn-sm ${primary ? "" : "btn-o"} cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}>
-      {busy ? "A carregar…" : label}
+      {busy ? (progress && progress.total > 1 ? `A carregar ${progress.done} de ${progress.total}…` : "A carregar…") : label}
       <input
         type="file"
         accept="image/*"
