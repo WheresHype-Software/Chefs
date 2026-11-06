@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Schibsted_Grotesk } from "next/font/google";
 import { publicEnv } from "@/lib/env";
 import "./globals.css";
@@ -12,6 +12,9 @@ const schibsted = Schibsted_Grotesk({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800", "900"],
 });
+
+// The cobalt the browser chrome and the phone status bar pick up.
+export const viewport: Viewport = { themeColor: "#1d4aa1" };
 
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.siteUrl),

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+  <title>Ao Lume</title>
+  <rect width="24" height="24" rx="4" fill="#1d4aa1"/>
+  <path d="M12 0v24M0 12h24" stroke="#fff" stroke-width="1.2" opacity="0.55"/>
+  <circle cx="12" cy="12" r="6.5" fill="#fff"/>
+  <circle cx="12" cy="12" r="3" fill="#f0b429"/>
+</svg>
