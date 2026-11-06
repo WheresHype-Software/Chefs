@@ -109,7 +109,9 @@ could not be confirmed.
 3. Run the new migrations (`20261105000001` … `20261105000007`).
 4. Schedule the catch-up job, which settles payments whose webhook never arrived:
    `curl -XPOST -H "x-reconcile-secret: $RECONCILE_SECRET" https://<your-domain>/api/payments/reconcile`
-   every few minutes.
+   every few minutes. Once a day, the same secret opens
+   `/api/chefs/nudge`, which emails chefs who signed up and stopped halfway (once per step,
+   never twice). Neither sends anything until it is scheduled.
 5. Make yourself an admin, set the commission in `/admin/pagamentos`, and switch payments on there when you are ready.
 
 **Why a person is in the loop.** EuPago's payout endpoints are read-only — there is no API that

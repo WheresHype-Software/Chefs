@@ -31,7 +31,7 @@ export default async function AdminPage() {
   const sb = await createClient();
 
   const weekAgo = new Date(new Date().getTime() - 7 * 86400_000).toISOString();
-  const [pending, titleRequests, reports, chefsApproved, requests, completed, reviews, roster] = await Promise.all([
+  const [pending, titleRequests, reports, chefsApproved, requests, completed, reviews, roster, chefProfiles] = await Promise.all([
     sb
       .from("chefs")
       .select(
@@ -55,11 +55,13 @@ export default async function AdminPage() {
     sb
       .from("chefs")
       .select(
-        "id, display_name, slug, status, area_name, badges, deposit_percent, rating_avg, review_count, completed_bookings, chef_photos(kind), offers(active)",
+        "id, profile_id, display_name, slug, status, area_name, badges, deposit_percent, rating_avg, review_count, completed_bookings, chef_photos(kind), offers(active)",
       )
       .neq("status", "pending")
       .order("status")
       .order("display_name"),
+    // Signed up as a chef and never created a profile: invisible everywhere else.
+    sb.from("profiles").select("id, name, email, created_at").eq("role", "chef").order("created_at", { ascending: false }),
   ]);
 
   type WithCerts = { chef_certifications: { title: string; document_path: string | null }[] };
@@ -96,6 +98,11 @@ export default async function AdminPage() {
     activeOffers: (c.offers ?? []).filter((o) => o.active).length,
     minDeposit,
   }));
+
+  const withProfile = new Set(((roster.data ?? []) as { profile_id: string | null }[]).map((c) => c.profile_id).filter(Boolean));
+  const neverStarted = (
+    (chefProfiles.data ?? []) as { id: string; name: string | null; email: string | null; created_at: string }[]
+  ).filter((p) => !withProfile.has(p.id));
 
   const reqRows = requests.data ?? [];
   const answered = reqRows.filter((r) => !["requested", "expired"].includes(r.status)).length;
@@ -148,6 +155,24 @@ export default async function AdminPage() {
           Chefs · {rosterChefs.filter((c) => c.status === "approved").length} no site,{" "}
           {rosterChefs.filter((c) => c.status !== "approved").length} escondidos
         </h2>
+        {neverStarted.length > 0 && (
+          <div className="box flex flex-col gap-2.5 p-5">
+            <h3 className="d m-0 text-[18px] font-normal">Criaram conta e nunca criaram perfil · {neverStarted.length}</h3>
+            <p className="m-0 text-sm text-muted">
+              Escolheram «sou chef» e pararam antes do primeiro passo. Recebem um lembrete automático ao fim de 24 horas; vale a pena
+              ligar-lhes se forem da sua zona.
+            </p>
+            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+              {neverStarted.map((p) => (
+                <li key={p.id} className="flex flex-wrap items-baseline gap-x-3 text-sm">
+                  <span className="font-semibold">{p.name ?? "sem nome"}</span>
+                  {p.email && <a href={`mailto:${p.email}`}>{p.email}</a>}
+                  <span className="text-muted">desde {p.created_at.slice(0, 10)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <ChefRoster chefs={rosterChefs} />
       </section>
 
