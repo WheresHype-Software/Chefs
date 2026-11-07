@@ -15,29 +15,48 @@ import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { revealDelay } from "@/lib/motion";
 import { getPublicSettings } from "@/lib/settings";
 
-export const metadata: Metadata = {
-  title: "Para chefs",
-  description:
-    "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. O cliente paga o sinal na app; pagamos-te depois do serviço.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { paymentsEnabled } = await getPublicSettings();
+  return {
+    title: "Para chefs",
+    description: paymentsEnabled
+      ? "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. O cliente paga o sinal na app; pagamos-te depois do serviço."
+      : "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. Sem mensalidades e sem comissões.",
+  };
+}
 
-const FAQ: FaqItem[] = [
+const faq = (paymentsOn: boolean, pct: string): FaqItem[] => [
   [
     "Quanto custa?",
-    "Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Só cobramos quando ganha: uma comissão sobre o valor da reserva, descontada ao sinal que o cliente paga na app. A percentagem em vigor está sempre no seu painel, e qualquer alteração é avisada com pelo menos 30 dias.",
+    paymentsOn
+      ? `Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Só cobramos quando ganha: uma comissão de ${pct}% sobre o valor da reserva, descontada ao sinal que o cliente paga na app. A percentagem em vigor está sempre no seu painel, e qualquer alteração é avisada com pelo menos 30 dias.`
+      : "Hoje, nada: criar o perfil, aparecer nas pesquisas, receber pedidos e combinar o serviço não têm custo nenhum, e não cobramos comissão. Mais à frente passará a haver uma comissão por cada reserva garantida, sempre descontada ao que o cliente paga e nunca cobrada a si à parte. Quem já cá estiver é avisado com pelo menos 30 dias.",
   ],
   [
     "Como recebo o pagamento?",
-    "O sinal é pago pelo cliente na app e fica à sua ordem. Depois de concluir o serviço, transferimo-lo para o seu IBAN já com a comissão descontada, acompanhado de um documento com os seus dados fiscais, o sinal recebido, a comissão e o valor transferido. O restante valor do serviço continua a ser combinado e pago diretamente entre si e o cliente.",
+    paymentsOn
+      ? "O sinal é pago pelo cliente na app e fica à sua ordem. Depois de concluir o serviço, transferimo-lo para o seu IBAN já com a comissão descontada, acompanhado de um documento com os seus dados fiscais, o sinal recebido, a comissão e o valor transferido. O restante valor do serviço continua a ser combinado e pago diretamente entre si e o cliente."
+      : "Diretamente do cliente, como combinarem entre os dois: o Ao Lume não toca no dinheiro. A app serve para o encontrar, organizar o pedido e guardar a conversa.",
   ],
   [
     "E se eu cancelar depois de aceitar?",
-    "O sinal é devolvido por inteiro ao cliente e não cobramos comissão nenhuma. Cancelamentos repetidos são tidos em conta na sua conta.",
+    paymentsOn
+      ? "O sinal é devolvido por inteiro ao cliente e não cobramos comissão nenhuma. Cancelamentos repetidos são tidos em conta na sua conta."
+      : "Avise o cliente pela página da reserva, para ficar registo. Cancelamentos repetidos são tidos em conta na sua conta.",
   ],
-  [
-    "Que dados preciso de dar?",
-    "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7), e dizemos-lhe sempre o que foi comunicado.",
-  ],
+  ...(paymentsOn
+    ? ([
+        [
+          "Que dados preciso de dar?",
+          "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7), e dizemos-lhe sempre o que foi comunicado.",
+        ],
+      ] as FaqItem[])
+    : ([
+        [
+          "Que dados preciso de dar?",
+          "Só o que aparece no perfil: quem é, onde cozinha e o que faz. Enquanto o pagamento for combinado diretamente consigo, não lhe pedimos NIF nem IBAN.",
+        ],
+      ] as FaqItem[])),
   [
     "Sou cozinheiro caseiro. Posso entrar?",
     "Sim. Todos começam como Cozinheiro e são revistos pela nossa equipa antes de aparecerem nas pesquisas. Quem tem formação em cozinha envia o certificado e passa a aparecer como Chef.",
@@ -59,6 +78,7 @@ export const revalidate = 3600;
 export default async function ParaChefs() {
   const settings = await getPublicSettings();
   const pct = String(settings.commissionPercent).replace(".", ",");
+  const paymentsOn = settings.paymentsEnabled;
   return (
     <div>
       <SiteHeader chefs />
@@ -86,7 +106,9 @@ export default async function ParaChefs() {
             </a>
           </div>
           <span className="al-in text-sm text-muted" style={{ animationDelay: "340ms" }}>
-            Cada perfil é revisto pela equipa · o sinal é pago na app
+            {paymentsOn
+              ? "Cada perfil é revisto pela equipa · o sinal é pago na app"
+              : "Cada perfil é revisto pela equipa · sem mensalidades e sem comissões"}
           </span>
         </div>
         <HeroStage />
@@ -228,25 +250,52 @@ export default async function ParaChefs() {
           <div className="al-rv flex min-w-0 flex-[1_1_440px] flex-col gap-6">
             <div className="flex flex-col gap-[18px]">
               <span className="inline-flex w-fit items-center gap-2 bg-yolk-soft px-3 py-1.5 text-[14px] font-semibold text-ink">
-                Sem mensalidades
+                {paymentsOn ? "Sem mensalidades" : "De graça, para já"}
               </span>
               <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
-                Só paga por cada
-                <br />
-                serviço garantido.
+                {paymentsOn ? (
+                  <>
+                    Só paga por cada
+                    <br />
+                    serviço garantido.
+                  </>
+                ) : (
+                  <>
+                    Hoje não paga
+                    <br />
+                    absolutamente nada.
+                  </>
+                )}
               </h2>
               <p className="m-0 max-w-[520px] text-lg text-ink-3">
-                Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a data
-                fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva, não há
-                nada a pagar.
+                {paymentsOn ? (
+                  <>
+                    Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a
+                    data fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva,
+                    não há nada a pagar.
+                  </>
+                ) : (
+                  <>
+                    Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos, e nenhuma comissão sobre o que
+                    combinar com o cliente. Estamos a começar e queremos chefs, não receita. Se um dia passarmos a cobrar, avisamos com pelo
+                    menos 30 dias.
+                  </>
+                )}
               </p>
             </div>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
-              {[
-                ["Deixa de andar atrás de quem marca e desaparece", "O sinal confirma a data. Sem sinal, não há reserva."],
-                ["Não tem de pedir dinheiro a ninguém", "O pedido do sinal parte de nós, não de si."],
-                ["O dinheiro é seu desde o primeiro minuto", "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."],
-              ].map(([t, d], i) => (
+              {(paymentsOn
+                ? [
+                    ["Deixa de andar atrás de quem marca e desaparece", "O sinal confirma a data. Sem sinal, não há reserva."],
+                    ["Não tem de pedir dinheiro a ninguém", "O pedido do sinal parte de nós, não de si."],
+                    ["O dinheiro é seu desde o primeiro minuto", "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."],
+                  ]
+                : [
+                    ["Uma montra que trabalha por si", "Aparece nas pesquisas da sua zona sem pagar nada por isso."],
+                    ["Os pedidos chegam organizados", "Dia, pessoas, morada e o que o cliente quer, tudo num sítio só."],
+                    ["O dinheiro nunca passa por nós", "Combina e recebe diretamente do cliente, como sempre fez."],
+                  ]
+              ).map(([t, d], i) => (
                 <li key={t} className="al-rv flex gap-3.5 border-t border-line pt-3.5" style={revealDelay(i)}>
                   <svg
                     width="20"
@@ -268,9 +317,12 @@ export default async function ParaChefs() {
               ))}
             </ul>
           </div>
-          <div className="al-rv min-w-0 flex-[1_1_380px]">
-            <FeeCalculator commissionPercent={settings.commissionPercent} commissionMin={settings.commissionMin} depositPercent={30} />
-          </div>
+          {/* A calculadora mostra uma comissão. Sem comissão, não há nada para calcular. */}
+          {paymentsOn && (
+            <div className="al-rv min-w-0 flex-[1_1_380px]">
+              <FeeCalculator commissionPercent={settings.commissionPercent} commissionMin={settings.commissionMin} depositPercent={30} />
+            </div>
+          )}
         </div>
       </section>
 
@@ -305,7 +357,7 @@ export default async function ParaChefs() {
             <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Perguntas</h2>
           </div>
           <div className="min-w-0 flex-[2_1_520px]">
-            <Faq items={FAQ} />
+            <Faq items={faq(paymentsOn, pct)} />
           </div>
         </div>
       </section>

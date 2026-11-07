@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getSettings } from "@/lib/settings";
+import { redirect } from "next/navigation";
 import { AgreementCard } from "@/components/dashboard/AgreementCard";
 import { BillingForm } from "@/components/dashboard/BillingForm";
 import { IbanCard } from "@/components/dashboard/IbanCard";
@@ -34,6 +36,9 @@ function steps(r: PayoutReadiness): Step[] {
 }
 
 export default async function Faturacao() {
+  // Sem pagamentos na app não há sinal para receber nem comissão para descontar: a secção sai
+  // do menu, e quem lá chegar por um link antigo volta para onde há alguma coisa para ver.
+  if (!(await getSettings()).paymentsEnabled) redirect("/dashboard");
   const chef = await requireChef();
   const { billing, readiness, settings, acceptedVersion } = await getBilling();
   const list = steps(readiness);

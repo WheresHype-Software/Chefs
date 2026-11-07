@@ -6,7 +6,8 @@ import { SideNav } from "@/components/dashboard/SideNav";
 import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
-import { DASHBOARD_NAV } from "@/lib/dashboard-nav";
+import { dashboardNav } from "@/lib/dashboard-nav";
+import { getSettings } from "@/lib/settings";
 import { chefTitle } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Painel", robots: { index: false } };
@@ -21,6 +22,8 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
   // app e a primeira coisa que aparecia era o pedido para criar uma conta de cozinheiro.
   if (!chef && session.role === "admin") redirect("/admin");
   const pending = chef ? (await getBookings({ statuses: ["requested"] })).length : 0;
+  const { paymentsEnabled } = await getSettings();
+  const nav = dashboardNav(paymentsEnabled);
 
   const brand = (
     <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
@@ -37,7 +40,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
         <MobileMenu
           brand={brand}
           alert={pending > 0}
-          links={DASHBOARD_NAV.map((l) => ({ ...l, badge: l.href === "/dashboard/pedidos" ? pending : undefined }))}
+          links={nav.map((l) => ({ ...l, badge: l.href === "/dashboard/pedidos" ? pending : undefined }))}
           actions={
             <>
               {chef?.status === "approved" && (
@@ -74,7 +77,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           {brand}
           <span className="lab text-muted">{session.role === "admin" ? "Admin" : "Chef"}</span>
         </div>
-        <SideNav pending={pending} />
+        <SideNav pending={pending} links={nav} />
         {chef && (
           <div className="mt-auto flex flex-col gap-1 border-t border-line px-3.5 pt-[18px]">
             <span className="d text-xl">{chef.display_name}</span>

@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DASHBOARD_NAV } from "@/lib/dashboard-nav";
 
-export function SideNav({ pending }: { pending: number }) {
+export function SideNav({ pending, links }: { pending: number; links: readonly { href: string; label: string }[] }) {
   const path = usePathname();
   return (
     <div className="flex flex-col gap-0.5">
-      {DASHBOARD_NAV.map(({ href, label }) => {
+      {links.map(({ href, label }) => {
         const current = href === "/dashboard" ? path === href : path.startsWith(href);
         return (
           <Link key={href} href={href} className="side-link" aria-current={current ? "page" : undefined}>

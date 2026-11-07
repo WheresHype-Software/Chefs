@@ -43,6 +43,10 @@ services:
       PLATFORM_BIC: ${PLATFORM_BIC:-}
       # Segredo do endpoint de reconciliação, chamado pelo cron.
       RECONCILE_SECRET: ${RECONCILE_SECRET:-}
+      # Avisos no Discord. Opcionais: sem URL, o aviso não é enviado.
+      DISCORD_WEBHOOK_CHEF_SIGNUP: ${DISCORD_WEBHOOK_CHEF_SIGNUP:-}
+      DISCORD_WEBHOOK_USER_SIGNUP: ${DISCORD_WEBHOOK_USER_SIGNUP:-}
+      DISCORD_WEBHOOK_CHEF_REVIEW: ${DISCORD_WEBHOOK_CHEF_REVIEW:-}
 
 networks:
   sites_proxy:

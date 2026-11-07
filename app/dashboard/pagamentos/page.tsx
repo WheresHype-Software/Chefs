@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getSettings } from "@/lib/settings";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { PayoutDocuments } from "@/components/dashboard/PayoutDocuments";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -17,6 +19,9 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function Pagamentos() {
+  // Sem pagamentos na app não há sinal para receber nem comissão para descontar: a secção sai
+  // do menu, e quem lá chegar por um link antigo volta para onde há alguma coisa para ver.
+  if (!(await getSettings()).paymentsEnabled) redirect("/dashboard");
   const [{ summary, payouts, documents }, { readiness }] = await Promise.all([getPayouts(), getBilling()]);
   const ready =
     readiness.hasFiscal &&

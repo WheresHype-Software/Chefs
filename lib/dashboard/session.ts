@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { announceChefSignup, announceUserSignup } from "../notify/discord";
 import { createClient, hasSupabase } from "../supabase/server";
 import { DEMO_CHEF } from "./demo";
 import type { MyChef, Role, Session } from "./types";
@@ -12,9 +13,36 @@ export const getSession = cache(async (): Promise<Session> => {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) redirect("/entrar");
-  const { data: profile } = await sb.from("profiles").select("role").eq("id", user.id).single();
-  return { demo: false, userId: user.id, role: (profile?.role ?? "client") as Role };
+  const { data: profile } = await sb.from("profiles").select("role, name, signup_announced_at").eq("id", user.id).single();
+  const role = (profile?.role ?? "client") as Role;
+  if (profile && !profile.signup_announced_at) void announceSignup(user.id, role, profile.name as string | null);
+  return { demo: false, userId: user.id, role };
 });
+
+/**
+ * O aviso de que alguém se inscreveu, enviado no primeiro pedido que essa pessoa faz já com
+ * sessão. É o mais perto do momento da inscrição a que se chega sem meter o Postgres a falar com
+ * o Discord: a conta é criada por um trigger em auth.users e o browser vem logo a seguir para uma
+ * página nossa.
+ *
+ * Quem conseguir carimbar a data é quem envia. Em duas renderizações ao mesmo tempo, só uma
+ * escreve, e por isso só uma avisa.
+ */
+async function announceSignup(userId: string, role: Role, name: string | null) {
+  try {
+    const sb = await createClient();
+    const { data } = await sb
+      .from("profiles")
+      .update({ signup_announced_at: new Date().toISOString() })
+      .eq("id", userId)
+      .is("signup_announced_at", null)
+      .select("id");
+    if (!data?.length) return; // outra renderização chegou primeiro
+    await (role === "chef" ? announceChefSignup(name) : announceUserSignup(name));
+  } catch (err) {
+    console.error("[session] aviso de inscrição:", err);
+  }
+}
 
 export const getMyChef = cache(async (): Promise<MyChef | null> => {
   const s = await getSession();

@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { announceChefForReview } from "@/lib/notify/discord";
 import { getSession } from "@/lib/dashboard";
 import { notifyAdmin } from "@/lib/email";
 import { TIER_LABEL } from "@/lib/format";
@@ -137,6 +138,9 @@ export async function submitForReview(): Promise<Result> {
   if (error) return failWith(error, "submitForReview", "Não foi possível enviar para revisão. Tente de novo.");
 
   const chef = ctx.chef;
+  // O email chega à caixa de quem o lê quando o abre; o Discord chega ao telemóvel de quem estiver
+  // por perto. Nenhum dos dois pode impedir o envio para revisão de ficar registado.
+  void announceChefForReview(chef).catch((err) => console.error("[profile] aviso no Discord:", err));
   const portfolio = chef.socials.instagram ? `Instagram @${chef.socials.instagram.replace(/^@/, "")}` : (chef.socials.website ?? "—");
   await notifyAdmin({
     subject: `Perfil para verificar: ${chef.display_name}`,

@@ -33,6 +33,12 @@ export const serverEnv = {
   reconcileSecret: process.env.RECONCILE_SECRET,
   /** Encrypts IBANs at rest. Read lazily: the app must boot without it when payments are off. */
   payoutEncryptionKey: process.env.PAYOUT_ENCRYPTION_KEY,
+  /** Avisos no Discord. Cada um é opcional: sem URL, o aviso simplesmente não é enviado. */
+  discord: {
+    chefSignup: process.env.DISCORD_WEBHOOK_CHEF_SIGNUP,
+    userSignup: process.env.DISCORD_WEBHOOK_USER_SIGNUP,
+    chefReview: process.env.DISCORD_WEBHOOK_CHEF_REVIEW,
+  },
 } as const;
 
 /** True when the EuPago client has what it needs. Checked before any payment action. */
