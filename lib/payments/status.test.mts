@@ -28,3 +28,11 @@ test("normaliseWord strips accents rather than mangling them", () => {
   assert.equal(normaliseWord("ANULADA"), "anulada");
   assert.equal(normaliseWord("Expirádá"), "expirada");
 });
+
+test("o código de resposta não é o estado do pagamento", () => {
+  // A EuPago devolve `estado: 0` a dizer "a pergunta correu bem", e o estado verdadeiro em
+  // `estado_referencia`. Ler o primeiro como estado responde "unknown" a um pagamento feito.
+  assert.equal(readStatus(0), "unknown");
+  assert.equal(readStatus("0"), "unknown");
+  assert.equal(readStatus("paga"), "paid");
+});

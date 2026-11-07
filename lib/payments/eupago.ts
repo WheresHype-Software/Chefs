@@ -124,14 +124,34 @@ const MultibancoResponse = z.object({
   transacao: z.union([z.string(), z.number()]).optional(),
 });
 
+/**
+ * The reference lookup, which answers for every method and not only Multibanco.
+ *
+ * Two traps in one response. `estado` is the API's own response code (0 means the call worked),
+ * not the state of the payment — reading it as a status silently answers "unknown" to a payment
+ * that is plainly settled. And the amount is not at the top level at all: it is inside the list
+ * of payments received against the reference, which is also the only place the real transaction
+ * id appears.
+ */
 const InfoResponse = z.object({
   sucesso: z.boolean().optional(),
   estado: z.union([z.string(), z.number()]).optional(),
+  estado_referencia: z.string().optional(),
   referencia: z.union([z.string(), z.number()]).optional(),
   entidade: z.union([z.string(), z.number()]).optional(),
   identificador: z.string().optional(),
   valor: z.union([z.string(), z.number()]).optional(),
   resposta: z.string().optional(),
+  pagamentos: z
+    .array(
+      z.object({
+        trid: z.union([z.string(), z.number()]).optional(),
+        estado: z.string().optional(),
+        valor: z.union([z.string(), z.number()]).optional(),
+        data_pagamento: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 const TridResponse = z.object({
@@ -322,12 +342,20 @@ export const eupago: PaymentProvider = {
     if (!res.ok) return res;
     const parsed = InfoResponse.safeParse(res.data);
     if (!parsed.success) return providerError("status shape", res.data);
+    const info = parsed.data;
+    // A negative code is the provider refusing the question, not an unpaid payment.
+    if (typeof info.estado === "number" && info.estado < 0) {
+      return providerError("status rejected", info, String(info.estado));
+    }
+    const settled = (info.pagamentos ?? []).filter((x) => readStatus(x.estado) === "paid");
+    const paidCents = settled.reduce((sum, x) => sum + (cents(x.valor) ?? 0), 0);
     return {
       ok: true,
       data: {
-        status: readStatus(parsed.data.estado),
-        amountCents: cents(parsed.data.valor),
-        providerTransactionId: null,
+        // The reference's own state, then any payment recorded against it. Never the response code.
+        status: readStatus(info.estado_referencia ?? info.pagamentos?.[0]?.estado),
+        amountCents: settled.length ? paidCents : cents(info.valor),
+        providerTransactionId: str(info.pagamentos?.[0]?.trid),
         raw: res.data,
       },
     };
