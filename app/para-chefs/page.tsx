@@ -249,53 +249,36 @@ export default async function ParaChefs() {
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-start gap-12 px-5 py-14 md:px-10 md:py-[110px]">
           <div className="al-rv flex min-w-0 flex-[1_1_440px] flex-col gap-6">
             <div className="flex flex-col gap-[18px]">
+              {/* A comissão é a mesma com os pagamentos ligados ou desligados: está decidida, e
+                  explicá-la agora é melhor do que deixá-la para quando começar a sair da conta de
+                  alguém. O que muda é o aviso em cima, que diz a quem chega hoje que ainda não paga. */}
               <span className="inline-flex w-fit items-center gap-2 bg-yolk-soft px-3 py-1.5 text-[14px] font-semibold text-ink">
-                {paymentsOn ? "Sem mensalidades" : "De graça, para já"}
+                Sem mensalidades
               </span>
               <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
-                {paymentsOn ? (
-                  <>
-                    Só paga por cada
-                    <br />
-                    serviço garantido.
-                  </>
-                ) : (
-                  <>
-                    Hoje não paga
-                    <br />
-                    absolutamente nada.
-                  </>
-                )}
+                Só paga por cada
+                <br />
+                serviço garantido.
               </h2>
+              {!paymentsOn && (
+                <p className="m-0 max-w-[520px] border-l-[3px] border-yolk bg-yolk-soft px-4 py-3 text-[15px] text-ink">
+                  <strong>Aos primeiros chefs não cobramos nada.</strong> Enquanto estivermos a começar, o pagamento é combinado diretamente
+                  consigo e não fica cá comissão nenhuma. É assim que vai funcionar quando ligarmos os pagamentos, e quem já cá estiver é
+                  avisado com pelo menos 30 dias.
+                </p>
+              )}
               <p className="m-0 max-w-[520px] text-lg text-ink-3">
-                {paymentsOn ? (
-                  <>
-                    Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a
-                    data fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva,
-                    não há nada a pagar.
-                  </>
-                ) : (
-                  <>
-                    Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos, e nenhuma comissão sobre o que
-                    combinar com o cliente. Estamos a começar e queremos chefs, não receita. Se um dia passarmos a cobrar, avisamos com pelo
-                    menos 30 dias.
-                  </>
-                )}
+                Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a data
+                fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva, não há
+                nada a pagar.
               </p>
             </div>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
-              {(paymentsOn
-                ? [
-                    ["Deixa de andar atrás de quem marca e desaparece", "O sinal confirma a data. Sem sinal, não há reserva."],
-                    ["Não tem de pedir dinheiro a ninguém", "O pedido do sinal parte de nós, não de si."],
-                    ["O dinheiro é seu desde o primeiro minuto", "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."],
-                  ]
-                : [
-                    ["Uma montra que trabalha por si", "Aparece nas pesquisas da sua zona sem pagar nada por isso."],
-                    ["Os pedidos chegam organizados", "Dia, pessoas, morada e o que o cliente quer, tudo num sítio só."],
-                    ["O dinheiro nunca passa por nós", "Combina e recebe diretamente do cliente, como sempre fez."],
-                  ]
-              ).map(([t, d], i) => (
+              {[
+                ["Deixa de andar atrás de quem marca e desaparece", "O sinal confirma a data. Sem sinal, não há reserva."],
+                ["Não tem de pedir dinheiro a ninguém", "O pedido do sinal parte de nós, não de si."],
+                ["O dinheiro é seu desde o primeiro minuto", "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."],
+              ].map(([t, d], i) => (
                 <li key={t} className="al-rv flex gap-3.5 border-t border-line pt-3.5" style={revealDelay(i)}>
                   <svg
                     width="20"
@@ -317,12 +300,9 @@ export default async function ParaChefs() {
               ))}
             </ul>
           </div>
-          {/* A calculadora mostra uma comissão. Sem comissão, não há nada para calcular. */}
-          {paymentsOn && (
-            <div className="al-rv min-w-0 flex-[1_1_380px]">
-              <FeeCalculator commissionPercent={settings.commissionPercent} commissionMin={settings.commissionMin} depositPercent={30} />
-            </div>
-          )}
+          <div className="al-rv min-w-0 flex-[1_1_380px]">
+            <FeeCalculator commissionPercent={settings.commissionPercent} commissionMin={settings.commissionMin} depositPercent={30} />
+          </div>
         </div>
       </section>
 
