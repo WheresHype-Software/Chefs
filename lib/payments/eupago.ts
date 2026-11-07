@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { serverEnv } from "../env.server";
 import { toEuros } from "../money";
-import { normaliseWord as normalise, readStatus } from "./status";
+import { normaliseWord as normalise, readInfoResponse, readStatus } from "./status";
 import type {
   CreatedPayment,
   CreateCardInput,
@@ -102,7 +102,7 @@ function apiKeyHeader(): Record<string, string> {
 }
 
 // --- OAuth, for the management endpoints (refunds, transaction lookups) ------
-const TokenResponse = z.object({ access_token: z.string(), expires_in: z.string().or(z.number()).optional() });
+const TokenResponse = z.object({ access_token: z.string(), expires_in: z.string().or(z.number()).nullish() });
 let token: { value: string; until: number } | null = null;
 
 async function bearer(): Promise<string | null> {
@@ -120,81 +120,54 @@ async function bearer(): Promise<string | null> {
 }
 
 // --- Responses ---------------------------------------------------------------
+// nullish, never optional: the provider sends null in fields it has nothing for, and a schema
+// that only tolerates absence throws away the whole reply over one of them. That is how a paid
+// card payment spent an afternoon looking unpaid.
 const MbwayResponse = z.object({
-  transactionStatus: z.string().optional(),
-  transactionID: z.string().optional(),
-  reference: z.union([z.string(), z.number()]).optional(),
-  code: z.string().optional(),
-  text: z.string().optional(),
+  transactionStatus: z.string().nullish(),
+  transactionID: z.string().nullish(),
+  reference: z.union([z.string(), z.number()]).nullish(),
+  code: z.string().nullish(),
+  text: z.string().nullish(),
 });
 
 const MultibancoResponse = z.object({
-  sucesso: z.boolean().optional(),
-  estado: z.number().optional(),
-  resposta: z.string().optional(),
-  referencia: z.union([z.string(), z.number()]).optional(),
-  entidade: z.union([z.string(), z.number()]).optional(),
-  valor: z.union([z.string(), z.number()]).optional(),
-  data_fim: z.string().optional(),
-  transacao: z.union([z.string(), z.number()]).optional(),
-});
-
-/**
- * The reference lookup, which answers for every method and not only Multibanco.
- *
- * Two traps in one response. `estado` is the API's own response code (0 means the call worked),
- * not the state of the payment — reading it as a status silently answers "unknown" to a payment
- * that is plainly settled. And the amount is not at the top level at all: it is inside the list
- * of payments received against the reference, which is also the only place the real transaction
- * id appears.
- */
-const InfoResponse = z.object({
-  sucesso: z.boolean().optional(),
-  estado: z.union([z.string(), z.number()]).optional(),
-  estado_referencia: z.string().optional(),
-  referencia: z.union([z.string(), z.number()]).optional(),
-  entidade: z.union([z.string(), z.number()]).optional(),
-  identificador: z.string().optional(),
-  valor: z.union([z.string(), z.number()]).optional(),
-  resposta: z.string().optional(),
-  pagamentos: z
-    .array(
-      z.object({
-        trid: z.union([z.string(), z.number()]).optional(),
-        estado: z.string().optional(),
-        valor: z.union([z.string(), z.number()]).optional(),
-        data_pagamento: z.string().optional(),
-      }),
-    )
-    .optional(),
+  sucesso: z.boolean().nullish(),
+  estado: z.number().nullish(),
+  resposta: z.string().nullish(),
+  referencia: z.union([z.string(), z.number()]).nullish(),
+  entidade: z.union([z.string(), z.number()]).nullish(),
+  valor: z.union([z.string(), z.number()]).nullish(),
+  data_fim: z.string().nullish(),
+  transacao: z.union([z.string(), z.number()]).nullish(),
 });
 
 const TridResponse = z.object({
-  transactionStatus: z.string().optional(),
+  transactionStatus: z.string().nullish(),
   transactionInfo: z
     .object({
-      trid: z.union([z.string(), z.number()]).optional(),
-      reference: z.union([z.string(), z.number()]).optional(),
-      amount: z.union([z.string(), z.number()]).optional(),
-      status: z.string().optional(),
+      trid: z.union([z.string(), z.number()]).nullish(),
+      reference: z.union([z.string(), z.number()]).nullish(),
+      amount: z.union([z.string(), z.number()]).nullish(),
+      status: z.string().nullish(),
     })
-    .optional(),
+    .nullish(),
 });
 
 const CardResponse = z.object({
-  transactionStatus: z.string().optional(),
-  transactionID: z.string().optional(),
-  reference: z.union([z.string(), z.number()]).optional(),
-  redirectUrl: z.string().optional(),
-  code: z.string().optional(),
-  text: z.string().optional(),
+  transactionStatus: z.string().nullish(),
+  transactionID: z.string().nullish(),
+  reference: z.union([z.string(), z.number()]).nullish(),
+  redirectUrl: z.string().nullish(),
+  code: z.string().nullish(),
+  text: z.string().nullish(),
 });
 
 const RefundResponse = z.object({
-  transactionStatus: z.string().optional(),
-  refundId: z.union([z.string(), z.number()]).optional(),
-  code: z.string().optional(),
-  text: z.string().optional(),
+  transactionStatus: z.string().nullish(),
+  refundId: z.union([z.string(), z.number()]).nullish(),
+  code: z.string().nullish(),
+  text: z.string().nullish(),
 });
 
 const str = (v: unknown): string | null => (v == null || v === "" ? null : String(v));
@@ -228,7 +201,7 @@ export const eupago: PaymentProvider = {
     const parsed = MbwayResponse.safeParse(res.data);
     if (!parsed.success) return providerError("createMbway shape", res.data);
     if (normalise(parsed.data.transactionStatus) !== "success") {
-      return providerError("createMbway rejected", parsed.data, parsed.data.code);
+      return providerError("createMbway rejected", parsed.data, parsed.data.code ?? undefined);
     }
     return {
       ok: true,
@@ -303,7 +276,7 @@ export const eupago: PaymentProvider = {
     const parsed = CardResponse.safeParse(res.data);
     if (!parsed.success) return providerError("createCard shape", res.data);
     if (normalise(parsed.data.transactionStatus) !== "success" || !parsed.data.redirectUrl) {
-      return providerError("createCard rejected", parsed.data, parsed.data.code);
+      return providerError("createCard rejected", parsed.data, parsed.data.code ?? undefined);
     }
     return {
       ok: true,
@@ -358,22 +331,16 @@ export const eupago: PaymentProvider = {
       LOOKUP_TIMEOUT_MS,
     );
     if (!res.ok) return res;
-    const parsed = InfoResponse.safeParse(res.data);
-    if (!parsed.success) return providerError("status shape", res.data);
-    const info = parsed.data;
-    // A negative code is the provider refusing the question, not an unpaid payment.
-    if (typeof info.estado === "number" && info.estado < 0) {
-      return providerError("status rejected", info, String(info.estado));
-    }
-    const settled = (info.pagamentos ?? []).filter((x) => readStatus(x.estado) === "paid");
-    const paidCents = settled.reduce((sum, x) => sum + (cents(x.valor) ?? 0), 0);
+    // Read by lib/payments/status, which is pure and tested against the provider's real replies.
+    // A zod schema here once rejected a settled payment over a single null field.
+    const read = readInfoResponse(res.data);
+    if (!read) return providerError("status rejected", res.data, "refused");
     return {
       ok: true,
       data: {
-        // The reference's own state, then any payment recorded against it. Never the response code.
-        status: readStatus(info.estado_referencia ?? info.pagamentos?.[0]?.estado),
-        amountCents: settled.length ? paidCents : cents(info.valor),
-        providerTransactionId: str(info.pagamentos?.[0]?.trid),
+        status: read.status,
+        amountCents: read.amountCents,
+        providerTransactionId: read.transactionId,
         raw: res.data,
       },
     };
@@ -400,7 +367,7 @@ export const eupago: PaymentProvider = {
     const parsed = RefundResponse.safeParse(res.data);
     if (!parsed.success) return providerError("refund shape", res.data);
     if (normalise(parsed.data.transactionStatus) !== "success") {
-      return providerError("refund rejected", parsed.data, parsed.data.code);
+      return providerError("refund rejected", parsed.data, parsed.data.code ?? undefined);
     }
     return { ok: true, data: { refundId: str(parsed.data.refundId) } };
   },
