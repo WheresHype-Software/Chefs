@@ -150,8 +150,8 @@ export async function announceReference(args: {
 }): Promise<void> {
   const sb = createAdminClient();
   if (!sb) return;
-  const { data } = await sb.from("bookings").select("ref, clients(email)").eq("id", args.bookingId).maybeSingle();
-  const booking = data as unknown as { ref: string; clients: { email: string } | null } | null;
+  const { data } = await sb.from("bookings").select("ref, client_id, clients(email)").eq("id", args.bookingId).maybeSingle();
+  const booking = data as unknown as { ref: string; client_id: string; clients: { email: string } | null } | null;
   if (!booking?.clients?.email || !args.reference) return;
 
   const facts: [string, string][] = [
@@ -167,7 +167,7 @@ export async function announceReference(args: {
     lead: "Pode pagar no homebanking ou numa caixa Multibanco.",
     facts,
     paragraphs: ["A reserva fica confirmada automaticamente assim que o pagamento entrar."],
-    cta: { label: "Ver a reserva", href: siteUrl(`/reserva/${args.bookingId}`) },
+    cta: { label: "Ver a reserva", href: await guestLink(args.bookingId, booking.client_id) },
   });
   await sendEmail({
     to: booking.clients.email,
@@ -175,6 +175,22 @@ export async function announceReference(args: {
     text: doc.text,
     html: doc.html,
   }).catch((err) => console.error("[payments] reference email:", err));
+}
+
+/**
+ * A link that actually opens the booking.
+ *
+ * A guest has no account: the only thing that proves a booking is theirs is the magic-link token.
+ * Without it the link lands on "não conseguimos abrir este pedido aqui" and a lookup form — which
+ * is a fine fallback and a terrible call to action when the email was asking them to pay.
+ *
+ * The proxy moves the token out of the address bar into an httpOnly cookie on arrival.
+ */
+export async function guestLink(bookingId: string, clientId: string | null): Promise<string> {
+  const sb = createAdminClient();
+  if (!sb || !clientId) return siteUrl(`/reserva/${bookingId}`);
+  const { data: token } = await sb.rpc("new_guest_token", { p_client_id: clientId });
+  return token ? siteUrl(`/reserva/${bookingId}?t=${token}`) : siteUrl(`/reserva/${bookingId}`);
 }
 
 // --- Telling people -----------------------------------------------------------
@@ -188,7 +204,7 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
   const { data } = await sb
     .from("bookings")
     .select(
-      "ref, date, time_label, booking_value, quoted_price, estimate, deposit_amount, deposit_due_at, deposit_status, offer_title, guests, chefs(display_name), clients(email, name)",
+      "ref, client_id, date, time_label, booking_value, quoted_price, estimate, deposit_amount, deposit_due_at, deposit_status, offer_title, guests, chefs(display_name), clients(email, name)",
     )
     .eq("id", bookingId)
     .maybeSingle();
@@ -196,6 +212,7 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
 
   const booking = data as unknown as {
     ref: string;
+    client_id: string;
     date: string;
     time_label: string | null;
     booking_value: string | number | null;
@@ -234,7 +251,7 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
       "Pode pagar por MB WAY ou por referência Multibanco na página da reserva.",
       "O restante valor do serviço é combinado e pago diretamente ao chef.",
     ],
-    cta: { label: "Pagar o sinal", href: siteUrl(`/reserva/${bookingId}`) },
+    cta: { label: "Pagar o sinal", href: await guestLink(bookingId, booking.client_id) },
   });
   await sendEmail({ to: booking.clients.email, subject: `Falta o sinal · reserva ${booking.ref}`, text: doc.text, html: doc.html }).catch(
     (err) => console.error("[payments] deposit due email:", err),
@@ -255,6 +272,7 @@ async function announcePaid(bookingId: string): Promise<void> {
 
   const booking = data as unknown as {
     ref: string;
+    client_id: string;
     date: string;
     time_label: string | null;
     offer_title: string;
@@ -291,7 +309,7 @@ async function announcePaid(bookingId: string): Promise<void> {
         `A data está garantida. ${booking.chefs?.display_name ?? "O chef"} combina consigo o restante valor, que é pago diretamente a ele no dia do serviço.`,
         "Guarde este email: a ligação abaixo abre a reserva e a conversa com o chef.",
       ],
-      cta: { label: "Ver a reserva", href: siteUrl(`/reserva/${bookingId}`) },
+      cta: { label: "Ver a reserva", href: await guestLink(bookingId, booking.client_id) },
     });
     await sendEmail({ to: clientEmail, subject: `Reserva ${booking.ref} confirmada`, text: doc.text, html: doc.html }).catch((err) =>
       console.error("[payments] client email:", err),

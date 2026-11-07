@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { maskIban } from "@/lib/crypto";
 import { getSession } from "@/lib/dashboard";
-import { sendEmail, siteUrl } from "@/lib/email";
+import { sendEmail } from "@/lib/email";
 import { renderEmail } from "@/lib/email-template";
 import { euro } from "@/lib/format";
 import { toCents } from "@/lib/money";
-import { findPayment, syncPayment } from "@/lib/payments/confirm";
+import { findPayment, guestLink, syncPayment } from "@/lib/payments/confirm";
 import { buildDac7Csv, buildDac7Rows, dac7Gaps, type Dac7Activity, type Dac7Seller } from "@/lib/payments/dac7";
 import { eupago } from "@/lib/payments/eupago";
 import { batchFiles, buildBatch, payBatch } from "@/lib/payments/payouts";
@@ -162,8 +162,8 @@ export async function startRefund(input: z.infer<typeof RefundInput>): Promise<A
 async function askClientForIban(refundId: string, bookingId: string, amount: number): Promise<void> {
   const sb = createAdminClient();
   if (!sb) return;
-  const { data } = await sb.from("bookings").select("ref, clients(email)").eq("id", bookingId).maybeSingle();
-  const booking = data as unknown as { ref: string; clients: { email: string } | null } | null;
+  const { data } = await sb.from("bookings").select("ref, client_id, clients(email)").eq("id", bookingId).maybeSingle();
+  const booking = data as unknown as { ref: string; client_id: string; clients: { email: string } | null } | null;
   if (!booking?.clients?.email) return;
 
   const doc = renderEmail({
@@ -174,7 +174,7 @@ async function askClientForIban(refundId: string, bookingId: string, amount: num
       "Como pagou por referência Multibanco, o banco não permite devolver pelo mesmo caminho: precisamos de uma conta para onde transferir.",
       "Indique o IBAN na página da sua reserva. Nunca lhe pedimos dados bancários por email nem por telefone.",
     ],
-    cta: { label: "Indicar o IBAN", href: siteUrl(`/reserva/${bookingId}`) },
+    cta: { label: "Indicar o IBAN", href: await guestLink(bookingId, booking.client_id) },
     footnote: `Devolução ${refundId.slice(0, 8)}`,
   });
   await sendEmail({ to: booking.clients.email, subject: `Devolução da reserva ${booking.ref}`, text: doc.text, html: doc.html });

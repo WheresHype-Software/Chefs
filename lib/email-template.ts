@@ -38,13 +38,24 @@ function esc(s: string): string {
 
 const absolute = (href: string) => (href.startsWith("/") ? siteUrl(href) : href);
 
-/** The wall: twelve cobalt tiles with white grout between them, and the single warm one. */
+/**
+ * A cobalt rule with one warm notch in it.
+ *
+ * It used to be twelve tiles with white grout, which is the brand's wall — but at ten pixels tall
+ * the grout stops reading as grout and starts reading as a row of broken dashes, and Outlook
+ * treats a border on a table cell however it feels that day. Three solid cells say the same thing
+ * and say it identically everywhere.
+ */
 function tileStrip(): string {
-  const cells = Array.from({ length: 12 }, (_, i) => {
-    const grout = i === 11 ? "" : "border-right:2px solid #ffffff;";
-    return `<td width="8.33%" height="10" style="width:8.33%;height:10px;background:${i === 8 ? YOLK : COBALT};${grout}font-size:0;line-height:10px;">&nbsp;</td>`;
-  }).join("");
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>${cells}</tr></table>`;
+  const cell = (width: string, colour: string) =>
+    `<td width="${width}" height="6" style="width:${width};height:6px;background:${colour};font-size:0;line-height:6px;">&nbsp;</td>`;
+  return (
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>` +
+    cell("66.66%", COBALT) +
+    cell("8.34%", YOLK) +
+    cell("25%", COBALT) +
+    `</tr></table>`
+  );
 }
 
 function factRows(facts: [string, string][]): string {
