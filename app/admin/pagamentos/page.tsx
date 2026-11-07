@@ -1,53 +1,43 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { AdminShell } from "@/components/admin/AdminShell";
-import { AdminQueueNav } from "@/components/admin/AdminQueueNav";
-import { ChefAccounts } from "@/components/admin/ChefAccounts";
-import { Dac7Export } from "@/components/admin/Dac7Export";
-import { PaymentSettingsForm } from "@/components/admin/PaymentSettingsForm";
-import { PaymentsTable } from "@/components/admin/PaymentsTable";
-import { PayoutBatches } from "@/components/admin/PayoutBatches";
-import { PayoutDocumentList } from "@/components/admin/PayoutDocumentList";
-import { RefundQueue } from "@/components/admin/RefundQueue";
+import Link from "next/link";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { getAdminPayments } from "@/lib/admin/payments";
-import { getSession } from "@/lib/dashboard";
 import { hasEupago } from "@/lib/env.server";
 import { euro } from "@/lib/format";
 import { hasSupabase } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Pagamentos", robots: { index: false } };
 
-export default async function AdminPagamentos() {
-  if (!hasSupabase) {
-    return (
-      <AdminShell title="Pagamentos">
-        <p className="m-0 text-muted">Os pagamentos ligam-se quando o projeto Supabase estiver configurado.</p>
-      </AdminShell>
-    );
-  }
-  const session = await getSession();
-  if (session.demo || session.role !== "admin") notFound();
-
+/** O que aconteceu ao dinheiro este mês, e o que está à espera de alguém. */
+export default async function PagamentosResumo() {
+  if (!hasSupabase) return null;
   const view = await getAdminPayments();
-  const thisYear = new Date().getFullYear();
-  const years = [thisYear, thisYear - 1, thisYear - 2];
+
   const needsApproval = view.accounts.filter((a) => a.iban_last4 && !a.iban_approved_at).length;
   const toTransfer = view.refunds.filter((r) => r.status === "manual_pending").length;
+  const needsIban = view.refunds.filter((r) => r.status === "needs_iban").length;
+
+  // Só entra aqui o que tem alguém à espera do outro lado.
+  const todo = [
+    { n: view.readyPayoutIds.length, href: "/admin/pagamentos/lotes", one: "pagamento pronto a sair", many: "pagamentos prontos a sair" },
+    { n: needsApproval, href: "/admin/pagamentos/contas", one: "conta de chef por verificar", many: "contas de chef por verificar" },
+    { n: toTransfer, href: "/admin/pagamentos/devolucoes", one: "devolução por transferir à mão", many: "devoluções por transferir à mão" },
+    {
+      n: needsIban,
+      href: "/admin/pagamentos/devolucoes",
+      one: "devolução à espera do IBAN do cliente",
+      many: "devoluções à espera do IBAN do cliente",
+    },
+  ].filter((t) => t.n > 0);
 
   return (
-    <AdminShell title="Pagamentos">
-      <AdminQueueNav
-        queues={[
-          { id: "devolucoes", label: "Devoluções", count: view.refunds.length },
-          { id: "lotes", label: "Por pagar aos chefs", count: view.duePayouts.filter((p) => p.status === "due").length },
-          { id: "chefs", label: "Contas por verificar", count: needsApproval },
-          { id: "pagamentos", label: "Pagamentos", count: view.payments.length },
-          { id: "documentos", label: "Documentos", count: view.documents.length },
-          { id: "dac7", label: "DAC7", count: 0 },
-          { id: "definicoes", label: "Definições", count: 0 },
-        ]}
-      />
+    <>
+      {!hasEupago && (
+        <p className="box m-0 border-2 border-cobalt p-4 text-sm">
+          <strong>A EuPago ainda não está configurada.</strong> Falta a chave de API ou a chave de cifra no servidor, por isso nenhum
+          pagamento pode ser iniciado, mesmo com os pagamentos ligados.
+        </p>
+      )}
 
       <StatGrid
         size="md"
@@ -56,24 +46,27 @@ export default async function AdminPagamentos() {
           ["Comissão (mês)", euro(view.totals.commissionThisMonth)],
           ["Devolvido (mês)", euro(view.totals.refundedThisMonth)],
           ["A pagar aos chefs", euro(view.totals.owed)],
-          ["Transferências à mão", String(toTransfer)],
         ]}
       />
 
-      {!hasEupago && (
-        <p className="box m-0 border-2 border-cobalt p-4 text-sm">
-          <strong>A EuPago ainda não está configurada.</strong> Falta a chave de API ou a chave de cifra no servidor, por isso nenhum
-          pagamento pode ser iniciado, mesmo com os pagamentos ligados aqui.
-        </p>
-      )}
-
-      <RefundQueue refunds={view.refunds} />
-      <PayoutBatches batches={view.batches} duePayouts={view.duePayouts} owed={view.totals.owed} />
-      <ChefAccounts accounts={view.accounts} />
-      <PaymentsTable payments={view.payments} />
-      <PayoutDocumentList documents={view.documents} />
-      <Dac7Export years={years} />
-      <PaymentSettingsForm settings={view.settings} providerReady={hasEupago} />
-    </AdminShell>
+      <section className="box flex flex-col gap-3 p-[22px]">
+        <h2 className="d m-0 text-[22px] font-normal">À sua espera</h2>
+        {todo.length ? (
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {todo.map((t) => (
+              <li key={`${t.href}-${t.one}`}>
+                <Link href={t.href} className="font-semibold">
+                  {t.n} {t.n === 1 ? t.one : t.many} →
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="m-0 text-sm text-muted">
+            Nada por decidir. Os sinais entram sozinhos e os pagamentos saem quando a retenção passa.
+          </p>
+        )}
+      </section>
+    </>
   );
 }

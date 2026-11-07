@@ -390,6 +390,8 @@ const Settings = z.object({
   deposit_margin_percent: z.number().min(0).max(100),
   deposit_due_hours: z.number().int().min(1).max(720),
   payout_hold_hours: z.number().int().min(0).max(2160),
+  iban_hold_hours: z.number().int().min(0).max(2160),
+  iban_hold_first_time: z.boolean(),
   // Optional: the log already keeps who changed what, when, and from which values to which.
   reason: z.string().trim().max(500).optional(),
 });

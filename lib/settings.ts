@@ -12,6 +12,10 @@ export type PlatformSettings = {
   depositMarginPercent: number;
   depositDueHours: number;
   payoutHoldHours: number;
+  /** Horas de retenção depois de o chef confirmar uma alteração de IBAN. */
+  ibanHoldHours: number;
+  /** Aplicar essa retenção também ao primeiro IBAN, quando não havia nenhum para desviar. */
+  ibanHoldFirstTime: boolean;
   agreementVersion: number;
 };
 
@@ -23,6 +27,8 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   depositMarginPercent: 5,
   depositDueHours: 48,
   payoutHoldHours: 48,
+  ibanHoldHours: 72,
+  ibanHoldFirstTime: false,
   agreementVersion: 1,
 };
 
@@ -32,7 +38,7 @@ export const getSettings = cache(async (): Promise<PlatformSettings> => {
   const { data } = await sb
     .from("platform_settings")
     .select(
-      "payments_enabled, commission_percent, commission_min, deposit_margin_percent, deposit_due_hours, payout_hold_hours, agreement_version",
+      "payments_enabled, commission_percent, commission_min, deposit_margin_percent, deposit_due_hours, payout_hold_hours, iban_hold_hours, iban_hold_first_time, agreement_version",
     )
     .eq("id", 1)
     .maybeSingle();
@@ -44,6 +50,8 @@ export const getSettings = cache(async (): Promise<PlatformSettings> => {
     depositMarginPercent: Number(data.deposit_margin_percent),
     depositDueHours: data.deposit_due_hours,
     payoutHoldHours: data.payout_hold_hours,
+    ibanHoldHours: data.iban_hold_hours,
+    ibanHoldFirstTime: data.iban_hold_first_time,
     agreementVersion: data.agreement_version,
   };
 });
@@ -57,7 +65,7 @@ export const getPublicSettings = cache(async (): Promise<PlatformSettings> => {
   const { data } = await createAnonClient()
     .from("platform_settings")
     .select(
-      "payments_enabled, commission_percent, commission_min, deposit_margin_percent, deposit_due_hours, payout_hold_hours, agreement_version",
+      "payments_enabled, commission_percent, commission_min, deposit_margin_percent, deposit_due_hours, payout_hold_hours, iban_hold_hours, iban_hold_first_time, agreement_version",
     )
     .eq("id", 1)
     .maybeSingle();
@@ -69,6 +77,8 @@ export const getPublicSettings = cache(async (): Promise<PlatformSettings> => {
     depositMarginPercent: Number(data.deposit_margin_percent),
     depositDueHours: data.deposit_due_hours,
     payoutHoldHours: data.payout_hold_hours,
+    ibanHoldHours: data.iban_hold_hours,
+    ibanHoldFirstTime: data.iban_hold_first_time,
     agreementVersion: data.agreement_version,
   };
 });

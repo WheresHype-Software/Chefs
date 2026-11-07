@@ -9,6 +9,10 @@ import { createClient, hasSupabase } from "@/lib/supabase/server";
  * only comes back for the chef it belongs to or for an admin. The second is the bucket, which is
  * private and only ever reached through a link that expires in a minute. A document id on its own
  * opens nothing.
+ *
+ * With `?download=1` the file comes back through here instead of by redirect, so the browser gets
+ * a filename and saves it. A redirect cannot do that: the `download` attribute is dropped the
+ * moment the response points at another origin, and the chef ends up with a tab of markup.
  */
 export const dynamic = "force-dynamic";
 
@@ -24,7 +28,22 @@ export async function GET(request: NextRequest, { params }: RouteContext<"/api/p
 
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ error: "unavailable" }, { status: 503 });
-  const { data: signed } = await admin.storage.from("payout-docs").createSignedUrl(data.document_path as string, 60);
+  const path = data.document_path as string;
+
+  if (request.nextUrl.searchParams.get("download") === "1") {
+    const { data: file } = await admin.storage.from("payout-docs").download(path);
+    if (!file) return NextResponse.json({ error: "unavailable" }, { status: 503 });
+    const name = `${(data.number as string | null) ?? "documento"}.html`;
+    return new NextResponse(await file.arrayBuffer(), {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${name}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  const { data: signed } = await admin.storage.from("payout-docs").createSignedUrl(path, 60);
   if (!signed?.signedUrl) return NextResponse.json({ error: "unavailable" }, { status: 503 });
 
   return NextResponse.redirect(signed.signedUrl, { headers: { "Cache-Control": "no-store" } });

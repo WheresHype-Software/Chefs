@@ -54,6 +54,8 @@ export function PaymentSettingsForm({ settings, providerReady }: { settings: Pla
             deposit_margin_percent: form.depositMarginPercent,
             deposit_due_hours: form.depositDueHours,
             payout_hold_hours: form.payoutHoldHours,
+            iban_hold_hours: form.ibanHoldHours,
+            iban_hold_first_time: form.ibanHoldFirstTime,
           });
         }}
       >
@@ -97,7 +99,10 @@ export function PaymentSettingsForm({ settings, providerReady }: { settings: Pla
               onChange={(e) => set("depositDueHours", Number(e.target.value))}
             />
           </Field>
-          <Field label="Retenção antes de pagar ao chef (h)">
+          <Field
+            label="Retenção antes de pagar ao chef (h)"
+            hint="Conta a partir do serviço concluído. É a janela para apanhar uma disputa."
+          >
             <input
               type="number"
               step="1"
@@ -107,6 +112,27 @@ export function PaymentSettingsForm({ settings, providerReady }: { settings: Pla
               onChange={(e) => set("payoutHoldHours", Number(e.target.value))}
             />
           </Field>
+          <Field label="Retenção após mudar o IBAN (h)" hint="Dá ao chef tempo de ver o email da alteração se não tiver sido ele.">
+            <input
+              type="number"
+              step="1"
+              min="0"
+              max="2160"
+              value={form.ibanHoldHours}
+              onChange={(e) => set("ibanHoldHours", Number(e.target.value))}
+            />
+          </Field>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 border-t border-line pt-3.5">
+          <div className="flex flex-col">
+            <span className="font-semibold">Reter também no primeiro IBAN</span>
+            <span className="text-sm text-muted">
+              Quando o chef ainda não tinha IBAN não há conta nenhuma de onde desviar dinheiro, e a espera só atrasa o primeiro pagamento de
+              quem ainda está a decidir se confia em nós. Desligado, essa espera não se aplica.
+            </span>
+          </div>
+          <Switch checked={form.ibanHoldFirstTime} label="Reter também no primeiro IBAN" onChange={(v) => set("ibanHoldFirstTime", v)} />
         </div>
 
         <p className="m-0 rounded-[2px] bg-paper p-3.5 text-sm">

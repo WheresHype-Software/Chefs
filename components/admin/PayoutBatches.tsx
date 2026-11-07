@@ -9,6 +9,21 @@ import type { AdminBatchRow, AdminPayoutRow } from "@/lib/admin/payments";
 import { callAction } from "@/lib/call-action";
 import { euro, shortStamp } from "@/lib/format";
 
+const HOLD_REASON: Record<string, string> = {
+  chef_payouts_blocked: "pagamentos bloqueados por nós",
+};
+
+/**
+ * Porque é que este ainda não entra num lote. A base de dados diz sim ou não; isto diz o que
+ * falta, que é a pergunta que a pessoa à frente do ecrã tem de facto.
+ */
+function whyWaiting(p: AdminPayoutRow): string {
+  if (p.chef?.payouts_blocked) return "pagamentos bloqueados por nós";
+  if (p.hold_reason) return HOLD_REASON[p.hold_reason] ?? p.hold_reason;
+  if (new Date(p.due_at) > new Date()) return `em retenção até ${shortStamp(p.due_at)}`;
+  return "falta a faturação, o contrato ou a verificação do IBAN";
+}
+
 const STATUS: Record<string, string> = {
   draft: "Por exportar",
   exported: "Ficheiro gerado · por pagar no banco",
@@ -33,7 +48,17 @@ function download(name: string, contents: string, type: string) {
  * left. The documents for the chefs are issued at that moment, which is the first time we can
  * honestly put a transfer date on them.
  */
-export function PayoutBatches({ batches, duePayouts, owed }: { batches: AdminBatchRow[]; duePayouts: AdminPayoutRow[]; owed: number }) {
+export function PayoutBatches({
+  batches,
+  duePayouts,
+  readyPayoutIds,
+  owed,
+}: {
+  batches: AdminBatchRow[];
+  duePayouts: AdminPayoutRow[];
+  readyPayoutIds: string[];
+  owed: number;
+}) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [openPaid, setOpenPaid] = useState<string | null>(null);
@@ -43,8 +68,11 @@ export function PayoutBatches({ batches, duePayouts, owed }: { batches: AdminBat
   const paid = useServerAction(confirmBatchPaid, { successMessage: "Lote marcado como pago e documentos emitidos." });
   const cancelled = useServerAction(cancelBatch, { successMessage: "Lote anulado." });
 
-  const ready = duePayouts.filter((p) => p.status === "due");
-  const held = duePayouts.filter((p) => p.status === "held");
+  // A lista vem da base de dados, da mesma função que o lote usa. Contar aqui por `status`
+  // deixava o botão prometer pagamentos que o build_payout_batch ia recusar.
+  const readyIds = new Set(readyPayoutIds);
+  const ready = duePayouts.filter((p) => readyIds.has(p.id));
+  const waiting = duePayouts.filter((p) => !readyIds.has(p.id));
 
   async function getFiles(batch: AdminBatchRow) {
     setBusy(true);
@@ -73,14 +101,20 @@ export function PayoutBatches({ batches, duePayouts, owed }: { batches: AdminBat
         </button>
         <FormMessage message={create.message} />
       </div>
-      {!ready.length && <p className="m-0 text-sm text-muted">Nada pronto: ou ainda está em retenção, ou falta aos chefs a faturação.</p>}
+      {!ready.length && (
+        <p className="m-0 text-sm text-muted">
+          {waiting.length
+            ? "Nada pronto ainda. Em baixo fica o que falta a cada um."
+            : "Nada por pagar: todos os serviços concluídos já foram liquidados."}
+        </p>
+      )}
 
-      {held.length > 0 && (
+      {waiting.length > 0 && (
         <div className="flex flex-col gap-1.5 border-l-2 border-line-2 pl-3">
-          <span className="lab text-muted">Retidos ({held.length})</span>
-          {held.map((p) => (
+          <span className="lab text-muted">À espera ({waiting.length})</span>
+          {waiting.map((p) => (
             <span key={p.id} className="text-sm">
-              {euro(p.amount)} · {p.chef?.display_name} · {p.hold_reason ?? "sem motivo registado"}
+              {euro(p.amount)} · {p.chef?.display_name} · {whyWaiting(p)}
             </span>
           ))}
         </div>

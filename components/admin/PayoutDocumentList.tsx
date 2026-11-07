@@ -27,10 +27,12 @@ export function PayoutDocumentList({ documents }: { documents: AdminDocumentRow[
               <span className="num text-sm">{euro(d.amount)}</span>
               <span className="text-sm text-muted">{d.chefName}</span>
               {d.bookingRef && <span className="text-sm text-muted">· {d.bookingRef}</span>}
-              <span className="lab ml-auto text-muted">
-                {d.status === "void" ? "anulado" : d.acknowledged_at ? "confirmado pelo chef" : "por confirmar"}
-              </span>
+              {/* O chef já não confirma documento a documento: o contrato que aceitou cobre-os todos. */}
+              <span className="lab ml-auto text-muted">{d.status === "void" ? "anulado" : "emitido"}</span>
               <span className="text-[13px] text-muted">{shortStamp(d.issued_at)}</span>
+              <a href={`/api/payments/document/${d.id}?download=1`} className="btn btn-sm btn-o no-underline" download>
+                Descarregar
+              </a>
             </div>
             {d.status === "issued" &&
               (open === d.id ? (

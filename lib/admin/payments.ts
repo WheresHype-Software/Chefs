@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { getSettings, type PlatformSettings } from "../settings";
 import { createClient } from "../supabase/server";
 
@@ -89,18 +90,21 @@ export type AdminPaymentsView = {
   refunds: AdminRefundRow[];
   batches: AdminBatchRow[];
   duePayouts: AdminPayoutRow[];
+  /** Ids de pagamentos que o lote aceita agora; o resto espera por alguma coisa. */
+  readyPayoutIds: string[];
   accounts: AdminChefAccount[];
   documents: AdminDocumentRow[];
 };
 
 const num = (v: unknown): number => Number(v ?? 0);
 
-export async function getAdminPayments(): Promise<AdminPaymentsView> {
+/** Uma leitura por render: o layout usa as contagens, a página usa os dados. */
+export const getAdminPayments = cache(async (): Promise<AdminPaymentsView> => {
   const sb = await createClient();
   const settings = await getSettings();
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
 
-  const [payments, refunds, batches, payouts, billing, documents, ledger] = await Promise.all([
+  const [payments, refunds, batches, payouts, billing, documents, ledger, readyNow] = await Promise.all([
     sb
       .from("payments")
       .select(
@@ -138,6 +142,9 @@ export async function getAdminPayments(): Promise<AdminPaymentsView> {
       .order("issued_at", { ascending: false })
       .limit(40),
     sb.from("ledger_entries").select("kind, amount, created_at").gte("created_at", monthStart).limit(2000),
+    // Quem o lote vai mesmo levar. A mesma função que o build_payout_batch usa, para o botão
+    // não prometer pagamentos que o SQL depois recusa.
+    sb.rpc("payouts_ready_now"),
   ]);
 
   const entries = (ledger.data ?? []) as { kind: string; amount: string }[];
@@ -171,6 +178,9 @@ export async function getAdminPayments(): Promise<AdminPaymentsView> {
       ...b,
       total: num(b.total),
     })),
+    readyPayoutIds: ((readyNow.data ?? []) as ({ payouts_ready_now: string } | string)[]).map((r) =>
+      typeof r === "string" ? r : r.payouts_ready_now,
+    ),
     duePayouts: (
       (payouts.data ?? []) as unknown as (Omit<AdminPayoutRow, "amount" | "chef" | "booking"> & {
         amount: string;
@@ -217,4 +227,4 @@ export async function getAdminPayments(): Promise<AdminPaymentsView> {
       bookingRef: d.snapshot?.booking?.ref ?? null,
     })),
   };
-}
+});

@@ -70,7 +70,7 @@ export function ActiveRow({ b }: { b: DashBooking }) {
       </div>
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-t border-line bg-paper px-4 py-3 md:px-5">
         <div className="min-w-0 flex-1">
-          <RequestActions id={b.id} status={b.status} date={b.date} />
+          <RequestActions id={b.id} status={b.status} date={b.date} depositStatus={b.deposit_status} />
         </div>
         <Link href={href} className="py-1.5 text-sm font-semibold">
           Abrir pedido e conversa →

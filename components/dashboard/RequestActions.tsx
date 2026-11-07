@@ -6,12 +6,24 @@ import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
 import { chefUpdateBooking } from "@/lib/bookings";
 import { dayLabel, isoDay } from "@/lib/format";
-import type { BookingStatus } from "@/lib/types";
+import type { BookingStatus, DepositStatus } from "@/lib/types";
 
 type Panel = null | "decline" | "propose";
 
 /** The chef's next steps for a booking, depending on its status. */
-export function RequestActions({ id, status, date }: { id: string; status: BookingStatus; date: string }) {
+export function RequestActions({
+  id,
+  status,
+  date,
+  depositStatus = "not_required",
+}: {
+  id: string;
+  status: BookingStatus;
+  date: string;
+  /** Quando o sinal é pago na app, quem confirma a reserva é o pagamento, não o chef. */
+  depositStatus?: DepositStatus;
+}) {
+  const awaitingDeposit = depositStatus === "due" || depositStatus === "pending" || depositStatus === "overdue";
   const [panel, setPanel] = useState<Panel>(null);
   const [reason, setReason] = useState("");
   const [proposal, setProposal] = useState({ date: "", time: "", price: "" });
@@ -44,11 +56,18 @@ export function RequestActions({ id, status, date }: { id: string; status: Booki
             </button>
           </>
         )}
-        {status === "accepted" && (
-          <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "confirmed" })}>
-            Sinal recebido · confirmar
-          </button>
-        )}
+        {/* Com o sinal a ser pago na app, o guard na base de dados recusa esta passagem até o
+            pagamento entrar. Mostrar o botão era convidar o chef a carregar e levar um erro. */}
+        {status === "accepted" &&
+          (awaitingDeposit ? (
+            <span className="order-last w-full text-[13px] text-muted">
+              A reserva confirma-se sozinha assim que o sinal entrar. Não é preciso fazer nada.
+            </span>
+          ) : (
+            <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "confirmed" })}>
+              Sinal recebido · confirmar
+            </button>
+          ))}
         {status === "confirmed" &&
           // Completing unlocks the client's review, so it waits for the service day.
           (date <= isoDay(new Date()) ? (

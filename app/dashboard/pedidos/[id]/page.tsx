@@ -37,7 +37,7 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
         <section className="box flex min-w-0 flex-[1_1_320px] flex-col gap-4 p-6">
           <DetailList items={details} />
           {b.notes && <span className="rounded-[2px] bg-paper px-3 py-2.5 text-sm text-ink-3">{b.notes}</span>}
-          <RequestActions key={b.id} id={b.id} status={b.status} date={b.date} />
+          <RequestActions key={b.id} id={b.id} status={b.status} date={b.date} depositStatus={b.deposit_status} />
         </section>
         <div className="flex min-w-0 flex-[2_1_480px] flex-col gap-6">
           <BookingMoney booking={b} />
