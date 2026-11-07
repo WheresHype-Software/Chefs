@@ -74,7 +74,7 @@ export async function syncPayment(payment: PaymentRow, trigger: "webhook" | "pol
       p_signature_valid: true,
       p_reference: payment.provider_reference,
       p_trid: payment.provider_transaction_id,
-      p_payload: { error: result.code ?? "unreachable", detail: result.error },
+      p_payload: { code: result.code ?? null, detail: result.detail ?? result.error },
     });
     return { changed: false, status: "unknown", paymentId: payment.id };
   }

@@ -32,22 +32,37 @@ const BASE = {
   production: "https://clientes.eupago.pt",
 } as const;
 
+// Creating a payment happens while somebody waits, so it fails fast. Asking what became of one
+// runs in the background, and EuPago's older endpoints can take their time — cutting that off at
+// twelve seconds turns a slow answer into no answer, and a paid booking into a stuck one.
 const TIMEOUT_MS = 12_000;
+const LOOKUP_TIMEOUT_MS = 30_000;
 
 /** Errors shown to people say nothing about the provider; the details go to the server log. */
 function providerError(context: string, detail: unknown, code?: string): ProviderResult<never> {
   console.error(`[eupago] ${context}:`, detail);
-  return { ok: false, error: "Não foi possível iniciar o pagamento. Tente de novo dentro de momentos.", code };
+  const technical = typeof detail === "string" ? detail : JSON.stringify(detail ?? null);
+  return {
+    ok: false,
+    error: "Não foi possível iniciar o pagamento. Tente de novo dentro de momentos.",
+    code,
+    detail: `${context} · ${technical}`.slice(0, 500),
+  };
 }
 
-async function postJson(path: string, body: unknown, headers: Record<string, string>): Promise<ProviderResult<unknown>> {
+async function postJson(
+  path: string,
+  body: unknown,
+  headers: Record<string, string>,
+  timeoutMs = TIMEOUT_MS,
+): Promise<ProviderResult<unknown>> {
   const url = `${BASE[serverEnv.eupago.env] ?? BASE.sandbox}${path}`;
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json", ...headers },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
     });
     const text = await res.text();
@@ -55,22 +70,22 @@ async function postJson(path: string, body: unknown, headers: Record<string, str
     try {
       parsed = text ? JSON.parse(text) : null;
     } catch {
-      return providerError(`${path} returned non-JSON (${res.status})`, text.slice(0, 400));
+      return providerError(`${path} returned non-JSON (${res.status})`, text.slice(0, 300), "non_json");
     }
     if (!res.ok) return providerError(`${path} ${res.status}`, parsed);
     return { ok: true, data: parsed };
   } catch (err) {
-    return providerError(`${path} unreachable`, err instanceof Error ? err.message : err);
+    return providerError(`${path} unreachable`, err instanceof Error ? `${err.name}: ${err.message}` : err, "unreachable");
   }
 }
 
-async function getJson(path: string, headers: Record<string, string>): Promise<ProviderResult<unknown>> {
+async function getJson(path: string, headers: Record<string, string>, timeoutMs = TIMEOUT_MS): Promise<ProviderResult<unknown>> {
   const url = `${BASE[serverEnv.eupago.env] ?? BASE.sandbox}${path}`;
   try {
     const res = await fetch(url, {
       method: "GET",
       headers: { Accept: "application/json", ...headers },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
     });
     const text = await res.text();
@@ -78,7 +93,7 @@ async function getJson(path: string, headers: Record<string, string>): Promise<P
     if (!res.ok) return providerError(`${path} ${res.status}`, parsed);
     return { ok: true, data: parsed };
   } catch (err) {
-    return providerError(`${path} failed`, err instanceof Error ? err.message : err);
+    return providerError(`${path} failed`, err instanceof Error ? `${err.name}: ${err.message}` : err, "unreachable");
   }
 }
 
@@ -311,9 +326,11 @@ export const eupago: PaymentProvider = {
     if (query.transactionId) {
       const auth = await bearer();
       if (auth) {
-        const res = await getJson(`/api/management/v1.02/payouts/transactions/${encodeURIComponent(query.transactionId)}`, {
-          Authorization: `Bearer ${auth}`,
-        });
+        const res = await getJson(
+          `/api/management/v1.02/payouts/transactions/${encodeURIComponent(query.transactionId)}`,
+          { Authorization: `Bearer ${auth}` },
+          LOOKUP_TIMEOUT_MS,
+        );
         if (res.ok) {
           const parsed = TridResponse.safeParse(res.data);
           if (parsed.success && parsed.data.transactionInfo) {
@@ -338,6 +355,7 @@ export const eupago: PaymentProvider = {
       "/clientes/rest_api/multibanco/info",
       { chave: serverEnv.eupago.apiKey ?? "", referencia: query.reference, entidade: query.entity ?? undefined },
       {},
+      LOOKUP_TIMEOUT_MS,
     );
     if (!res.ok) return res;
     const parsed = InfoResponse.safeParse(res.data);

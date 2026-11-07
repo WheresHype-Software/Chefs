@@ -6,7 +6,11 @@
  * to another provider is one file, not a rewrite.
  */
 
-export type ProviderResult<T> = { ok: true; data: T } | { ok: false; error: string; code?: string };
+export type ProviderResult<T> =
+  | { ok: true; data: T }
+  // `error` is the sentence shown to a person; `detail` is what actually went wrong, kept for
+  // the audit trail. Diagnosing a failed payment from a sanitised message is guesswork.
+  | { ok: false; error: string; code?: string; detail?: string };
 
 /** What the provider gives back when a payment is opened. */
 export type CreatedPayment = {
