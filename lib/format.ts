@@ -143,6 +143,15 @@ export function timeLabel(iso: string): string {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
+/**
+ * Dia, mês, ano e hora. Para o admin, onde se olha para uma lista de coisas que aconteceram em
+ * semanas diferentes e a hora é o que distingue duas inscrições da mesma tarde.
+ */
+export function fullStamp(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]!.slice(0, 3)}. ${d.getFullYear()}, ${timeLabel(iso)}`;
+}
+
 export function shortStamp(iso: string): string {
   const d = new Date(iso);
   return `${d.getDate()} ${MONTHS[d.getMonth()]!.slice(0, 3)}., ${timeLabel(iso)}`;

@@ -4,6 +4,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { AprovacoesTabs } from "@/components/admin/AprovacoesTabs";
 import { ChefRoster } from "@/components/admin/ChefRoster";
 import { getRoster } from "@/lib/admin/queues";
+import { fullStamp } from "@/lib/format";
 import { getSession } from "@/lib/dashboard";
 import { hasSupabase } from "@/lib/supabase/server";
 
@@ -35,7 +36,7 @@ export default async function ChefsPage() {
               <li key={p.id} className="flex flex-wrap items-baseline gap-x-3 text-sm">
                 <span className="font-semibold">{p.name ?? "sem nome"}</span>
                 {p.email && <a href={`mailto:${p.email}`}>{p.email}</a>}
-                <span className="text-muted">desde {p.created_at.slice(0, 10)}</span>
+                <span className="text-muted">desde {fullStamp(p.created_at)}</span>
               </li>
             ))}
           </ul>

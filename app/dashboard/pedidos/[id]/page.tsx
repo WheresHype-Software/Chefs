@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { notFound } from "next/navigation";
 import { BookingChat } from "@/components/booking/BookingChat";
 import { BookingMoney } from "@/components/dashboard/BookingMoney";
+import { ContactClient } from "@/components/dashboard/ContactClient";
 import { BookingReview } from "@/components/booking/BookingReview";
 import { ReviewReply } from "@/components/dashboard/ReviewReply";
 import { RequestActions } from "@/components/dashboard/RequestActions";
@@ -23,8 +24,6 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
     ["Pessoas / unidades", String(b.guests)],
     isPickup ? ["Código de levantamento", b.pickup_code ?? "Gerado ao aceitar"] : ["Morada", b.address ?? "—"],
     !!b.distance_km && ["Distância", `${String(b.distance_km).replace(".", ",")} km`],
-    ["Telemóvel", b.client?.phone ?? "—"],
-    ["Email", b.client?.email ?? "—"],
   ];
 
   return (
@@ -36,6 +35,7 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
       <div className="flex flex-wrap items-start gap-6">
         <section className="box flex min-w-0 flex-[1_1_320px] flex-col gap-4 p-6">
           <DetailList items={details} />
+          <ContactClient name={b.client?.name} phone={b.client?.phone} email={b.client?.email} bookingRef={b.ref} />
           {b.notes && <span className="rounded-[2px] bg-paper px-3 py-2.5 text-sm text-ink-3">{b.notes}</span>}
           <RequestActions key={b.id} id={b.id} status={b.status} date={b.date} depositStatus={b.deposit_status} />
         </section>

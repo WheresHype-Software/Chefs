@@ -16,6 +16,10 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
   // The chef dashboard is for chefs and admins; clients have their own area.
   if (session.role === "client") redirect("/conta");
   const chef = await getMyChef();
+  // Um admin sem perfil de chef não tem nada que fazer aqui: as páginas que se seguem pedem um
+  // chef e, quando não o encontram, atiram-no para o formulário de criar perfil. Entrava-se na
+  // app e a primeira coisa que aparecia era o pedido para criar uma conta de cozinheiro.
+  if (!chef && session.role === "admin") redirect("/admin");
   const pending = chef ? (await getBookings({ statuses: ["requested"] })).length : 0;
 
   const brand = (

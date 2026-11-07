@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { Wordmark } from "@/components/SiteChrome";
+import { getMyChef } from "@/lib/dashboard";
 
 const SECTIONS = [
   { href: "/admin", label: "Aprovações" },
@@ -10,8 +11,15 @@ const SECTIONS = [
   { href: "/admin/apoio", label: "Apoio" },
 ] as const;
 
-/** The frame every admin page shares: brand, the sections, and a way out. */
-export function AdminShell({ title, children }: { title: string; children: ReactNode }) {
+/**
+ * The frame every admin page shares: brand, the sections, and a way out.
+ *
+ * Administração and the chef dashboard are different jobs with different layouts, and most admins
+ * do not cook. The link to the chef panel only shows for the ones who also have a profile there;
+ * for everyone else it led to a page that immediately asked them to become a chef.
+ */
+export async function AdminShell({ title, children }: { title: string; children: ReactNode }) {
+  const chef = await getMyChef();
   const brand = (
     <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
       <Wordmark />
@@ -24,7 +32,11 @@ export function AdminShell({ title, children }: { title: string; children: React
           {brand}
           <MobileMenu
             brand={brand}
-            links={[...SECTIONS, { href: "/dashboard", label: "Painel" }, { href: "/", label: "Página inicial" }]}
+            links={[
+              ...SECTIONS,
+              ...(chef ? [{ href: "/dashboard" as const, label: "Painel" }] : []),
+              { href: "/", label: "Página inicial" },
+            ]}
             actions={<SignOutButton block />}
           />
           <div className="hidden items-baseline gap-5 text-sm md:flex">
@@ -33,9 +45,11 @@ export function AdminShell({ title, children }: { title: string; children: React
                 {s.label}
               </Link>
             ))}
-            <Link href="/dashboard" className="text-muted no-underline hover:text-ink">
-              Painel
-            </Link>
+            {chef && (
+              <Link href="/dashboard" className="text-muted no-underline hover:text-ink">
+                Painel
+              </Link>
+            )}
             <SignOutButton />
           </div>
         </div>

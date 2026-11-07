@@ -81,12 +81,26 @@ textarea {
 }
 
 a {
-  color: inherit;
   text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
 }
-a:hover {
-  color: var(--color-cobalt);
+
+/*
+ * A cor dos links tem de ficar numa camada, e esta é a razão.
+ *
+ * CSS sem camada ganha a qualquer CSS em camada, por mais específico que este seja. Escritas
+ * assim soltas, estas duas regras ganhavam a todas as utilidades do Tailwind, que vivem em
+ * @layer utilities: um `text-white` num <a> não fazia absolutamente nada, em lado nenhum do site,
+ * e o link ficava da cor do pai sem avisar ninguém. Dentro de @layer base voltam a ser o que
+ * sempre quiseram ser: o ponto de partida, que uma utilidade pode mudar quando precisa.
+ */
+@layer base {
+  a {
+    color: inherit;
+  }
+  a:hover {
+    color: var(--color-cobalt);
+  }
 }
 
 :focus-visible {

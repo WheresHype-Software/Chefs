@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { contactPhone, whatsappLink } from "@/lib/contact";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { markFulfilled } from "@/app/dashboard/actions/agenda";
@@ -128,6 +129,27 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
                     Abrir no Maps
                   </a>
                 )}
+                {(() => {
+                  const p = contactPhone(i.client?.phone);
+                  return p ? (
+                    <>
+                      <a href={`tel:${p.tel}`} className="btn btn-sm btn-o">
+                        Ligar
+                      </a>
+                      <a
+                        href={whatsappLink(
+                          p,
+                          `Olá${i.client?.name ? ` ${i.client.name.split(" ")[0]}` : ""}! Sou do Ao Lume, sobre a reserva ${i.ref}.`,
+                        )}
+                        target="_blank"
+                        rel="noopener"
+                        className="btn btn-sm btn-o"
+                      >
+                        WhatsApp
+                      </a>
+                    </>
+                  ) : null;
+                })()}
                 <Link href={`/dashboard/pedidos/${i.id}`} className="btn btn-sm btn-o">
                   Mensagem
                 </Link>

@@ -113,8 +113,10 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
       <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-x-6 gap-y-8 px-5 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:gap-10 md:px-8 md:py-14">
         <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <span className="wordmark text-[26px] text-white">ao lume</span>
+          {/* As regras do sinal vivem nos Termos e na página de cada chef, onde são lidas antes de
+              se pedir. Aqui em baixo serviam de pouco e eram a última coisa que alguém levava do site. */}
           <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">
-            Chefs e cozinheiros caseiros perto de si. O sinal da reserva é pago na app; o serviço e o restante valor são combinados com cada chef.
+            Juntamos quem gosta de comer bem a quem sabe cozinhar. O resto acontece à sua mesa.
           </p>
           <a href={`mailto:${EMAIL.support}`} className="text-[15px] text-[#c9d6ee] no-underline hover:text-white">
             {EMAIL.support}

@@ -3,7 +3,7 @@ import { DecisionCard } from "@/components/admin/DecisionCard";
 import type { Decision } from "@/components/admin/ChefDecision";
 import type { CertificateDoc } from "@/lib/admin/certificates";
 import { readiness, type Check } from "@/lib/admin/readiness";
-import { TIER_LABEL } from "@/lib/format";
+import { TIER_LABEL, fullStamp } from "@/lib/format";
 
 export type PendingChef = {
   id: string;
@@ -71,7 +71,7 @@ function Summary({ chef: c, missing }: { chef: PendingChef; missing: Check[] }) 
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <h3 className="m-0 truncate text-[18px] font-bold leading-tight">{c.display_name}</h3>
         <span className="truncate text-[13px] text-muted">
-          {TIER_LABEL[c.tier]} · {c.area_name ?? "sem zona"} · enviado {new Date(c.created_at).toLocaleDateString("pt-PT")}
+          {TIER_LABEL[c.tier]} · {c.area_name ?? "sem zona"} · enviado {fullStamp(c.created_at)}
           {c.chef_certifications.length > 0 && " · com certificado"}
         </span>
       </span>

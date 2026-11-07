@@ -10,6 +10,8 @@ import { chefTitle } from "@/lib/format";
 
 export type RosterChef = {
   id: string;
+  /** Null nos perfis que a equipa semeou: não há ninguém a quem perguntar. */
+  profile_id: string | null;
   display_name: string;
   slug: string;
   status: "draft" | "pending" | "approved" | "rejected" | "suspended";
@@ -68,6 +70,11 @@ export function ChefRoster({ chefs }: { chefs: RosterChef[] }) {
         {chefs.map((c) => {
           const missing = gaps(c);
           const live = c.status === "approved";
+          // Um rascunho de alguém é um perfil a meio, não um perfil à espera de decisão: a pessoa
+          // ainda não carregou em «enviar para revisão». Publicá-lo seria pô-lo no site por cima
+          // dela, muitas vezes sem ofertas e com uma fotografia. Os rascunhos sem dono são outra
+          // coisa: foram semeados por nós e é assim que vão para o ar.
+          const unsubmitted = c.status === "draft" && c.profile_id !== null;
           return (
             <li key={c.id} className="box flex flex-col gap-2.5 p-5">
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
@@ -101,7 +108,12 @@ export function ChefRoster({ chefs }: { chefs: RosterChef[] }) {
                 </p>
               )}
 
-              {open === c.id ? (
+              {unsubmitted ? (
+                <p className="m-0 text-sm text-muted">
+                  Ainda não foi enviado para revisão. Quando {c.display_name.split(" ")[0]} terminar o perfil e o enviar, aparece em «Perfis
+                  por aprovar».
+                </p>
+              ) : open === c.id ? (
                 <ReasonForm
                   label={live ? "Motivo para esconder" : "Nota para o chef (opcional)"}
                   placeholder={live ? "Perfil incompleto · a pedido do chef · denúncia" : "Está tudo bem, voltou ao site"}
