@@ -61,6 +61,7 @@ const RPC_ERRORS: Record<string, string> = {
   address_required: "Indique a morada.",
   outside_service_area: "A morada fica fora da área de serviço deste chef.",
   too_many_requests: "Enviou muitos pedidos na última hora. Tente mais tarde.",
+  cannot_book_own_offer: "Não pode reservar a sua própria oferta. Para testar, use uma janela privada e um email diferente.",
 };
 
 export async function requestBooking(input: z.infer<typeof BookingInput>): Promise<BookingResult> {
