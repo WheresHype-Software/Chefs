@@ -87,7 +87,6 @@ export default async function Faturacao() {
             highlights={CONTRACT_HIGHLIGHTS}
             commissionPercent={settings.commissionPercent}
             commissionMin={settings.commissionMin}
-            payoutHoldHours={settings.payoutHoldHours}
           />
         </div>
       </div>

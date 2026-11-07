@@ -12,7 +12,6 @@ type Props = {
   highlights: readonly string[];
   commissionPercent: number;
   commissionMin: number;
-  payoutHoldHours: number;
 };
 
 /**
@@ -20,7 +19,7 @@ type Props = {
  * payment documents without a signature on each one, so the full text is on the page — not behind
  * a link — and the checkbox is never pre-ticked.
  */
-export function AgreementCard({ text, version, acceptedVersion, highlights, commissionPercent, commissionMin, payoutHoldHours }: Props) {
+export function AgreementCard({ text, version, acceptedVersion, highlights, commissionPercent, commissionMin }: Props) {
   const [checked, setChecked] = useState(false);
   const { run, pending, message } = useServerAction(acceptAgreement, { successMessage: "Contrato aceite. Obrigado." });
   const accepted = acceptedVersion != null && acceptedVersion >= version;
@@ -53,7 +52,7 @@ export function AgreementCard({ text, version, acceptedVersion, highlights, comm
           </span>
           <span>
             Comissão em vigor: <strong className="num">{pct}%</strong> do valor da reserva, com um mínimo de{" "}
-            <strong className="num">{min} €</strong>. Pagamos-te {payoutHoldHours} horas depois do serviço concluído.
+            <strong className="num">{min} €</strong>, descontada ao sinal. Transferimos-te o resto depois do serviço concluído.
           </span>
         </li>
       </ul>

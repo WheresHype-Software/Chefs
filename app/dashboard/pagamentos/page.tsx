@@ -17,7 +17,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function Pagamentos() {
-  const [{ summary, payouts, documents }, { readiness, settings }] = await Promise.all([getPayouts(), getBilling()]);
+  const [{ summary, payouts, documents }, { readiness }] = await Promise.all([getPayouts(), getBilling()]);
   const ready =
     readiness.hasFiscal &&
     readiness.hasDac7 &&
@@ -29,7 +29,7 @@ export default async function Pagamentos() {
     <div className="flex flex-col gap-[26px]">
       <PageHeader
         title="Pagamentos"
-        description={`O cliente paga o sinal na app. Depois de cada serviço concluído esperamos ${settings.payoutHoldHours} horas e transferimos-te o sinal menos a comissão.`}
+        description="O cliente paga o sinal na app. Depois de cada serviço concluído, transferimos-te esse sinal menos a nossa comissão."
       />
 
       {!ready && (

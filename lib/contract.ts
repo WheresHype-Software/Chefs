@@ -14,8 +14,12 @@ import { COMPANY, EMAIL } from "./legal";
  * Deliberately written without the commission figure in it: the rate lives in the settings and is
  * shown next to this text, so changing a percentage does not invalidate everyone's agreement.
  * Clause 3 is what binds that rate, and clause 9 is the notice period for changing it.
+ *
+ * For the same reason it does not name a payment interval. The hold exists and is described;
+ * how often payments actually go out is an operational decision, and writing a number into a
+ * contract turns a change of rhythm into a breach.
  */
-export const CONTRACT_VERSION = 1;
+export const CONTRACT_VERSION = 2;
 
 export const CONTRACT_TITLE = "Contrato de intermediação de pagamentos";
 
@@ -41,9 +45,11 @@ recebido. O valor da comissão fica fixado no momento em que o chef aceita o ped
 depois disso, mesmo que a taxa mude entretanto.
 
 4. Pagamento ao chef
-Concluído o serviço e decorrido o prazo de retenção indicado no painel, o Ao Lume transfere ao chef o
-sinal recebido deduzido da comissão, para o IBAN registado na conta do chef. O prazo de retenção existe
-para que eventuais reclamações do cliente cheguem antes de o dinheiro sair.
+Concluído o serviço, o Ao Lume transfere ao chef o sinal recebido deduzido da comissão, para o IBAN
+registado na conta do chef. Entre a conclusão do serviço e o pagamento existe um período de retenção,
+para que eventuais reclamações do cliente cheguem antes de o dinheiro sair. Os pagamentos são feitos
+periodicamente; o chef vê a qualquer momento, no seu painel, quanto tem a receber e em que estado está
+cada valor.
 
 5. Documento de pagamento
 Com cada pagamento, o Ao Lume emite e envia ao chef um documento que identifica o chef (nome legal, NIF e
