@@ -28,7 +28,7 @@ export default async function Home() {
     <div>
       <SiteHeader />
       <main>
-        <HeroWall />
+        <HeroWall paymentsOn={paymentsOn} />
         <ServiceTiles />
         <HowItWorks paymentsOn={paymentsOn} />
         {chefs.length > 0 && <NearbyChefs chefs={chefs} featured={featured} />}

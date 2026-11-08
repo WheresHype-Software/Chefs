@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ChefDoor } from "@/components/auth/ChefDoor";
+import { ChefHat } from "@/components/brand/ChefHat";
 import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";
 import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
 import { MobileMenu } from "@/components/MobileMenu";
@@ -39,9 +41,22 @@ const CHEF_NAV: NavItem[] = [
 ];
 
 /** Changing side (client ↔ chef) is still navigation, just the only one that matters: bold. */
-function AudienceSwitch({ href, label, className = "" }: NavItem & { className?: string }) {
+/**
+ * A passagem para o outro lado do site, como botão e não como mais uma palavra na navegação.
+ *
+ * Era um link a negrito no meio dos outros, e passava despercebido: quem vinha cozinhar não
+ * percebia que havia um sítio para si e acabava a criar conta de cliente. Em escuro, com o
+ * barrete ao lado, lê-se como aquilo que é — uma porta para outro lado, não mais uma secção.
+ */
+function AudienceSwitch({ href, label, toChef, className = "" }: NavItem & { toChef: boolean; className?: string }) {
   return (
-    <Link href={href} className={`rounded-md px-2 py-2 font-bold text-ink no-underline hover:bg-paper lg:px-3 ${className}`}>
+    <Link
+      href={href}
+      className={`inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[14px] font-semibold no-underline lg:px-4 ${
+        toChef ? "bg-ink text-white hover:bg-ink-2" : "border border-line-2 bg-white text-ink hover:border-cobalt"
+      } ${className}`}
+    >
+      {toChef && <ChefHat size={18} className="shrink-0 text-yolk" />}
       {label}
     </Link>
   );
@@ -72,7 +87,7 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
                 {item.label}
               </Link>
             ))}
-            <AudienceSwitch {...other} />
+            <AudienceSwitch {...other} toChef={!chefs} />
           </nav>
           <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-line md:block lg:mx-2" />
           {chefs && (
@@ -94,7 +109,13 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
                 <Link href={secondary.href} className="btn btn-o w-full">
                   {secondary.label}
                 </Link>
-                <AudienceSwitch {...other} className="mt-1 self-start text-[17px]" />
+                {/* Quem cozinha tem de encontrar o seu lado mesmo com o menu aberto, que no
+                    telemóvel é por onde se navega. Um link a mais na lista passava-lhe ao lado. */}
+                {chefs ? (
+                  <AudienceSwitch {...other} toChef={false} className="mt-1 self-start text-[16px]" />
+                ) : (
+                  <ChefDoor className="-mx-5 mt-2" />
+                )}
               </>
             }
           />

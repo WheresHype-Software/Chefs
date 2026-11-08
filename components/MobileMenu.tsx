@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { AzulejoField } from "@/components/brand/Azulejo";
 
 export type MenuLink = { href: string; label: string; badge?: number };
 
@@ -112,10 +111,6 @@ export function MobileMenu({ links, brand, actions, alert = false }: Props) {
             </ul>
             {actions && <div className="flex flex-col gap-3 py-6">{actions}</div>}
           </nav>
-
-          <div className="h-10 shrink-0 overflow-hidden" aria-hidden="true">
-            <AzulejoField variant="glaze" size={40} />
-          </div>
         </div>
       </dialog>
     </>

@@ -21,7 +21,15 @@ const TILES: (Tile & { mobile?: boolean })[] = [
 ];
 
 /** What makes asking safe, said where people decide to search. */
-const PROMISES = ["Sem criar conta", "Só paga depois de o chef aceitar", "Sinal pago em segurança na app"];
+/*
+ * A terceira promessa depende de a app cobrar alguma coisa. Com os pagamentos desligados o sinal
+ * é combinado com o chef, e prometer aqui um pagamento seguro na app seria prometer o que não há.
+ */
+const promises = (paymentsOn: boolean) => [
+  "Sem criar conta",
+  "Só paga depois de o chef aceitar",
+  paymentsOn ? "Sinal pago em segurança na app" : "Combina o pagamento diretamente com o chef",
+];
 
 function Check() {
   return (
@@ -66,7 +74,8 @@ function MosaicTile({ tile, index, className = "" }: { tile: Tile; index: number
  * The opening: the promise and the search on the left, a mosaic of azulejo and food tiles on the
  * right that sets itself tile by tile. On phones the mosaic becomes a strip of three photos.
  */
-export function HeroWall() {
+export function HeroWall({ paymentsOn = false }: { paymentsOn?: boolean }) {
+  const PROMISES = promises(paymentsOn);
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-white">
       <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-5 pb-12 pt-10 md:px-8 md:pb-16 md:pt-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14 lg:pb-24 lg:pt-20">
