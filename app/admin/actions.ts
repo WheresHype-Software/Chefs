@@ -227,6 +227,41 @@ export async function approveChefs(chefIds: string[]): Promise<ActionResult> {
   return approved === ids.data.length ? ok() : fail(`Aprovados ${approved} de ${ids.data.length}. Atualize a página e veja os restantes.`);
 }
 
+const BadgesInput = z.object({
+  chefId: z.string().uuid(),
+  badges: z.array(z.enum(BADGES)).max(BADGES.length),
+});
+
+/**
+ * Sets the team's badges on a chef already decided on: the Chef title ("certified"), Fundador,
+ * and the identity and portfolio checks. Status stays as it is, and so do badges the chef chose
+ * themselves ("cozinheira"). Logged in admin_logs by the RPC. No email: this is a correction or a
+ * reward the team hands out, not a decision the chef waits for.
+ */
+export async function setChefBadges(chefId: string, badges: string[]): Promise<ActionResult> {
+  if (!(await isAdmin())) return fail("Sem permissão.");
+  const input = BadgesInput.safeParse({ chefId, badges });
+  if (!input.success) return fail("Pedido inválido. Atualize a página e tente de novo.");
+  const sb = await createClient();
+  const { data: chef } = await sb.from("chefs").select("status, badges, slug").eq("id", chefId).single();
+  if (!chef) return fail("Chef não encontrado.");
+  const own = (chef.badges as string[]).filter((b) => !(BADGES as readonly string[]).includes(b));
+  const { error } = await sb.rpc("admin_review_chef", {
+    p_chef_id: chefId,
+    p_status: chef.status,
+    p_note: null,
+    p_badges: [...new Set([...own, ...input.data.badges])],
+  });
+  if (error) return failWith(error, "setChefBadges", "Não foi possível guardar os selos. Tente de novo.");
+  // Granting the title by hand also settles any certificate still waiting in «Títulos de Chef».
+  if (input.data.badges.includes("certified") && !(chef.badges as string[]).includes("certified")) {
+    await sb.from("chef_certifications").update({ verified: true }).eq("chef_id", chefId);
+  }
+  revalidatePath(`/chef/${chef.slug}`);
+  revalidatePath("/admin/chefs");
+  return ok();
+}
+
 const TitleRefusal = z.object({ chefId: z.string().uuid(), reason: z.string().trim().min(3).max(800) });
 
 /**

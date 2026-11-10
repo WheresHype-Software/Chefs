@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { setChefVisibility } from "@/app/admin/actions";
+import { ChefBadgesEditor } from "@/components/admin/ChefBadgesEditor";
 import { ReasonForm } from "@/components/admin/ReasonForm";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage } from "@/components/ui/FormMessage";
@@ -248,6 +249,15 @@ export function ChefRoster({ chefs }: { chefs: RosterChef[] }) {
                   {live ? "No site, mas" : "Antes de publicar:"} {missing.join(" · ")}.
                 </p>
               )}
+
+              <div className="border-t border-line px-5 py-3.5">
+                <ChefBadgesEditor
+                  key={c.badges.join(",")}
+                  chefId={c.id}
+                  badges={c.badges}
+                  cook={c.badges.includes("cozinheira") ? "Cozinheira" : "Cozinheiro"}
+                />
+              </div>
 
               <div className="mt-auto flex flex-col gap-3 border-t border-line px-5 py-3.5">
                 {unsubmitted ? (
