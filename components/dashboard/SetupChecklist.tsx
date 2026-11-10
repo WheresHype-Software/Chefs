@@ -9,7 +9,7 @@ function steps(chef: MyChef, p: SetupProgress): Step[] {
     {
       title: "Fotografias",
       text: "Uma fotografia sua e pelo menos três dos seus pratos, com descrição.",
-      href: "/dashboard/fotos",
+      href: "/dashboard/perfil#fotografias",
       action: "Carregar fotografias",
       done: p.profilePhoto && p.dishPhotos >= 3,
     },

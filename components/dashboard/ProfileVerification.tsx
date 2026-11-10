@@ -45,7 +45,7 @@ export function ProfileVerification({ chef, photos }: { chef: MyChef | null; pho
           ))}
         </ul>
         {chef ? (
-          <Link href="/dashboard/fotos" className="btn btn-sm btn-o">
+          <Link href="#fotografias" className="btn btn-sm btn-o">
             Gerir fotografias
           </Link>
         ) : (

@@ -10,7 +10,7 @@ export type PhotoZone = { id: string; label: string; status: string; done: boole
  * marked. Long pages of photos read as one list without it; with it, what's missing is visible
  * from anywhere. Sits under the phone's top bar, and the three fit side by side at phone width.
  */
-export function PhotoZones({ zones }: { zones: PhotoZone[] }) {
+export function PhotoZones({ zones, label = "Zonas das fotografias" }: { zones: PhotoZone[]; label?: string }) {
   const [active, setActive] = useState(zones[0]?.id);
   // The zones come as a fresh array on every render; observe again only when the zones change.
   const ids = zones.map((z) => z.id).join(" ");
@@ -34,11 +34,8 @@ export function PhotoZones({ zones }: { zones: PhotoZone[] }) {
   }, [ids]);
 
   return (
-    <nav
-      aria-label="Zonas das fotografias"
-      className="sticky top-16 z-10 -mx-4 bg-paper/95 px-4 py-2 backdrop-blur-[6px] md:top-0 md:mx-0 md:px-0"
-    >
-      <ol className="m-0 grid list-none grid-cols-3 gap-1.5 p-0">
+    <nav aria-label={label} className="sticky top-16 z-10 -mx-4 bg-paper/95 px-4 py-2 backdrop-blur-[6px] md:top-0 md:mx-0 md:px-0">
+      <ol className="m-0 grid list-none gap-1.5 p-0" style={{ gridTemplateColumns: `repeat(${zones.length}, minmax(0, 1fr))` }}>
         {zones.map((z) => {
           const current = z.id === active;
           return (

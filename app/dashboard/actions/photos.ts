@@ -96,7 +96,7 @@ export async function updatePhotoCaption(id: string, caption: string): Promise<R
     .update({ caption: cleanCaption(caption) })
     .eq("id", id)
     .eq("chef_id", ctx.chef.id);
-  return error ? failWith(error, "updatePhotoCaption", "Não foi possível guardar a descrição. Tente de novo.") : done("/dashboard/fotos");
+  return error ? failWith(error, "updatePhotoCaption", "Não foi possível guardar a descrição. Tente de novo.") : done("/dashboard");
 }
 
 export async function deletePhoto(id: string): Promise<Result> {

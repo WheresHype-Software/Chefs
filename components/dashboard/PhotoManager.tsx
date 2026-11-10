@@ -99,10 +99,17 @@ function VerificationSelfie({ selfie, approved, busy, onFiles }: UploadProps & {
   );
 }
 
-type Props = { photos: ChefPhoto[]; userId: string | null; initials: string; approved: boolean };
+type Props = {
+  photos: ChefPhoto[];
+  userId: string | null;
+  initials: string;
+  approved: boolean;
+  /** The bar of photo zones at the top; off where the page has its own section bar (Perfil). */
+  zoneBar?: boolean;
+};
 
 /** Profile photo and the dish gallery: upload, describe, order, pick the cover, delete. */
-export function PhotoManager({ photos, userId, initials, approved }: Props) {
+export function PhotoManager({ photos, userId, initials, approved, zoneBar = true }: Props) {
   // Photos that have been saved but that this page has not been re-rendered to include yet.
   const [justAdded, setJustAdded] = useState<ChefPhoto[]>([]);
   const {
@@ -126,23 +133,25 @@ export function PhotoManager({ photos, userId, initials, approved }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <PhotoZones
-        zones={[
-          { id: "zona-perfil", label: "Perfil", done: Boolean(portrait), status: portrait ? "Feita" : "Em falta" },
-          {
-            id: "zona-selfie",
-            label: "Verificação",
-            done: Boolean(selfie) || approved,
-            status: approved ? "Verificado" : selfie ? "Enviada" : "Em falta",
-          },
-          {
-            id: "zona-pratos",
-            label: "Pratos",
-            done: dishes.length >= 3,
-            status: dishes.length >= 3 ? `${dishes.length} fotografias` : `${dishes.length} de 3`,
-          },
-        ]}
-      />
+      {zoneBar && (
+        <PhotoZones
+          zones={[
+            { id: "zona-perfil", label: "Perfil", done: Boolean(portrait), status: portrait ? "Feita" : "Em falta" },
+            {
+              id: "zona-selfie",
+              label: "Verificação",
+              done: Boolean(selfie) || approved,
+              status: approved ? "Verificado" : selfie ? "Enviada" : "Em falta",
+            },
+            {
+              id: "zona-pratos",
+              label: "Pratos",
+              done: dishes.length >= 3,
+              status: dishes.length >= 3 ? `${dishes.length} fotografias` : `${dishes.length} de 3`,
+            },
+          ]}
+        />
+      )}
       <FormMessage message={uploadMessage ?? message} />
 
       <LumiSlot name="retrato" />

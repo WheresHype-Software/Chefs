@@ -16,7 +16,6 @@ const ALL: readonly { href: string; label: string; money?: true }[] = [
   { href: "/dashboard/pagamentos", label: "Pagamentos", money: true },
   { href: "/dashboard/faturacao", label: "Faturação", money: true },
   { href: "/dashboard/perfil", label: "Perfil" },
-  { href: "/dashboard/fotos", label: "Fotografias" },
 ];
 
 export function dashboardNav(paymentsOn: boolean): readonly { href: string; label: string }[] {
