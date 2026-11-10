@@ -49,7 +49,10 @@ function Acceptance({ label, record, current }: { label: string; record: Accepta
 function Row({ r }: { r: AcceptanceRow }) {
   const older = r.history.filter((a) => a.id !== r.contract?.id && a.id !== r.terms?.id);
   return (
-    <li className="flex flex-col gap-2 border-b border-line py-3.5 last:border-b-0">
+    <li
+      id={`conta-${r.userId}`}
+      className="flex scroll-mt-20 flex-col gap-2 border-b border-line py-3.5 target:bg-yolk-soft last:border-b-0"
+    >
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="font-semibold">{r.chef?.display_name ?? r.name ?? "sem nome"}</span>
         {r.chef && r.name && r.name !== r.chef.display_name && <span className="text-sm text-muted">{r.name}</span>}
