@@ -12,6 +12,7 @@ export { getMyCertificates, getMyTitleStatements, type MyCertificate, type MyTit
 export { getReviews } from "./reviews";
 export { getSetupProgress } from "./setup";
 export { lumiOn } from "./lumi";
+export { quoteMinimum } from "./quote";
 export { getBilling, type BillingView } from "./billing";
 export { getPayouts, getChefMoney, type PayoutsView, type PayoutRow, type PayoutDocumentRow, type PayoutSummary } from "./payouts";
 export type {

@@ -162,13 +162,13 @@ export default async function ReservaPage({ params }: PageProps<"/reserva/[id]">
             <DetailList items={details} />
             {b.status === "change_proposed" && (
               <div className="rounded-[2px] bg-paper p-3.5 text-sm">
-                <strong className="font-semibold">Proposta de {first}:</strong>{" "}
+                <strong className="font-semibold">{b.estimate == null ? `Orçamento de ${first}:` : `Proposta de ${first}:`}</strong>{" "}
                 {[b.proposed_date && dayLabel(b.proposed_date), b.proposed_time, b.quoted_price && euro(b.quoted_price)]
                   .filter(Boolean)
                   .join(" · ")}
               </div>
             )}
-            <ClientBookingActions key={b.id} id={b.id} status={b.status} />
+            <ClientBookingActions key={b.id} id={b.id} status={b.status} quote={b.estimate == null && b.quoted_price != null} />
             <span className="text-xs text-muted">
               {STATUS_LABEL[b.status]} ·{" "}
               {b.deposit_amount != null

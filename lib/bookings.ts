@@ -98,6 +98,13 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   const parsed = ChefUpdateInput.safeParse(update);
   if (!parsedId.success || !parsed.success) return fail("Dados inválidos.");
   const sb = await createClient();
+  // A request with no price ("sob orçamento") is answered with a quote, never accepted bare.
+  if (parsed.data.status === "accepted" || parsed.data.status === "change_proposed") {
+    const { data: booking } = await sb.from("bookings").select("estimate, quoted_price").eq("id", id).maybeSingle();
+    const unpriced = booking && booking.estimate == null && booking.quoted_price == null;
+    if (unpriced && parsed.data.status === "accepted") return fail("Este pedido é sob orçamento: envie primeiro o seu orçamento.");
+    if (unpriced && parsed.data.quoted_price == null) return fail("Indique o valor do orçamento.");
+  }
   // Completion unlocks the review, so it only counts once the service day has come.
   if (parsed.data.status === "completed") {
     const { data: booking } = await sb.from("bookings").select("date").eq("id", id).maybeSingle();
@@ -106,6 +113,10 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   // select() returns the row, so "nothing was updated" (not this chef's booking) is caught too.
   const { data, error } = await sb.from("bookings").update(parsed.data).eq("id", id).select("id").maybeSingle();
   revalidatePath("/dashboard", "layout");
+  if (error?.message.includes("price_required")) return fail("Este pedido é sob orçamento: envie primeiro o seu orçamento.");
+  if (error?.message.includes("quote_below_minimum")) {
+    return fail("O orçamento é demasiado baixo para o sinal cobrir a comissão mínima. Indique um valor mais alto.");
+  }
   if (error?.message.includes("invalid_transition")) {
     return failWith(error, "chefUpdateBooking", "Este pedido já mudou de estado. Atualize a página para ver o estado atual.");
   }

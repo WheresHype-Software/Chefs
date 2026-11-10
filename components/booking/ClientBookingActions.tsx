@@ -8,7 +8,7 @@ import type { BookingStatus } from "@/lib/types";
 const CANCELLABLE: BookingStatus[] = ["requested", "accepted", "change_proposed", "confirmed"];
 
 /** Cancel, or accept the chef's proposed change, from the booking status page. */
-export function ClientBookingActions({ id, status }: { id: string; status: BookingStatus }) {
+export function ClientBookingActions({ id, status, quote = false }: { id: string; status: BookingStatus; quote?: boolean }) {
   const { run, pending, message } = useServerAction(clientAction);
   if (!CANCELLABLE.includes(status)) return null;
 
@@ -17,7 +17,7 @@ export function ClientBookingActions({ id, status }: { id: string; status: Booki
       <div className="flex flex-wrap gap-2.5">
         {status === "change_proposed" && (
           <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, "accept_proposal")}>
-            Aceitar proposta
+            {quote ? "Aceitar orçamento" : "Aceitar proposta"}
           </button>
         )}
         <button

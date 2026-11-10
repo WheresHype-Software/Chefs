@@ -9,14 +9,15 @@ import { BookingReview } from "@/components/booking/BookingReview";
 import { ReviewReply } from "@/components/dashboard/ReviewReply";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookingView } from "@/lib/bookings";
-import { getBooking } from "@/lib/dashboard";
+import { getBooking, quoteMinimum } from "@/lib/dashboard";
 import { dayLabel, MODE_LABEL, STATUS_LABEL } from "@/lib/format";
 
 export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pedidos/[id]">) {
   const { id } = await params;
   const b = await getBooking(id);
   if (!b) notFound();
-  const view = await getBookingView(id);
+  const [view, minQuote] = await Promise.all([getBookingView(id), quoteMinimum()]);
+  const needsPrice = b.estimate == null && b.quoted_price == null;
   const isPickup = b.fulfilment_mode === "pickup";
   const details: (DetailRow | false)[] = [
     ["Serviço", `${b.offer_title} · ${MODE_LABEL[b.fulfilment_mode]}`],
@@ -37,7 +38,15 @@ export default async function PedidoDetalhe({ params }: PageProps<"/dashboard/pe
           <DetailList items={details} />
           <ContactClient name={b.client?.name} phone={b.client?.phone} email={b.client?.email} bookingRef={b.ref} />
           {b.notes && <span className="rounded-[2px] bg-paper px-3 py-2.5 text-sm text-ink-3">{b.notes}</span>}
-          <RequestActions key={b.id} id={b.id} status={b.status} date={b.date} depositStatus={b.deposit_status} />
+          <RequestActions
+            key={b.id}
+            id={b.id}
+            status={b.status}
+            date={b.date}
+            depositStatus={b.deposit_status}
+            needsPrice={needsPrice}
+            minQuote={minQuote}
+          />
         </section>
         <div className="flex min-w-0 flex-[2_1_480px] flex-col gap-6">
           <BookingMoney booking={b} />

@@ -16,12 +16,18 @@ export function RequestActions({
   status,
   date,
   depositStatus = "not_required",
+  needsPrice = false,
+  minQuote = null,
 }: {
   id: string;
   status: BookingStatus;
   date: string;
   /** Quando o sinal é pago na app, quem confirma a reserva é o pagamento, não o chef. */
   depositStatus?: DepositStatus;
+  /** Sob orçamento: the request has no value yet, so the chef answers with a quote, not "Aceitar". */
+  needsPrice?: boolean;
+  /** Smallest quote the signal can carry the minimum commission on (payments on). */
+  minQuote?: number | null;
 }) {
   const awaitingDeposit = depositStatus === "due" || depositStatus === "pending" || depositStatus === "overdue";
   const [panel, setPanel] = useState<Panel>(null);
@@ -30,8 +36,10 @@ export function RequestActions({
   const { run, pending, message } = useServerAction(chefUpdateBooking, { onSuccess: () => setPanel(null) });
   const toggle = (p: Panel) => setPanel((current) => (current === p ? null : p));
 
+  const price = proposal.price ? Number(proposal.price.replace(",", ".")) : undefined;
+  const priceOk = price != null && Number.isFinite(price) && price > 0 && (minQuote == null || price >= minQuote);
+
   function sendProposal() {
-    const price = proposal.price ? Number(proposal.price.replace(",", ".")) : undefined;
     run(id, {
       status: "change_proposed",
       proposed_date: proposal.date || undefined,
@@ -45,12 +53,20 @@ export function RequestActions({
       <div className="flex flex-wrap gap-1.5">
         {status === "requested" && (
           <>
-            <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "accepted" })}>
-              Aceitar
-            </button>
-            <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => toggle("propose")}>
-              Propor alteração
-            </button>
+            {needsPrice ? (
+              <button type="button" className="btn btn-sm" disabled={pending} onClick={() => toggle("propose")}>
+                Enviar orçamento
+              </button>
+            ) : (
+              <>
+                <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "accepted" })}>
+                  Aceitar
+                </button>
+                <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => toggle("propose")}>
+                  Propor alteração
+                </button>
+              </>
+            )}
             <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => toggle("decline")}>
               Recusar
             </button>
@@ -105,7 +121,37 @@ export function RequestActions({
         </div>
       )}
 
-      {panel === "propose" && (
+      {panel === "propose" && needsPrice && (
+        <div className="flex flex-col gap-3 rounded-[2px] bg-paper p-4">
+          <p className="m-0 text-sm text-ink-3">
+            O cliente espera o seu preço. Veja as notas do pedido e indique o valor total do serviço. Se o cliente aceitar, paga o sinal na
+            app e a data fica garantida.
+          </p>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(140px,100%),1fr))] gap-3.5">
+            <Field label="Valor total (€)" hint={minQuote ? `Mínimo ${minQuote} €` : undefined}>
+              <input
+                inputMode="decimal"
+                required
+                autoFocus
+                value={proposal.price}
+                onChange={(e) => setProposal((p) => ({ ...p, price: e.target.value }))}
+                placeholder="250"
+              />
+            </Field>
+            <Field label="Outra data (opcional)">
+              <input type="date" value={proposal.date} onChange={(e) => setProposal((p) => ({ ...p, date: e.target.value }))} />
+            </Field>
+            <Field label="Hora (opcional)">
+              <input value={proposal.time} onChange={(e) => setProposal((p) => ({ ...p, time: e.target.value }))} placeholder="20:00" />
+            </Field>
+          </div>
+          <button type="button" className="btn btn-sm self-start" disabled={pending || !priceOk} onClick={sendProposal}>
+            Enviar orçamento ao cliente
+          </button>
+        </div>
+      )}
+
+      {panel === "propose" && !needsPrice && (
         <div className="flex flex-col gap-3 rounded-[2px] bg-paper p-4">
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(140px,100%),1fr))] gap-3.5">
             <Field label="Nova data">

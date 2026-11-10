@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
 import { ActiveRow, HistoryRow } from "@/components/dashboard/BookingRows";
+import { LumiCoach } from "@/components/dashboard/LumiCoach";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { getBookings, type DashBooking } from "@/lib/dashboard";
+import { getBookings, lumiOn, quoteMinimum, type DashBooking } from "@/lib/dashboard";
 import { isoDay } from "@/lib/format";
 
-function Group({ title, hint, items, empty }: { title: string; hint?: string; items: DashBooking[]; empty?: ReactNode }) {
+type GroupProps = { title: string; hint?: string; items: DashBooking[]; empty?: ReactNode; minQuote?: number | null; lumiFor?: string };
+
+function Group({ title, hint, items, empty, minQuote = null, lumiFor }: GroupProps) {
   if (!items.length && !empty) return null;
   return (
     <section className="flex flex-col gap-3">
@@ -14,7 +17,11 @@ function Group({ title, hint, items, empty }: { title: string; hint?: string; it
         </h2>
         {hint && <span className="text-[13px] text-muted">{hint}</span>}
       </div>
-      {items.length === 0 ? <p className="m-0 text-muted">{empty}</p> : items.map((b) => <ActiveRow key={b.id} b={b} />)}
+      {items.length === 0 ? (
+        <p className="m-0 text-muted">{empty}</p>
+      ) : (
+        items.map((b) => <ActiveRow key={b.id} b={b} minQuote={minQuote} lumi={b.id === lumiFor} />)
+      )}
     </section>
   );
 }
@@ -34,6 +41,9 @@ export default async function Pedidos() {
     getBookings({ statuses: ["completed", "declined", "cancelled", "expired"] }),
   ]);
   const history = [...past].sort((a, b) => b.date.localeCompare(a.date));
+  const [minQuote, lumi] = await Promise.all([quoteMinimum(), lumiOn()]);
+  // The first request still waiting for a price: Lumi explains it there.
+  const unpriced = requests.find((b) => b.status === "requested" && b.estimate == null && b.quoted_price == null);
 
   return (
     <div className="flex flex-col gap-8">
@@ -47,9 +57,25 @@ export default async function Pedidos() {
         hint="Os pedidos expiram ao fim de 48 horas."
         items={requests}
         empty="Sem pedidos novos. Quando um cliente pedir, aparece aqui e recebe um email."
+        minQuote={minQuote}
+        lumiFor={lumi === "on" ? unpriced?.id : undefined}
       />
       <Group title="Por concluir" hint="Marque como concluída: o cliente recebe o pedido de avaliação." items={toComplete} />
       <Group title="Próximas reservas" items={upcoming} empty="Sem reservas marcadas." />
+
+      {lumi === "on" && unpriced && (
+        <LumiCoach
+          inline
+          tips={[
+            {
+              target: "orcamento",
+              mood: "dica",
+              title: "Este pedido é sob orçamento",
+              text: "O cliente espera o seu preço. Leia as notas, carregue em «Enviar orçamento» e indique o valor total. Se o cliente aceitar, paga o sinal na app e a data fica garantida.",
+            },
+          ]}
+        />
+      )}
 
       {history.length > 0 && (
         <details className="group rounded-[12px] border border-line bg-paper">
