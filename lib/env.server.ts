@@ -38,6 +38,7 @@ export const serverEnv = {
     chefSignup: process.env.DISCORD_WEBHOOK_CHEF_SIGNUP,
     userSignup: process.env.DISCORD_WEBHOOK_USER_SIGNUP,
     chefReview: process.env.DISCORD_WEBHOOK_CHEF_REVIEW,
+    booking: process.env.DISCORD_WEBHOOK_BOOKING,
   },
 } as const;
 

@@ -74,3 +74,38 @@ export function announceChefForReview(chef: { display_name: string; area_name: s
     ],
   });
 }
+
+const MODE: Record<string, string> = { home: "Em casa do cliente", delivery: "Entrega", pickup: "Para levantar" };
+
+/**
+ * Um pedido de reserva novo. Vai o que a equipa precisa para acompanhar: o chef, a referência,
+ * o primeiro nome do cliente, quantas pessoas, o serviço, a data e as notas (alergias, ocasião).
+ * Email, telemóvel e morada ficam de fora, como nos outros avisos.
+ */
+export function announceBooking(b: {
+  ref: string;
+  chefName: string;
+  clientName: string;
+  guests: number;
+  offerTitle: string;
+  mode: string | null;
+  date: string;
+  time: string;
+  notes?: string | null;
+}) {
+  const notes = b.notes?.trim();
+  return post(serverEnv.discord.booking, {
+    title: `Novo pedido de reserva · ${b.ref}`,
+    description: `${b.clientName.split(" ")[0] || "Um cliente"} pediu uma reserva a ${b.chefName}.`,
+    color: OK,
+    url: siteUrl("/admin"),
+    fields: [
+      { name: "Chef", value: b.chefName, inline: true },
+      { name: "Pedido", value: b.ref, inline: true },
+      { name: "Pessoas / unidades", value: String(b.guests), inline: true },
+      { name: "Serviço", value: b.mode ? `${b.offerTitle} · ${MODE[b.mode] ?? b.mode}` : b.offerTitle },
+      { name: "Quando", value: `${b.date} · ${b.time}`, inline: true },
+      ...(notes ? [{ name: "Notas do cliente", value: notes.length > 500 ? `${notes.slice(0, 500)}…` : notes }] : []),
+    ],
+  });
+}

@@ -1,5 +1,6 @@
 "use server";
 
+import { announceBooking } from "@/lib/notify/discord";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking-token";
@@ -98,7 +99,7 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   }
 
   const r = data as { bookingId: string; ref: string; token: string; chefName: string };
-  const { data: offer } = await sb.from("offers").select("chefs(badges)").eq("id", b.offerId).maybeSingle();
+  const { data: offer } = await sb.from("offers").select("title, fulfilment_mode, chefs(badges)").eq("id", b.offerId).maybeSingle();
   const chefName = titledName({ name: r.chefName, badges: (offer?.chefs as unknown as { badges: string[] } | null)?.badges ?? [] });
   // This browser gets the token as an httpOnly cookie; the email carries it once in the link.
   (await cookies()).set(bookingTokenCookieName(r.bookingId), r.token, bookingTokenCookieOptions(r.bookingId));
@@ -133,6 +134,17 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
     return false;
   });
   await notifyChef(r.bookingId, r.ref, b).catch((err) => console.error("[action] requestBooking chef email:", err));
+  await announceBooking({
+    ref: r.ref,
+    chefName,
+    clientName: b.name,
+    guests: b.guests,
+    offerTitle: (offer?.title as string | undefined) ?? "Oferta",
+    mode: (offer?.fulfilment_mode as string | undefined) ?? null,
+    date: b.date,
+    time: b.time,
+    notes: b.notes,
+  });
   return { ok: true, bookingId: r.bookingId, ref: r.ref, link, privateLink: siteUrl(emailLink), emailed };
 }
 
