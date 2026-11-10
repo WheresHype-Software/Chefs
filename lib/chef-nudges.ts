@@ -39,7 +39,7 @@ function message(c: Candidate) {
             "Precisa do nome que quer mostrar, a zona onde cozinha e uma frase sobre si. As fotografias e os menus podem vir depois.",
             "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
           ],
-          cta: { label: "Criar a minha página", href: siteUrl("/dashboard/perfil") },
+          cta: { label: "Criar a minha página", href: siteUrl("/dashboard/comecar") },
         },
       };
     case "draft_incomplete":
@@ -53,7 +53,7 @@ function message(c: Candidate) {
             "Faltam três fotografias de pratos e pelo menos um menu com preço. É o que decide quem reserva e quem fecha a página.",
             "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
           ],
-          cta: { label: "Continuar o perfil", href: siteUrl("/dashboard") },
+          cta: { label: "Continuar o perfil", href: siteUrl("/dashboard/comecar") },
         },
       };
     case "draft_ready":
@@ -67,7 +67,7 @@ function message(c: Candidate) {
             "A nossa equipa revê cada perfil antes de ficar público. Depois disso começa a aparecer nas pesquisas da sua zona.",
             "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
           ],
-          cta: { label: "Enviar para revisão", href: siteUrl("/dashboard/perfil") },
+          cta: { label: "Enviar para revisão", href: siteUrl("/dashboard/comecar?passo=3") },
         },
       };
   }

@@ -46,7 +46,7 @@ const EMAIL: Record<Decision, { subject: string; doc: (name: string, slug: strin
       heading: "Precisamos de algumas alterações",
       lead: `Olá ${name}. Revimos o seu perfil e falta pouco.`,
       paragraphs: [note, "Depois de atualizar, volte a enviar para revisão. Respondemos normalmente no mesmo dia útil."],
-      cta: { label: "Atualizar o perfil", href: siteUrl("/dashboard/perfil") },
+      cta: { label: "Atualizar o perfil", href: siteUrl("/dashboard/comecar") },
     }),
   },
   suspended: {

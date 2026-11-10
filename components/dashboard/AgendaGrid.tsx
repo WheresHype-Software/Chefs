@@ -1,10 +1,10 @@
 "use client";
 
+import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { useState, useTransition } from "react";
-import { openWeekdays, toggleDay } from "@/app/dashboard/actions/agenda";
+import { openWeekdays, setDay, setWeeklyDays } from "@/app/dashboard/actions/agenda";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
-import { useToggleList } from "@/hooks/useToggleList";
 import { callAction } from "@/lib/call-action";
 import { isoDay } from "@/lib/format";
 import type { ActionResult } from "@/lib/result";
@@ -30,62 +30,110 @@ function Legend({ state, label }: { state: DayState; label: string }) {
   );
 }
 
+/** Monday-first chips, as JS getDay() numbers. */
+const CHIPS: [string, number][] = [
+  ["Seg", 1],
+  ["Ter", 2],
+  ["Qua", 3],
+  ["Qui", 4],
+  ["Sex", 5],
+  ["Sáb", 6],
+  ["Dom", 0],
+];
+const PRESETS: [string, number[]][] = [
+  ["Todos os dias", [0, 1, 2, 3, 4, 5, 6]],
+  ["Fins de semana", [5, 6, 0]],
+  ["Dias úteis", [1, 2, 3, 4, 5]],
+];
+const same = (a: number[], b: number[]) => a.length === b.length && a.every((x) => b.includes(x));
+
+type Overrides = Record<string, "available" | "blocked">;
+
+/**
+ * The chef's calendar: the days open every week (`weekly`), and per-day exceptions on top (an
+ * extra day open, a day off). Tapping a day flips it; the weekly days are set once in the box
+ * beside it and stay until changed.
+ */
 export function AgendaGrid({
   year,
   month,
   initial,
+  weekly: initialWeekly,
   booked,
 }: {
   year: number;
   month: number;
-  initial: Record<string, "available" | "blocked">;
+  initial: Overrides;
+  /** Weekdays open every week, as JS getDay() (0 = Sunday). */
+  weekly: number[];
   booked: string[];
 }) {
-  // Only open days matter to clients; an old "blocked" day is simply closed.
-  const [open, setOpen] = useState(() => new Set(Object.keys(initial).filter((d) => initial[d] === "available")));
+  const [overrides, setOverrides] = useState<Overrides>(initial);
+  const [weekly, setWeekly] = useState(initialWeekly);
+  const [draft, setDraft] = useState(initialWeekly);
   const [pending, start] = useTransition();
   const [message, setMessage] = useState<FormMessageValue | null>(null);
-  const weekdays = useToggleList<number>([]);
   const lead = (new Date(year, month, 1).getDay() + 6) % 7;
   const count = new Date(year, month + 1, 0).getDate();
   const today = isoDay(new Date());
   const bookedSet = new Set(booked);
   const monthName = new Date(year, month, 1).toLocaleDateString("pt-PT", { month: "long" });
-  const openCount = [...open].filter((d) => d >= today && d.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`)).length;
+  const dow = (iso: string) => new Date(`${iso}T12:00:00`).getDay();
+  const isOpen = (iso: string) => (overrides[iso] ? overrides[iso] === "available" : weekly.includes(dow(iso)));
+  const monthDays = Array.from({ length: count }, (_, i) => isoDay(new Date(year, month, i + 1)));
+  const openCount = monthDays.filter((d) => d >= today && isOpen(d)).length;
+  const changed = !same(draft, weekly);
 
-  /** Applies a change on screen at once and puts the previous days back if saving fails. */
-  function save(next: Set<string>, run: () => Promise<ActionResult>) {
-    const before = open;
-    setOpen(next);
+  /** Runs a save; on failure puts the screen back as it was and says why. */
+  function save(undo: () => void, run: () => Promise<ActionResult>, done?: string) {
     setMessage(null);
     start(async () => {
       const result = await callAction(run);
       if (!result.ok) {
-        setOpen(before);
+        undo();
         setMessage({ ok: false, text: result.error });
-      }
+      } else if (done) setMessage({ ok: true, text: done });
     });
   }
 
   function toggle(iso: string) {
-    const next = new Set(open);
-    if (next.has(iso)) next.delete(iso);
-    else next.add(iso);
-    save(next, () => toggleDay(iso));
+    const before = overrides;
+    const open = !isOpen(iso);
+    const next = { ...overrides };
+    // Back to what the weekday says: no exception needed.
+    if (open === weekly.includes(dow(iso))) delete next[iso];
+    else next[iso] = open ? "available" : "blocked";
+    setOverrides(next);
+    save(
+      () => setOverrides(before),
+      () => setDay(iso, open),
+    );
   }
 
-  function fillWeekdays() {
-    const jsDays = weekdays.items.map((w) => (w + 1) % 7); // Monday-first index -> JS getDay()
-    const next = new Set(open);
-    for (let i = 1; i <= count; i++) {
-      const dt = new Date(year, month, i);
-      if (isoDay(dt) >= today && jsDays.includes(dt.getDay())) next.add(isoDay(dt));
-    }
-    save(next, () => openWeekdays(year, month, jsDays));
+  function saveWeekly() {
+    const before = weekly;
+    setWeekly(draft);
+    save(
+      () => setWeekly(before),
+      () => setWeeklyDays(draft),
+      "Dias fixos guardados.",
+    );
+  }
+
+  function openThisMonthOnly() {
+    const before = overrides;
+    const next = { ...overrides };
+    for (const d of monthDays) if (d >= today && draft.includes(dow(d)) && !isOpen(d)) next[d] = "available";
+    setOverrides(next);
+    save(
+      () => setOverrides(before),
+      () => openWeekdays(year, month, draft),
+      `Dias abertos em ${monthName}.`,
+    );
   }
 
   const calendar = (
-    <div className="box flex flex-col gap-4 p-4 md:p-5">
+    <div data-lumi="calendario" className="box flex flex-col gap-4 p-4 md:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[15px] font-semibold first-letter:uppercase">{monthName}</span>
         <span className="text-[13px] text-muted">
@@ -104,7 +152,7 @@ export function AgendaGrid({
           ))}
           {Array.from({ length: count }, (_, i) => {
             const iso = isoDay(new Date(year, month, i + 1));
-            const state: DayState = bookedSet.has(iso) ? "booked" : iso < today ? "past" : open.has(iso) ? "open" : "closed";
+            const state: DayState = bookedSet.has(iso) ? "booked" : iso < today ? "past" : isOpen(iso) ? "open" : "closed";
             return (
               <button
                 key={iso}
@@ -131,6 +179,7 @@ export function AgendaGrid({
 
   return (
     <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+      <LumiSlot name="calendario" />
       {calendar}
 
       <div className="flex flex-col gap-5">
@@ -147,25 +196,58 @@ export function AgendaGrid({
               <strong className="font-semibold text-cobalt">Azul</strong>: já tem reserva nesse dia.
             </li>
           </ul>
-          <span className="text-[14px] text-muted">Toque num dia para o abrir ou fechar. Fica guardado logo.</span>
+          <span className="text-[14px] text-muted">
+            Toque num dia para o abrir ou fechar; fica guardado logo. Fechar um dia fixo fecha só esse dia, e abrir outro dia abre só esse.
+          </span>
         </div>
 
-        <div className="box flex flex-col gap-3 p-5">
+        <LumiSlot name="semana" />
+        <section data-lumi="semana" aria-labelledby="dias-fixos" className="box flex flex-col gap-3.5 p-5">
           <div className="flex flex-col gap-0.5">
-            <span className="text-[17px] font-bold">Abrir vários dias de uma vez</span>
-            <span className="text-[14px] text-muted">Escolha os dias da semana em que costuma cozinhar.</span>
+            <h2 id="dias-fixos" className="m-0 text-[17px] font-bold">
+              Dias fixos
+            </h2>
+            <span className="text-[14px] text-muted">
+              Os dias da semana em que costuma cozinhar. Ficam abertos todas as semanas, sem data de fim.
+            </span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {WD.map((w, i) => (
-              <Chip key={w} pressed={weekdays.has(i)} onClick={() => weekdays.toggle(i)}>
-                {w}
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Escolhas rápidas">
+            {PRESETS.map(([label, days]) => (
+              <Chip key={label} pressed={same(draft, days)} onClick={() => setDraft(same(draft, days) ? [] : days)}>
+                {label}
               </Chip>
             ))}
           </div>
-          <button type="button" className="btn btn-sm self-start" disabled={!weekdays.items.length || pending} onClick={fillWeekdays}>
-            Abrir estes dias em {monthName}
-          </button>
-        </div>
+          <div className="grid grid-cols-7 gap-1" role="group" aria-label="Dias da semana">
+            {CHIPS.map(([label, d]) => (
+              <Chip
+                key={label}
+                pressed={draft.includes(d)}
+                onClick={() => setDraft(draft.includes(d) ? draft.filter((x) => x !== d) : [...draft, d])}
+                className="!min-w-0 justify-center !px-0"
+              >
+                {label}
+              </Chip>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" className="btn btn-sm" disabled={!changed || pending} onClick={saveWeekly}>
+              {draft.length === 0 && weekly.length > 0 ? "Deixar de ter dias fixos" : "Guardar dias fixos"}
+            </button>
+            {draft.length > 0 && (
+              <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={openThisMonthOnly}>
+                Abrir só em {monthName}
+              </button>
+            )}
+          </div>
+          <span className="text-[13px] text-muted">
+            {weekly.length
+              ? `Abertos todas as semanas: ${CHIPS.filter(([, d]) => weekly.includes(d))
+                  .map(([l]) => l)
+                  .join(", ")}. Para uma folga ou férias, feche esse dia no calendário.`
+              : "Ainda sem dias fixos: só ficam abertos os dias que abrir no calendário."}
+          </span>
+        </section>
         <FormMessage message={message} />
       </div>
     </div>

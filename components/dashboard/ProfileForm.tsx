@@ -1,20 +1,43 @@
 "use client";
 
 import { AddressSearch } from "@/components/AddressSearch";
+import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { ProfileVerification, type VerificationPhotos } from "@/components/dashboard/ProfileVerification";
 import { Chip } from "@/components/ui/Chip";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
+import { useRouter } from "next/navigation";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
 import { LANGUAGES } from "@/lib/languages";
 import { slugify } from "@/lib/slug";
 import { SITE_DOMAIN } from "@/lib/constants";
 
-/** Public profile details: name, link, tier, bio, base area and service radius. */
-function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit: number }) {
-  const { form, set, areaQuery, typeArea, pickArea, save, busy, locating, message } = useProfileForm(chef);
+/**
+ * Public profile details: name, link, tier, bio, base area and service radius.
+ *
+ * `next` turns it into the first step of the onboarding flow: only what the review needs, the
+ * Instagram or site required, and saving moves on to `next` instead of staying put. The fields it
+ * hides keep their values in the form and are saved as they are.
+ */
+export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | null; minDeposit?: number; next?: string }) {
+  const router = useRouter();
+  const { form, set, areaQuery, typeArea, pickArea, save, busy, locating, message } = useProfileForm(chef, {
+    requireSocial: Boolean(next),
+    onSaved: next ? () => router.push(next) : undefined,
+  });
+  const full = !next;
+  const social = (
+    <>
+      <Field label="Instagram">
+        <input maxLength={80} value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@o.seu.perfil" />
+      </Field>
+      <Field label="Site">
+        <input type="url" maxLength={200} value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://" />
+      </Field>
+    </>
+  );
 
   return (
     <form
@@ -24,9 +47,9 @@ function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit:
         save();
       }}
     >
-      <h2 className="d m-0 text-2xl font-normal">A sua página</h2>
+      <h2 className="d m-0 text-2xl font-normal">{full ? "A sua página" : "Sobre si"}</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
-        <Field label="Nome público">
+        <Field label="Nome público" lumi="nome">
           <input
             required
             maxLength={80}
@@ -35,7 +58,7 @@ function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit:
             onBlur={() => !form.slug && set("slug", slugify(form.display_name))}
           />
         </Field>
-        <Field label="Link" hint={`${SITE_DOMAIN}/chef/${form.slug || "o-seu-nome"}`}>
+        <Field label="Link" lumi="link" hint={`${SITE_DOMAIN}/chef/${form.slug || "o-seu-nome"}`}>
           <input
             required
             maxLength={60}
@@ -44,19 +67,24 @@ function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit:
             placeholder="o-seu-nome"
           />
         </Field>
-        <Field label="Como quer aparecer" hint="Com certificado verificado, passa a aparecer como Chef.">
+        <Field label="Como quer aparecer" lumi="aparecer" hint="Com certificado verificado, passa a aparecer como Chef.">
           <select value={form.cook_form} onChange={(e) => set("cook_form", e.target.value as typeof form.cook_form)}>
             <option value="cozinheiro">Cozinheiro</option>
             <option value="cozinheira">Cozinheira</option>
           </select>
         </Field>
-        <Field label="Perfil">
+        <Field label="Perfil" lumi="perfil">
           <select value={form.tier} onChange={(e) => set("tier", e.target.value as MyChef["tier"])}>
             <option value="home">{form.cook_form === "cozinheira" ? "Cozinheira caseira" : "Cozinheiro caseiro"}</option>
             <option value="professional">Profissional de cozinha</option>
           </select>
         </Field>
-        <Field label="Uma frase para o seu perfil" hint="Aparece por baixo do seu nome. Até 80 caracteres.">
+        <Field
+          lumi="frase"
+          className="col-span-full"
+          label="Uma frase para o seu perfil"
+          hint="Aparece por baixo do seu nome. Até 80 caracteres."
+        >
           <input
             maxLength={80}
             value={form.headline}
@@ -65,7 +93,7 @@ function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit:
           />
         </Field>
       </div>
-      <Field label="Sobre si">
+      <Field label="Sobre si" lumi="bio">
         <textarea
           rows={4}
           maxLength={2000}
@@ -75,7 +103,8 @@ function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit:
         />
       </Field>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
-        <div className="field lab">
+        <LumiSlot name="zona" />
+        <div className="field lab" data-lumi="zona">
           Zona de base
           <AddressSearch
             label="Zona de base"
@@ -87,51 +116,60 @@ function ProfileDetails({ chef, minDeposit }: { chef: MyChef | null; minDeposit:
           />
           <span className="hint">Os clientes veem a zona, nunca a sua morada.</span>
         </div>
-        <Field label="Raio de serviço (km)">
+        <Field label="Raio de serviço (km)" lumi="raio">
           <NumberInput min={1} max={100} emptyValue={10} value={form.service_radius_km} onChange={(v) => set("service_radius_km", v)} />
         </Field>
-        <Field label="Instagram">
-          <input maxLength={80} value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@o.seu.perfil" />
-        </Field>
-        <Field label="Site">
-          <input type="url" maxLength={200} value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://" />
-        </Field>
-        <Field label="Anos de experiência">
-          <NumberInput min={0} max={70} value={form.years_experience} onChange={(v) => set("years_experience", v)} />
-        </Field>
-        <Field
-          label="Sinal pedido (%)"
-          hint={
-            minDeposit > 0
-              ? (form.deposit_percent ?? 0) > 0 && (form.deposit_percent ?? 0) < minDeposit
-                ? `Tem de ser pelo menos ${minDeposit}%.`
-                : `O cliente paga-o na app. Mínimo ${minDeposit}%.`
-              : "O cliente paga-o na app para confirmar a reserva."
-          }
-        >
-          <NumberInput min={0} max={100} emptyValue={0} value={form.deposit_percent} onChange={(v) => set("deposit_percent", v)} />
-        </Field>
-      </div>
-      <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-        <legend className="field lab mb-2 p-0">Idiomas que fala (opcional)</legend>
-        <div className="flex flex-wrap gap-1.5">
-          {LANGUAGES.map(([code, name]) => (
-            <Chip
-              key={code}
-              pressed={form.languages.includes(code)}
-              onClick={() =>
-                set("languages", form.languages.includes(code) ? form.languages.filter((l) => l !== code) : [...form.languages, code])
+        {full && social}
+        {full && (
+          <>
+            <Field label="Anos de experiência">
+              <NumberInput min={0} max={70} value={form.years_experience} onChange={(v) => set("years_experience", v)} />
+            </Field>
+            <Field
+              label="Sinal pedido (%)"
+              hint={
+                minDeposit > 0
+                  ? (form.deposit_percent ?? 0) > 0 && (form.deposit_percent ?? 0) < minDeposit
+                    ? `Tem de ser pelo menos ${minDeposit}%.`
+                    : `O cliente paga-o na app. Mínimo ${minDeposit}%.`
+                  : "O cliente paga-o na app para confirmar a reserva."
               }
             >
-              {name}
-            </Chip>
-          ))}
-        </div>
-        <span className="hint">Aparecem no seu perfil, para clientes que falam outras línguas.</span>
-      </fieldset>
+              <NumberInput min={0} max={100} emptyValue={0} value={form.deposit_percent} onChange={(v) => set("deposit_percent", v)} />
+            </Field>
+          </>
+        )}
+      </div>
+      {!full && <LumiSlot name="social" />}
+      {!full && (
+        <fieldset className="m-0 flex flex-col gap-3 rounded-[3px] border border-line-2 bg-paper p-4" data-lumi="social">
+          <legend className="lab px-1">Instagram ou site</legend>
+          <p className="m-0 text-sm text-ink-3">Basta um dos dois.</p>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">{social}</div>
+        </fieldset>
+      )}
+      {full && (
+        <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+          <legend className="field lab mb-2 p-0">Idiomas que fala (opcional)</legend>
+          <div className="flex flex-wrap gap-1.5">
+            {LANGUAGES.map(([code, name]) => (
+              <Chip
+                key={code}
+                pressed={form.languages.includes(code)}
+                onClick={() =>
+                  set("languages", form.languages.includes(code) ? form.languages.filter((l) => l !== code) : [...form.languages, code])
+                }
+              >
+                {name}
+              </Chip>
+            ))}
+          </div>
+          <span className="hint">Aparecem no seu perfil, para clientes que falam outras línguas.</span>
+        </fieldset>
+      )}
       <FormMessage message={message} />
       <button type="submit" className="btn self-start" disabled={busy}>
-        {locating ? "A procurar a zona…" : chef ? "Guardar perfil" : "Criar perfil"}
+        {locating ? "A procurar a zona…" : next ? "Continuar" : chef ? "Guardar perfil" : "Criar perfil"}
       </button>
     </form>
   );

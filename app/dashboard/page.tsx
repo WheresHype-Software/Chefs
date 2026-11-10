@@ -11,8 +11,10 @@ export default async function Overview() {
   const chef = await getMyChef();
   if (!chef) {
     // Admins without their own chef page belong in the admin area; clients never get here (layout).
-    redirect(session.role === "admin" ? "/admin" : "/dashboard/perfil");
+    redirect(session.role === "admin" ? "/admin" : "/dashboard/comecar");
   }
+  // Até o perfil seguir para revisão, o painel é o caminho até lá: quem entra cai no passo onde ficou.
+  if (chef.status === "draft" || chef.status === "rejected") redirect("/dashboard/comecar");
 
   const today = isoDay(new Date());
   const in7 = new Date();

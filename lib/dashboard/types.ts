@@ -2,7 +2,9 @@ import type { BookingStatus, DepositStatus, FulfilmentMode, PriceModel, ServiceT
 
 export type Role = "client" | "chef" | "admin";
 
-export type Session = { demo: true; userId: null; role: "chef" } | { demo: false; userId: string; role: Role };
+/** `lumiOff`: the chef turned off Lumi, the mascot's help (auth metadata `lumi_off`). */
+export type Session =
+  { demo: true; userId: null; role: "chef"; lumiOff?: false } | { demo: false; userId: string; role: Role; lumiOff: boolean };
 
 export type MyChef = {
   id: string;

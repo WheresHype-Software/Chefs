@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { DishPhotoCard } from "@/components/dashboard/DishPhotoCard";
+import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { PhotoUploadButton } from "@/components/dashboard/PhotoUploadButton";
+import { PhotoZones } from "@/components/dashboard/PhotoZones";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Photo } from "@/components/ui/Photo";
 import { useDishPhotos } from "@/hooks/useDishPhotos";
@@ -14,7 +16,12 @@ type UploadProps = { busy: boolean; onFiles: (kind: UploadKind, files: FileList 
 
 function ProfilePhoto({ portrait, initials, busy, onFiles }: UploadProps & { portrait: ChefPhoto | undefined; initials: string }) {
   return (
-    <section aria-labelledby="perfil-foto" className="box flex flex-wrap items-center gap-6 p-5 md:p-6">
+    <section
+      id="zona-perfil"
+      aria-labelledby="perfil-foto"
+      data-lumi="retrato"
+      className="box scroll-mt-36 md:scroll-mt-24 flex flex-wrap items-center gap-6 p-5 md:p-6"
+    >
       <div className="h-28 w-28 shrink-0 overflow-hidden rounded-full bg-cobalt-soft">
         {portrait ? (
           <Photo photo={portrait.url} alt="A sua fotografia de perfil" sizes="112px" className="h-full w-full" />
@@ -47,7 +54,12 @@ const SELFIE_STEPS = [
 /** The private selfie the team compares with the profile photo, and what happens to it. */
 function VerificationSelfie({ selfie, approved, busy, onFiles }: UploadProps & { selfie: ChefPhoto | undefined; approved: boolean }) {
   return (
-    <section aria-labelledby="selfie" className="box flex flex-wrap items-start gap-6 p-5 md:p-6">
+    <section
+      id="zona-selfie"
+      aria-labelledby="selfie"
+      data-lumi="selfie"
+      className="box scroll-mt-36 md:scroll-mt-24 flex flex-wrap items-start gap-6 p-5 md:p-6"
+    >
       <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-paper text-center text-[13px] text-muted">
         {selfie?.url ? (
           // A short-lived private link, so a plain img rather than the optimised public Photo.
@@ -114,12 +126,32 @@ export function PhotoManager({ photos, userId, initials, approved }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
+      <PhotoZones
+        zones={[
+          { id: "zona-perfil", label: "Perfil", done: Boolean(portrait), status: portrait ? "Feita" : "Em falta" },
+          {
+            id: "zona-selfie",
+            label: "Verificação",
+            done: Boolean(selfie) || approved,
+            status: approved ? "Verificado" : selfie ? "Enviada" : "Em falta",
+          },
+          {
+            id: "zona-pratos",
+            label: "Pratos",
+            done: dishes.length >= 3,
+            status: dishes.length >= 3 ? `${dishes.length} fotografias` : `${dishes.length} de 3`,
+          },
+        ]}
+      />
       <FormMessage message={uploadMessage ?? message} />
 
+      <LumiSlot name="retrato" />
       <ProfilePhoto portrait={portrait} initials={initials} busy={uploading} onFiles={upload} />
+      <LumiSlot name="selfie" />
       <VerificationSelfie selfie={selfie} approved={approved} busy={uploading} onFiles={upload} />
 
-      <section aria-labelledby="pratos" className="flex flex-col gap-4">
+      <LumiSlot name="pratos" />
+      <section id="zona-pratos" aria-labelledby="pratos" data-lumi="pratos" className="scroll-mt-36 md:scroll-mt-24 flex flex-col gap-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-col gap-1">
             <h2 id="pratos" className="d m-0 text-2xl font-normal">

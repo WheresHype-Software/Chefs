@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AgendaGrid } from "@/components/dashboard/AgendaGrid";
-import { getAvailability, getBookings, getSetupProgress } from "@/lib/dashboard";
+import { LumiCoach, LumiRestore } from "@/components/dashboard/LumiCoach";
+import { getAvailability, getBookings, getSetupProgress, getWeeklyDays, lumiOn } from "@/lib/dashboard";
 import { isoDay, monthLabel } from "@/lib/format";
+import { agendaTips } from "@/lib/lumi-tips";
 
 export default async function Agenda({ searchParams }: PageProps<"/dashboard/agenda">) {
   const { mes } = await searchParams;
@@ -13,11 +15,14 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
   const month = m! - 1;
   const from = isoDay(new Date(year, month, 1));
   const to = isoDay(new Date(year, month + 1, 0));
-  const [avail, bookings, progress] = await Promise.all([
+  const [avail, bookings, progress, lumi, weekly] = await Promise.all([
     getAvailability(from, to),
     getBookings({ from, to, statuses: ["accepted", "confirmed"] }),
     getSetupProgress(),
+    lumiOn(),
+    getWeeklyDays(),
   ]);
+  const tips = agendaTips(progress.openDays);
   const shift = (delta: number) => {
     const d = new Date(year, month + delta, 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -44,7 +49,7 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
         <div role="status" className="flex flex-col gap-1.5 rounded-[10px] border border-cobalt/30 bg-cobalt-soft p-5">
           <span className="d text-xl">Ainda não abriu nenhum dia.</span>
           <span className="text-[15px] text-ink-3">
-            Use o atalho para abrir os dias da semana em que costuma cozinhar, ou toque em cada dia do calendário.
+            Escolha os seus dias fixos, que ficam abertos todas as semanas, ou toque em cada dia do calendário.
             {progress.activeOffers === 0 && " Lembre-se de criar também uma oferta, em Ofertas."}
           </span>
         </div>
@@ -54,8 +59,11 @@ export default async function Agenda({ searchParams }: PageProps<"/dashboard/age
         year={year}
         month={month}
         initial={Object.fromEntries(avail.map((a) => [a.date, a.status]))}
+        weekly={weekly}
         booked={bookings.map((b) => b.date)}
       />
+      {lumi === "on" && <LumiCoach key={tips.start} tips={tips.tips} start={tips.start} inline followScroll />}
+      {lumi === "off" && <LumiRestore />}
     </div>
   );
 }

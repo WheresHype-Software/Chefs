@@ -34,15 +34,26 @@ type ProfileFormValues = ReturnType<typeof initialForm>;
 /** "Alvalade, Lisboa" -> "Alvalade". */
 const areaName = (label: string) => label.split(",")[0]!.trim();
 
+type Options = {
+  /** Runs after a successful save; the onboarding flow uses it to move to the next step. */
+  onSaved?: () => void;
+  /** Instagram or site is needed to send for review; onboarding asks for it up front. */
+  requireSocial?: boolean;
+};
+
 /** State and save rules of the profile form: fields, the base-area search and its geocoding fallback. */
-export function useProfileForm(chef: MyChef | null) {
+export function useProfileForm(chef: MyChef | null, { onSaved, requireSocial }: Options = {}) {
   const [form, setForm] = useState(() => initialForm(chef));
   const [areaQuery, setAreaQuery] = useState(chef?.area_name ?? "");
   const [place, setPlace] = useState<Place | null>(
     chef?.lat && chef?.lng ? { label: chef.area_name ?? "", lat: chef.lat, lng: chef.lng } : null,
   );
   const [locating, setLocating] = useState(false);
-  const { run, pending, message, setMessage } = useServerAction(saveProfile, { successMessage: "Perfil guardado." });
+  const { run, pending, message, setMessage } = useServerAction(saveProfile, {
+    // In onboarding the save is silent: the next step appearing is the confirmation.
+    successMessage: onSaved ? undefined : "Perfil guardado.",
+    onSuccess: onSaved,
+  });
   const set = <K extends keyof ProfileFormValues>(key: K, value: ProfileFormValues[K]) => setForm((f) => ({ ...f, [key]: value }));
 
   /** Typing in the area field drops the picked place until a suggestion is chosen again. */
@@ -57,6 +68,13 @@ export function useProfileForm(chef: MyChef | null) {
   }
 
   async function save() {
+    if (requireSocial && !form.instagram.trim() && !form.website.trim()) {
+      setMessage({
+        ok: false,
+        text: "Indique o Instagram ou o site. Basta um, e serve só para a equipa ver o seu trabalho antes de aprovar.",
+      });
+      return;
+    }
     // Typed a zone without picking a suggestion: look it up instead of refusing.
     let base = place;
     if (!base && areaQuery.trim()) {
