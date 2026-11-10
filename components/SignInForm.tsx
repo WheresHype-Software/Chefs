@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signUpWithTerms } from "@/app/auth/actions";
 import { trackPixel } from "@/lib/meta-pixel";
 import { createClient } from "@/lib/supabase/client";
 
@@ -21,6 +22,7 @@ const ERRORS: [RegExp, string][] = [
   [/already registered|already exists/i, "Já existe uma conta com este email. Entre com a palavra-passe."],
   [/password should be at least/i, "A palavra-passe precisa de pelo menos 8 caracteres."],
   [/rate limit|too many/i, "Demasiadas tentativas. Tente de novo dentro de alguns minutos."],
+  [/terms not accepted/i, "Para criar a conta, aceite os termos."],
 ];
 
 function errorText(err: unknown): string {
@@ -37,6 +39,7 @@ export function SignInForm({ next, asChef }: { next: string; asChef: boolean }) 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -64,19 +67,12 @@ export function SignInForm({ next, asChef }: { next: string; asChef: boolean }) 
         if (error) throw error;
         go();
       } else {
-        const { data, error } = await sb.auth.signUp({
-          email,
-          password,
-          options: {
-            // Only used if email confirmation is switched on in Supabase.
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-            data: { name, role: asChef ? "chef" : "client" },
-          },
-        });
-        if (error) throw error;
+        // On the server, so the acceptance of the terms is recorded with the account, in one go.
+        const res = await signUpWithTerms({ name, email, password, asChef, next, accepted });
+        if (!res.ok) throw new Error(res.error);
         // Ads measurement: no-op unless the visitor accepted cookies.
         trackPixel("CompleteRegistration", { content_name: asChef ? "chef" : "client" });
-        if (data.session) go();
+        if (res.session) go();
         else setMsg({ ok: true, text: `Conta criada. Confirme o email que enviámos para ${email}.` });
       }
     } catch (err) {
@@ -132,10 +128,39 @@ export function SignInForm({ next, asChef }: { next: string; asChef: boolean }) 
             {mode === "signup" && <span className="hint">Pelo menos 8 caracteres.</span>}
           </label>
         )}
+        {mode === "signup" && (
+          // Never pre-ticked, and the button waits for it: the acceptance has to be a choice.
+          <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+            <input type="checkbox" required checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-1" />
+            <span>
+              Li e aceito os{" "}
+              <a href="/termos" target="_blank" rel="noopener">
+                Termos e condições
+              </a>
+              {asChef && (
+                <>
+                  {" "}
+                  e o{" "}
+                  <a href="/contrato-chefs" target="_blank" rel="noopener">
+                    Contrato de intermediação de pagamentos
+                  </a>
+                </>
+              )}
+              .{" "}
+              <span className="text-muted">
+                Saiba como tratamos os seus dados na{" "}
+                <a href="/privacidade" target="_blank" rel="noopener">
+                  Política de privacidade
+                </a>
+                .
+              </span>
+            </span>
+          </label>
+        )}
         {mode === "recover" && (
           <p className="m-0 text-sm text-muted">Enviamos-lhe uma ligação por email para escolher uma nova palavra-passe.</p>
         )}
-        <button type="submit" className="btn" disabled={busy}>
+        <button type="submit" className="btn" disabled={busy || (mode === "signup" && !accepted)}>
           {busy
             ? "Um momento…"
             : mode === "recover"

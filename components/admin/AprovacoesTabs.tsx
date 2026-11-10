@@ -11,6 +11,7 @@ export async function AprovacoesTabs() {
         { href: "/admin/titulos", label: "Títulos de Chef", count: titles.length },
         { href: "/admin/denuncias", label: "Denúncias", count: reports.length },
         { href: "/admin/chefs", label: "Chefs", count: roster.chefs.filter((c) => c.status === "approved").length },
+        { href: "/admin/chefs/contratos", label: "Contratos" },
       ]}
     />
   );

@@ -2,7 +2,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGrid } from "@/components/ui/StatGrid";
 import { redirect } from "next/navigation";
+import { LegalAcceptanceCard } from "@/components/dashboard/LegalAcceptanceCard";
 import { SetupChecklist } from "@/components/dashboard/SetupChecklist";
+import { myAcceptance } from "@/lib/acceptance";
 import { getBookings, getChefMoney, getMyChef, getPayouts, getSession, getSetupProgress } from "@/lib/dashboard";
 import { dayLabel, euro, isoDay, longDay, rating } from "@/lib/format";
 
@@ -25,6 +27,9 @@ export default async function Overview() {
     getSetupProgress(),
     getChefMoney(),
   ]);
+  // A new version of the terms or the contract waits here until the chef accepts it.
+  const legal = session.demo || !session.userId ? { terms: true, contract: true } : await myAcceptance(session.userId);
+  const toAccept = [...(legal.terms ? [] : ["terms" as const]), ...(legal.contract ? [] : ["chef_contract" as const])];
   // Only worth a query once there is money to show.
   const payouts = money ? await getPayouts() : null;
   const byDay = new Map<string, number>();
@@ -34,6 +39,18 @@ export default async function Overview() {
 
   return (
     <div className="flex flex-col gap-6">
+      {toAccept.length > 0 && (
+        <LegalAcceptanceCard
+          kinds={toAccept}
+          context="dashboard"
+          title={toAccept.includes("chef_contract") ? "Há uma nova versão do contrato" : "Os termos foram atualizados"}
+          intro={
+            toAccept.includes("chef_contract")
+              ? "Leia e aceite para continuar a usar o Ao Lume. O contrato diz, entre outras coisas, que o serviço, a segurança alimentar e as licenças são da sua responsabilidade, e que esta aceitação vale como a sua assinatura."
+              : "Leia os termos atualizados e aceite para continuar a usar o Ao Lume."
+          }
+        />
+      )}
       <SetupChecklist chef={chef} progress={progress} />
 
       <PageHeader meta={longDay(today)} title={`Olá, ${chef.display_name.split(" ")[0]}`} />

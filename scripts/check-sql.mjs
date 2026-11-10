@@ -26,6 +26,8 @@ for (const file of files) {
     .split("\n")
     .map((l) => l.replace(/--.*$/, ""))
     .join("\n")
+    // Tagged dollar quotes ($texto$…$texto$) hold literal text, where an apostrophe is just a letter.
+    .replace(/\$([A-Za-z_]\w*)\$[\s\S]*?\$\1\$/g, "''")
     .replace(/'(?:[^']|'')*'/g, "''");
 
   const markers = (code.match(/\$\$/g) ?? []).length;
