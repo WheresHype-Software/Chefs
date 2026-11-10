@@ -15,12 +15,13 @@ const REASONS = [
   "O documento está ilegível ou cortado.",
   "O nome no certificado não corresponde ao do perfil.",
   "Não é um certificado de formação em cozinha.",
+  "A descrição não chega para confirmar a experiência: envie um certificado ou fotografias do seu trabalho.",
 ];
 
-type Props = { chefId: string; name: string; slug: string; badges: string[]; docs: CertificateDoc[] };
+type Props = { chefId: string; name: string; slug: string; badges: string[]; docs: CertificateDoc[]; statements: string[] };
 
 /** A cook asking to be called "Chef": see the certificate, then verify or refuse with a reason. */
-export function TitleRequestCard({ chefId, name, slug, badges, docs }: Props) {
+export function TitleRequestCard({ chefId, name, slug, badges, docs, statements }: Props) {
   const [done, setDone] = useState<"verified" | "refused" | null>(null);
   const [refusing, setRefusing] = useState(false);
   const [reason, setReason] = useState("");
@@ -33,9 +34,7 @@ export function TitleRequestCard({ chefId, name, slug, badges, docs }: Props) {
     return (
       <article role="status" className="box px-5 py-4 text-[15px]">
         <strong className="font-semibold">{name}</strong>{" "}
-        {done === "verified"
-          ? `já aparece como Chef ${name} e recebeu um email.`
-          : "recebeu o motivo por email e pode enviar outro certificado."}
+        {done === "verified" ? `já aparece como Chef ${name} e recebeu um email.` : "recebeu o motivo por email e pode voltar a pedir."}
       </article>
     );
   }
@@ -51,7 +50,13 @@ export function TitleRequestCard({ chefId, name, slug, badges, docs }: Props) {
         </Link>
       </div>
 
-      <CertificateLinks docs={docs} />
+      {docs.length > 0 && <CertificateLinks docs={docs} />}
+      {statements.map((text, i) => (
+        <figure key={i} className="m-0 flex flex-col gap-1.5 rounded-[8px] bg-paper p-3.5">
+          <figcaption className="lab">Sem certificado · a experiência descrita pelo cozinheiro</figcaption>
+          <blockquote className="m-0 whitespace-pre-line text-[15px] [overflow-wrap:anywhere]">{text}</blockquote>
+        </figure>
+      ))}
       {previews.length > 0 && (
         <div className="flex flex-wrap gap-3">
           {previews.map((d, i) => (
@@ -66,7 +71,11 @@ export function TitleRequestCard({ chefId, name, slug, badges, docs }: Props) {
           ))}
         </div>
       )}
-      <p className="m-0 text-xs text-muted">Confirme que o documento é válido e está em nome desta pessoa. Os links duram 10 minutos.</p>
+      <p className="m-0 text-xs text-muted">
+        {docs.length > 0
+          ? "Confirme que o documento é válido e está em nome desta pessoa. Os links duram 10 minutos."
+          : "Sem documento: decida pela descrição, pelas fotografias dos pratos e pelas avaliações. Se tiver dúvidas, ligue-lhe."}
+      </p>
 
       {refusing && (
         <div className="flex flex-col gap-2.5 rounded-[8px] bg-paper p-3.5">

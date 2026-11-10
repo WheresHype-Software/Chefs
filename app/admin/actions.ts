@@ -194,9 +194,9 @@ export async function verifyChefTitle(chefId: string): Promise<ActionResult> {
     const email = (chef.profiles as unknown as { email: string } | null)?.email;
     if (email) {
       const doc = renderEmail({
-        preheader: "O seu certificado foi verificado.",
+        preheader: "O seu título de Chef foi confirmado.",
         heading: `Já aparece como Chef ${chef.display_name}`,
-        lead: `Olá ${chef.display_name}. Verificámos o seu certificado de cozinha.`,
+        lead: `Olá ${chef.display_name}. Confirmámos o seu pedido de título de Chef.`,
         paragraphs: [
           "A partir de agora aparece aos clientes como Chef, com o selo «Chef verificado» ao lado do nome em todas as pesquisas.",
         ],
@@ -277,6 +277,7 @@ export async function refuseChefTitle(chefId: string, reason: string): Promise<A
   if (!chef) return fail("Chef não encontrado.");
   const { error } = await sb.from("chef_certifications").delete().eq("chef_id", chefId).eq("verified", false);
   if (error) return failWith(error, "refuseChefTitle", "Não foi possível recusar o pedido. Tente de novo.");
+  await sb.from("chef_title_statements").delete().eq("chef_id", chefId);
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -288,16 +289,16 @@ export async function refuseChefTitle(chefId: string, reason: string): Promise<A
     const email = (chef.profiles as unknown as { email: string } | null)?.email;
     if (email) {
       const doc = renderEmail({
-        preheader: "Não conseguimos verificar o certificado.",
-        heading: "O certificado que enviou",
-        lead: `Olá ${chef.display_name}. Não conseguimos verificar o certificado que nos enviou.`,
+        preheader: "Ainda não conseguimos confirmar o título.",
+        heading: "O seu pedido de título de Chef",
+        lead: `Olá ${chef.display_name}. Ainda não conseguimos confirmar o título de Chef com o que nos enviou.`,
         facts: [["Porquê", input.data.reason]],
         paragraphs: [
-          "Pode enviar outro quando quiser. Continua a receber pedidos entretanto: o título de Chef é um extra, não um requisito.",
+          "Pode voltar a pedir quando quiser, com um certificado ou com mais detalhe sobre a sua experiência. Continua a receber pedidos entretanto: o título de Chef é um extra, não um requisito.",
         ],
-        cta: { label: "Enviar outro certificado", href: siteUrl("/dashboard/perfil") },
+        cta: { label: "Voltar a pedir", href: siteUrl("/dashboard/perfil#titulo") },
       });
-      await sendEmail({ to: email, subject: "O seu certificado no Ao Lume", text: doc.text, html: doc.html });
+      await sendEmail({ to: email, subject: "O seu pedido de título de Chef", text: doc.text, html: doc.html });
     }
   } catch (err) {
     console.error("[action] refuseChefTitle email:", err);

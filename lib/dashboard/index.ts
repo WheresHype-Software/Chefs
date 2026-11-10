@@ -8,7 +8,7 @@ export { getLogistics } from "./logistics";
 export { getAvailability, getWeeklyDays } from "./availability";
 export { getCooking } from "./cooking";
 export { getMyPhotos } from "./photos";
-export { getMyCertificates, type MyCertificate } from "./certificates";
+export { getMyCertificates, getMyTitleStatements, type MyCertificate, type MyTitleStatement } from "./certificates";
 export { getReviews } from "./reviews";
 export { getSetupProgress } from "./setup";
 export { lumiOn } from "./lumi";

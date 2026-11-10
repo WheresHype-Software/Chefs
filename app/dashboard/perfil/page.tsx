@@ -7,7 +7,7 @@ import { PhotoZones } from "@/components/dashboard/PhotoZones";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { redirect } from "next/navigation";
-import { getCooking, getMyCertificates, getMyChef, getMyPhotos, getOffers, getSession, lumiOn } from "@/lib/dashboard";
+import { getCooking, getMyCertificates, getMyChef, getMyTitleStatements, getMyPhotos, getOffers, getSession, lumiOn } from "@/lib/dashboard";
 import { chefTitle, euro, initials, rating } from "@/lib/format";
 import { COOKING_TIPS, PHOTO_TIPS } from "@/lib/lumi-tips";
 import { requiredDepositPercent } from "@/lib/money";
@@ -107,6 +107,7 @@ export default async function Perfil() {
             name={chef.display_name}
             badges={chef.badges}
             certificates={await getMyCertificates()}
+            statements={await getMyTitleStatements()}
             userId={session.demo ? null : session.userId}
           />
         </div>

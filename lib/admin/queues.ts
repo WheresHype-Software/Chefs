@@ -48,20 +48,23 @@ export const getPendingChefs = cache(async (): Promise<PendingChef[]> => {
 });
 
 export type TitleRequest = { id: string; display_name: string; slug: string; badges: string[] } & WithCerts & {
+    chef_title_statements: { body: string; created_at: string }[];
     certificateDocs: Awaited<ReturnType<typeof certificateLinks>>;
   };
 
 export const getTitleRequests = cache(async (): Promise<TitleRequest[]> => {
   const sb = await createClient();
-  // Cozinheiros aprovados que enviaram certificado e ainda não são «Chef».
+  // Cozinheiros aprovados que pediram o título (com certificado ou com uma descrição) e ainda não são «Chef».
   const { data } = await sb
     .from("chefs")
-    .select("id, display_name, slug, badges, chef_certifications!inner(title, document_path)")
+    .select("id, display_name, slug, badges, chef_certifications(title, document_path), chef_title_statements(body, created_at)")
     .eq("status", "approved")
     .not("badges", "cs", "{certified}")
     .order("display_name");
 
-  const rows = (data ?? []) as unknown as ({ id: string; display_name: string; slug: string; badges: string[] } & WithCerts)[];
+  const rows = ((data ?? []) as unknown as Omit<TitleRequest, "certificateDocs">[]).filter(
+    (r) => r.chef_certifications.length > 0 || r.chef_title_statements.length > 0,
+  );
   return Promise.all(rows.map(async (r) => ({ ...r, certificateDocs: await certificateLinks(sb, r.chef_certifications) })));
 });
 

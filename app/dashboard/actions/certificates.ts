@@ -44,3 +44,33 @@ export async function addCertificate(title: string, path: string): Promise<Resul
   });
   return done("/dashboard/perfil");
 }
+
+const StatementInput = z.string().trim().min(20).max(1500);
+
+/**
+ * The Chef title without a certificate: the cook describes their experience (years in a kitchen,
+ * teaching, where they cooked) and the team decides. The text is private to the cook and the team.
+ */
+export async function addTitleStatement(body: string): Promise<Result> {
+  const parsed = StatementInput.safeParse(body);
+  if (!parsed.success) return fail("Conte-nos um pouco mais: pelo menos uma ou duas frases sobre a sua experiência.");
+  const ctx = await chefContext();
+  if (ctx.demo) return ok();
+  if (!ctx.chef) return fail(NO_CHEF);
+  const { error } = await ctx.sb.from("chef_title_statements").insert({ chef_id: ctx.chef.id, body: parsed.data });
+  if (error) return failWith(error, "addTitleStatement", "Não foi possível enviar a sua descrição. Tente de novo.");
+
+  await notifyAdmin({
+    subject: `Pedido de título de Chef: ${ctx.chef.display_name}`,
+    preheader: `${ctx.chef.display_name} descreveu a sua experiência e pede o título de Chef.`,
+    heading: "Um pedido de título sem certificado",
+    lead: `${ctx.chef.display_name} não tem certificado, mas descreveu a sua experiência na cozinha.`,
+    facts: [
+      ["Quem pede", ctx.chef.display_name],
+      ["Perfil público", siteUrl(`/chef/${ctx.chef.slug}`)],
+    ],
+    paragraphs: [parsed.data],
+    cta: { label: "Abrir os pedidos de título", href: "/admin/titulos" },
+  });
+  return done("/dashboard/perfil");
+}

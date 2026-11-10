@@ -19,16 +19,24 @@ export default async function TitulosPage() {
     <AdminShell title="Títulos de Chef">
       <AprovacoesTabs />
       <p className="m-0 max-w-[62ch] text-muted">
-        Cozinheiros já aprovados que enviaram um certificado. O título muda como aparecem nas pesquisas, por isso o documento é visto por
-        uma pessoa.
+        Cozinheiros já aprovados que pediram o título de Chef, com um certificado ou com uma descrição da sua experiência. O título muda
+        como aparecem nas pesquisas, por isso cada pedido é visto por uma pessoa.
       </p>
       <section className="flex flex-col gap-4">
         {queue.length ? (
           queue.map((c) => (
-            <TitleRequestCard key={c.id} chefId={c.id} name={c.display_name} slug={c.slug} badges={c.badges} docs={c.certificateDocs} />
+            <TitleRequestCard
+              key={c.id}
+              chefId={c.id}
+              name={c.display_name}
+              slug={c.slug}
+              badges={c.badges}
+              docs={c.certificateDocs}
+              statements={c.chef_title_statements.map((x) => x.body)}
+            />
           ))
         ) : (
-          <p className="m-0 text-muted">Nenhum certificado por verificar.</p>
+          <p className="m-0 text-muted">Nenhum pedido de título por ver.</p>
         )}
       </section>
     </AdminShell>
