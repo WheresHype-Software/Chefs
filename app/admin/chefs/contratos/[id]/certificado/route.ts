@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { PRINT_SCRIPT, renderAcceptanceCertificate } from "@/lib/admin/acceptance-certificate";
 import { getCertificateData } from "@/lib/admin/acceptances";
 import { getSession } from "@/lib/dashboard";
-import { createClient, hasSupabase } from "@/lib/supabase/server";
+import { hasSupabase } from "@/lib/supabase/server";
 
 /**
  * GET /admin/chefs/contratos/<acceptance id>/certificado — the printable certificate.
@@ -23,11 +23,8 @@ export async function GET(_request: Request, { params }: RouteContext<"/admin/ch
   const session = await getSession();
   if (session.demo || session.role !== "admin" || !session.userId) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  const sb = await createClient();
-  const { data: admin } = await sb.from("profiles").select("name, email").eq("id", session.userId).maybeSingle();
-  const issuer = [admin?.name, admin?.email].filter(Boolean).join(", ") || "administração";
-
-  const data = await getCertificateData(id, issuer);
+  // Issued by the company, not by whoever pressed the button: no admin is named on it.
+  const data = await getCertificateData(id);
   if (!data) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   return new NextResponse(renderAcceptanceCertificate(data), {

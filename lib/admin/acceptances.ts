@@ -2,7 +2,7 @@ import "server-only";
 import { currentText } from "../acceptance";
 import { sha256 } from "../crypto";
 import { siteUrl } from "../env";
-import { COMPANY } from "../legal";
+import { COMPANY, EMAIL } from "../legal";
 import { createClient } from "../supabase/server";
 import { TERMS_UPDATED } from "../terms";
 import type { CertificateData } from "./acceptance-certificate";
@@ -83,7 +83,7 @@ export async function getAcceptanceRoster(): Promise<AcceptanceRow[]> {
 }
 
 /** Everything the certificate states, read with the admin's own session (RLS: admins only). */
-export async function getCertificateData(acceptanceId: string, issuedBy: string): Promise<CertificateData | null> {
+export async function getCertificateData(acceptanceId: string): Promise<CertificateData | null> {
   const sb = await createClient();
   const { data: row } = await sb.from("legal_acceptances").select("*").eq("id", acceptanceId).maybeSingle();
   if (!row) return null;
@@ -116,8 +116,7 @@ export async function getCertificateData(acceptanceId: string, issuedBy: string)
 
   return {
     issuedAt: new Date().toISOString(),
-    issuedBy,
-    platform: { name: COMPANY.name, nif: COMPANY.nif, address: COMPANY.address },
+    platform: { name: COMPANY.name, nif: COMPANY.nif, address: COMPANY.address, email: EMAIL.legal },
     acceptance: {
       id: a.id,
       kind: a.kind,

@@ -14,8 +14,7 @@ import { FORM_CLAUSE_TITLE } from "../contract";
  */
 export type CertificateData = {
   issuedAt: string;
-  issuedBy: string;
-  platform: { name: string; nif: string; address: string };
+  platform: { name: string; nif: string; address: string; email: string };
   acceptance: {
     id: string;
     kind: "terms" | "chef_contract";
@@ -179,9 +178,9 @@ export function renderAcceptanceCertificate(d: CertificateData): string {
   <h2>Declaração</h2>
   ${statement}
 
-  <p class="foot">Emitido a ${esc(lisbonStampSeconds(d.issuedAt))} por ${esc(d.issuedBy)}, em nome de ${esc(d.platform.name)}, NIF ${esc(
-    d.platform.nif,
-  )}, ${esc(d.platform.address)}, a partir dos registos da plataforma Ao Lume.${
+  <p class="foot">Emitido a ${esc(lisbonStampSeconds(d.issuedAt))} por ${esc(d.platform.name)}, NIF ${esc(d.platform.nif)}, ${esc(
+    d.platform.address,
+  )}, contacto ${esc(d.platform.email)}, a partir dos registos da plataforma Ao Lume.${
     d.text ? ` O texto aceite pode ser consultado em ${esc(d.archiveUrl)}.` : ""
   }</p>
 
