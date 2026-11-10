@@ -42,9 +42,6 @@ export function OnboardingSubmit({ items, notes }: { items: ReviewItem[]; notes:
         {submit.pending ? "A enviar…" : "Enviar para revisão"}
       </button>
       <FormMessage message={submit.message} />
-      <span className="text-xs text-muted">
-        Ao enviar, aceita os termos para chefs: é responsável pela legalidade, higiene, impostos e pagamentos do seu serviço.
-      </span>
     </section>
   );
 }

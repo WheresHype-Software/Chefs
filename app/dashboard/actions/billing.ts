@@ -2,14 +2,13 @@
 
 import { headers } from "next/headers";
 import { z } from "zod";
-import { CONTRACT_VERSION, contractText } from "@/lib/contract";
-import { sha256 } from "@/lib/crypto";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { renderEmail } from "@/lib/email-template";
 import { isValidIban, isValidNif, isValidPostalCode, normaliseIban } from "@/lib/fiscal";
 import { canEncrypt, encrypt, hashToken, oneTimeToken } from "@/lib/payments/secrets";
 import { fail, failInvalid, failWith, ok, type ActionResult } from "@/lib/result";
 import { chefContext, done, NO_CHEF } from "./context";
+import { acceptLegal } from "./legal";
 
 const CONFIRM_PATH = "/dashboard/faturacao/confirmar";
 
@@ -154,22 +153,15 @@ export async function confirmIbanChange(token: string): Promise<ActionResult> {
   return done("/dashboard/faturacao");
 }
 
-/** The contract. Accepting it is what makes every payment document valid without signing each one. */
+/**
+ * The contract. Accepting it is what makes every payment document valid without signing each one.
+ * Recorded like every other acceptance (lib/acceptance.ts): text archived, copy sent by email.
+ */
 export async function acceptAgreement(): Promise<ActionResult> {
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   if (!ctx.chef) return fail(NO_CHEF);
-
-  const h = await headers();
-  const { error } = await ctx.sb.rpc("accept_chef_agreement", {
-    p_version: CONTRACT_VERSION,
-    p_sha: sha256(contractText()),
-    // The first address in x-forwarded-for is the visitor; the rest are proxies.
-    p_ip: (h.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || null,
-    p_user_agent: h.get("user-agent"),
-  });
-  if (error) return failWith(error, "acceptAgreement");
-  return done("/dashboard/faturacao");
+  return acceptLegal(["chef_contract"], "billing");
 }
 
 /**

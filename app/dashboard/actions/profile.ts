@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { myAcceptance } from "@/lib/acceptance";
 import { announceChefForReview } from "@/lib/notify/discord";
 import { getSession } from "@/lib/dashboard";
 import { notifyAdmin } from "@/lib/email";
@@ -134,6 +135,11 @@ export async function submitForReview(): Promise<Result> {
   if (!faces.some((f) => f.kind === "selfie")) return fail("Falta a selfie de verificação, em Fotografias.");
   if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
   if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail("Indique o Instagram ou o site.");
+  // Nothing goes public before the chef has accepted the terms and the contract that hold them
+  // responsible for their own service.
+  const { userId } = await getSession();
+  const legal = userId ? await myAcceptance(userId) : { terms: false, contract: false };
+  if (!legal.terms || !legal.contract) return fail("Aceite os termos e o contrato antes de enviar para revisão.");
   const { error } = await ctx.sb.from("chefs").update({ status: "pending" }).eq("id", ctx.chef.id);
   if (error) return failWith(error, "submitForReview", "Não foi possível enviar para revisão. Tente de novo.");
 

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { LegalAcceptanceCard } from "@/components/dashboard/LegalAcceptanceCard";
 import { LumiCoach, LumiRail, LumiRestore, LumiSlot } from "@/components/dashboard/LumiCoach";
 import { OnboardingSubmit } from "@/components/dashboard/OnboardingSubmit";
 import { PhotoManager } from "@/components/dashboard/PhotoManager";
 import { ProfileDetails } from "@/components/dashboard/ProfileForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyChef, getMyPhotos, getSession } from "@/lib/dashboard";
+import { myAcceptance } from "@/lib/acceptance";
 import { initials } from "@/lib/format";
 import { onboardingTips } from "@/lib/onboarding-tips";
 import { requiredDepositPercent } from "@/lib/money";
@@ -39,7 +41,12 @@ export default async function Comecar({ searchParams }: PageProps<"/dashboard/co
   const asked = Number((await searchParams).passo);
   const step = asked >= 1 && asked <= 3 && (asked === 1 || chef) ? asked : first;
 
+  // Accounts made before the sign-up checkbox existed, or clients who became chefs, accept here.
+  const legal = session.demo || !session.userId ? { terms: true, contract: true } : await myAcceptance(session.userId);
+  const toAccept = [...(legal.terms ? [] : ["terms" as const]), ...(legal.contract ? [] : ["chef_contract" as const])];
+
   const reviewItems = [
+    { label: "Termos e contrato aceites", done: toAccept.length === 0, href: href(3) },
     { label: "Instagram ou site", done: social, href: href(1) },
     { label: "Fotografia de perfil", done: count("portrait") > 0, href: href(2) },
     { label: "Selfie de verificação", done: count("selfie") > 0, href: href(2) },
@@ -139,6 +146,15 @@ export default async function Comecar({ searchParams }: PageProps<"/dashboard/co
           {step === 3 && chef && (
             <>
               <LumiSlot name="enviar" />
+              {toAccept.length > 0 && (
+                <div className="max-w-[640px]">
+                  <LegalAcceptanceCard
+                    kinds={toAccept}
+                    context="onboarding"
+                    intro="Antes de o perfil seguir para revisão, precisamos da sua aceitação. O contrato diz, entre outras coisas, que o serviço, a segurança alimentar e as licenças são da sua responsabilidade."
+                  />
+                </div>
+              )}
               <OnboardingSubmit notes={chef.status === "rejected" ? chef.verification_notes : null} items={reviewItems} />
             </>
           )}

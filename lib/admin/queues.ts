@@ -121,7 +121,7 @@ export const getRoster = cache(async (): Promise<{ chefs: RosterChef[]; neverSta
     sb
       .from("chefs")
       .select(
-        "id, profile_id, display_name, slug, status, area_name, badges, deposit_percent, rating_avg, review_count, completed_bookings, chef_photos(kind), offers(active)",
+        "id, profile_id, display_name, slug, status, area_name, badges, deposit_percent, rating_avg, review_count, completed_bookings, created_at, chef_photos(kind, url, sort_order), offers(active), profiles(email)",
       )
       .neq("status", "pending")
       .order("status")
@@ -133,16 +133,24 @@ export const getRoster = cache(async (): Promise<{ chefs: RosterChef[]; neverSta
 
   const minDeposit = settings.paymentsEnabled ? requiredDepositPercent(moneyRules(settings)) : 0;
   const chefs: RosterChef[] = (
-    (roster.data ?? []) as unknown as (Omit<RosterChef, "photos" | "activeOffers" | "minDeposit"> & {
-      chef_photos: { kind: string }[];
+    (roster.data ?? []) as unknown as (Omit<RosterChef, "photos" | "activeOffers" | "minDeposit" | "portrait" | "gallery" | "email"> & {
+      chef_photos: { kind: string; url: string; sort_order: number | null }[];
       offers: { active: boolean }[];
+      profiles: { email: string | null } | null;
     })[]
-  ).map((c) => ({
-    ...c,
-    photos: (c.chef_photos ?? []).filter((p) => p.kind !== "selfie").length,
-    activeOffers: (c.offers ?? []).filter((o) => o.active).length,
-    minDeposit,
-  }));
+  ).map(({ chef_photos, offers, profiles, ...c }) => {
+    // The selfie is private: it never leaves the approval queue.
+    const shown = (chef_photos ?? []).filter((p) => p.kind !== "selfie").sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    return {
+      ...c,
+      email: profiles?.email ?? null,
+      portrait: shown.find((p) => p.kind === "portrait")?.url ?? null,
+      gallery: shown.filter((p) => p.kind === "gallery").map((p) => p.url),
+      photos: shown.length,
+      activeOffers: (offers ?? []).filter((o) => o.active).length,
+      minDeposit,
+    };
+  });
 
   const withProfile = new Set(((roster.data ?? []) as { profile_id: string | null }[]).map((c) => c.profile_id).filter(Boolean));
   const neverStarted = ((chefProfiles.data ?? []) as NeverStarted[]).filter((p) => !withProfile.has(p.id));

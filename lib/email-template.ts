@@ -18,6 +18,8 @@ export type EmailDoc = {
   /** A path ("/admin#aprovar") or a full URL. */
   cta?: { label: string; href: string };
   footnote?: string;
+  /** Small links at the foot, side by side (the texts someone accepted, for example). */
+  footLinks?: { label: string; href: string }[];
   /** A word beside the logo, for mail that is not from the client's side ("Administração"). */
   tag?: string;
 };
@@ -93,6 +95,13 @@ export function renderEmail(doc: EmailDoc): { html: string; text: string } {
     (doc.cta ? button(doc.cta) : "") +
     (doc.footnote
       ? `<p style="margin:26px 0 0;font-family:${FONT};font-size:14px;line-height:1.6;color:${MUTED};">${esc(doc.footnote)}</p>`
+      : "") +
+    (doc.footLinks?.length
+      ? `<p style="margin:${doc.footnote ? "6px" : "26px"} 0 0;font-family:${FONT};font-size:14px;line-height:1.8;color:${MUTED};">` +
+        doc.footLinks
+          .map((l) => `<a href="${esc(absolute(l.href))}" style="color:${COBALT};">${esc(l.label)}</a>`)
+          .join(" &nbsp;·&nbsp; ") +
+        `</p>`
       : "");
 
   const html = `<!doctype html>
@@ -129,6 +138,7 @@ ${body}
     ...(doc.facts?.length ? [...doc.facts.map(([label, value]) => `${label}: ${value}`), ""] : []),
     ...(doc.cta ? [`${doc.cta.label}: ${absolute(doc.cta.href)}`, ""] : []),
     ...(doc.footnote ? [doc.footnote, ""] : []),
+    ...(doc.footLinks?.length ? [...doc.footLinks.map((l) => `${l.label}: ${absolute(l.href)}`), ""] : []),
     "Ao Lume",
   ].join("\n");
 
