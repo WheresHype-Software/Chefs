@@ -14,7 +14,7 @@ export default async function EntrarPage({ searchParams }: PageProps<"/entrar">)
   const sp = await searchParams;
   const asChef = sp.chef === "1";
   // Same-site paths only: "//host" or "/\host" would send a fresh sign-in off-site.
-  const next = typeof sp.next === "string" && /^\/(?![/\\])/.test(sp.next) ? sp.next : asChef ? "/dashboard/perfil" : "/dashboard";
+  const next = typeof sp.next === "string" && /^\/(?![/\\])/.test(sp.next) ? sp.next : asChef ? "/dashboard/comecar" : "/dashboard";
 
   const expired =
     sp.erro === "link" ? (

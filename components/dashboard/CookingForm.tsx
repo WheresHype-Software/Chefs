@@ -1,6 +1,8 @@
 "use client";
 
-import { saveCooking } from "@/app/dashboard/actions/cooking";
+import { useState, useTransition } from "react";
+import { addCuisine, saveCooking } from "@/app/dashboard/actions/cooking";
+import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { Chip } from "@/components/ui/Chip";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Switch } from "@/components/ui/Switch";
@@ -27,7 +29,11 @@ type Props = {
   preview: { name: string; tier: string; area: string; rating: string; from: string };
 };
 
-export function CookingForm({ categories, diets, mine, preview }: Props) {
+export function CookingForm({ categories: initialCategories, diets, mine, preview }: Props) {
+  const [categories, setCategories] = useState(initialCategories);
+  const [draft, setDraft] = useState("");
+  const [adding, startAdding] = useTransition();
+  const [addError, setAddError] = useState<string | null>(null);
   const cats = useToggleList(mine.categories, MAX_CATEGORIES);
   const chosenDiets = useToggleList(mine.diets);
   const services = useToggleList(mine.services);
@@ -41,7 +47,8 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
   return (
     <div className="flex flex-wrap items-start gap-6">
       <div className="flex min-w-0 flex-[3_1_460px] flex-col gap-3.5">
-        <section className="box flex flex-col gap-3.5 p-6">
+        <LumiSlot name="categorias" />
+        <section data-lumi="categorias" className="box flex flex-col gap-3.5 p-6">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="d m-0 text-2xl font-normal">Categorias de cozinha</h2>
             <span className="lab text-muted">
@@ -56,9 +63,50 @@ export function CookingForm({ categories, diets, mine, preview }: Props) {
               </Chip>
             ))}
           </div>
+          <form
+            className="flex flex-col gap-1.5 border-t border-line pt-3.5"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const name = draft.trim();
+              if (!name) return;
+              setAddError(null);
+              startAdding(async () => {
+                const r = await addCuisine(name);
+                if (!r.ok) return setAddError(r.error);
+                setCategories((list) => (list.some((c) => c.id === r.id) ? list : [...list, { id: r.id, name: r.name }]));
+                if (!cats.has(r.id) && cats.canAdd) cats.toggle(r.id);
+                setDraft("");
+              });
+            }}
+          >
+            <label htmlFor="outra-cozinha" className="text-sm font-semibold">
+              A sua cozinha não está na lista?
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <input
+                id="outra-cozinha"
+                value={draft}
+                maxLength={40}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Por exemplo: Açoriana"
+                className="min-w-0 flex-[1_1_200px]"
+              />
+              <button type="submit" className="btn btn-o btn-sm" disabled={adding || draft.trim().length < 3}>
+                {adding ? "A acrescentar…" : "Acrescentar"}
+              </button>
+            </div>
+            {addError ? (
+              <span className="text-sm text-danger" role="alert">
+                {addError}
+              </span>
+            ) : (
+              <span className="hint">Fica escolhida de imediato, se ainda não tiver cinco. Depois, guarde as alterações.</span>
+            )}
+          </form>
         </section>
 
-        <section className="box flex flex-col gap-1 p-6">
+        <LumiSlot name="servicos" />
+        <section data-lumi="servicos" className="box flex flex-col gap-1 p-6">
           <h2 className="d mb-2 mt-0 text-2xl font-normal">Serviços que oferece</h2>
           {SERVICES.map(([key, description]) => (
             <div key={key} className="flex items-center justify-between gap-4 border-t border-line py-3.5">

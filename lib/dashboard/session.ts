@@ -16,7 +16,7 @@ export const getSession = cache(async (): Promise<Session> => {
   const { data: profile } = await sb.from("profiles").select("role, name, signup_announced_at").eq("id", user.id).single();
   const role = (profile?.role ?? "client") as Role;
   if (profile && !profile.signup_announced_at) void announceSignup(user.id, role, profile.name as string | null);
-  return { demo: false, userId: user.id, role };
+  return { demo: false, userId: user.id, role, lumiOff: user.user_metadata?.lumi_off === true };
 });
 
 /**
@@ -60,7 +60,7 @@ export const getMyChef = cache(async (): Promise<MyChef | null> => {
 
 export async function requireChef(): Promise<MyChef> {
   const chef = await getMyChef();
-  if (!chef) redirect("/dashboard/perfil");
+  if (!chef) redirect("/dashboard/comecar");
   return chef;
 }
 

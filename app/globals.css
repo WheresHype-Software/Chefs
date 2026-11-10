@@ -976,3 +976,132 @@ html:has(.menu-sheet[open]) {
   outline: 2px solid var(--color-cobalt);
   outline-offset: 6px;
 }
+
+/* Lumi, the mascot (components/Lumi.tsx): she only moves when asked to, and never under reduced motion. */
+@keyframes lumi-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes lumi-flame {
+  0% {
+    transform: scale(1, 1) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1.08, 0.9) rotate(3deg);
+  }
+}
+@keyframes lumi-wave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  70% {
+    transform: rotate(-30deg);
+  }
+  80% {
+    transform: rotate(-14deg);
+  }
+  90% {
+    transform: rotate(-30deg);
+  }
+}
+@keyframes lumi-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes lumi-shadow {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.14;
+  }
+  50% {
+    transform: scaleX(0.86);
+    opacity: 0.08;
+  }
+}
+@keyframes lumi-pop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.lumi-flame,
+.lumi-wave,
+.lumi-blink,
+.lumi-shadow {
+  transform-box: fill-box;
+}
+.lumi-flame {
+  transform-origin: 50% 100%;
+}
+.lumi-wave {
+  transform-origin: 0% 70%;
+}
+.lumi-blink,
+.lumi-shadow {
+  transform-origin: 50% 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lumi-on .lumi-bob {
+    animation: lumi-bob 2.6s ease-in-out infinite;
+  }
+  .lumi-on .lumi-flame {
+    animation: lumi-flame 0.45s ease-in-out infinite alternate;
+  }
+  .lumi-on .lumi-wave {
+    animation: lumi-wave 3.2s ease-in-out infinite;
+  }
+  .lumi-on .lumi-blink {
+    animation: lumi-blink 4s infinite;
+  }
+  .lumi-on .lumi-shadow {
+    animation: lumi-shadow 2.6s ease-in-out infinite;
+  }
+  .lumi-pop {
+    animation: lumi-pop 0.35s var(--ease-out) both;
+  }
+}
+@keyframes lumi-hop {
+  0% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-10px);
+  }
+  70% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lumi-hop {
+    display: inline-block;
+    animation: lumi-hop 0.5s var(--ease-out);
+  }
+}
+/* The part of the form Lumi is talking about. */
+.lumi-target {
+  outline: 3px solid var(--color-cobalt-soft);
+  outline-offset: 6px;
+  border-radius: 4px;
+  transition: outline-color 0.3s var(--ease-out);
+}

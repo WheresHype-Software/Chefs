@@ -9,7 +9,7 @@ function steps(chef: MyChef, p: SetupProgress): Step[] {
     {
       title: "Fotografias",
       text: "Uma fotografia sua e pelo menos três dos seus pratos, com descrição.",
-      href: "/dashboard/fotos",
+      href: "/dashboard/perfil#fotografias",
       action: "Carregar fotografias",
       done: p.profilePhoto && p.dishPhotos >= 3,
     },
@@ -33,7 +33,7 @@ function steps(chef: MyChef, p: SetupProgress): Step[] {
         chef.status === "rejected"
           ? `Pedimos alterações: ${chef.verification_notes ?? "veja o email que enviámos."}`
           : "A equipa confirma as fotografias e o perfil fica público.",
-      href: "/dashboard/perfil",
+      href: "/dashboard/comecar?passo=3",
       action: chef.status === "rejected" ? "Rever e reenviar" : "Enviar para revisão",
       done: sent,
     },
@@ -50,6 +50,11 @@ function steps(chef: MyChef, p: SetupProgress): Step[] {
           },
         ]),
   ];
+}
+
+/** Every first step done: from here on the dashboard stops guiding (no checklist, no Lumi). */
+export function setupComplete(chef: MyChef, progress: SetupProgress): boolean {
+  return steps(chef, progress).every((s) => s.done);
 }
 
 /**
@@ -90,8 +95,8 @@ export function SetupChecklist({ chef, progress }: { chef: MyChef; progress: Set
       {waiting && <p className="m-0 text-muted">A equipa responde por email. Entretanto pode afinar as ofertas e a disponibilidade.</p>}
       {onlyBilling && (
         <p className="m-0 text-muted">
-          Já podes receber pedidos. O sinal que os clientes pagarem fica à tua ordem. Só não to conseguimos transferir enquanto não
-          tivermos os teus dados fiscais, o IBAN e o contrato aceite. Não se perde nada: fica à tua espera.
+          Já podes receber pedidos. O sinal que os clientes pagarem fica à tua ordem. Só não to conseguimos transferir enquanto não tivermos
+          os teus dados fiscais, o IBAN e o contrato aceite. Não se perde nada: fica à tua espera.
         </p>
       )}
       <ol className="m-0 flex list-none flex-col p-0">

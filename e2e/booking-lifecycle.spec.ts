@@ -33,31 +33,31 @@ test.describe.serial("booking lifecycle", () => {
   });
 
   test("chef creates a profile, uploads photos and applies", async () => {
-    await signIn(chef, run.chef.email, run.password, "/dashboard/perfil");
+    await signIn(chef, run.chef.email, run.password, "/dashboard/comecar");
 
     await chef.getByLabel("Nome público").fill(run.chef.name);
     await chef.getByLabel("Nome público").blur();
     // Leaving the name fills in the page link from it.
     await expect(chef.getByLabel(/^Link/)).toHaveValue(run.chef.slug);
-    await chef.getByLabel("Especialidade (uma linha)").fill("Cozinha de teste");
+    await chef.getByLabel("Uma frase para o seu perfil").fill("Cozinha de teste");
     await chef.getByLabel("Sobre si").fill("Perfil criado pelos testes automáticos. É apagado no fim de cada execução.");
     await chef.getByRole("combobox", { name: "Zona de base" }).fill("Alvalade, Lisboa");
     await chef.getByLabel("Instagram").fill("@ao.lume.teste");
-    await chef.getByRole("button", { name: "Criar perfil" }).click();
-    await expectSaved(chef, "Perfil guardado.");
-
-    await openPage(chef, "/dashboard/fotos");
+    // Saving the profile goes straight on to the verification step.
+    await chef.getByRole("button", { name: "Continuar" }).click();
+    await chef.waitForURL(/passo=2/);
     await chef.getByLabel("Carregar fotografia").setInputFiles(await samplePhoto(chef, "retrato.jpg"));
     await expectSaved(chef, "Fotografia carregada.");
     const dishes = await Promise.all(["prato-1.jpg", "prato-2.jpg", "prato-3.jpg"].map((name) => samplePhoto(chef, name)));
     await chef.getByLabel("Adicionar fotografias").setInputFiles(dishes);
     await expectSaved(chef, "3 fotografias carregadas.");
+    await chef.getByLabel("Tirar selfie").setInputFiles(await samplePhoto(chef, "selfie.jpg"));
+    await expectSaved(chef, "Selfie enviada.");
 
-    await openPage(chef, "/dashboard/perfil");
+    await chef.getByRole("link", { name: "Continuar" }).click();
     await chef.getByRole("button", { name: "Enviar para revisão" }).click();
-    await expectSaved(chef, "Enviado para revisão.");
-    await chef.reload();
-    await expect(chef.getByText("Estado: em revisão")).toBeVisible();
+    await chef.waitForURL(/\/dashboard$/);
+    await expect(chef.getByText("O seu perfil está em revisão")).toBeVisible();
   });
 
   test("admin reviews the application and approves it", async () => {
@@ -80,7 +80,7 @@ test.describe.serial("booking lifecycle", () => {
     await chef.getByLabel("Onde").selectOption({ label: "Levantamento" });
     await chef.getByLabel("Valor (€)").fill(String(run.offer.price));
     await chef.getByLabel("Antecedência (horas)").fill("0");
-    await chef.getByLabel("Horas (separadas por vírgula)").fill("20:00");
+    await chef.getByRole("button", { name: "20:00", exact: true }).click();
     await chef.getByRole("button", { name: "Guardar" }).click();
     await expect(chef.getByText(run.offer.title)).toBeVisible();
 

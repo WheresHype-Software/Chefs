@@ -1,5 +1,6 @@
 "use client";
 
+import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import Link from "next/link";
 import { useState } from "react";
 import { OfferForm } from "@/components/dashboard/OfferForm";
@@ -75,7 +76,8 @@ export function OfferList({ offers, openDays }: { offers: DashOffer[]; openDays:
   const [created, setCreated] = useState(false);
   return (
     <div className="flex flex-wrap items-start gap-6">
-      <section className="flex min-w-0 flex-[3_1_420px] flex-col gap-3.5">
+      <section data-lumi="ofertas" className="flex min-w-0 flex-[3_1_420px] flex-col gap-3.5">
+        <LumiSlot name="ofertas" />
         {created && <NextStepAgenda openDays={openDays} onClose={() => setCreated(false)} />}
         {offers.length === 0 && (
           <p className="m-0 text-muted">

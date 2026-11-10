@@ -12,12 +12,10 @@ const ALL: readonly { href: string; label: string; money?: true }[] = [
   { href: "/dashboard/logistica", label: "Logística" },
   { href: "/dashboard/agenda", label: "Disponibilidade" },
   { href: "/dashboard/ofertas", label: "Ofertas" },
-  { href: "/dashboard/cozinha", label: "Cozinha e serviços" },
   { href: "/dashboard/avaliacoes", label: "Avaliações" },
   { href: "/dashboard/pagamentos", label: "Pagamentos", money: true },
   { href: "/dashboard/faturacao", label: "Faturação", money: true },
   { href: "/dashboard/perfil", label: "Perfil" },
-  { href: "/dashboard/fotos", label: "Fotografias" },
 ];
 
 export function dashboardNav(paymentsOn: boolean): readonly { href: string; label: string }[] {

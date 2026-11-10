@@ -3,7 +3,6 @@
 import { useState, type ReactNode } from "react";
 import { saveLogistics } from "@/app/dashboard/actions/logistics";
 import { ToggleChipList, type ToggleItem } from "@/components/dashboard/ToggleChipList";
-import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Switch } from "@/components/ui/Switch";
@@ -78,43 +77,9 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
             onChange={(e) => set("travel_radius_km", Number(e.target.value))}
           />
         </label>
-        <div className="flex flex-col border-t border-line">
-          <SettingRow label="Grátis até (km)">
-            <NumberInput
-              className={numberInput}
-              decimal
-              min={0}
-              emptyValue={0}
-              value={s.free_distance_km}
-              onChange={(v) => set("free_distance_km", v ?? 0)}
-            />
-          </SettingRow>
-          <SettingRow label="Depois, por km (€)">
-            <NumberInput
-              className={numberInput}
-              decimal
-              min={0}
-              emptyValue={0}
-              value={s.fee_per_km}
-              onChange={(v) => set("fee_per_km", v ?? 0)}
-            />
-          </SettingRow>
-          <SettingRow label="Chegada antes do serviço (min)">
-            <NumberInput
-              className={numberInput}
-              min={0}
-              max={600}
-              emptyValue={0}
-              value={s.arrival_minutes_before}
-              onChange={(v) => set("arrival_minutes_before", v ?? 0)}
-            />
-          </SettingRow>
-        </div>
+        {/* Travel fees and arrival time are agreed with each client for now; the saved values are kept. */}
         <span className="text-[13px] text-muted">
-          Aparece a clientes até {s.travel_radius_km} km de {area}
-          {s.travel_radius_km > s.free_distance_km
-            ? `, com taxa de deslocação a partir dos ${s.free_distance_km} km.`
-            : ", sem taxa de deslocação."}
+          Aparece a clientes até {s.travel_radius_km} km de {area}. A deslocação e a hora de chegada combinam-se com cada cliente.
         </span>
       </ToggleCard>
 
@@ -156,17 +121,13 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
       </ToggleCard>
 
       <ToggleCard title="Levantamento" enabled={s.pickup_enabled} onToggle={(v) => set("pickup_enabled", v)}>
-        <Field label="Morada da cozinha" hint="Só é mostrada ao cliente depois de aceitar o pedido.">
-          <input
-            value={s.kitchen_address ?? ""}
-            maxLength={300}
-            onChange={(e) => set("kitchen_address", e.target.value || null)}
-            placeholder="Rua, número, código postal"
-          />
-        </Field>
+        {/* The kitchen address isn't asked for here for now: the chef gives it to the client when the order is ready. */}
         <span className="lab text-muted">Horários</span>
         <ToggleChipList items={slots} onChange={setSlots} addLabel="Novo horário" addPlaceholder="+ 09:00–10:00" />
-        <span className="text-[13px] text-muted">Cada levantamento tem um código de 4 dígitos para confirmar a entrega.</span>
+        <span className="text-[13px] text-muted">
+          A morada combina-se com o cliente quando a encomenda estiver pronta. Cada levantamento tem um código de 4 dígitos para confirmar a
+          entrega.
+        </span>
       </ToggleCard>
 
       <button
