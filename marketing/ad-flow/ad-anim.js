@@ -12,7 +12,7 @@ const pan = (w, c = '#fff') => `<svg width="${w}" height="${Math.round(w * 28 / 
 const photo = (n) => 'file://' + path.join(FOTOS, n + '.jpg');
 
 const TXT = {
-  hook: { k: 'PARA CHEFS E COZINHEIROS', t: 'Cozinhas bem?', s: 'Vê como é fácil começar a receber pedidos.' },
+  hook: { k: process.env.HOOK_K || 'PARA CHEFS E COZINHEIROS', t: process.env.HOOK_T || 'Cozinhas bem?', s: process.env.HOOK_S || 'Vê como é fácil começar a receber pedidos.' },
   signup: { k: '1 · CRIA A CONTA', t: 'Registo em segundos', s: 'Nome, email, palavra-passe. Pronto.' },
   page: { k: '2 · A TUA PÁGINA', t: 'A tua montra pessoal', s: 'Pratos, menus, avaliações e selos, num link só teu.' },
   book: { k: '3 · O CLIENTE RESERVA', t: 'Sem criar conta', s: 'Escolhe menu, dia e hora. Tu aceitas ou propões outra data.' },
@@ -219,7 +219,7 @@ ${APPCSS}
 #app{top:${sb}px;height:${Math.round(appH / S)}px;transform:scale(${S})}
 </style></head><body>
 <div id="bg" class="abs"></div>
-<div id="hookbg" class="abs" style="inset:0"><img class="abs ph" id="hookimg" src="${photo('f24')}" style="object-position:50% 35%"><div class="abs grad" style="background:linear-gradient(180deg,rgba(18,48,110,.55) 0%,rgba(18,48,110,.25) 30%,rgba(18,48,110,.92) ${isStory ? 72 : 80}%,#12306e 100%)"></div></div>
+<div id="hookbg" class="abs" style="inset:0"><img class="abs ph" id="hookimg" src="${photo(process.env.HOOK_IMG || 'f24')}" style="object-position:50% 35%"><div class="abs grad" style="background:linear-gradient(180deg,rgba(18,48,110,${process.env.HOOK_IMG ? '.85' : '.55'}) 0%,rgba(18,48,110,${process.env.HOOK_IMG ? '.6' : '.25'}) 30%,rgba(18,48,110,.92) ${isStory ? 72 : 80}%,#12306e 100%)"></div></div>
 <div id="logo" class="abs" style="top:${isStory ? 250 : 64}px;left:${isStory ? 90 : 64}px;display:flex;align-items:center;gap:14px;font-size:${isStory ? 44 : 36}px;font-weight:800;letter-spacing:-.03em">${pan(isStory ? 64 : 52)}ao lume</div>
 ${scenes}
 <div id="phone"><div id="scr"><div id="sb"><span>9:41</span><svg height="${Math.round(sb * .32)}" viewBox="0 0 64 22"><rect x="0" y="14" width="5" height="8" rx="1" fill="#142033"/><rect x="8" y="10" width="5" height="12" rx="1" fill="#142033"/><rect x="16" y="6" width="5" height="16" rx="1" fill="#142033"/><rect x="24" y="2" width="5" height="20" rx="1" fill="#142033"/><rect x="36" y="3" width="24" height="17" rx="4" fill="none" stroke="#142033" stroke-width="2"/><rect x="39" y="6" width="17" height="11" rx="2" fill="#142033"/><rect x="61" y="9" width="2.5" height="5" rx="1" fill="#142033"/></svg></div><div id="island"></div>
@@ -236,7 +236,7 @@ ${scenes}
 <div id="close" class="abs" style="left:${isStory ? 90 : 64}px;right:${isStory ? 90 : 64}px;top:${c.top}px;bottom:${c.bottom}px;display:flex;flex-direction:column;justify-content:flex-end">
   <div id="c-logo" style="position:absolute;top:0;left:0;display:flex;align-items:center;gap:14px;font-size:${isStory ? 44 : 38}px;font-weight:800;letter-spacing:-.03em;opacity:0">${pan(isStory ? 64 : 54)}ao lume</div>
   <div id="c-k" style="opacity:0"><span class="k" style="font-size:${isStory ? 30 : 24}px">LANÇAMENTO EM PORTUGAL</span></div>
-  <h1 id="c-h1" style="margin-top:${isStory ? 28 : 20}px;font-size:${c.h1}px;opacity:0">Os primeiros chefs ficam <span class="hl">Fundadores.</span></h1>
+  <h1 id="c-h1" style="margin-top:${isStory ? 28 : 20}px;font-size:${c.h1}px;opacity:0">${process.env.CLOSE_H1 || 'Os primeiros chefs ficam'} <span class="hl">Fundadores.</span></h1>
   <div style="margin-top:${isStory ? 40 : 28}px;display:flex;flex-direction:column;gap:${isStory ? 22 : 16}px">
     <div class="row" id="c-r1"><i>★</i>Selo Fundador e destaque</div>
     <div class="row" id="c-r2"><i>✓</i>Sem mensalidades</div>
@@ -307,7 +307,7 @@ function render(t){
   const S=V.sc, [h0,h1]=S.hook, [c0,c1]=S.close;
   $('hookbg').style.opacity=1-ramp(t,h1-.35,.45);
   $('hookimg').style.transform='scale('+(1.12-.08*cl(t/h1))+')';
-  $('logo').style.opacity=ramp(t,.05,.4)*(1-ramp(t,h1-.3,.3));
+  $('logo').style.opacity=${process.env.NO_HOOK_LOGO ? 0 : 1}*ramp(t,.05,.4)*(1-ramp(t,h1-.3,.3));
   for(const n of ['hook','signup','page','book']){
     const [a,b]=S[n], el=$('tx-'+n);
     const i=ramp(t,a+(n==='hook'?.15:.05),.45), o=n==='book'?ramp(t,b-.05,.35):ramp(t,b-.12,.25);
