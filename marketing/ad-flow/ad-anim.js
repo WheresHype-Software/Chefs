@@ -242,7 +242,7 @@ ${scenes}
     <div class="row" id="c-r2"><i>✓</i>Sem mensalidades</div>
     <div class="row" id="c-r3"><i>✓</i>Só pagas por cada serviço garantido</div>
   </div>
-  <div id="c-btn" style="margin-top:${isStory ? 44 : 32}px;opacity:0"><span class="btn">Cria o teu perfil · link na bio</span></div>
+  <div id="c-btn" style="margin-top:${isStory ? 44 : 32}px;opacity:0"><span class="btn">${process.env.CTA || "Cria o teu perfil · link na bio"}</span></div>
 </div>
 <script>
 const V=${JSON.stringify({ sc: v.sc, loc: v.loc })}, STORY=${isStory}, SC=${S};
