@@ -685,6 +685,9 @@ html:has(.menu-sheet[open]) {
   cursor: pointer;
 }
 .al-bub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   animation: al-drop 0.6s var(--ease-out) both;
   transition: transform 0.2s ease;
 }
@@ -694,20 +697,47 @@ html:has(.menu-sheet[open]) {
 .al-pin button {
   font: inherit;
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
+  align-items: center;
   padding: 0;
-  border-radius: var(--radius-sq);
-  border: 1px solid var(--color-cobalt);
-  background: #fff;
+  border: 0;
+  background: none;
   color: var(--color-ink);
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 6px 18px rgb(20 32 51 / 0.18);
-  overflow: hidden;
+  filter: drop-shadow(0 4px 10px rgb(20 32 51 / 0.22));
 }
-.al-pin[data-sel="true"] button,
-.al-pin[data-hot="true"] button {
+.al-pin .face {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--color-cobalt);
+  background: var(--color-cobalt-soft);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.al-pin .face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.al-pin[data-sel="true"] .face,
+.al-pin[data-hot="true"] .face {
+  width: 62px;
+  height: 62px;
+  box-shadow: 0 0 0 3px var(--color-yolk);
+}
+.al-pin[data-sel="true"] .price,
+.al-pin[data-hot="true"] .price {
   background: var(--color-cobalt);
+  border-color: var(--color-cobalt);
   color: #fff;
 }
 .al-pin[data-hot="true"] .al-bub {
@@ -724,28 +754,90 @@ html:has(.menu-sheet[open]) {
     0 0 0 6px rgb(29 74 161 / 0.18),
     0 2px 6px rgb(20 32 51 / 0.3);
 }
-.al-pin .ini {
-  padding: 6px 9px;
-  font-size: 14px;
-  border-right: 1px solid var(--color-line-2);
+.al-pin .ini,
+.al-group .ini {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-cobalt);
 }
 .al-pin .price {
-  padding: 6px 10px;
-  font-size: 14px;
+  position: relative;
+  margin-top: -8px;
+  padding: 2px 9px;
+  border: 1px solid var(--color-line-2);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.al-pin .stem {
-  width: 2px;
-  height: 32px;
-  background: var(--color-cobalt);
-}
 .al-pin .foot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--color-cobalt);
-  margin-top: -3px;
+  border: 2px solid #fff;
+  margin-top: 3px;
+}
+/* Several chefs too close to tell apart: one bubble of faces; a tap zooms in on them. */
+.al-group button {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 10px rgb(20 32 51 / 0.22));
+  animation: al-drop 0.5s var(--ease-out) both;
+}
+.al-group .stack {
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 999px;
+  border: 2px solid var(--color-cobalt);
+  background: #fff;
+}
+.al-group .sface,
+.al-group .more {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-left: -12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-cobalt-soft);
+}
+.al-group .sface:first-child {
+  margin-left: 0;
+}
+.al-group .sface img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.al-group .more {
+  background: var(--color-cobalt);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+}
+.al-group .count {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.al-group:hover .stack {
+  border-color: var(--color-yolk);
 }
 .al-pin[data-hidden="true"] {
   opacity: 0.15;

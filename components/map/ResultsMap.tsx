@@ -4,7 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { GeoJSONSource, Map as MLMap, Marker } from "maplibre-gl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LISBON } from "@/components/map/map-style";
-import { createPin } from "@/components/map/pin";
+import { createGroup, createPin, groupChefs } from "@/components/map/pin";
 import { ResultsMapControls } from "@/components/map/ResultsMapControls";
 import { useMapLibre } from "@/hooks/useMapLibre";
 import type { LocationStatus } from "@/hooks/useMyLocation";
@@ -21,7 +21,7 @@ function fitPoints(m: MLMap, lib: MapLibre, points: LatLng[], duration = 700) {
   if (!points.length) return void m.easeTo({ center: LISBON, zoom: 11.5, duration });
   const bounds = new lib.LngLatBounds();
   points.forEach((p) => bounds.extend([p.lng, p.lat]));
-  m.fitBounds(bounds, { padding: { top: 90, bottom: 60, left: 50, right: 70 }, maxZoom: 13.5, duration });
+  m.fitBounds(bounds, { padding: { top: 130, bottom: 70, left: 60, right: 80 }, maxZoom: 13.5, duration });
 }
 
 type Props = {
@@ -55,18 +55,57 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
 
   const points = () => [...chefs, ...(origin ? [origin] : [])];
 
-  // Pins follow the results; clicking the empty map clears the selection.
+  // Pins follow the results; chefs too close together become one group, redrawn after every move.
+  // The selected and hovered chefs are never grouped, so the one being looked at stays visible.
+  const focus = useRef({ selectedId, hoveredId });
   useEffect(() => {
+    focus.current = { selectedId, hoveredId };
+  });
+
+  // The drop-in animation is for the first appearance only, not every redraw after a move.
+  const drawn = useRef(false);
+
+  function drawPins() {
     const m = map.current;
-    if (!ready || !m || !lib.current) return;
+    const lib_ = lib.current;
+    if (!m || !lib_) return;
     const markers = pins.current;
     markers.forEach(({ marker }) => marker.remove());
     markers.clear();
-    chefs.forEach((chef, i) => {
-      const node = createPin(chef, (id) => selectRef.current(id), 150 + i * 60);
-      const marker = new lib.current!.Marker({ element: node, anchor: "bottom" }).setLngLat([chef.lng, chef.lat]).addTo(m);
-      markers.set(chef.id, { marker, node });
+    const { selectedId: sel, hoveredId: hot } = focus.current;
+    const alone = new Set([sel, hot].filter((x): x is string => Boolean(x)));
+    groupChefs(m, chefs, alone).forEach((group, i) => {
+      if (group.length === 1) {
+        const chef = group[0]!;
+        const node = createPin(chef, (id) => selectRef.current(id), drawn.current ? 0 : 150 + i * 60);
+        node.dataset.sel = String(chef.id === sel);
+        node.dataset.hot = String(chef.id === hot);
+        node.style.zIndex = alone.has(chef.id) ? "5" : "1";
+        const marker = new lib_.Marker({ element: node, anchor: "bottom" }).setLngLat([chef.lng, chef.lat]).addTo(m);
+        markers.set(chef.id, { marker, node });
+        return;
+      }
+      const node = createGroup(group, () => {
+        const bounds = new lib_.LngLatBounds();
+        group.forEach((c) => bounds.extend([c.lng, c.lat]));
+        m.fitBounds(bounds, { padding: 120, maxZoom: Math.max(m.getZoom() + 2, 13), duration: 700 });
+      });
+      const lng = group.reduce((a, c) => a + c.lng, 0) / group.length;
+      const lat = group.reduce((a, c) => a + c.lat, 0) / group.length;
+      const marker = new lib_.Marker({ element: node, anchor: "center" }).setLngLat([lng, lat]).addTo(m);
+      markers.set(`group:${group.map((c) => c.id).join(",")}`, { marker, node });
     });
+    drawn.current = true;
+  }
+  const drawRef = useRef(drawPins);
+  useEffect(() => {
+    drawRef.current = drawPins;
+  });
+
+  useEffect(() => {
+    const m = map.current;
+    if (!ready || !m || !lib.current) return;
+    drawn.current = false;
     if (!m.getSource(AREA)) {
       m.addSource(AREA, { type: "geojson", data: EMPTY });
       m.addLayer({ id: `${AREA}-fill`, type: "fill", source: AREA, paint: { "fill-color": "#1D4AA1", "fill-opacity": 0.08 } });
@@ -77,22 +116,21 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
         paint: { "line-color": "#1D4AA1", "line-width": 1.5, "line-dasharray": [2, 2] },
       });
       m.on("click", () => selectRef.current(null));
+      m.on("moveend", () => drawRef.current());
     }
     fitPoints(m, lib.current, points(), 0);
+    drawPins();
+    const markers = pins.current;
     return () => markers.forEach(({ marker }) => marker.remove());
     // Reframing on a new origin is the next effect's job.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, chefs]);
 
-  // Selected and hovered pins stand out; the selected chef's service area is drawn.
+  // The selected chef's service area; selecting or hovering pulls that chef out of any group.
   useEffect(() => {
     const m = map.current;
     if (!ready || !m) return;
-    pins.current.forEach(({ node }, id) => {
-      node.dataset.sel = String(id === selectedId);
-      node.dataset.hot = String(id === hoveredId);
-      node.style.zIndex = id === selectedId || id === hoveredId ? "5" : "1";
-    });
+    drawPins();
     const chef = chefs.find((c) => c.id === selectedId);
     (m.getSource(AREA) as GeoJSONSource | undefined)?.setData(
       chef
@@ -100,6 +138,8 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
         : EMPTY,
     );
     if (chef && !m.getBounds().contains([chef.lng, chef.lat])) m.easeTo({ center: [chef.lng, chef.lat], duration: 600 });
+    // drawPins reads the latest selection through focus.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, chefs, selectedId, hoveredId, map]);
 
   // The origin dot; finding the visitor reframes the map around them and the chefs.
