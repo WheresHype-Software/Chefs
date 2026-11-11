@@ -2,6 +2,7 @@ import { BookingForm } from "@/components/booking/BookingForm";
 import { ICONS } from "@/components/chef/icons";
 import type { MonthCalendarData } from "@/hooks/useMonthCalendar";
 import { titledFirst } from "@/lib/format";
+import { instagramHandle } from "@/lib/instagram";
 import type { ChefProfile } from "@/lib/types";
 
 type Props = { chef: ChefProfile; initialCalendar?: MonthCalendarData; initialOfferId?: string };
@@ -35,7 +36,7 @@ export function ChefBookingAside({ chef, initialCalendar, initialOfferId }: Prop
       ) : (
         <p className="m-0 text-muted">
           {titledFirst(chef)} ainda está a preparar os menus. Volte em breve
-          {chef.socials.instagram ? ", ou acompanhe no Instagram." : "."}
+          {instagramHandle(chef.socials.instagram) ? ", ou acompanhe no Instagram." : "."}
         </p>
       )}
       <a href="#condicoes" className="text-[13px] text-muted">

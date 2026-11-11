@@ -3,12 +3,13 @@ import { Photo } from "@/components/ui/Photo";
 import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { BADGE_LABEL, type Badge } from "@/lib/constants";
 import { chefTitle, initials, isVerifiedChef, titledName } from "@/lib/format";
+import { instagramHandle, instagramUrl } from "@/lib/instagram";
 import type { ChefProfile } from "@/lib/types";
 
 /** The chef's face, large (the only place it appears on the page), title and badges, name, and where/rating/Instagram. */
 export function ChefHeader({ chef }: { chef: ChefProfile }) {
   const verified = isVerifiedChef(chef.badges);
-  const handle = chef.socials.instagram?.replace(/^@/, "");
+  const handle = instagramHandle(chef.socials.instagram);
   return (
     <div className="flex flex-wrap items-center gap-5 md:gap-8">
       <div className="aspect-[4/5] w-36 shrink-0 overflow-hidden rounded-[16px] bg-cobalt-soft shadow-[0_14px_36px_-16px_rgb(20_32_51/0.5)] ring-4 ring-white sm:w-44 md:w-52">
@@ -69,7 +70,7 @@ export function ChefHeader({ chef }: { chef: ChefProfile }) {
           {handle && (
             <li>
               <a
-                href={`https://instagram.com/${handle}`}
+                href={instagramUrl(handle)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-ink-3 no-underline hover:text-cobalt"

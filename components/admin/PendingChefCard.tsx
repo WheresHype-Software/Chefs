@@ -4,6 +4,7 @@ import type { Decision } from "@/components/admin/ChefDecision";
 import type { CertificateDoc } from "@/lib/admin/certificates";
 import { readiness, type Check } from "@/lib/admin/readiness";
 import { TIER_LABEL, fullStamp } from "@/lib/format";
+import { instagramHandle, instagramUrl } from "@/lib/instagram";
 
 export type PendingChef = {
   id: string;
@@ -111,11 +112,7 @@ export function PendingChefCard({ chef: c, open, onToggle, onDecided }: Props) {
 
       {(c.socials.instagram || c.socials.website) && (
         <span className="text-sm [overflow-wrap:anywhere]">
-          {c.socials.instagram && (
-            <a href={`https://instagram.com/${c.socials.instagram.replace("@", "")}`} target="_blank" rel="noopener">
-              {c.socials.instagram}
-            </a>
-          )}
+          {c.socials.instagram && <InstagramLink raw={c.socials.instagram} />}
           {c.socials.instagram && c.socials.website && " · "}
           {c.socials.website && (
             <a href={c.socials.website} target="_blank" rel="noopener noreferrer">
@@ -171,5 +168,16 @@ export function PendingChefCard({ chef: c, open, onToggle, onDecided }: Props) {
         </section>
       </div>
     </DecisionCard>
+  );
+}
+
+/** The chef's Instagram as typed; linked only when it is a real username, so the admin sees both. */
+function InstagramLink({ raw }: { raw: string }) {
+  const handle = instagramHandle(raw);
+  if (!handle) return <span title="Não é um nome de utilizador do Instagram">{raw} (não é um @ válido)</span>;
+  return (
+    <a href={instagramUrl(handle)} target="_blank" rel="noopener noreferrer">
+      @{handle}
+    </a>
   );
 }

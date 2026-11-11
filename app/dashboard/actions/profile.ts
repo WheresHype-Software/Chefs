@@ -6,6 +6,7 @@ import { announceChefForReview } from "@/lib/notify/discord";
 import { getSession } from "@/lib/dashboard";
 import { notifyAdmin } from "@/lib/email";
 import { TIER_LABEL } from "@/lib/format";
+import { instagramHandle } from "@/lib/instagram";
 import { LANGUAGES } from "@/lib/languages";
 import { requiredDepositPercent } from "@/lib/money";
 import { getSettings, moneyRules } from "@/lib/settings";
@@ -70,6 +71,11 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
       );
     }
   }
+  // Stored as the bare username, whatever form it was typed in, so every link built from it works.
+  const instagram = p.instagram ? instagramHandle(p.instagram) : null;
+  if (p.instagram && !instagram) {
+    return fail("Instagram: escreva só o nome de utilizador, por exemplo @o.seu.perfil, ou cole o link do perfil.");
+  }
   const session = await getSession();
   if (!ctx.chef && session.role === "client")
     return fail("Esta é uma conta de cliente. Para ter um perfil de chef, crie uma conta de chef.");
@@ -82,7 +88,7 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
     bio: p.bio || null,
     area_name: p.area_name,
     service_radius_km: p.service_radius_km,
-    socials: { instagram: p.instagram || undefined, website: p.website || undefined },
+    socials: { instagram: instagram ?? undefined, website: p.website || undefined },
     years_experience: p.years_experience ?? null,
     deposit_percent: p.deposit_percent ?? null,
     ...(p.languages ? { languages: p.languages } : {}),
@@ -147,7 +153,8 @@ export async function submitForReview(): Promise<Result> {
   // O email chega à caixa de quem o lê quando o abre; o Discord chega ao telemóvel de quem estiver
   // por perto. Nenhum dos dois pode impedir o envio para revisão de ficar registado.
   void announceChefForReview(chef).catch((err) => console.error("[profile] aviso no Discord:", err));
-  const portfolio = chef.socials.instagram ? `Instagram @${chef.socials.instagram.replace(/^@/, "")}` : (chef.socials.website ?? "—");
+  const handle = instagramHandle(chef.socials.instagram);
+  const portfolio = handle ? `Instagram @${handle}` : chef.socials.instagram || chef.socials.website || "—";
   await notifyAdmin({
     subject: `Perfil para verificar: ${chef.display_name}`,
     preheader: `${chef.display_name}, ${chef.area_name ?? "zona por indicar"}, espera aprovação.`,
