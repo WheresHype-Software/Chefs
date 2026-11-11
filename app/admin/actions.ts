@@ -305,3 +305,45 @@ export async function refuseChefTitle(chefId: string, reason: string): Promise<A
   }
   return ok();
 }
+
+const MakeChefInput = z.string().trim().toLowerCase().email();
+
+/**
+ * Turns a client account into a chef account, for someone who signed up on the wrong side. Only
+ * the role changes: their bookings as a client stay. The chef contract is asked of them before
+ * their profile goes to review, as for anyone who never accepted it. They get an email saying so.
+ */
+export async function makeChef(email: string): Promise<ActionResult> {
+  if (!(await isAdmin())) return fail("Sem permissão.");
+  const parsed = MakeChefInput.safeParse(email);
+  if (!parsed.success) return fail("Escreva um email válido.");
+  const sb = await createClient();
+  const { data: profile } = await sb.from("profiles").select("id, role, name").eq("email", parsed.data).maybeSingle();
+  if (!profile) return fail("Não encontrámos nenhuma conta com este email.");
+  if (profile.role === "chef") return fail("Esta conta já é de chef.");
+  if (profile.role === "admin") return fail("Esta conta é de administração: não pode ser mudada aqui.");
+  const { error } = await sb.from("profiles").update({ role: "chef" }).eq("id", profile.id);
+  if (error) return failWith(error, "makeChef", "Não foi possível mudar a conta. Tente de novo.");
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  await sb
+    .from("admin_logs")
+    .insert({ admin_id: user?.id, action: "account_to_chef", target: profile.id, details: { from: profile.role } });
+
+  try {
+    const name = (profile.name as string | null)?.split(" ")[0] || "Olá";
+    const doc = renderEmail({
+      preheader: "Já pode criar o seu perfil de chef.",
+      heading: "A sua conta passou a conta de chef",
+      lead: `${name === "Olá" ? "Olá" : `Olá ${name}`}. Mudámos a sua conta no Ao Lume para conta de chef, como pediu.`,
+      paragraphs: ["Saia da conta e volte a entrar: vai direto para a criação do seu perfil, com o mesmo email e a mesma palavra-passe."],
+      cta: { label: "Criar o meu perfil", href: siteUrl("/dashboard/comecar") },
+    });
+    await sendEmail({ to: parsed.data, subject: "A sua conta Ao Lume passou a conta de chef", text: doc.text, html: doc.html });
+  } catch (err) {
+    console.error("[action] makeChef email:", err);
+  }
+  revalidatePath("/admin/chefs");
+  return ok();
+}

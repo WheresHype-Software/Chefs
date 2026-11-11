@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { AprovacoesTabs } from "@/components/admin/AprovacoesTabs";
 import { ChefRoster } from "@/components/admin/ChefRoster";
+import { MakeChefForm } from "@/components/admin/MakeChefForm";
 import { getRoster } from "@/lib/admin/queues";
 import { fullStamp } from "@/lib/format";
 import { getSession } from "@/lib/dashboard";
@@ -42,6 +43,8 @@ export default async function ChefsPage() {
           </ul>
         </section>
       )}
+
+      <MakeChefForm />
 
       <ChefRoster chefs={chefs} />
     </AdminShell>
