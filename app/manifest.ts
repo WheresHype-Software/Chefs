@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-/** The tile mark, for a phone home screen and the browser's own chrome. */
+/** The pan mark from the logo, for a phone home screen and the browser's own chrome. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Ao Lume",
