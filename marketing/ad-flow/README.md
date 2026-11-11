@@ -24,3 +24,12 @@ Material para gravar o fluxo **real** da app Ao Lume num mockup de telemóvel e 
 - Não mencionar zonas, nem o domínio no vídeo; CTA "link na bio".
 - Cores da marca: cobalto #1D4AA1, azul escuro #12306E, amarelo #F0B429, tinta #142033, fundo #F3F6FB; letra Schibsted Grotesk; logo "ao lume" com frigideira preta e chama amarela (ver `app/icon.svg` e `stories-anteriores-make.js`, que tem o SVG da frigideira e o estilo das stories anteriores).
 - Montagem: HTML animado gravado com Playwright + ffmpeg (como em `stories-anteriores-make.js`), com o vídeo da app dentro da moldura do telemóvel. Entregar MP4 (H.264, 30 fps) + PNG de capa + texto para o anúncio, num zip.
+
+## Montagem final (feita)
+
+- `ad-anim.js` (usado na entrega): ecrãs da app **recriados** em HTML dentro do telemóvel (registo → página da chef → reserva sem conta → "Pedido enviado"), cena de benefícios (captar clientes, gerir reservas, perfil com pratos, avaliações verificadas) e fecho Fundador. Variantes `story` (20,6 s), `post` (16,2 s) e `story-curta` (8,6 s).
+  `FOTOS=<repo>/marketing/ad-flow/fotos NODE_PATH=$(npm root -g) node <cópia>/ad-anim.js` numa pasta temporária → `out/*.mp4` + `out/*-capa.png`. `ONLY=1.5,7.2 ...` gera só imagens soltas para rever.
+- `ad-make.js`: alternativa com as gravações reais (`frames/<nome>/` de `rec.js`) dentro do telemóvel.
+- `rec.js` grava agora a 2x por capturas CDP (o `recordVideo` só grava a 1x) para `frames/<nome>/%05d.jpg`; às vezes encrava no arranque, por isso convém correr com `timeout 70` e repetir.
+- `mock.js`: o pedido de reserva já chega a "Pedido enviado a Chef Marta" (`rpc/request_booking` + `offers`); a foto de perfil é a f8.
+- Correr os scripts a partir de uma cópia fora do repo: dentro do repo, `require('playwright')` apanha a versão do projeto, que não encontra o Chromium instalado.

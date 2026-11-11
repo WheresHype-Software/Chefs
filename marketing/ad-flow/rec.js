@@ -1,4 +1,5 @@
 const { chromium } = require('playwright');
+const fs = require('fs');
 const which = process.argv[2];
 const BASE = 'http://localhost:3320';
 const CSS = `nextjs-portal{display:none!important}
@@ -12,6 +13,9 @@ html{scroll-behavior:auto!important}`;
     addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); const d = document.createElement('div'); d.id = 'tapdot'; document.body.appendChild(d); });
   }, CSS);
   const pg = await ctx.newPage();
+  // Captura a 2x em ciclo (o recordVideo e o screencast do Playwright só gravam a 1x): frames/<nome>/%05d.jpg a 30 fps.
+  const shots = []; const cdp = await ctx.newCDPSession(pg); let capturing = true;
+  const loop = (async () => { while (capturing) { const t = Date.now(); const r = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90 }).catch(() => null); if (r) shots.push({ t: (t + Date.now()) / 2000, d: r.data }); } })();
   const W = (ms) => pg.waitForTimeout(ms);
   const tap = async (loc, hold = 380) => {
     await loc.scrollIntoViewIfNeeded(); const bb = await loc.boundingBox();
@@ -46,12 +50,24 @@ html{scroll-behavior:auto!important}`;
     await tap(pg.getByRole('link', { name: 'Pedir reserva' }).or(pg.getByRole('button', { name: 'Pedir reserva' })).first()); await W(1100);
     await tap(pg.getByRole('radio', { name: /Marmitas da semana/ })); await W(500);
     await scrollBy(330, 700); await W(300); await snap(1);
-    await tap(pg.getByRole('button', { name: /disponível/ }).nth(1)); await W(500);
+    await tap(pg.getByRole('button', { name: /, disponível$/ }).nth(1)); await W(500); await scrollBy(300, 600); await W(200);
     await tap(pg.getByRole('button', { name: '12:00' }).or(pg.getByRole('radio', { name: '12:00' })).first()); await W(400); await snap(2);
     await type(pg.getByLabel('Nome'), 'Sofia Ramos');
     await type(pg.getByLabel('Email'), 'sofia@exemplo.pt');
     await type(pg.getByLabel('Telemóvel'), '912 345 678'); await snap(3);
-    await tap(pg.locator('form button[type=submit]').last()); await W(2500); await snap(4);
+    await tap(pg.locator('form button[type=submit]').last()); await W(700);
+    // Mostrar o topo da confirmação ("Pedido enviado a ..."); o link privado (com o domínio) fica fora do ecrã.
+    const h = await pg.getByRole('heading', { name: /Pedido enviado/ }).boundingBox();
+    if (h) await scrollBy(h.y - 190, 700);
+    await W(2200); await snap(4);
   }
+  await W(300); capturing = false; await loop;
+  const dir = `frames/${which}`; fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+  const t0 = shots[0].t, end = shots[shots.length - 1].t; let j = 0;
+  for (let k = 0; t0 + k / 30 <= end; k++) {
+    while (j + 1 < shots.length && shots[j + 1].t <= t0 + k / 30) j++;
+    fs.writeFileSync(`${dir}/${String(k + 1).padStart(5, '0')}.jpg`, Buffer.from(shots[j].d, 'base64'));
+  }
+  console.log(which, shots.length, 'capturas', (shots.length / (end - t0)).toFixed(1), 'fps', (end - t0).toFixed(1), 's');
   await ctx.close(); await b.close();
 })();
