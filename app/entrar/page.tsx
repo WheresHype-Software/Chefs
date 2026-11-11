@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { AuthSplit } from "@/components/auth/AuthSplit";
 import { ChefHat } from "@/components/brand/ChefHat";
 import { SignInForm } from "@/components/SignInForm";
 import { SignInMosaic } from "@/components/SignInMosaic";
@@ -13,6 +12,7 @@ export const metadata: Metadata = { title: "Entrar" };
 export default async function EntrarPage({ searchParams }: PageProps<"/entrar">) {
   const sp = await searchParams;
   const asChef = sp.chef === "1";
+  const startOnSignup = sp.criar === "1";
   // Same-site paths only: "//host" or "/\host" would send a fresh sign-in off-site.
   const next = typeof sp.next === "string" && /^\/(?![/\\])/.test(sp.next) ? sp.next : asChef ? "/dashboard/comecar" : "/dashboard";
 
@@ -90,11 +90,35 @@ export default async function EntrarPage({ searchParams }: PageProps<"/entrar">)
     );
   }
 
+  /*
+   * Uma porta só. Quem já tem conta entra sem escolher nada: a conta sabe se é de chef ou de
+   * cliente. Quem cria conta responde primeiro «Quero reservar» ou «Quero cozinhar», e só depois
+   * vê o formulário. Antes havia dois lados lado a lado, e mesmo assim houve chefs a criar conta
+   * de cliente pelo lado errado e a ficar presos com esse email.
+   */
   return (
     <div className="min-h-screen bg-paper">
       <SiteHeader />
-      {expired && <div className="mx-auto max-w-[1240px] px-5 pt-5 sm:px-8">{expired}</div>}
-      <AuthSplit chefHref="/entrar?chef=1" form={hasSupabase ? <SignInForm next={next} asChef={false} /> : demo} />
+      <div className="mx-auto grid max-w-[1180px] items-start gap-10 px-5 py-8 md:px-8 md:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-16">
+        <div className="flex min-w-0 flex-col gap-5">
+          <div className="al-in flex flex-col gap-2">
+            <h1 className="d m-0 text-[clamp(30px,4vw,44px)] leading-[1.03]">Entrar no Ao Lume</h1>
+            <p className="m-0 max-w-[460px] text-[16px] text-ink-3">
+              Para quem quer comer bem e para quem cozinha. Se ainda não tem conta, diga-nos primeiro como a vai usar.
+            </p>
+            {expired}
+          </div>
+          <div className="box al-in w-full min-w-0 max-w-[480px] p-5 shadow-[0_24px_60px_-30px_rgb(20_32_51/0.4)] [animation-delay:120ms] sm:p-7">
+            {hasSupabase ? <SignInForm next={next} asChef={false} startOnSignup={startOnSignup} /> : demo}
+          </div>
+          <p className="m-0 max-w-[480px] text-[14px] text-muted">
+            Para pedir uma reserva não precisa de conta: o link no email abre o pedido e a conversa com o chef.
+          </p>
+        </div>
+        <div className="hidden lg:block">
+          <SignInMosaic forChefs={false} />
+        </div>
+      </div>
     </div>
   );
 }
