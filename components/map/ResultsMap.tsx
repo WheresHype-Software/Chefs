@@ -65,35 +65,56 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
   // The drop-in animation is for the first appearance only, not every redraw after a move.
   const drawn = useRef(false);
 
+  /**
+   * Brings the markers in line with the current grouping. Markers that are still right are kept as
+   * they are, so a zoom or pan doesn't rebuild every pin (which reloaded each photo and flickered).
+   */
   function drawPins() {
     const m = map.current;
     const lib_ = lib.current;
     if (!m || !lib_) return;
     const markers = pins.current;
-    markers.forEach(({ marker }) => marker.remove());
-    markers.clear();
     const { selectedId: sel, hoveredId: hot } = focus.current;
     const alone = new Set([sel, hot].filter((x): x is string => Boolean(x)));
+    const wanted = new Set<string>();
     groupChefs(m, chefs, alone).forEach((group, i) => {
+      const delay = drawn.current ? undefined : 150 + i * 60;
       if (group.length === 1) {
         const chef = group[0]!;
-        const node = createPin(chef, (id) => selectRef.current(id), drawn.current ? 0 : 150 + i * 60);
-        node.dataset.sel = String(chef.id === sel);
-        node.dataset.hot = String(chef.id === hot);
-        node.style.zIndex = alone.has(chef.id) ? "5" : "1";
-        const marker = new lib_.Marker({ element: node, anchor: "bottom" }).setLngLat([chef.lng, chef.lat]).addTo(m);
-        markers.set(chef.id, { marker, node });
+        wanted.add(chef.id);
+        let entry = markers.get(chef.id);
+        if (!entry) {
+          const node = createPin(chef, (id) => selectRef.current(id), delay);
+          const marker = new lib_.Marker({ element: node, anchor: "bottom" }).setLngLat([chef.lng, chef.lat]).addTo(m);
+          entry = { marker, node };
+          markers.set(chef.id, entry);
+        }
+        entry.node.dataset.sel = String(chef.id === sel);
+        entry.node.dataset.hot = String(chef.id === hot);
+        entry.node.style.zIndex = alone.has(chef.id) ? "5" : "1";
         return;
       }
-      const node = createGroup(group, () => {
-        const bounds = new lib_.LngLatBounds();
-        group.forEach((c) => bounds.extend([c.lng, c.lat]));
-        m.fitBounds(bounds, { padding: 120, maxZoom: Math.max(m.getZoom() + 2, 13), duration: 700 });
-      });
+      const key = `group:${group.map((c) => c.id).join(",")}`;
+      wanted.add(key);
+      if (markers.has(key)) return;
+      const node = createGroup(
+        group,
+        () => {
+          const bounds = new lib_.LngLatBounds();
+          group.forEach((c) => bounds.extend([c.lng, c.lat]));
+          m.fitBounds(bounds, { padding: 120, maxZoom: Math.max(m.getZoom() + 2, 13), duration: 700 });
+        },
+        delay,
+      );
       const lng = group.reduce((a, c) => a + c.lng, 0) / group.length;
       const lat = group.reduce((a, c) => a + c.lat, 0) / group.length;
       const marker = new lib_.Marker({ element: node, anchor: "center" }).setLngLat([lng, lat]).addTo(m);
-      markers.set(`group:${group.map((c) => c.id).join(",")}`, { marker, node });
+      markers.set(key, { marker, node });
+    });
+    markers.forEach(({ marker }, key) => {
+      if (wanted.has(key)) return;
+      marker.remove();
+      markers.delete(key);
     });
     drawn.current = true;
   }
@@ -121,7 +142,10 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
     fitPoints(m, lib.current, points(), 0);
     drawPins();
     const markers = pins.current;
-    return () => markers.forEach(({ marker }) => marker.remove());
+    return () => {
+      markers.forEach(({ marker }) => marker.remove());
+      markers.clear();
+    };
     // Reframing on a new origin is the next effect's job.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, chefs]);

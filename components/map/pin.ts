@@ -11,11 +11,6 @@ import type { ChefCard } from "@/lib/types";
  * too close to tell apart at the current zoom are drawn as one group instead (see groupChefs).
  */
 
-/** A small copy of the portrait: a pin is 52 px, the uploaded photo can be 2000 px. */
-function thumb(url: string): string {
-  return /^https:\/\/[^/]+\.supabase\.co\//.test(url) ? `/_next/image?url=${encodeURIComponent(url)}&w=128&q=70` : url;
-}
-
 /** The round face: the photo, or the initials when there is none or it fails to load. */
 function face(chef: ChefCard, className: string): HTMLSpanElement {
   const span = document.createElement("span");
@@ -29,7 +24,8 @@ function face(chef: ChefCard, className: string): HTMLSpanElement {
   };
   if (chef.portrait) {
     const img = document.createElement("img");
-    img.src = thumb(chef.portrait);
+    // The stored photo as is, like the result cards: the browser already has it cached from them.
+    img.src = chef.portrait;
     img.alt = "";
     img.decoding = "async";
     img.addEventListener("error", showInitials, { once: true });
@@ -38,12 +34,17 @@ function face(chef: ChefCard, className: string): HTMLSpanElement {
   return span;
 }
 
-export function createPin(chef: ChefCard, onPick: (id: string) => void, delayMs = 0): HTMLDivElement {
+/**
+ * `delayMs` staggers the drop-in on the map's first draw; without it the marker appears still,
+ * as pins that come and go while zooming should.
+ */
+export function createPin(chef: ChefCard, onPick: (id: string) => void, delayMs?: number): HTMLDivElement {
   const node = document.createElement("div");
   node.className = "al-pin";
   const bub = document.createElement("div");
   bub.className = "al-bub";
-  bub.style.animationDelay = `${delayMs}ms`;
+  if (delayMs === undefined) node.dataset.still = "";
+  else bub.style.animationDelay = `${delayMs}ms`;
   const button = document.createElement("button");
   button.type = "button";
   button.append(face(chef, "face"));
@@ -64,11 +65,13 @@ export function createPin(chef: ChefCard, onPick: (id: string) => void, delayMs 
 }
 
 /** Several chefs in one spot: up to two faces, "+n", and how many. Clicking zooms in on them. */
-export function createGroup(chefs: ChefCard[], onOpen: () => void): HTMLDivElement {
+export function createGroup(chefs: ChefCard[], onOpen: () => void, delayMs?: number): HTMLDivElement {
   const node = document.createElement("div");
   node.className = "al-group";
+  if (delayMs === undefined) node.dataset.still = "";
   const button = document.createElement("button");
   button.type = "button";
+  if (delayMs !== undefined) button.style.animationDelay = `${delayMs}ms`;
   const stack = document.createElement("span");
   stack.className = "stack";
   chefs.slice(0, 2).forEach((c) => stack.append(face(c, "sface")));

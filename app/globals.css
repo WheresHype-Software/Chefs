@@ -691,6 +691,11 @@ html:has(.menu-sheet[open]) {
   animation: al-drop 0.6s var(--ease-out) both;
   transition: transform 0.2s ease;
 }
+/* Pins that appear while zooming come in still: only the map's first draw drops them in. */
+.al-pin[data-still] .al-bub,
+.al-group[data-still] button {
+  animation: none;
+}
 .al-pin:hover .al-bub {
   transform: translateY(-4px);
 }
