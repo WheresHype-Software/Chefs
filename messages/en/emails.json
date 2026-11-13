@@ -185,5 +185,23 @@
     "body": "The document with the detailed breakdown is in your dashboard, under Payments.",
     "cta": "View the document",
     "footnote": "Document {number}"
+  },
+  "auth": {
+    "confirm": {
+      "subject": "Confirm your email",
+      "preheader": "One more step to activate your Ao Lume account.",
+      "heading": "Confirm your email",
+      "lead": "Hi{name}. To activate your Ao Lume account, please confirm this email address is yours.",
+      "cta": "Confirm email",
+      "footnote": "If you didn't create an Ao Lume account, you can ignore this email: without confirmation, the account stays inactive."
+    },
+    "recovery": {
+      "subject": "Choose a new password",
+      "preheader": "The link to change the password of your Ao Lume account.",
+      "heading": "New password",
+      "lead": "We received a request to change the password of your Ao Lume account. Use the button below to choose a new one.",
+      "cta": "Choose a new password",
+      "footnote": "The link works only once and expires shortly. If you didn't ask for this, ignore this email: your password stays the same."
+    }
   }
 }

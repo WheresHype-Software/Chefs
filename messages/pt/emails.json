@@ -185,5 +185,23 @@
     "body": "O documento com a conta detalhada está no teu painel, em Pagamentos.",
     "cta": "Ver o documento",
     "footnote": "Documento {number}"
+  },
+  "auth": {
+    "confirm": {
+      "subject": "Confirme o seu email",
+      "preheader": "Falta um passo para ativar a sua conta no Ao Lume.",
+      "heading": "Confirme o seu email",
+      "lead": "Olá{name}. Para ativar a sua conta no Ao Lume, confirme que este email é seu.",
+      "cta": "Confirmar email",
+      "footnote": "Se não criou uma conta no Ao Lume, pode ignorar este email: sem confirmação, a conta não fica ativa."
+    },
+    "recovery": {
+      "subject": "Escolha uma nova palavra-passe",
+      "preheader": "O link para mudar a palavra-passe da sua conta no Ao Lume.",
+      "heading": "Nova palavra-passe",
+      "lead": "Recebemos um pedido para mudar a palavra-passe da sua conta no Ao Lume. Use o botão abaixo para escolher uma nova.",
+      "cta": "Escolher nova palavra-passe",
+      "footnote": "O link só funciona uma vez e expira dentro de pouco tempo. Se não pediu esta mudança, ignore este email: a sua palavra-passe continua a mesma."
+    }
   }
 }
