@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { ResultsMap } from "@/components/map/ResultsMap";
 import { ChefTile } from "@/components/search/ChefTile";
@@ -11,16 +12,13 @@ import type { ChefCard } from "@/lib/types";
 
 type View = "list" | "map";
 
-const LOCATION_HINT = {
-  denied: "Sem acesso à localização. Pode ativá-la nas definições do navegador.",
-  unavailable: "Não foi possível encontrar a sua localização.",
-} as const;
-
 /**
  * Results as a list beside a map (desktop), or either one behind a "Lista / Mapa" switch (phones).
  * Hovering a chef lights up their pin; picking a pin opens their card and finds them in the list.
  */
 export function SearchResults({ chefs, place }: { chefs: ChefCard[]; place: LatLng | null }) {
+  const t = useTranslations("search.results");
+  const locationHint = { denied: t("locationDenied"), unavailable: t("locationUnavailable") } as const;
   const [view, setView] = useState<View>("list");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -42,7 +40,7 @@ export function SearchResults({ chefs, place }: { chefs: ChefCard[]; place: LatL
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,44%)]">
-      <section aria-label="Resultados" className={`px-5 py-8 md:px-8 lg:py-10 ${view === "map" ? "hidden lg:block" : ""}`}>
+      <section aria-label={t("label")} className={`px-5 py-8 md:px-8 lg:py-10 ${view === "map" ? "hidden lg:block" : ""}`}>
         <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-10 p-0 sm:grid-cols-2">
           {chefs.map((chef, i) => (
             <li
@@ -75,7 +73,7 @@ export function SearchResults({ chefs, place }: { chefs: ChefCard[]; place: LatL
         >
           {(me.status === "denied" || me.status === "unavailable") && (
             <p role="status" className="absolute left-3 right-16 top-3 z-[4] m-0 rounded-[8px] bg-white px-3 py-2 text-[13px] shadow">
-              {LOCATION_HINT[me.status]}
+              {locationHint[me.status]}
             </p>
           )}
           {selected && (
@@ -90,7 +88,7 @@ export function SearchResults({ chefs, place }: { chefs: ChefCard[]; place: LatL
           className="btn pointer-events-auto rounded-full !px-6 shadow-[0_10px_30px_-10px_rgb(20_32_51/0.5)]"
           onClick={() => switchTo(view === "list" ? "map" : "list")}
         >
-          {view === "list" ? "Ver no mapa" : "Ver lista"}
+          {view === "list" ? t("showMap") : t("showList")}
         </button>
       </div>
     </div>

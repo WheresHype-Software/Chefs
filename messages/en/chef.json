@@ -1,1 +1,144 @@
-{}
+{
+  "meta": {
+    "title": "{name} · {headline} in {area}",
+    "defaultHeadline": "Home cooking"
+  },
+  "loading": "Loading the chef's profile",
+  "nav": {
+    "label": "Profile sections",
+    "about": "About",
+    "menus": "Menus",
+    "terms": "Payment",
+    "reviews": "Reviews",
+    "reviewsCount": "Reviews ({count})",
+    "book": "Request a booking"
+  },
+  "gallery": {
+    "label": "Photos",
+    "placeholder": "Photo"
+  },
+  "header": {
+    "verifiedChef": "Verified chef",
+    "photoOf": "Photo of {name}",
+    "rating": "{rating} · {count, plural, one {# review} other {# reviews}}",
+    "new": "New on Ao Lume"
+  },
+  "badges": {
+    "identity": "Identity verified",
+    "portfolio": "Portfolio verified",
+    "certified": "Certified",
+    "founder": "Founding chef"
+  },
+  "facts": {
+    "price": "Price",
+    "quote": "On request",
+    "from": "from {price}",
+    "menusSoon": "Menus coming soon",
+    "area": "Area",
+    "areaValue": "{area} · up to {km} km",
+    "languages": "Languages",
+    "responds": "Replies",
+    "respondsValue": "in ~{hours} h"
+  },
+  "languages": {
+    "pt": "Portuguese",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "it": "Italian",
+    "de": "German"
+  },
+  "about": {
+    "title": "About {name}",
+    "subtitle": "Who's cooking, how they work and their experience.",
+    "noBio": "{name} hasn't written about themselves yet. Have a look at the menus below.",
+    "years": "{count, plural, one {# year of experience} other {# years of experience}}",
+    "speaks": "Speaks {languages}",
+    "pathTitle": "Background",
+    "pathSubtitle": "Where they've worked and their training.",
+    "verifiedDocument": "Document verified",
+    "present": "present"
+  },
+  "cuisines": {
+    "title": "What they cook",
+    "subtitle": "Types of cuisine and how you can get your food.",
+    "kinds": "Types of cuisine",
+    "services": "Services"
+  },
+  "offers": {
+    "title": "Menus and prices",
+    "subtitle": "Pick a menu to request a booking with it.",
+    "none": "No menus published yet.",
+    "range": "{min}–{max} {unit}",
+    "minimum": "From {min} {unit}",
+    "leadDays": "Book {days, plural, one {# day} other {# days}} ahead",
+    "leadHours": "Book {hours} h ahead",
+    "cta": "Request this menu →"
+  },
+  "terms": {
+    "title": "Payment and cancellation",
+    "subtitle": "{name}'s terms, so you know them before you ask.",
+    "when": "When you pay",
+    "whenApp": "Nothing when you send the request. If {name} accepts, you pay the deposit here to confirm the date.",
+    "whenDirect": "Nothing when you send the request. Only once {name} accepts, directly to {name}.",
+    "rest": "How you pay the rest",
+    "deposit": "Deposit",
+    "depositApp": "{percent}% of the total, paid in the app by MB WAY or Multibanco. You arrange the rest with {name}.",
+    "depositDirect": "{percent}% to confirm the date; the rest as you agree.",
+    "cancellation": "Cancellation",
+    "footApp": "The deposit is paid on Ao Lume and passed on to the chef after the service. You arrange the rest directly with the chef.",
+    "footDirect": "You arrange the service and payment directly with the chef.",
+    "payment": {
+      "mbway": "MB WAY",
+      "transfer": "Bank transfer",
+      "cash": "Cash"
+    },
+    "policy": {
+      "flexible": "Flexible: free up to 24 h before",
+      "moderate": "Moderate: free up to 5 days before",
+      "strict": "Strict: deposit non-refundable",
+      "custom": "The chef's own policy"
+    }
+  },
+  "reviews": {
+    "title": "Reviews",
+    "subtitle": "Only clients with a completed booking can leave a review.",
+    "none": "No reviews yet. The first ones come after the first completed bookings.",
+    "count": "{count, plural, one {# review} other {# reviews}}",
+    "distribution": "How the ratings are spread",
+    "byCategory": "By category",
+    "categories": {
+      "food": "Food",
+      "presentation": "Presentation",
+      "punctuality": "Punctuality",
+      "communication": "Communication",
+      "value": "Value for money"
+    },
+    "stars": "{count} out of 5 stars",
+    "verified": "Verified booking",
+    "verifiedWhat": "Verified booking · {what}",
+    "what": "{offer} · {guests} people",
+    "reply": "The chef's reply:",
+    "sort": "Sort reviews",
+    "sorts": {
+      "recent": "Most recent",
+      "best": "Highest rated",
+      "worst": "Lowest rated"
+    },
+    "more": "Show more reviews ({count})"
+  },
+  "booking": {
+    "title": "Request a booking",
+    "responds": "replies in ~{hours} h",
+    "noAccount": "No account needed",
+    "noPayment": "Nothing to pay when you ask",
+    "answer": "Answer within 48 h",
+    "preparing": "{name} is still preparing their menus. Come back soon.",
+    "preparingInstagram": "{name} is still preparing their menus. Come back soon, or follow along on Instagram.",
+    "termsLink": "Payment, deposit and cancellation →"
+  },
+  "mobileBar": {
+    "from": "from <strong>{price}</strong>",
+    "book": "Request a booking"
+  }
+}

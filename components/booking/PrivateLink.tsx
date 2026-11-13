@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useSyncExternalStore } from "react";
 
 const noop = () => () => {};
 
 /** The guest's private booking link, with copy and (on phones) share. */
 export function PrivateLink({ url, title }: { url: string; title: string }) {
+  const t = useTranslations("booking.privateLink");
   const [copied, setCopied] = useState(false);
   // Read after hydration so server and first client render agree.
   const canShare = useSyncExternalStore(
@@ -27,7 +29,7 @@ export function PrivateLink({ url, title }: { url: string; title: string }) {
   return (
     <div className="flex flex-col gap-2">
       <label className="flex flex-col gap-1.5">
-        <span className="sr-only">Link do pedido</span>
+        <span className="sr-only">{t("label")}</span>
         <input
           readOnly
           value={url}
@@ -37,16 +39,16 @@ export function PrivateLink({ url, title }: { url: string; title: string }) {
       </label>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn btn-sm" onClick={copy}>
-          {copied ? "Link copiado" : "Copiar link"}
+          {copied ? t("copied") : t("copy")}
         </button>
         {canShare && (
           <button type="button" className="btn btn-sm btn-o" onClick={() => navigator.share({ title, url }).catch(() => {})}>
-            Partilhar
+            {t("share")}
           </button>
         )}
       </div>
       <span aria-live="polite" className="sr-only">
-        {copied ? "Link copiado" : ""}
+        {copied ? t("copied") : ""}
       </span>
     </div>
   );

@@ -1,8 +1,14 @@
+import { useLocale, useTranslations } from "next-intl";
+import { cuisineLabel } from "@/lib/constants";
 import { chefTitle, titledName, fromPrice, rating, toneFor } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { ChefCard } from "@/lib/types";
 
 /** Compact chef card used in the map rail and the dashboard preview. */
 export function ChefMiniCard({ chef, selected, onSelect }: { chef: ChefCard; selected?: boolean; onSelect?: () => void }) {
+  const t = useTranslations("search.map");
+  const tc = useTranslations("search.cuisines");
+  const locale = useLocale() as Locale;
   return (
     <button
       type="button"
@@ -15,17 +21,18 @@ export function ChefMiniCard({ chef, selected, onSelect }: { chef: ChefCard; sel
           // eslint-disable-next-line @next/next/no-img-element
           <img src={chef.cover} alt="" className="h-full w-full object-cover" />
         ) : (
-          <span className="text-[10px] uppercase tracking-[.12em] text-muted">Foto</span>
+          <span className="text-[10px] uppercase tracking-[.12em] text-muted">{t("photo")}</span>
         )}
       </span>
       <span className="flex min-w-0 flex-col gap-[3px] py-1 pr-1">
-        <span className="lab text-muted">{chefTitle(chef.badges)}</span>
-        <span className="d text-[22px] leading-[1.1]">{titledName(chef)}</span>
+        <span className="lab text-muted">{chefTitle(chef.badges, locale)}</span>
+        <span className="d text-[22px] leading-[1.1]">{titledName(chef, locale)}</span>
         <span className="text-[13px] text-muted">
-          {chef.categories.join(" · ")} · {chef.area}
+          {chef.categories.map((c) => cuisineLabel((k) => tc(k), c)).join(" · ")} · {chef.area}
         </span>
         <span className="num mt-auto text-[13px]">
-          <strong className="font-semibold">{rating(chef.rating, chef.reviewCount)}</strong> · desde {fromPrice(chef.offers)}
+          <strong className="font-semibold">{rating(chef.rating, chef.reviewCount, locale)}</strong> ·{" "}
+          {t("from", { price: fromPrice(chef.offers, locale) })}
         </span>
       </span>
     </button>
@@ -36,6 +43,7 @@ type Props = { chefs: ChefCard[]; selectedId: string | null; onSelect: (id: stri
 
 /** Horizontal rail of chef cards along the bottom of the map. */
 export function ChefRail({ chefs, selectedId, onSelect, panelOpen }: Props) {
+  const t = useTranslations("search.map");
   return (
     <div
       className={`absolute bottom-2.5 left-2.5 right-2.5 z-[4] flex gap-2.5 overflow-x-auto pb-1 transition-[right] duration-[600ms] [scrollbar-width:none] md:bottom-4 md:left-4 ${
@@ -43,9 +51,7 @@ export function ChefRail({ chefs, selectedId, onSelect, panelOpen }: Props) {
       }`}
     >
       {chefs.length === 0 && (
-        <div className="box flex-[0_0_300px] p-4 text-sm text-muted">
-          Ainda não há chefs para esta pesquisa. Experimente outro tipo de serviço ou outra morada.
-        </div>
+        <div className="box flex-[0_0_300px] p-4 text-sm text-muted">{t("empty")}</div>
       )}
       {chefs.map((c) => (
         <ChefMiniCard key={c.id} chef={c} selected={c.id === selectedId} onSelect={() => onSelect(c.id)} />

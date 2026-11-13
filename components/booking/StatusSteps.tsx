@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 export type StatusStep = { label: string; /** When it happened, or what happens there. */ detail: string };
 
 type Props = {
@@ -13,8 +15,9 @@ type Props = {
  * on wider screens. The current step is marked for screen readers with aria-current.
  */
 export function StatusSteps({ steps, current, action }: Props) {
+  const t = useTranslations("booking.status.steps");
   return (
-    <ol aria-label="Estado do pedido" className="m-0 grid list-none p-0 md:grid-cols-4 md:gap-3">
+    <ol aria-label={t("label")} className="m-0 grid list-none p-0 md:grid-cols-4 md:gap-3">
       {steps.map((s, i) => {
         const done = i < current;
         const now = i === current;
@@ -44,7 +47,7 @@ export function StatusSteps({ steps, current, action }: Props) {
             <span className="flex min-w-0 flex-col gap-0.5 pt-0.5 md:pt-0">
               <span className={`text-[15px] font-semibold ${now ? "text-cobalt" : done ? "text-ink" : "text-muted"}`}>
                 {s.label}
-                <span className="sr-only">{done ? " (feito)" : now ? " (agora)" : ""}</span>
+                <span className="sr-only">{done ? t("done") : now ? t("now") : ""}</span>
               </span>
               <span className="text-[13px] text-muted">{s.detail}</span>
               {now && action && (

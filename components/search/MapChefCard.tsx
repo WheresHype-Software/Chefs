@@ -1,7 +1,9 @@
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Photo } from "@/components/ui/Photo";
 import { fromPrice, initials, titledName } from "@/lib/format";
 import type { LatLng } from "@/lib/geo";
+import type { Locale } from "@/lib/i18n/routing";
 import { durationLabel, travelEstimates, type TravelMode } from "@/lib/travel";
 import type { ChefCard } from "@/lib/types";
 
@@ -54,6 +56,8 @@ function DishStrip({ chef }: { chef: ChefCard }) {
 
 /** The chef picked on the map: their face first, a few dishes, where, from how much, and rough travel times. */
 export function MapChefCard({ chef, origin, originIsMe, onClose, raised = false }: Props) {
+  const t = useTranslations("search.mapCard");
+  const locale = useLocale() as Locale;
   const trip = origin ? travelEstimates(origin, chef) : null;
 
   return (
@@ -68,7 +72,7 @@ export function MapChefCard({ chef, origin, originIsMe, onClose, raised = false 
           type="button"
           onClick={onClose}
           className="ctl absolute right-2 top-2 !h-8 !w-8 !bg-white/95 !text-base shadow"
-          aria-label="Fechar"
+          aria-label={t("close")}
         >
           ×
         </button>
@@ -91,27 +95,27 @@ export function MapChefCard({ chef, origin, originIsMe, onClose, raised = false 
       <div className="flex flex-col gap-3 p-3 pt-1">
         <div className="flex min-w-0 flex-col gap-0.5 pl-[100px]">
           <Link href={`/chef/${chef.slug}`} className="truncate text-[17px] font-bold text-ink no-underline hover:text-cobalt">
-            {titledName(chef)}
+            {titledName(chef, locale)}
           </Link>
           <span className="text-[14px]">
-            desde <strong className="tabular-nums">{fromPrice(chef.offers)}</strong>
+            {t.rich("from", { price: fromPrice(chef.offers, locale), strong: (c) => <strong className="tabular-nums">{c}</strong> })}
           </span>
         </div>
-        <span className="truncate text-[14px] text-muted">
-          {chef.area} · desloca-se até {chef.radiusKm} km
-        </span>
+        <span className="truncate text-[14px] text-muted">{t("radius", { area: chef.area ?? "", km: chef.radiusKm })}</span>
 
         {trip && (
           <div className="flex flex-col gap-1.5 border-t border-line pt-2.5">
             <span className="text-[12px] text-muted">
-              Cerca de {String(trip.km).replace(".", ",")} km {originIsMe ? "de si" : "da zona pesquisada"} · estimativa até à zona do chef
+              {t(originIsMe ? "tripFromMe" : "tripFromPlace", {
+                km: locale === "pt" ? String(trip.km).replace(".", ",") : String(trip.km),
+              })}
             </span>
             <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
-              {trip.times.map((t) => (
-                <li key={t.mode} className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 text-[13px] font-semibold">
-                  {ICON[t.mode]}
-                  <span className="sr-only">{t.label}:</span>
-                  {durationLabel(t.minutes)}
+              {trip.times.map((e) => (
+                <li key={e.mode} className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 text-[13px] font-semibold">
+                  {ICON[e.mode]}
+                  <span className="sr-only">{t(`travel.${e.mode}`)}:</span>
+                  {durationLabel(e.minutes, locale)}
                 </li>
               ))}
             </ul>
@@ -119,7 +123,7 @@ export function MapChefCard({ chef, origin, originIsMe, onClose, raised = false 
         )}
 
         <Link href={`/chef/${chef.slug}`} className="btn btn-sm">
-          Ver perfil e pedir reserva
+          {t("cta")}
         </Link>
       </div>
     </div>

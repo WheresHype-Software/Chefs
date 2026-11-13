@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/lib/i18n/navigation";
 import { useEffect, useState } from "react";
 import { Field } from "@/components/ui/Field";
@@ -8,6 +9,7 @@ import { usePolling } from "@/hooks/usePolling";
 import { callAction } from "@/lib/call-action";
 import { cancelDepositPayment, getPaymentState, refreshPaymentState, startDepositPayment, type PaymentState } from "@/lib/deposit";
 import { euro } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { PaymentMethod } from "@/lib/types";
 
 type Props = {
@@ -20,11 +22,7 @@ type Props = {
   bookingValue: number | null;
 };
 
-const METHODS: [PaymentMethod, string][] = [
-  ["mbway", "MB WAY"],
-  ["multibanco", "Referência Multibanco"],
-  ["card", "Cartão"],
-];
+const METHODS: PaymentMethod[] = ["mbway", "multibanco", "card"];
 
 /** "4:58", or null once it has run out. */
 function countdown(until: string | null, now: number): string | null {
@@ -36,15 +34,17 @@ function countdown(until: string | null, now: number): string | null {
 }
 
 function Reference({ entity, reference, amount }: { entity: string | null; reference: string | null; amount: number }) {
+  const t = useTranslations("booking.deposit");
+  const locale = useLocale() as Locale;
   const pretty = (reference ?? "").replace(/\s+/g, "").replace(/(\d{3})(?=\d)/g, "$1 ");
   return (
     <dl className="m-0 grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2.5 rounded-[2px] bg-paper p-4">
-      <dt className="lab m-0 text-muted">Entidade</dt>
+      <dt className="lab m-0 text-muted">{t("entity")}</dt>
       <dd className="num m-0 text-lg font-semibold">{entity}</dd>
-      <dt className="lab m-0 text-muted">Referência</dt>
+      <dt className="lab m-0 text-muted">{t("reference")}</dt>
       <dd className="num m-0 text-lg font-semibold">{pretty}</dd>
-      <dt className="lab m-0 text-muted">Valor</dt>
-      <dd className="num m-0 text-lg font-semibold">{euro(amount)}</dd>
+      <dt className="lab m-0 text-muted">{t("amount")}</dt>
+      <dd className="num m-0 text-lg font-semibold">{euro(amount, locale)}</dd>
     </dl>
   );
 }
@@ -58,6 +58,8 @@ function Reference({ entity, reference, amount }: { entity: string | null; refer
  * to look like a payment.
  */
 export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue, cardAvailable }: Props) {
+  const t = useTranslations("booking.deposit");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const [state, setState] = useState(initial);
   const [method, setMethod] = useState<PaymentMethod>("mbway");
@@ -84,7 +86,7 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
     window.history.replaceState(null, "", window.location.pathname);
     void (async () => {
       if (outcome === "ok") await checkNow();
-      else if (outcome === "falhou") setError("O pagamento com cartão não foi aceite. Pode tentar de novo.");
+      else if (outcome === "falhou") setError(t("cardFailed"));
     })();
     // Runs once, on arrival.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,7 +135,7 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
       }
     } catch (err) {
       console.error("[deposit] checkNow:", err);
-      setError("Não conseguimos confirmar agora. Tente dentro de momentos.");
+      setError(t("checkFailed"));
     } finally {
       setBusy(false);
     }
@@ -152,52 +154,51 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
 
   const summary = (
     <aside className="flex min-w-0 flex-[1_1_230px] flex-col gap-3 bg-paper p-5">
-      <span className="lab text-muted">Resumo</span>
+      <span className="lab text-muted">{t("summary")}</span>
       <dl className="m-0 flex flex-col gap-2.5">
         {bookingValue != null && (
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="m-0 text-[15px] text-muted">Valor do serviço</dt>
-            <dd className="num m-0 text-[15px]">{euro(bookingValue)}</dd>
+            <dt className="m-0 text-[15px] text-muted">{t("bookingValue")}</dt>
+            <dd className="num m-0 text-[15px]">{euro(bookingValue, locale)}</dd>
           </div>
         )}
         <div className="flex items-baseline justify-between gap-3 border-t border-line-2 pt-2.5">
-          <dt className="m-0 text-[15px] font-semibold">A pagar agora</dt>
-          <dd className="num m-0 text-[22px] font-semibold text-cobalt">{euro(amount)}</dd>
+          <dt className="m-0 text-[15px] font-semibold">{t("payNow")}</dt>
+          <dd className="num m-0 text-[22px] font-semibold text-cobalt">{euro(amount, locale)}</dd>
         </div>
         {rest != null && rest > 0 && (
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="m-0 text-[15px] text-muted">Depois, ao chef</dt>
-            <dd className="num m-0 text-[15px]">{euro(rest)}</dd>
+            <dt className="m-0 text-[15px] text-muted">{t("later")}</dt>
+            <dd className="num m-0 text-[15px]">{euro(rest, locale)}</dd>
           </div>
         )}
       </dl>
-      <p className="m-0 text-[13px] leading-relaxed text-muted">
-        O sinal garante a data. O restante valor é combinado e pago diretamente a {chefFirstName}, no dia do serviço.
-      </p>
+      <p className="m-0 text-[13px] leading-relaxed text-muted">{t("summaryNote", { name: chefFirstName })}</p>
     </aside>
   );
 
   return (
     <section className="box flex flex-col gap-4 border-2 border-cobalt p-6">
       <div className="flex flex-col gap-1.5">
-        <h2 className="d m-0 text-[28px]">Falta o sinal</h2>
+        <h2 className="d m-0 text-[28px]">{t("title")}</h2>
         <p className="m-0 text-muted">
-          {chefFirstName} aceitou o pedido. Pague o sinal de <strong className="num font-semibold text-ink">{euro(amount)}</strong> para a
-          reserva ficar confirmada. O resto do valor combina diretamente com {chefFirstName}, no dia.
+          {t.rich("intro", {
+            name: chefFirstName,
+            amount: euro(amount, locale),
+            strong: (c) => <strong className="num font-semibold text-ink">{c}</strong>,
+          })}
         </p>
-        {state.depositStatus === "overdue" && (
-          <p className="m-0 text-sm text-danger">O prazo para pagar o sinal passou. Ainda pode pagar, mas o chef já pode ter cancelado.</p>
-        )}
+        {state.depositStatus === "overdue" && <p className="m-0 text-sm text-danger">{t("overdue")}</p>}
       </div>
 
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[2_1_320px] flex-col gap-4">
           {!waiting && (
             <>
-              <div className="flex flex-wrap gap-2.5" role="group" aria-label="Como quer pagar">
-                {METHODS.filter(([m]) => m !== "card" || cardAvailable).map(([m, label]) => (
+              <div className="flex flex-wrap gap-2.5" role="group" aria-label={t("howToPay")}>
+                {METHODS.filter((m) => m !== "card" || cardAvailable).map((m) => (
                   <button key={m} type="button" className="chip" aria-pressed={method === m} onClick={() => setMethod(m)} disabled={busy}>
-                    {label}
+                    {t(`methods.${m}`)}
                   </button>
                 ))}
               </div>
@@ -210,7 +211,7 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
                 }}
               >
                 {method === "mbway" && (
-                  <Field label="Telemóvel do MB WAY" required hint="Recebe um pedido na aplicação para aprovar em 5 minutos.">
+                  <Field label={t("mbwayPhone")} required hint={t("mbwayHint")}>
                     <input
                       required
                       type="tel"
@@ -223,14 +224,10 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
                     />
                   </Field>
                 )}
-                {method === "multibanco" && (
-                  <p className="m-0 text-sm text-muted">
-                    Geramos uma entidade e referência para pagar no homebanking ou numa caixa Multibanco.
-                  </p>
-                )}
+                {method === "multibanco" && <p className="m-0 text-sm text-muted">{t("multibancoHint")}</p>}
                 <div className="flex flex-wrap items-center gap-4">
                   <button className="btn" disabled={busy}>
-                    {busy ? "A preparar…" : `Pagar ${euro(amount)}`}
+                    {busy ? t("preparing") : t("pay", { amount: euro(amount, locale) })}
                   </button>
                   {error && <FormMessage message={{ ok: false, text: error }} />}
                 </div>
@@ -240,16 +237,14 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
 
           {waiting && payment?.method === "mbway" && (
             <div className="flex flex-col gap-3">
-              <p className="m-0">
-                Abra a aplicação MB WAY no número {payment.phoneMasked} e aprove o pagamento de {euro(payment.amount)}.
-              </p>
+              <p className="m-0">{t("mbwayWaiting", { phone: payment.phoneMasked ?? "", amount: euro(payment.amount, locale) })}</p>
               <p className="m-0 flex items-baseline gap-2.5 text-sm text-muted">
                 <span className="num text-2xl text-ink">{left ?? "—"}</span>
-                <span>{left ? "para aprovar" : "o pedido expirou"}</span>
+                <span>{left ? t("toApprove") : t("mbwayExpired")}</span>
               </p>
               <div className="flex flex-wrap gap-2.5">
                 <button type="button" className="btn btn-o btn-sm" onClick={() => void startOver()} disabled={busy}>
-                  {left ? "Pagar de outra forma" : "Tentar de novo"}
+                  {left ? t("otherWay") : t("retry")}
                 </button>
               </div>
             </div>
@@ -257,18 +252,18 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
 
           {waiting && payment?.method === "card" && (
             <div className="flex flex-col gap-3">
-              <p className="m-0">Abrimos a página segura da EuPago para pagar {euro(payment.amount)} com cartão.</p>
+              <p className="m-0">{t("cardWaiting", { amount: euro(payment.amount, locale) })}</p>
               <div className="flex flex-wrap gap-2.5">
                 {payment.redirectUrl && (
                   <a href={payment.redirectUrl} className="btn btn-sm">
-                    Continuar o pagamento
+                    {t("cardContinue")}
                   </a>
                 )}
                 <button type="button" className="btn btn-o btn-sm" onClick={() => void checkNow()} disabled={busy}>
-                  {busy ? "A verificar…" : "Já paguei, verificar"}
+                  {busy ? t("checking") : t("checkPaid")}
                 </button>
                 <button type="button" className="btn btn-o btn-sm" onClick={() => void startOver()} disabled={busy}>
-                  Pagar de outra forma
+                  {t("otherWay")}
                 </button>
               </div>
             </div>
@@ -277,12 +272,9 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
           {waiting && payment?.method === "multibanco" && (
             <div className="flex flex-col gap-3">
               <Reference entity={payment.entity} reference={payment.reference} amount={payment.amount} />
-              <p className="m-0 text-sm text-muted">
-                Enviámos-lhe estes dados por email. A reserva fica confirmada automaticamente assim que o pagamento entrar. Pode fechar esta
-                página.
-              </p>
+              <p className="m-0 text-sm text-muted">{t("multibancoSent")}</p>
               <button type="button" className="btn btn-o btn-sm self-start" onClick={() => void startOver()} disabled={busy}>
-                Pagar de outra forma
+                {t("otherWay")}
               </button>
             </div>
           )}
@@ -290,9 +282,7 @@ export function DepositPayment({ bookingId, initial, chefFirstName, bookingValue
         {summary}
       </div>
 
-      <p className="m-0 text-xs text-muted">
-        O pagamento é processado pela EuPago. O Ao Lume recebe o sinal em nome do chef e transfere-lho depois do serviço.
-      </p>
+      <p className="m-0 text-xs text-muted">{t("processor")}</p>
     </section>
   );
 }

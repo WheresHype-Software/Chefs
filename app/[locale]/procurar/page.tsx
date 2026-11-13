@@ -1,31 +1,35 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { AzulejoTile } from "@/components/brand/Azulejo";
 import { SearchResults } from "@/components/search/SearchResults";
 import { CuisineSelect } from "@/components/search/CuisineSelect";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { CUISINES, POPULAR_CUISINES, SERVICE_FILTERS } from "@/lib/constants";
-import { dayLabel } from "@/lib/format";
+import { CUISINES, cuisineLabel, POPULAR_CUISINES, SERVICE_FILTERS } from "@/lib/constants";
+import { dayLabel, serviceLabel } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import { searchChefs } from "@/lib/search";
 import { parseSearchQuery, searchHref, type SearchQuery } from "@/lib/search-params";
+import { alternates } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Procurar chefs",
-  description: "Chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas, pastelaria, entregas e eventos.",
-};
-
-function heading(q: SearchQuery, count: number): string {
-  const place = q.where.split(",")[0]?.trim();
-  if (count === 0) return place ? `Ainda sem chefs perto de ${place}` : "Ainda sem chefs para esta pesquisa";
-  return place ? `Chefs perto de ${place}` : "Chefs no Ao Lume";
+export async function generateMetadata({ params }: PageProps<"/[locale]/procurar">): Promise<Metadata> {
+  const locale = (await params).locale as Locale;
+  const t = await getTranslations({ locale, namespace: "search.meta" });
+  return { title: t("title"), description: t("description"), alternates: alternates("/procurar", locale) };
 }
 
-function summary(q: SearchQuery, count: number): string {
-  const parts = [count === 1 ? "1 chef" : `${count} chefs`];
-  if (q.date) parts.push(`livres ${dayLabel(q.date)}`);
-  const found = parts.join(", ");
-  return count ? `${found}. Abra um chef para ver o menu, os dias livres e pedir reserva, sem criar conta.` : found;
+type T = Awaited<ReturnType<typeof getTranslations<"search">>>;
+
+function heading(t: T, q: SearchQuery, count: number): string {
+  const place = q.where.split(",")[0]?.trim();
+  if (count === 0) return place ? t("heading.noneNear", { place }) : t("heading.none");
+  return place ? t("heading.near", { place }) : t("heading.all");
+}
+
+function summary(t: T, locale: Locale, q: SearchQuery, count: number): string {
+  const found = q.date ? t("summary.countOnDate", { count, day: dayLabel(q.date, locale) }) : t("summary.count", { count });
+  return count ? t("summary.hint", { found }) : found;
 }
 
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -40,7 +44,11 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-export default async function ProcurarPage({ searchParams }: PageProps<"/[locale]/procurar">) {
+export default async function ProcurarPage({ params, searchParams }: PageProps<"/[locale]/procurar">) {
+  const locale = (await params).locale as Locale;
+  const t = await getTranslations("search");
+  const tc = await getTranslations("search.cuisines");
+  const cuisine = (name: string) => cuisineLabel((k) => tc(k), name);
   const q = parseSearchQuery(await searchParams);
   const { chefs, place } = await searchChefs(q);
 
@@ -52,30 +60,31 @@ export default async function ProcurarPage({ searchParams }: PageProps<"/[locale
           <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-5 pb-6 pt-8 md:px-8 md:pt-10">
             <SearchBar key={`${q.where}|${q.service}|${q.date ?? ""}`} size="compact" initial={q} />
             <div className="flex flex-col gap-1">
-              <h1 className="d m-0 text-[clamp(28px,3.6vw,40px)] leading-[1.08]">{heading(q, chefs.length)}</h1>
-              <p className="m-0 text-[15px] text-muted">{summary(q, chefs.length)}</p>
+              <h1 className="d m-0 text-[clamp(28px,3.6vw,40px)] leading-[1.08]">{heading(t, q, chefs.length)}</h1>
+              <p className="m-0 text-[15px] text-muted">{summary(t, locale, q, chefs.length)}</p>
             </div>
             <div className="flex flex-col gap-2.5">
-              <FilterRow label="Tipo de serviço">
-                {SERVICE_FILTERS.map(([key, label]) => (
+              <FilterRow label={t("filters.service")}>
+                {SERVICE_FILTERS.map((key) => (
                   <Link key={key} href={searchHref(q, { service: key })} scroll={false} className="chip" aria-current={q.service === key}>
-                    {label}
+                    {key === "all" ? t("filters.all") : serviceLabel(key, locale)}
                   </Link>
                 ))}
               </FilterRow>
-              <FilterRow label="Cozinha">
+              <FilterRow label={t("filters.cuisine")}>
                 <Link href={searchHref(q, { cuisine: null })} scroll={false} className="chip" aria-current={!q.cuisine}>
-                  Todas as cozinhas
+                  {t("filters.allCuisines")}
                 </Link>
                 {POPULAR_CUISINES.map((c) => (
                   <Link key={c} href={searchHref(q, { cuisine: c })} scroll={false} className="chip" aria-current={q.cuisine === c}>
-                    {c}
+                    {cuisine(c)}
                   </Link>
                 ))}
                 <CuisineSelect
                   current={q.cuisine}
                   options={CUISINES.filter((c) => !POPULAR_CUISINES.includes(c)).map((c) => ({
-                    label: c,
+                    value: c,
+                    label: cuisine(c),
                     href: searchHref(q, { cuisine: c }),
                   }))}
                 />
@@ -87,29 +96,26 @@ export default async function ProcurarPage({ searchParams }: PageProps<"/[locale
         {chefs.length > 0 ? (
           <SearchResults key={chefs.map((c) => c.id).join()} chefs={chefs} place={place} />
         ) : (
-          <section aria-label="Resultados" className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
+          <section aria-label={t("empty.label")} className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
             <div className="flex flex-col items-start gap-5 md:flex-row md:items-center">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[10px]">
                 <AzulejoTile variant="glaze" />
               </div>
               <div className="flex flex-col gap-3">
-                <p className="m-0 max-w-[56ch] text-[17px] text-ink-3">
-                  Ainda não há chefs livres com estes filtros. O Ao Lume está a abrir zona a zona: experimente outra data, outro serviço ou
-                  uma zona próxima.
-                </p>
+                <p className="m-0 max-w-[56ch] text-[17px] text-ink-3">{t("empty.text")}</p>
                 <div className="flex flex-wrap gap-2">
                   {q.date && (
                     <Link href={searchHref(q, { date: null })} className="btn btn-o btn-sm">
-                      Qualquer data
+                      {t("empty.anyDate")}
                     </Link>
                   )}
                   {(q.service !== "all" || q.cuisine) && (
                     <Link href={searchHref(q, { service: "all", cuisine: null })} className="btn btn-o btn-sm">
-                      Todos os serviços
+                      {t("empty.allServices")}
                     </Link>
                   )}
                   <Link href="/procurar" className="btn btn-sm">
-                    Ver todos os chefs
+                    {t("empty.allChefs")}
                   </Link>
                 </div>
               </div>
