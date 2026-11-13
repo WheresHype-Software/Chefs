@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AddressSearch } from "@/components/AddressSearch";
 import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { ProfileVerification, type VerificationPhotos } from "@/components/dashboard/ProfileVerification";
@@ -11,7 +11,8 @@ import { FormMessage } from "@/components/ui/FormMessage";
 import { useRouter } from "@/lib/i18n/navigation";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
-import { LANGUAGES } from "@/lib/languages";
+import type { Locale } from "@/lib/i18n/routing";
+import { languageOptions } from "@/lib/languages";
 import { slugify } from "@/lib/slug";
 import { SITE_DOMAIN } from "@/lib/constants";
 
@@ -24,6 +25,7 @@ import { SITE_DOMAIN } from "@/lib/constants";
  */
 export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | null; minDeposit?: number; next?: string }) {
   const t = useTranslations("dashboard.profile.form");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const { form, set, areaQuery, typeArea, pickArea, save, busy, locating, message } = useProfileForm(chef, {
     requireSocial: Boolean(next),
@@ -149,7 +151,7 @@ export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | 
         <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
           <legend className="field lab mb-2 p-0">{t("languages")}</legend>
           <div className="flex flex-wrap gap-1.5">
-            {LANGUAGES.map(([code, name]) => (
+            {languageOptions(locale).map(([code, name]) => (
               <Chip
                 key={code}
                 pressed={form.languages.includes(code)}

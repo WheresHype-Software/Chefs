@@ -9,7 +9,7 @@ import { FormMessage } from "@/components/ui/FormMessage";
 import { Switch } from "@/components/ui/Switch";
 import { useServerAction } from "@/hooks/useServerAction";
 import { useToggleList } from "@/hooks/useToggleList";
-import { MAX_CATEGORIES } from "@/lib/constants";
+import { MAX_CATEGORIES, cuisineLabel, dietLabel } from "@/lib/constants";
 import { serviceLabel } from "@/lib/format";
 import { type Locale } from "@/lib/i18n/routing";
 import type { ServiceType } from "@/lib/types";
@@ -33,6 +33,8 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
   const [draft, setDraft] = useState("");
   const [adding, startAdding] = useTransition();
   const [addError, setAddError] = useState<string | null>(null);
+  const tc = useTranslations("search.cuisines");
+  const td = useTranslations("search.diets");
   const cats = useToggleList(mine.categories, MAX_CATEGORIES);
   const chosenDiets = useToggleList(mine.diets);
   const services = useToggleList(mine.services);
@@ -40,6 +42,7 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
   const catLine =
     cats.items
       .map((id) => categories.find((c) => c.id === id)?.name)
+      .map((n) => n && cuisineLabel(tc, n))
       .filter(Boolean)
       .join(" · ") || t("noCategory");
 
@@ -56,7 +59,7 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
           <div className="flex flex-wrap gap-1.5">
             {categories.map((c) => (
               <Chip key={c.id} pressed={cats.has(c.id)} disabled={!cats.has(c.id) && !cats.canAdd} onClick={() => cats.toggle(c.id)}>
-                {c.name}
+                {cuisineLabel(tc, c.name)}
               </Chip>
             ))}
           </div>
@@ -121,7 +124,7 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
           <div className="flex flex-wrap gap-1.5">
             {diets.map((d) => (
               <Chip key={d.id} pressed={chosenDiets.has(d.id)} onClick={() => chosenDiets.toggle(d.id)}>
-                {d.name}
+                {dietLabel(td, d.name)}
               </Chip>
             ))}
           </div>

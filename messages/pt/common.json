@@ -30,5 +30,16 @@
   "errors": {
     "generic": "Algo correu mal. Tente de novo dentro de momentos.",
     "network": "Sem ligação. Verifique a internet e tente de novo."
+  },
+  "photos": {
+    "table": "Mesa com vários pratos caseiros servidos para partilhar",
+    "cooking": "Mãos a cozinhar numa cozinha de casa",
+    "plated": "Prato empratado por um chef",
+    "grill": "Espetadas a grelhar no carvão",
+    "soup": "Taça de sopa caseira",
+    "cake": "Bolo caseiro de aniversário",
+    "bowl": "Refeição saudável numa taça",
+    "salad": "Salada fresca da época",
+    "spread": "Refeição colorida vista de cima"
   }
 }

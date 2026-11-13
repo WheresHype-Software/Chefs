@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getSettings } from "@/lib/settings";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { AgreementCard } from "@/components/dashboard/AgreementCard";
@@ -7,6 +7,7 @@ import { BillingForm } from "@/components/dashboard/BillingForm";
 import { IbanCard } from "@/components/dashboard/IbanCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { CONTRACT_HIGHLIGHTS, CONTRACT_VERSION, contractText } from "@/lib/contract";
+import { CONTRACT_HIGHLIGHTS_EN, contractTextEn } from "@/lib/contract.en";
 import { getBilling, requireChef } from "@/lib/dashboard";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/dashboard/faturacao">): Promise<Metadata> {
@@ -19,6 +20,10 @@ type Step = { label: string; done: boolean; note?: string };
 
 export default async function Faturacao() {
   const t = await getTranslations("dashboard.billing");
+  // In English the chef reads the courtesy translation; what they accept (and what lib/acceptance.ts
+  // hashes on the server) is always the Portuguese contract, which prevails.
+  const english = (await getLocale()) === "en";
+  const notice = english ? (await getTranslations("legal.notice"))("body") : undefined;
   // Sem pagamentos na app não há sinal para receber nem comissão para descontar: a secção sai
   // do menu, e quem lá chegar por um link antigo volta para onde há alguma coisa para ver.
   if (!(await getSettings()).paymentsEnabled) return redirectLocalized("/dashboard");
@@ -73,10 +78,11 @@ export default async function Faturacao() {
         </div>
         <div className="flex min-w-0 flex-[2_1_340px] flex-col gap-6">
           <AgreementCard
-            text={contractText()}
+            text={english ? contractTextEn() : contractText()}
             version={CONTRACT_VERSION}
             acceptedVersion={acceptedVersion}
-            highlights={CONTRACT_HIGHLIGHTS}
+            highlights={english ? CONTRACT_HIGHLIGHTS_EN : CONTRACT_HIGHLIGHTS}
+            notice={notice}
             commissionPercent={settings.commissionPercent}
             commissionMin={settings.commissionMin}
           />

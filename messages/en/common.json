@@ -30,5 +30,16 @@
   "errors": {
     "generic": "Something went wrong. Please try again in a moment.",
     "network": "No connection. Check your internet and try again."
+  },
+  "photos": {
+    "table": "A table with several home-cooked dishes served to share",
+    "cooking": "Hands cooking in a home kitchen",
+    "plated": "A dish plated by a chef",
+    "grill": "Skewers grilling over charcoal",
+    "soup": "A bowl of home-made soup",
+    "cake": "A home-made birthday cake",
+    "bowl": "A healthy meal in a bowl",
+    "salad": "A fresh seasonal salad",
+    "spread": "A colourful meal seen from above"
   }
 }

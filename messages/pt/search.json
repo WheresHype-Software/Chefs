@@ -152,5 +152,13 @@
     "american": "Americana",
     "fusion": "Fusão",
     "barbecue": "Churrasco"
+  },
+  "diets": {
+    "vegetarian": "Vegetariano",
+    "vegan": "Vegan",
+    "glutenFree": "Sem glúten",
+    "lactoseFree": "Sem lactose",
+    "halal": "Halal",
+    "kids": "Para crianças"
   }
 }

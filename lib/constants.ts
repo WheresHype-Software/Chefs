@@ -112,6 +112,22 @@ export const POPULAR_CUISINES: readonly string[] = [
 
 export const DIETS = ["Vegetariano", "Vegan", "Sem glúten", "Sem lactose", "Halal", "Para crianças"] as const;
 
+/** Diets are stored in Portuguese (diets.name_pt); translated for display only (search.diets.<key>). */
+export const DIET_KEY = {
+  Vegetariano: "vegetarian",
+  Vegan: "vegan",
+  "Sem glúten": "glutenFree",
+  "Sem lactose": "lactoseFree",
+  Halal: "halal",
+  "Para crianças": "kids",
+} as const satisfies Record<(typeof DIETS)[number], string>;
+export type DietKey = (typeof DIET_KEY)[keyof typeof DIET_KEY];
+
+export function dietLabel(translate: (key: DietKey) => string, name: string): string {
+  const key = (DIET_KEY as Record<string, DietKey>)[name];
+  return key ? translate(key) : name;
+}
+
 /** A chef can pick up to this many cooking categories (also enforced in the database). */
 export const MAX_CATEGORIES = 5;
 

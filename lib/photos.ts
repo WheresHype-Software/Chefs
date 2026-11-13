@@ -2,7 +2,9 @@
 // Replace with real photos of Ao Lume chefs and their food before launch.
 // Every image goes through <Photo>, which falls back to an azulejo tile if a URL ever fails.
 
-export type StockPhoto = { id: string; alt: string };
+/** `key` names its description in messages (common.photos.<key>), translated by <Photo>. */
+export type StockPhoto = { id: string; key: PhotoKey };
+type PhotoKey = "table" | "cooking" | "plated" | "grill" | "soup" | "cake" | "bowl" | "salad" | "spread";
 
 const unsplash = (id: string, width: number) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=70`;
 
@@ -15,16 +17,16 @@ export function photoSrcSet(photo: StockPhoto, widths = [400, 800, 1200]): strin
 }
 
 export const PHOTOS = {
-  table: { id: "photo-1504674900247-0877df9cc836", alt: "Mesa com vários pratos caseiros servidos para partilhar" },
-  cooking: { id: "photo-1556910103-1c02745aae4d", alt: "Mãos a cozinhar numa cozinha de casa" },
-  plated: { id: "photo-1414235077428-338989a2e8c0", alt: "Prato empratado por um chef" },
-  grill: { id: "photo-1555939594-58d7cb561ad1", alt: "Espetadas a grelhar no carvão" },
-  soup: { id: "photo-1547592180-85f173990554", alt: "Taça de sopa caseira" },
-  cake: { id: "photo-1565958011703-44f9829ba187", alt: "Bolo caseiro de aniversário" },
-  bowl: { id: "photo-1512621776951-a57141f2eefd", alt: "Refeição saudável numa taça" },
-  salad: { id: "photo-1546069901-ba9599a7e63c", alt: "Salada fresca da época" },
-  spread: { id: "photo-1540189549336-e6e99c3679fe", alt: "Refeição colorida vista de cima" },
-} satisfies Record<string, StockPhoto>;
+  table: { id: "photo-1504674900247-0877df9cc836", key: "table" },
+  cooking: { id: "photo-1556910103-1c02745aae4d", key: "cooking" },
+  plated: { id: "photo-1414235077428-338989a2e8c0", key: "plated" },
+  grill: { id: "photo-1555939594-58d7cb561ad1", key: "grill" },
+  soup: { id: "photo-1547592180-85f173990554", key: "soup" },
+  cake: { id: "photo-1565958011703-44f9829ba187", key: "cake" },
+  bowl: { id: "photo-1512621776951-a57141f2eefd", key: "bowl" },
+  salad: { id: "photo-1546069901-ba9599a7e63c", key: "salad" },
+  spread: { id: "photo-1540189549336-e6e99c3679fe", key: "spread" },
+} satisfies Record<PhotoKey, StockPhoto>;
 
 /** A representative photo per service type, for service tiles and empty covers. */
 export const SERVICE_PHOTO = {

@@ -14,6 +14,8 @@ type Props = {
   version: number;
   acceptedVersion: number | null;
   highlights: readonly string[];
+  /** Shown above the text when it is a translation (the Portuguese contract is the binding one). */
+  notice?: string;
   commissionPercent: number;
   commissionMin: number;
 };
@@ -23,7 +25,7 @@ type Props = {
  * payment documents without a signature on each one, so the full text is on the page — not behind
  * a link — and the checkbox is never pre-ticked.
  */
-export function AgreementCard({ text, version, acceptedVersion, highlights, commissionPercent, commissionMin }: Props) {
+export function AgreementCard({ text, version, acceptedVersion, highlights, notice, commissionPercent, commissionMin }: Props) {
   const t = useTranslations("dashboard.billing.agreement");
   const locale = useLocale() as Locale;
   const [checked, setChecked] = useState(false);
@@ -65,6 +67,7 @@ export function AgreementCard({ text, version, acceptedVersion, highlights, comm
 
       <details className="border-t border-line pt-4">
         <summary className="lab cursor-pointer text-muted">{t("readFull")}</summary>
+        {notice && <p className="m-0 mt-3 border-l-2 border-line-2 pl-3 text-sm text-ink-3">{notice}</p>}
         <pre className="m-0 mt-3 max-h-[380px] overflow-auto whitespace-pre-wrap font-sans text-sm leading-relaxed text-ink-3">
           {reflow(text)}
         </pre>

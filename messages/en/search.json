@@ -152,5 +152,13 @@
     "american": "American",
     "fusion": "Fusion",
     "barbecue": "Barbecue"
+  },
+  "diets": {
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "glutenFree": "Gluten-free",
+    "lactoseFree": "Lactose-free",
+    "halal": "Halal",
+    "kids": "Kid-friendly"
   }
 }
