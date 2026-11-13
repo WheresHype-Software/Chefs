@@ -1,0 +1,20 @@
+{
+  "tier": { "professional": "Says they are a professional chef", "home": "Cooks at home" },
+  "title": { "chef": "Chef", "cook": "Cook", "cookFemale": "Cook" },
+  "service": { "home": "Chef at home", "delivery": "Delivery", "pickup": "Pick-up", "events": "Events", "meal_prep": "Meal prep" },
+  "mode": { "home": "At your home", "delivery": "Delivery", "pickup": "Pick-up" },
+  "status": {
+    "requested": "Request sent",
+    "accepted": "Accepted by the chef",
+    "change_proposed": "Change proposed",
+    "declined": "Declined",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "expired": "Expired"
+  },
+  "price": { "quote": "On request", "quoteShort": "quote", "from": "From {price}", "per": "{price} / {unit}" },
+  "rating": { "new": "New" },
+  "units": { "people": "People", "meals": "Meals", "units": "Units" },
+  "unit": { "pessoa": "person", "pessoas": "people", "refeição": "meal", "refeições": "meals", "pack": "pack", "unidade": "unit", "unidades": "units", "evento": "event", "dúzia": "dozen", "bolo": "cake", "kg": "kg", "caixa": "box" }
+}

@@ -1,11 +1,9 @@
 // Shared by the dashboard's server actions; not an action module itself.
 import "server-only";
-import { revalidatePath } from "next/cache";
+import { revalidateLocalized } from "@/lib/i18n/server";
 import { getMyChef, getSession } from "@/lib/dashboard";
 import { ok, type ActionResult } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
-
-export const NO_CHEF = "Crie primeiro o seu perfil de chef, em Perfil.";
 
 /** The signed-in chef (null before they create a profile) and a Supabase client, or `demo`. */
 export async function chefContext() {
@@ -17,6 +15,6 @@ export async function chefContext() {
 
 /** Success: refresh the dashboard so server components show the change. */
 export function done(path = "/dashboard"): ActionResult {
-  revalidatePath(path, "layout");
+  revalidateLocalized(path, "layout");
   return ok();
 }

@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "title": "My account"
+  },
+  "nav": {
+    "label": "Account",
+    "bookings": "My bookings",
+    "search": "Find chefs",
+    "admin": "Admin"
+  },
+  "loading": "Loading your bookings",
+  "bookings": {
+    "title": "My bookings",
+    "description": "Open a booking to see where it stands and talk to the chef.",
+    "none": "You don’t have any bookings yet.",
+    "findChef": "Find a chef",
+    "upcoming": "Upcoming",
+    "upcomingEmpty": "No bookings scheduled.",
+    "past": "Past",
+    "chefFallback": "Chef"
+  }
+}

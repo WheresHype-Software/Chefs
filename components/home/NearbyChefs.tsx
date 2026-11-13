@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { ResultsMap } from "@/components/map/ResultsMap";
 import { ChefTile } from "@/components/search/ChefTile";
@@ -12,6 +13,7 @@ type Props = { chefs: ChefCard[]; featured: ChefCard[] };
 
 /** A few chefs to start with, beside the map of everyone cooking: the home page's "who is near me". */
 export function NearbyChefs({ chefs, featured }: Props) {
+  const t = useTranslations("home.nearby");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const me = useMyLocation();
@@ -22,14 +24,12 @@ export function NearbyChefs({ chefs, featured }: Props) {
       <div className="al-rv mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
         <div className="flex flex-col gap-2">
           <h2 id="perto-title" className="d m-0 text-[clamp(28px,3.4vw,40px)] leading-[1.05]">
-            Quem cozinha perto de si
+            {t("title")}
           </h2>
-          <p className="m-0 max-w-[60ch] text-[16px] text-muted">
-            Toque num chef no mapa para ver a zona, o preço e o menu. Os chefs mostram a zona onde trabalham, nunca a morada.
-          </p>
+          <p className="m-0 max-w-[60ch] text-[16px] text-muted">{t("text")}</p>
         </div>
         <Link href="/procurar" className="text-[16px] font-semibold text-cobalt no-underline hover:underline">
-          Ver todos os chefs →
+          {t("seeAll")}
         </Link>
       </div>
 

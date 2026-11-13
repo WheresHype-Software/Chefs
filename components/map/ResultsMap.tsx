@@ -2,6 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { GeoJSONSource, Map as MLMap, Marker } from "maplibre-gl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LISBON } from "@/components/map/map-style";
 import { createGroup, createPin, groupChefs } from "@/components/map/pin";
@@ -9,6 +10,7 @@ import { ResultsMapControls } from "@/components/map/ResultsMapControls";
 import { useMapLibre } from "@/hooks/useMapLibre";
 import type { LocationStatus } from "@/hooks/useMyLocation";
 import { circleRing, type LatLng } from "@/lib/geo";
+import type { Locale } from "@/lib/i18n/routing";
 import type { ChefCard } from "@/lib/types";
 
 const AREA = "al-area";
@@ -41,6 +43,13 @@ type Props = {
 
 /** Search results on a map: a pin per chef, the selected chef's service area, and map controls. */
 export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onLocate, locating, embedded = false, children }: Props) {
+  const t = useTranslations("search.map");
+  const locale = useLocale() as Locale;
+  // Pins are DOM, built once per marker; a ref keeps the latest strings without rebuilding them.
+  const strings = useRef({ locale, groupCount: (n: number) => t("groupCount", { count: n }), groupLabel: (n: number) => t("groupLabel", { count: n }) });
+  useEffect(() => {
+    strings.current = { locale, groupCount: (n) => t("groupCount", { count: n }), groupLabel: (n) => t("groupLabel", { count: n }) };
+  });
   const frame = useRef<HTMLDivElement>(null);
   const container = useRef<HTMLDivElement>(null);
   const { map, lib, ready } = useMapLibre(container, { cooperativeGestures: embedded });
@@ -84,7 +93,7 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
         wanted.add(chef.id);
         let entry = markers.get(chef.id);
         if (!entry) {
-          const node = createPin(chef, (id) => selectRef.current(id), delay);
+          const node = createPin(chef, (id) => selectRef.current(id), strings.current.locale, delay);
           const marker = new lib_.Marker({ element: node, anchor: "bottom" }).setLngLat([chef.lng, chef.lat]).addTo(m);
           entry = { marker, node };
           markers.set(chef.id, entry);
@@ -104,6 +113,7 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
           group.forEach((c) => bounds.extend([c.lng, c.lat]));
           m.fitBounds(bounds, { padding: 120, maxZoom: Math.max(m.getZoom() + 2, 13), duration: 700 });
         },
+        { count: strings.current.groupCount(group.length), aria: strings.current.groupLabel(group.length) },
         delay,
       );
       const lng = group.reduce((a, c) => a + c.lng, 0) / group.length;
@@ -175,7 +185,7 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
     if (!origin) return;
     const dot = document.createElement("div");
     dot.className = "al-origin";
-    dot.setAttribute("aria-label", "A sua localização");
+    dot.setAttribute("aria-label", t("myLocation"));
     originPin.current = new lib.current.Marker({ element: dot }).setLngLat([origin.lng, origin.lat]).addTo(m);
     fitPoints(m, lib.current, points());
     // Only a new origin reframes; chef changes reframe in the effect above.
@@ -196,7 +206,7 @@ export function ResultsMap({ chefs, selectedId, hoveredId, onSelect, origin, onL
   return (
     <div ref={frame} className="fabric relative h-full w-full overflow-hidden bg-[#F1F0EC]">
       {/* MapLibre's stylesheet makes its container position: relative, so it is sized, not inset. */}
-      <div ref={container} className="h-full w-full" aria-label="Mapa dos chefs" role="region" />
+      <div ref={container} className="h-full w-full" aria-label={t("region")} role="region" />
       <ResultsMapControls
         onZoomIn={() => map.current?.zoomIn()}
         onZoomOut={() => map.current?.zoomOut()}

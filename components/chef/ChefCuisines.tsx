@@ -1,5 +1,8 @@
+import { useLocale, useTranslations } from "next-intl";
 import { ChefSection } from "@/components/chef/ChefSection";
-import { SERVICE_LABEL } from "@/lib/format";
+import { cuisineLabel } from "@/lib/constants";
+import { serviceLabel } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { ChefProfile } from "@/lib/types";
 
 function Group({ title, items, strong }: { title: string; items: string[]; strong?: boolean }) {
@@ -22,13 +25,18 @@ function Group({ title, items, strong }: { title: string; items: string[]; stron
 
 /** What the chef cooks and how they serve it, each as its own group of tags (room for as many as they have). */
 export function ChefCuisines({ chef }: { chef: ChefProfile }) {
+  const t = useTranslations("chef.cuisines");
+  const tc = useTranslations("search.cuisines");
+  const locale = useLocale() as Locale;
   if (!chef.categories.length && !chef.services.length) return null;
   return (
-    <ChefSection id="cozinha" icon="menu" title="O que cozinha" subtitle="Tipos de cozinha e como pode receber.">
-      {chef.categories.length > 0 && <Group title="Tipos de cozinha" items={chef.categories} strong />}
+    <ChefSection id="cozinha" icon="menu" title={t("title")} subtitle={t("subtitle")}>
+      {chef.categories.length > 0 && (
+        <Group title={t("kinds")} items={chef.categories.map((c) => cuisineLabel((k) => tc(k), c))} strong />
+      )}
       {chef.services.length > 0 && (
         <div className="border-t border-line pt-4">
-          <Group title="Serviços" items={chef.services.map((s) => SERVICE_LABEL[s])} />
+          <Group title={t("services")} items={chef.services.map((s) => serviceLabel(s, locale))} />
         </div>
       )}
     </ChefSection>

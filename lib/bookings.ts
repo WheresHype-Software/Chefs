@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { requestTranslator, revalidateLocalized } from "@/lib/i18n/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
@@ -42,12 +42,13 @@ const MessageBody = z.string().trim().min(1).max(4000);
 
 export async function postMessage(id: string, body: string): Promise<ActionResult> {
   if (isDemo(id)) return ok();
+  const t = await requestTranslator("errors");
   const input = z.object({ id: BookingId, body: MessageBody }).safeParse({ id, body });
-  if (!input.success) return fail("Mensagem inválida.");
+  if (!input.success) return fail(t("booking.invalidMessage"));
 
   const sb = await createClient();
   const view = await getBookingView(id);
-  if (!view) return fail("Reserva não encontrada.");
+  if (!view) return fail(t("booking.notFound"));
 
   if (view.viewer === "chef") {
     const { data: booking } = await sb.from("bookings").select("chef_id, client_id").eq("id", id).single();
@@ -57,25 +58,26 @@ export async function postMessage(id: string, body: string): Promise<ActionResul
       .eq("chef_id", booking?.chef_id ?? "")
       .eq("client_id", booking?.client_id ?? "")
       .single();
-    if (!conv) return fail("Conversa não encontrada.");
+    if (!conv) return fail(t("booking.conversationNotFound"));
     const { error } = await sb.from("messages").insert({ conversation_id: conv.id, sender: "chef", body: input.data.body });
-    return error ? failWith(error, "postMessage chef", "Não foi possível enviar a mensagem.") : ok();
+    return error ? failWith(error, "postMessage chef", t("booking.messageFailed")) : ok();
   }
 
   const { error } = await sb.rpc("client_post_message", { p_booking_id: id, p_body: input.data.body, p_token: await guestToken(id) });
-  return error ? failWith(error, "postMessage client", "Não foi possível enviar a mensagem.") : ok();
+  return error ? failWith(error, "postMessage client", t("booking.messageFailed")) : ok();
 }
 
 const ClientActionName = z.enum(["cancel", "accept_proposal"]);
 
 export async function clientAction(id: string, action: z.infer<typeof ClientActionName>): Promise<ActionResult> {
   if (isDemo(id)) return ok();
+  const t = await requestTranslator("errors");
   const input = z.object({ id: BookingId, action: ClientActionName }).safeParse({ id, action });
-  if (!input.success) return fail("Pedido inválido.");
+  if (!input.success) return fail(t("invalidRequest"));
   const sb = await createClient();
   const { error } = await sb.rpc("client_update_booking", { p_booking_id: id, p_action: action, p_token: await guestToken(id) });
-  revalidatePath(`/reserva/${id}`);
-  return error ? failWith(error, "clientAction", "Não foi possível concluir. Atualize a página e tente de novo.") : ok();
+  revalidateLocalized(`/reserva/${id}`);
+  return error ? failWith(error, "clientAction", t("booking.clientActionFailed")) : ok();
 }
 
 const ChefUpdateInput = z.object({
@@ -93,35 +95,36 @@ export type ChefUpdate = z.infer<typeof ChefUpdateInput> & { status: BookingStat
 
 export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise<ActionResult> {
   if (!hasSupabase) return ok();
+  const t = await requestTranslator("errors");
   const parsedId = BookingId.safeParse(id);
   // Only the workflow fields a chef may set; the database trigger enforces the transitions.
   const parsed = ChefUpdateInput.safeParse(update);
-  if (!parsedId.success || !parsed.success) return fail("Dados inválidos.");
+  if (!parsedId.success || !parsed.success) return fail(t("invalidData"));
   const sb = await createClient();
   // A request with no price ("sob orçamento") is answered with a quote, never accepted bare.
   if (parsed.data.status === "accepted" || parsed.data.status === "change_proposed") {
     const { data: booking } = await sb.from("bookings").select("estimate, quoted_price").eq("id", id).maybeSingle();
     const unpriced = booking && booking.estimate == null && booking.quoted_price == null;
-    if (unpriced && parsed.data.status === "accepted") return fail("Este pedido é sob orçamento: envie primeiro o seu orçamento.");
-    if (unpriced && parsed.data.quoted_price == null) return fail("Indique o valor do orçamento.");
+    if (unpriced && parsed.data.status === "accepted") return fail(t("booking.quoteFirst"));
+    if (unpriced && parsed.data.quoted_price == null) return fail(t("booking.quoteRequired"));
   }
   // Completion unlocks the review, so it only counts once the service day has come.
   if (parsed.data.status === "completed") {
     const { data: booking } = await sb.from("bookings").select("date").eq("id", id).maybeSingle();
-    if (booking && booking.date > lisbonToday()) return fail("Só pode marcar como concluída a partir do dia do serviço.");
+    if (booking && booking.date > lisbonToday()) return fail(t("booking.completeFromServiceDay"));
   }
   // select() returns the row, so "nothing was updated" (not this chef's booking) is caught too.
   const { data, error } = await sb.from("bookings").update(parsed.data).eq("id", id).select("id").maybeSingle();
-  revalidatePath("/dashboard", "layout");
-  if (error?.message.includes("price_required")) return fail("Este pedido é sob orçamento: envie primeiro o seu orçamento.");
+  revalidateLocalized("/dashboard", "layout");
+  if (error?.message.includes("price_required")) return fail(t("booking.quoteFirst"));
   if (error?.message.includes("quote_below_minimum")) {
-    return fail("O orçamento é demasiado baixo para o sinal cobrir a comissão mínima. Indique um valor mais alto.");
+    return fail(t("booking.quoteTooLow"));
   }
   if (error?.message.includes("invalid_transition")) {
-    return failWith(error, "chefUpdateBooking", "Este pedido já mudou de estado. Atualize a página para ver o estado atual.");
+    return failWith(error, "chefUpdateBooking", t("booking.stateChanged"));
   }
-  if (error) return failWith(error, "chefUpdateBooking", "Não foi possível atualizar a reserva. Tente de novo.");
-  if (!data) return failWith({ id }, "chefUpdateBooking no row", "Não encontrámos este pedido. Atualize a página.");
+  if (error) return failWith(error, "chefUpdateBooking", t("booking.updateFailed"));
+  if (!data) return failWith({ id }, "chefUpdateBooking no row", t("booking.requestNotFound"));
   if (parsed.data.status === "completed") await sendReviewRequest(id);
   // Accepting puts a signal on the clock: the client has to be told, or it expires unseen.
   if (parsed.data.status === "accepted") await announceDepositDue(id).catch((err) => console.error("[bookings] deposit email:", err));
@@ -137,8 +140,9 @@ const ReviewInput = z.object({
 
 export async function submitReview(id: string, review: z.infer<typeof ReviewInput>): Promise<ActionResult> {
   if (isDemo(id)) return ok();
+  const t = await requestTranslator("errors");
   const parsed = ReviewInput.safeParse(review);
-  if (!BookingId.safeParse(id).success || !parsed.success) return fail("Avaliação inválida.");
+  if (!BookingId.safeParse(id).success || !parsed.success) return fail(t("booking.invalidReview"));
   const { scores, comment, allowShowcase } = parsed.data;
   const sb = await createClient();
   const { error } = await sb.rpc("submit_review", {
@@ -153,6 +157,6 @@ export async function submitReview(id: string, review: z.infer<typeof ReviewInpu
     p_allow_showcase: allowShowcase,
     p_token: await guestToken(id),
   });
-  revalidatePath(`/reserva/${id}`);
-  return error ? failWith(error, "submitReview", "Não foi possível publicar a avaliação.") : ok();
+  revalidateLocalized(`/reserva/${id}`);
+  return error ? failWith(error, "submitReview", t("booking.reviewFailed")) : ok();
 }

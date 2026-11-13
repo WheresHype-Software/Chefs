@@ -1,10 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useState, useTransition } from "react";
 import { AddressSearch, type Place } from "@/components/AddressSearch";
 import { SERVICE_FILTERS, type ServiceFilter } from "@/lib/constants";
-import { isoDay } from "@/lib/format";
+import { isoDay, serviceLabel } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import { searchHref, type SearchQuery } from "@/lib/search-params";
 
 type Props = {
@@ -12,8 +14,6 @@ type Props = {
   /** "hero" is the large home-page bar; "compact" sits above results. */
   size?: "hero" | "compact";
 };
-
-const SERVICE_OPTIONS: [ServiceFilter, string][] = SERVICE_FILTERS.map(([key, label]) => [key, key === "all" ? "Tudo" : label]);
 
 function Cell({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
@@ -28,6 +28,8 @@ const inputClass = "w-full min-w-0 border-0 bg-transparent p-0 text-[16px] text-
 
 /** Where / what / when, then go to the results page. */
 export function SearchBar({ initial = {}, size = "hero" }: Props) {
+  const t = useTranslations("search.bar");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const [where, setWhere] = useState(initial.where ?? "");
   const [place, setPlace] = useState<Place | null>(
@@ -56,43 +58,43 @@ export function SearchBar({ initial = {}, size = "hero" }: Props) {
     <div className="@container w-full">
       <form
         role="search"
-        aria-label="Procurar chefs"
+        aria-label={t("label")}
         onSubmit={submit}
         className={`grid w-full rounded-[12px] border border-line-2 bg-white shadow-[0_10px_30px_-12px_rgb(20_32_51/0.25)] @min-[640px]:grid-cols-[1.3fr_1fr_1.1fr_auto] @min-[640px]:items-stretch ${
           hero ? "p-1.5" : "p-1"
         }`}
       >
-        <Cell label="Onde" className="border-b border-line @min-[640px]:border-b-0 @min-[640px]:border-r">
+        <Cell label={t("where")} className="border-b border-line @min-[640px]:border-b-0 @min-[640px]:border-r">
           <AddressSearch
-            label="Morada ou bairro"
+            label={t("whereLabel")}
             value={where}
             onChange={(v) => {
               setWhere(v);
               setPlace(null);
             }}
             onSelect={setPlace}
-            placeholder="Zona ou morada"
+            placeholder={t("wherePlaceholder")}
             inputClassName={inputClass}
           />
         </Cell>
-        <Cell label="O quê" className="border-b border-line @min-[640px]:border-b-0 @min-[640px]:border-r">
+        <Cell label={t("what")} className="border-b border-line @min-[640px]:border-b-0 @min-[640px]:border-r">
           <select
-            aria-label="Tipo de serviço"
+            aria-label={t("serviceLabel")}
             value={service}
             onChange={(e) => setService(e.target.value as ServiceFilter)}
             className={`${inputClass} cursor-pointer`}
           >
-            {SERVICE_OPTIONS.map(([key, label]) => (
+            {SERVICE_FILTERS.map((key) => (
               <option key={key} value={key}>
-                {label}
+                {key === "all" ? t("anything") : serviceLabel(key, locale)}
               </option>
             ))}
           </select>
         </Cell>
-        <Cell label="Quando">
+        <Cell label={t("when")}>
           <input
             type="date"
-            aria-label="Data"
+            aria-label={t("date")}
             min={today}
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -114,7 +116,7 @@ export function SearchBar({ initial = {}, size = "hero" }: Props) {
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-4-4" />
             </svg>
-            {pending ? "A procurar…" : "Procurar"}
+            {pending ? t("submitting") : t("submit")}
           </button>
         </div>
       </form>

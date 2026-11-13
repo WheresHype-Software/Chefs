@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { revealDelay } from "@/lib/motion";
 
 /*
@@ -6,34 +7,20 @@ import { revealDelay } from "@/lib/motion";
  * pedido à espera de um botão que não existe, e a primeira coisa que aprende sobre nós é que
  * dizemos coisas que não são verdade.
  */
-const steps = (paymentsOn: boolean): [string, string][] => [
-  ["Encontre quem cozinha perto", "Pesquise pela sua zona ou explore o mapa, e veja menus, preços e avaliações de quem já reservou."],
-  ["Peça a reserva", "Escolha o dia livre e diga o que precisa. Não precisa de criar conta e ainda não paga nada."],
-  paymentsOn
-    ? [
-        "Pague o sinal e está feito",
-        "Quando o chef aceita, paga aqui o sinal por MB WAY ou Multibanco e a reserva fica confirmada. O resto combina com o chef, no dia.",
-      ]
-    : [
-        "Combine com o chef e está feito",
-        "Quando o chef aceita, falam pelo pedido e combinam o sinal e o pagamento entre os dois. A reserva fica confirmada assim que o chef o confirmar.",
-      ],
-];
+const steps = (paymentsOn: boolean) => ["find", "request", paymentsOn ? "payDeposit" : "agree"] as const;
 
 /** Three steps on a cobalt band; the numbers carry the order. */
 export function HowItWorks({ paymentsOn = false }: { paymentsOn?: boolean }) {
-  const STEPS = steps(paymentsOn);
+  const t = useTranslations("home.howItWorks");
+  const STEPS = steps(paymentsOn).map((key) => [t(`steps.${key}.title`), t(`steps.${key}.text`)] as const);
   return (
     <section id="como" aria-labelledby="como-title" className="scroll-mt-16 bg-cobalt text-white">
       <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-20 md:px-8 md:py-24 lg:grid-cols-[1fr_2fr]">
         <div className="al-rv flex flex-col gap-4">
           <h2 id="como-title" className="d m-0 text-[clamp(30px,3.6vw,44px)] leading-[1.02] text-white">
-            Como funciona
+            {t("title")}
           </h2>
-          <p className="m-0 max-w-[34ch] text-[17px] text-[#d6e1f5]">
-            O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço;{" "}
-            {paymentsOn ? "o sinal é pago aqui e o resto diretamente ao chef" : "o pagamento é combinado diretamente com o chef"}.
-          </p>
+          <p className="m-0 max-w-[34ch] text-[17px] text-[#d6e1f5]">{paymentsOn ? t("introPaymentsOn") : t("introPaymentsOff")}</p>
         </div>
         <ol className="m-0 grid list-none gap-8 p-0 md:grid-cols-3 md:gap-6">
           {STEPS.map(([title, text], i) => (

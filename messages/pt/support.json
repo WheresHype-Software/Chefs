@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Apoio",
+    "description": "Fale connosco sobre uma reserva, um pagamento ou a sua conta no Ao Lume."
+  },
+  "page": {
+    "title": "Como podemos ajudar?",
+    "lead": "Escreva-nos e respondemos normalmente no mesmo dia útil. Se for sobre uma reserva, indique o número do pedido: poupa-nos uma troca de emails."
+  },
+  "paymentsFaq": {
+    "title": "Perguntas frequentes sobre pagamentos",
+    "whenDeposit": {
+      "q": "Quando pago o sinal?",
+      "a": "Só depois de o chef aceitar o seu pedido. Recebe um email com o valor e o prazo, e paga na página da reserva por MB WAY ou por referência Multibanco."
+    },
+    "rest": {
+      "q": "E o resto do valor?",
+      "a": "É combinado e pago diretamente ao chef. O Ao Lume só recebe o sinal, e só para garantir a reserva."
+    },
+    "refund": {
+      "q": "O chef cancelou. Recebo o dinheiro de volta?",
+      "a": "Sim, o sinal é devolvido por inteiro. Se pagou por MB WAY ou cartão, volta pelo mesmo caminho; se pagou por referência Multibanco, pedimos-lhe o IBAN na página da sua reserva. Nunca por email nem por telefone."
+    },
+    "howToPay": {
+      "q": "Quando e como pago?",
+      "a": "Só depois de o chef aceitar o seu pedido. O pagamento, incluindo qualquer sinal, é combinado diretamente entre si e o chef, pelos meios que ele aceitar. O Ao Lume não cobra nada ao cliente."
+    },
+    "chefCancelled": {
+      "q": "O chef cancelou. E o que já lhe paguei?",
+      "a": "Fale com ele pela página da reserva, onde fica registo da conversa. Se não chegarem a acordo, escreva-nos: ajudamos a resolver e isso conta para a conta dele no Ao Lume."
+    },
+    "ibanScam": {
+      "q": "Alguém me pediu o IBAN por mensagem. É do Ao Lume?",
+      "a": "Não. Só lhe pedimos dados bancários dentro da página da sua reserva, com a sessão aberta. Se receber um pedido por email, SMS ou telefone, não responda e avise-nos em <mail>{email}</mail>."
+    }
+  },
+  "contacts": {
+    "title": "Outras formas de falar connosco",
+    "support": { "label": "Apoio", "what": "reservas, pagamentos, a sua conta" },
+    "privacy": { "label": "Privacidade", "what": "aceder, corrigir ou apagar os seus dados" },
+    "legal": { "label": "Jurídico", "what": "termos, conteúdos, moderação" },
+    "company": "{name}, NIF {nif} · {address}",
+    "more": "Pode também usar o <book>Livro de Reclamações</book>, ou ler os nossos <terms>termos</terms> e a <privacy>política de privacidade</privacy>."
+  },
+  "form": {
+    "categories": {
+      "reserva": "Uma reserva",
+      "pagamento": "Um pagamento",
+      "conta": "A minha conta",
+      "chef": "Sou chef",
+      "outro": "Outro assunto"
+    },
+    "name": "O seu nome",
+    "email": "Email",
+    "emailHint": "É para aqui que respondemos.",
+    "phone": "Telemóvel",
+    "phoneHint": "Opcional, se preferir que liguemos.",
+    "category": "Sobre o quê",
+    "bookingRef": "Número do pedido",
+    "bookingRefHint": "Começa por AL- e está no email que recebeu. Ajuda-nos a responder mais depressa.",
+    "subject": "Assunto",
+    "body": "A sua mensagem",
+    "submit": "Enviar mensagem",
+    "sentTitle": "Mensagem enviada",
+    "sentText": "A sua referência é <b>{ref}</b>. Enviámos-lhe uma cópia por email e respondemos normalmente no mesmo dia útil.",
+    "writeAnother": "Escrever outra mensagem"
+  },
+  "errorPage": {
+    "documentTitle": "Algo correu mal · Ao Lume",
+    "title": "Algo correu mal.",
+    "text": "Não conseguimos mostrar esta página agora. Tente de novo dentro de momentos; se continuar, volte mais tarde.",
+    "backHome": "Voltar ao início",
+    "reference": "Referência: {digest}"
+  },
+  "notFound": {
+    "title": "Esta página não está no menu.",
+    "backHome": "Voltar ao início"
+  }
+}

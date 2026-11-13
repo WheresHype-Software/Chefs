@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateLocalized } from "@/lib/i18n/server";
 import { z } from "zod";
 import { getSession } from "@/lib/dashboard";
 import { sendEmail } from "@/lib/email";
@@ -43,7 +43,7 @@ export async function replyToTicket(input: z.infer<typeof Reply>): Promise<Actio
     (err) => console.error("[support] reply email:", err),
   );
 
-  revalidatePath("/admin/apoio");
+  revalidateLocalized("/admin/apoio");
   return ok();
 }
 
@@ -53,6 +53,6 @@ export async function setTicketStatus(ticketId: string, status: "open" | "answer
   if (!z.string().uuid().safeParse(ticketId).success) return fail("Mensagem inválida.");
   const { error } = await sb.rpc("set_ticket_status", { p_ticket: ticketId, p_status: status });
   if (error) return failWith(error, "setTicketStatus", "Não foi possível alterar o estado.");
-  revalidatePath("/admin/apoio");
+  revalidateLocalized("/admin/apoio");
   return ok();
 }

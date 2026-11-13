@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -13,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
  */
 export function NewPasswordForm({ next }: { next: string }) {
   const router = useRouter();
+  const t = useTranslations("auth.newPassword");
   const [password, setPassword] = useState("");
   const [again, setAgain] = useState("");
   const [busy, setBusy] = useState(false);
@@ -25,7 +27,7 @@ export function NewPasswordForm({ next }: { next: string }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (password !== again) {
-      setError("As palavras-passe não coincidem.");
+      setError(t("errors.mismatch"));
       return;
     }
     setBusy(true);
@@ -39,21 +41,21 @@ export function NewPasswordForm({ next }: { next: string }) {
     } catch (err) {
       console.error("[auth] updateUser:", err);
       const raw = err instanceof Error ? err.message : "";
-      if (/should be at least|weak|short/i.test(raw)) setError("A palavra-passe precisa de pelo menos 8 caracteres.");
-      else if (/same.*password|different from the old/i.test(raw)) setError("Escolha uma palavra-passe diferente da anterior.");
-      else if (/session|jwt|expired|not authenticated/i.test(raw)) setError("A ligação expirou. Peça uma nova no ecrã de entrada.");
-      else setError("Não foi possível guardar a palavra-passe. Tente de novo.");
+      if (/should be at least|weak|short/i.test(raw)) setError(t("errors.tooShort"));
+      else if (/same.*password|different from the old/i.test(raw)) setError(t("errors.samePassword"));
+      else if (/session|jwt|expired|not authenticated/i.test(raw)) setError(t("errors.expired"));
+      else setError(t("errors.generic"));
     } finally {
       setBusy(false);
     }
   }
 
-  if (done) return <p className="m-0 text-ok">Palavra-passe alterada. A entrar…</p>;
+  if (done) return <p className="m-0 text-ok">{t("done")}</p>;
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <label className="field lab">
-        Nova palavra-passe
+        {t("password")}
         <input
           required
           type="password"
@@ -62,10 +64,10 @@ export function NewPasswordForm({ next }: { next: string }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <span className={`hint ${tooShort ? "text-danger" : ""}`}>Pelo menos 8 caracteres.</span>
+        <span className={`hint ${tooShort ? "text-danger" : ""}`}>{t("passwordHint")}</span>
       </label>
       <label className="field lab">
-        Repita a palavra-passe
+        {t("again")}
         <input
           required
           type="password"
@@ -74,10 +76,10 @@ export function NewPasswordForm({ next }: { next: string }) {
           value={again}
           onChange={(e) => setAgain(e.target.value)}
         />
-        {mismatch && <span className="hint text-danger">Não coincide com a de cima.</span>}
+        {mismatch && <span className="hint text-danger">{t("mismatchHint")}</span>}
       </label>
       <button type="submit" className="btn" disabled={busy || password.length < 8 || password !== again}>
-        {busy ? "A guardar…" : "Guardar e entrar"}
+        {busy ? t("saving") : t("submit")}
       </button>
       {error && (
         <p role="alert" className="m-0 text-sm text-danger">

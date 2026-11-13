@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateLocalized } from "@/lib/i18n/server";
 import { BADGES } from "@/lib/constants";
 import { getSession } from "@/lib/dashboard";
 import { sendEmail, siteUrl } from "@/lib/email";
@@ -95,7 +95,7 @@ export async function reviewChef(chefId: string, decision: Decision, note: strin
   } catch (err) {
     console.error("[action] reviewChef email:", err);
   }
-  // No revalidatePath("/admin"): re-rendering would drop the card before DecisionCard folds it into
+  // No revalidateLocalized("/admin"): re-rendering would drop the card before DecisionCard folds it into
   // its confirmation. The queue and stats catch up on the next visit.
   return ok();
 }
@@ -143,7 +143,7 @@ export async function setChefVisibility(chefId: string, hidden: boolean, note: s
     console.error("[action] setChefVisibility email:", err);
   }
 
-  revalidatePath("/admin");
+  revalidateLocalized("/admin");
   return ok();
 }
 
@@ -167,7 +167,7 @@ export async function moderateReview(reviewId: string, reportId: string, action:
     data: { user },
   } = await sb.auth.getUser();
   await sb.from("admin_logs").insert({ admin_id: user?.id, action: `review_${action}`, target: reviewId });
-  revalidatePath("/admin");
+  revalidateLocalized("/admin");
   return ok();
 }
 
@@ -223,7 +223,7 @@ export async function approveChefs(chefIds: string[]): Promise<ActionResult> {
     const r = await reviewChef(id, "approved", "", ["identity", "portfolio"]);
     if (r.ok) approved++;
   }
-  revalidatePath("/admin");
+  revalidateLocalized("/admin");
   return approved === ids.data.length ? ok() : fail(`Aprovados ${approved} de ${ids.data.length}. Atualize a página e veja os restantes.`);
 }
 
@@ -257,8 +257,8 @@ export async function setChefBadges(chefId: string, badges: string[]): Promise<A
   if (input.data.badges.includes("certified") && !(chef.badges as string[]).includes("certified")) {
     await sb.from("chef_certifications").update({ verified: true }).eq("chef_id", chefId);
   }
-  revalidatePath(`/chef/${chef.slug}`);
-  revalidatePath("/admin/chefs");
+  revalidateLocalized(`/chef/${chef.slug}`);
+  revalidateLocalized("/admin/chefs");
   return ok();
 }
 
@@ -344,6 +344,6 @@ export async function makeChef(email: string): Promise<ActionResult> {
   } catch (err) {
     console.error("[action] makeChef email:", err);
   }
-  revalidatePath("/admin/chefs");
+  revalidateLocalized("/admin/chefs");
   return ok();
 }

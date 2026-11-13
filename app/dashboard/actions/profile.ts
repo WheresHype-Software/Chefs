@@ -3,8 +3,11 @@
 import { z } from "zod";
 import { myAcceptance } from "@/lib/acceptance";
 import { announceChefForReview } from "@/lib/notify/discord";
+import { getLocale } from "next-intl/server";
 import { getSession } from "@/lib/dashboard";
 import { notifyAdmin } from "@/lib/email";
+import { requestTranslator } from "@/lib/i18n/server";
+import type { Locale } from "@/lib/i18n/routing";
 import { TIER_LABEL } from "@/lib/format";
 import { instagramHandle } from "@/lib/instagram";
 import { LANGUAGES } from "@/lib/languages";
@@ -12,7 +15,7 @@ import { requiredDepositPercent } from "@/lib/money";
 import { getSettings, moneyRules } from "@/lib/settings";
 import { fail, failInvalid, failWith, ok, type ActionResult as Result } from "@/lib/result";
 import { createClient } from "@/lib/supabase/server";
-import { chefContext, done, NO_CHEF } from "./context";
+import { chefContext, done } from "./context";
 
 const ProfileInput = z.object({
   display_name: z.string().trim().min(2).max(80),
@@ -20,7 +23,7 @@ const ProfileInput = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Use letras, números e hífenes"),
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
   tier: z.enum(["professional", "home"]),
   cook_form: z.enum(["cozinheiro", "cozinheira"]),
   headline: z.string().trim().max(80).optional(),
@@ -40,22 +43,26 @@ const ProfileInput = z.object({
     .optional(),
 });
 
-const PROFILE_LABELS: Record<string, string> = {
-  display_name: "Nome público",
-  slug: "O link só pode ter letras, números e hífenes.",
-  headline: "Frase de apresentação",
-  bio: "Sobre si",
-  area_name: "Zona de base",
-  service_radius_km: "Raio de serviço",
-  instagram: "Instagram",
-  website: "Site",
-  years_experience: "Anos de experiência",
-  deposit_percent: "Sinal pedido",
-};
-
 export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<Result> {
+  const locale = (await getLocale()) as Locale;
+  const t = await requestTranslator("errors");
   const parsed = ProfileInput.safeParse(input);
-  if (!parsed.success) return failInvalid(parsed.error, PROFILE_LABELS);
+  if (!parsed.success) {
+    const fields = [
+      "display_name",
+      "slug",
+      "headline",
+      "bio",
+      "area_name",
+      "service_radius_km",
+      "instagram",
+      "website",
+      "years_experience",
+      "deposit_percent",
+    ] as const;
+    const labels = Object.fromEntries(fields.map((f) => [f, t(`dashboard.profile.fields.${f}`)]));
+    return failInvalid(parsed.error, t, labels);
+  }
   const ctx = await chefContext();
   if (ctx.demo) return ok();
   const p = parsed.data;
@@ -66,19 +73,17 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
   if (settings.paymentsEnabled && (p.deposit_percent ?? 0) > 0) {
     const min = requiredDepositPercent(moneyRules(settings));
     if (p.deposit_percent! < min) {
-      return fail(
-        `O sinal tem de ser pelo menos ${min}%: é o que cobre a nossa comissão de ${String(settings.commissionPercent).replace(".", ",")}% e ainda te deixa receber alguma coisa.`,
-      );
+      const commission = locale === "pt" ? String(settings.commissionPercent).replace(".", ",") : String(settings.commissionPercent);
+      return fail(t("dashboard.profile.depositMin", { min, commission }));
     }
   }
   // Stored as the bare username, whatever form it was typed in, so every link built from it works.
   const instagram = p.instagram ? instagramHandle(p.instagram) : null;
   if (p.instagram && !instagram) {
-    return fail("Instagram: escreva só o nome de utilizador, por exemplo @o.seu.perfil, ou cole o link do perfil.");
+    return fail(t("dashboard.profile.instagram"));
   }
   const session = await getSession();
-  if (!ctx.chef && session.role === "client")
-    return fail("Esta é uma conta de cliente. Para ter um perfil de chef, crie uma conta de chef.");
+  if (!ctx.chef && session.role === "client") return fail(t("dashboard.profile.clientAccount"));
   const row = {
     display_name: p.display_name,
     slug: p.slug,
@@ -104,8 +109,8 @@ export async function saveProfile(input: z.infer<typeof ProfileInput>): Promise<
     ({ error } = await write({ ...row, cook_form: undefined }));
   }
   if (error) {
-    if (error.code === "23505") return fail("Esse link já está a ser usado. Escolha outro.");
-    return failWith(error, "saveProfile", "Não foi possível guardar o perfil. Tente de novo.");
+    if (error.code === "23505") return fail(t("dashboard.profile.slugTaken"));
+    return failWith(error, "saveProfile", t("dashboard.profile.saveFailed"));
   }
   if (!ctx.chef) {
     // New chef: default policy and logistics rows.
@@ -127,9 +132,10 @@ async function getMyChefFresh(): Promise<string | null> {
 }
 
 export async function submitForReview(): Promise<Result> {
+  const t = await requestTranslator("errors");
   const ctx = await chefContext();
   if (ctx.demo) return ok();
-  if (!ctx.chef) return fail(NO_CHEF);
+  if (!ctx.chef) return fail(t("dashboard.noChef"));
   const { count } = await ctx.sb
     .from("chef_photos")
     .select("id", { count: "exact", head: true })
@@ -137,17 +143,17 @@ export async function submitForReview(): Promise<Result> {
     .eq("kind", "gallery");
   // A public profile photo, and a private selfie the team compares it with.
   const { data: faces } = await ctx.sb.from("chef_photos").select("kind").eq("chef_id", ctx.chef.id).in("kind", ["portrait", "selfie"]);
-  if (!faces?.some((f) => f.kind === "portrait")) return fail("Falta a fotografia de perfil.");
-  if (!faces.some((f) => f.kind === "selfie")) return fail("Falta a selfie de verificação, em Fotografias.");
-  if ((count ?? 0) < 3) return fail("Carregue pelo menos três fotos de pratos.");
-  if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail("Indique o Instagram ou o site.");
+  if (!faces?.some((f) => f.kind === "portrait")) return fail(t("dashboard.profile.noPortrait"));
+  if (!faces.some((f) => f.kind === "selfie")) return fail(t("dashboard.profile.noSelfie"));
+  if ((count ?? 0) < 3) return fail(t("dashboard.profile.needDishes"));
+  if (!ctx.chef.socials.instagram && !ctx.chef.socials.website) return fail(t("dashboard.profile.needLink"));
   // Nothing goes public before the chef has accepted the terms and the contract that hold them
   // responsible for their own service.
   const { userId } = await getSession();
   const legal = userId ? await myAcceptance(userId) : { terms: false, contract: false };
-  if (!legal.terms || !legal.contract) return fail("Aceite os termos e o contrato antes de enviar para revisão.");
+  if (!legal.terms || !legal.contract) return fail(t("dashboard.profile.acceptFirst"));
   const { error } = await ctx.sb.from("chefs").update({ status: "pending" }).eq("id", ctx.chef.id);
-  if (error) return failWith(error, "submitForReview", "Não foi possível enviar para revisão. Tente de novo.");
+  if (error) return failWith(error, "submitForReview", t("dashboard.profile.submitFailed"));
 
   const chef = ctx.chef;
   // O email chega à caixa de quem o lê quando o abre; o Discord chega ao telemóvel de quem estiver

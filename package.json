@@ -16,13 +16,15 @@
     "test:e2e:ui": "playwright test --ui",
     "check:sql": "node scripts/check-sql.mjs \"supabase/migrations/*.sql\"",
     "check:rpc": "node scripts/check-rpc.mjs",
-    "check": "npm run check:sql && npm run check:rpc && npm run typecheck && npm run lint"
+    "check": "npm run check:sql && npm run check:rpc && npm run check:i18n && npm run typecheck && npm run lint",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "maplibre-gl": "^6.16.0",
     "next": "16.4.3",
+    "next-intl": "4.14.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { ChefHat } from "@/components/brand/ChefHat";
 
@@ -57,21 +58,22 @@ function Option({ onPick, dark, icon, title, text }: { onPick: () => void; dark?
  * accounts from the general sign-in page and got stuck with that email; asking first stops it.
  */
 export function RoleChoice({ onPick }: { onPick: (role: Role) => void }) {
+  const t = useTranslations("auth.roleChoice");
   return (
     <div className="flex flex-col gap-3">
-      <p className="m-0 text-[17px] font-semibold">Como vai usar o Ao Lume?</p>
+      <p className="m-0 text-[17px] font-semibold">{t("question")}</p>
       <Option
         onPick={() => onPick("client")}
         icon={<Plate />}
-        title="Quero reservar"
-        text="Encontrar chefs e cozinheiros, e pedir jantares, marmitas ou bolos."
+        title={t("client.title")}
+        text={t("client.text")}
       />
       <Option
         dark
         onPick={() => onPick("chef")}
         icon={<ChefHat size={30} />}
-        title="Quero cozinhar"
-        text="Criar a minha página de chef e receber pedidos de clientes."
+        title={t("chef.title")}
+        text={t("chef.text")}
       />
     </div>
   );

@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "title": "A minha conta"
+  },
+  "nav": {
+    "label": "Conta",
+    "bookings": "As minhas reservas",
+    "search": "Procurar chefs",
+    "admin": "Administração"
+  },
+  "loading": "A carregar as suas reservas",
+  "bookings": {
+    "title": "As minhas reservas",
+    "description": "Abra uma reserva para ver o estado e falar com o chef.",
+    "none": "Ainda não tem reservas.",
+    "findChef": "Encontrar um chef",
+    "upcoming": "Próximas",
+    "upcomingEmpty": "Sem reservas marcadas.",
+    "past": "Anteriores",
+    "chefFallback": "Chef"
+  }
+}

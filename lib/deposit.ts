@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { requestTranslator, revalidateLocalized } from "@/lib/i18n/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
@@ -81,6 +81,7 @@ export type StartResult = { ok: true; state: PaymentState } | { ok: false; error
  * waiting for their approval, or an entity and reference.
  */
 export async function startDepositPayment(id: string, method: PaymentMethod, phone?: string): Promise<StartResult> {
+  const t = await requestTranslator("errors");
   const parsed = z.object({ id: BookingId, method: Method }).safeParse({ id, method });
   if (isDemo(id)) {
     return {
@@ -103,20 +104,20 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
       },
     };
   }
-  if (!parsed.success) return { ok: false, error: "Pedido inválido." };
+  if (!parsed.success) return { ok: false, error: t("invalidRequest") };
 
   // One person, one booking: a handful of attempts an hour is generous and stops a loop.
   const limit = rateLimit(`deposit:${id}:${callerIp(await headers())}`, 10, 3600);
-  if (!limit.allowed) return { ok: false, error: "Demasiadas tentativas. Aguarde alguns minutos e tente de novo." };
+  if (!limit.allowed) return { ok: false, error: t("deposit.tooManyAttempts") };
 
   if (method === "card" && !cardPaymentsPossible) {
-    return { ok: false, error: "O pagamento com cartão só funciona no site publicado. Use MB WAY ou referência Multibanco." };
+    return { ok: false, error: t("deposit.cardOnlyLive") };
   }
 
   let normalisedPhone: string | null = null;
   if (method === "mbway") {
     normalisedPhone = normalisePhone(phone ?? "");
-    if (!normalisedPhone) return { ok: false, error: "Indique um número de telemóvel português associado ao MB WAY." };
+    if (!normalisedPhone) return { ok: false, error: t("deposit.mbwayPhone") };
   }
 
   const sb = await createClient();
@@ -129,25 +130,25 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
   });
   if (error) {
     const known: Record<string, string> = {
-      not_allowed: "Não conseguimos abrir este pedido aqui.",
-      booking_not_awaiting_payment: "Esta reserva já não está à espera do sinal. Atualize a página.",
-      deposit_not_due: "Esta reserva já não está à espera do sinal. Atualize a página.",
-      nothing_to_pay: "Esta reserva não tem sinal a pagar.",
+      not_allowed: t("deposit.notAllowed"),
+      booking_not_awaiting_payment: t("deposit.notAwaiting"),
+      deposit_not_due: t("deposit.notAwaiting"),
+      nothing_to_pay: t("deposit.nothingToPay"),
     };
     const key = Object.keys(known).find((k) => error.message.includes(k));
-    return { ok: false, error: key ? known[key]! : "Não foi possível iniciar o pagamento. Tente de novo." };
+    return { ok: false, error: key ? known[key]! : t("deposit.startFailed") };
   }
 
   // From here the provider is involved, which needs to bypass RLS: the guest has no session.
   const admin = createAdminClient();
-  if (!admin) return { ok: false, error: "Os pagamentos ainda não estão disponíveis. Tente mais tarde." };
+  if (!admin) return { ok: false, error: t("deposit.unavailable") };
 
   const { data: payment } = await admin
     .from("payments")
     .select("id, amount, booking_id, bookings(ref, deposit_due_at, clients(email, name))")
     .eq("id", paymentId as string)
     .maybeSingle();
-  if (!payment) return { ok: false, error: "Não foi possível iniciar o pagamento. Tente de novo." };
+  if (!payment) return { ok: false, error: t("deposit.startFailed") };
 
   const row = payment as unknown as {
     id: string;
@@ -182,7 +183,9 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
   if (!created.ok) {
     // Only the server may decide a payment failed, so this goes through the secret-key client.
     await admin.rpc("mark_payment_unpaid", { p_payment: row.id, p_status: "failed" });
-    return { ok: false, error: created.error };
+    // The provider's own message (created.error) is Portuguese and for the log; the visitor gets
+    // the same thing in their language.
+    return { ok: false, error: t("deposit.providerFailed") };
   }
 
   const { error: updateError } = await admin
@@ -198,7 +201,7 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
       expires_at: created.data.expiresAt,
     })
     .eq("id", row.id);
-  if (updateError) return failWith(updateError, "startDepositPayment update", "Não foi possível iniciar o pagamento.") as StartResult;
+  if (updateError) return failWith(updateError, "startDepositPayment update", t("deposit.startFailedShort")) as StartResult;
 
   if (method === "multibanco") {
     await announceReference({
@@ -210,24 +213,25 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
     }).catch((err) => console.error("[deposit] reference email:", err));
   }
 
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   const state = await getPaymentState(id);
-  return state ? { ok: true, state } : { ok: false, error: "Não foi possível iniciar o pagamento. Tente de novo." };
+  return state ? { ok: true, state } : { ok: false, error: t("deposit.startFailed") };
 }
 
 /** Gives up on the current attempt so the client can choose another way to pay. */
 export async function cancelDepositPayment(id: string): Promise<ActionResult> {
   if (isDemo(id)) return { ok: true };
-  if (!BookingId.safeParse(id).success) return fail("Pedido inválido.");
+  const t = await requestTranslator("errors");
+  if (!BookingId.safeParse(id).success) return fail(t("invalidRequest"));
   // getPaymentState is the authorisation: it only answers for a booking this caller can open.
   const state = await getPaymentState(id);
   if (!state?.payment) return { ok: true };
-  if (state.payment.status === "paid") return fail("Este pagamento já foi feito.");
+  if (state.payment.status === "paid") return fail(t("deposit.alreadyPaid"));
   const admin = createAdminClient();
-  if (!admin) return fail("Não foi possível cancelar. Atualize a página.");
+  if (!admin) return fail(t("deposit.cancelFailed"));
   const { error } = await admin.rpc("mark_payment_unpaid", { p_payment: state.payment.id, p_status: "failed" });
-  revalidatePath(`/reserva/${id}`);
-  return error ? failWith(error, "cancelDepositPayment", "Não foi possível cancelar. Atualize a página.") : { ok: true };
+  revalidateLocalized(`/reserva/${id}`);
+  return error ? failWith(error, "cancelDepositPayment", t("deposit.cancelFailed")) : { ok: true };
 }
 
 export type PendingRefund = { id: string; amount: number; reason: string };
@@ -256,12 +260,13 @@ const RefundIbanInput = z.object({
 /** The client's account, encrypted before it is stored and erased once the transfer is made. */
 export async function submitRefundIban(id: string, input: z.infer<typeof RefundIbanInput>): Promise<ActionResult> {
   if (isDemo(id)) return { ok: true };
+  const t = await requestTranslator("errors");
   const parsed = RefundIbanInput.safeParse(input);
-  if (!BookingId.safeParse(id).success || !parsed.success) return fail("Dados inválidos.");
+  if (!BookingId.safeParse(id).success || !parsed.success) return fail(t("invalidData"));
 
   const iban = normaliseIban(parsed.data.iban);
-  if (!isValidIban(iban)) return fail("Esse IBAN não é válido. Confirme os dígitos com o seu banco.");
-  if (!canEncrypt()) return fail("Não conseguimos registar os dados agora. Tente mais tarde.");
+  if (!isValidIban(iban)) return fail(t("invalidIban"));
+  if (!canEncrypt()) return fail(t("deposit.cannotStore"));
 
   const sb = await createClient();
   const { error } = await sb.rpc("submit_refund_iban", {
@@ -273,10 +278,10 @@ export async function submitRefundIban(id: string, input: z.infer<typeof RefundI
     p_token: await guestToken(id),
   });
   if (error) {
-    if (error.message.includes("not_waiting_for_iban")) return fail("Esta devolução já está a ser tratada.");
-    return failWith(error, "submitRefundIban", "Não foi possível guardar os dados. Tente de novo.");
+    if (error.message.includes("not_waiting_for_iban")) return fail(t("deposit.refundInProgress"));
+    return failWith(error, "submitRefundIban", t("deposit.saveFailed"));
   }
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   return { ok: true };
 }
 

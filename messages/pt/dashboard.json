@@ -1,0 +1,909 @@
+{
+  "meta": {
+    "title": "Painel",
+    "confirmIban": "Confirmar IBAN",
+    "payments": "Pagamentos",
+    "billing": "Faturação e pagamentos"
+  },
+  "client": "Cliente",
+  "nav": {
+    "overview": "Visão geral",
+    "requests": "Pedidos",
+    "logistics": "Logística",
+    "availability": "Disponibilidade",
+    "offers": "Ofertas",
+    "reviews": "Avaliações",
+    "payments": "Pagamentos",
+    "billing": "Faturação",
+    "profile": "Perfil"
+  },
+  "weekdays": {
+    "mon": "Seg",
+    "tue": "Ter",
+    "wed": "Qua",
+    "thu": "Qui",
+    "fri": "Sex",
+    "sat": "Sáb",
+    "sun": "Dom"
+  },
+  "layout": {
+    "homeLabel": "Ao Lume, página inicial",
+    "navLabel": "Painel",
+    "publicProfile": "Ver perfil público",
+    "publicProfileLink": "Ver perfil público →",
+    "admin": "Administração",
+    "adminLink": "Administração →",
+    "roleAdmin": "Admin",
+    "roleChef": "Chef",
+    "status": "Perfil {status, select, pending {em revisão} other {ainda não publicado}}",
+    "demo": "Modo de demonstração: dados de exemplo, nada é guardado.",
+    "loading": "A carregar",
+    "backToDashboard": "Voltar ao painel"
+  },
+  "home": {
+    "contractTitle": "Há uma nova versão do contrato",
+    "termsTitle": "Os termos foram atualizados",
+    "contractIntro": "Leia e aceite para continuar a usar o Ao Lume. O contrato diz, entre outras coisas, que o serviço, a segurança alimentar e as licenças são da sua responsabilidade, e que esta aceitação vale como a sua assinatura.",
+    "termsIntro": "Leia os termos atualizados e aceite para continuar a usar o Ao Lume.",
+    "hello": "Olá, {name}",
+    "stats": {
+      "toAnswer": "Pedidos por responder",
+      "thisWeek": "Serviços esta semana",
+      "deliveries": "Entregas",
+      "rating": "Avaliação"
+    },
+    "money": {
+      "title": "Dinheiro",
+      "seePayments": "Ver pagamentos",
+      "owedByUs": "A receber de nós",
+      "clientsOwe": "Clientes devem-te",
+      "paidByUs": "Recebido de nós este ano",
+      "paidByClients": "Recebido dos clientes este ano",
+      "awaitingDeposit": "{count, plural, =1 {# reserva à espera} other {# reservas à espera}} do sinal.",
+      "restToConfirm": "{count, plural, =1 {# reserva por confirmar} other {# reservas por confirmar}} se o cliente já te pagou o resto."
+    },
+    "newRequests": "Novos pedidos",
+    "seeAll": "Ver todos →",
+    "reply": "Responder",
+    "busiest": "{day} é o seu dia mais cheio",
+    "busiestServices": "{count, plural, =1 {# serviço} other {# serviços}}: {list}",
+    "seeDayLogistics": "Ver logística do dia"
+  },
+  "onboarding": {
+    "steps": {
+      "profile": "Criar perfil",
+      "verification": "Verificação",
+      "review": "Enviar para revisão"
+    },
+    "stepsLabel": "Passos",
+    "items": {
+      "terms": "Termos e contrato aceites",
+      "social": "Instagram ou site",
+      "portrait": "Fotografia de perfil",
+      "selfie": "Selfie de verificação",
+      "dishes": "Fotos de pratos ({count}/3)"
+    },
+    "titleRejected": "Reveja o seu perfil",
+    "title": "Crie o seu perfil de chef",
+    "description": "Três passos, uns dez minutos. Pode parar quando quiser: o que guardar fica guardado e volta aqui quando entrar.",
+    "photosReady": "Fotografias prontas.",
+    "missing": "Falta: {items}.",
+    "missingPortrait": "fotografia de perfil",
+    "missingSelfie": "selfie de verificação",
+    "missingDishes": "{count, plural, =1 {# foto de prato} other {# fotos de pratos}}",
+    "continue": "Continuar",
+    "legalIntro": "Antes de o perfil seguir para revisão, precisamos da sua aceitação. O contrato diz, entre outras coisas, que o serviço, a segurança alimentar e as licenças são da sua responsabilidade."
+  },
+  "offers": {
+    "title": "Menus, caixas e encomendas",
+    "description": "Preço fixo, por pessoa ou sob orçamento. Cada oferta diz onde é servida: em casa do cliente, entrega ou levantamento.",
+    "inactive": "inativa",
+    "meta": "{min}–{max} · reservar com {hours} h · {slots}",
+    "created": "Oferta criada.",
+    "openDaysNote": "Tem {count, plural, =1 {# dia aberto} other {# dias abertos}} em Disponibilidade: os clientes já podem pedir esta oferta nesses dias.",
+    "noOpenDaysNote": "Agora abra, em Disponibilidade, os dias em que pode cozinhar. Os clientes só podem pedir reserva nos dias abertos.",
+    "seeAvailability": "Ver a disponibilidade",
+    "openDays": "Abrir dias",
+    "close": "Fechar",
+    "edit": "Editar",
+    "empty": "Ainda não tem ofertas. Crie a primeira: um menu, uma caixa, uma encomenda. Depois abra, em Disponibilidade, os dias em que pode cozinhar.",
+    "newOffer": "Nova oferta",
+    "form": {
+      "editOffer": "Editar oferta",
+      "newOffer": "Nova oferta",
+      "title": "Título",
+      "titlePlaceholder": "Jantar do Minho",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Pratos, tempos, o que inclui",
+      "where": "Onde",
+      "modeHome": "Em casa do cliente",
+      "modeDelivery": "Entrega",
+      "modePickup": "Levantamento",
+      "price": "Preço",
+      "perPerson": "Por pessoa / unidade",
+      "fixed": "Fixo",
+      "quote": "Sob orçamento",
+      "value": "Valor (€)",
+      "unit": "Unidade",
+      "unitPlaceholder": "pessoa, refeição, bolo",
+      "min": "Mínimo",
+      "max": "Máximo",
+      "noLimit": "Sem limite",
+      "leadTime": "Antecedência (horas)",
+      "visible": "Visível no perfil e nas pesquisas",
+      "save": "Guardar",
+      "close": "Fechar",
+      "confirmDelete": "Apagar esta oferta?",
+      "delete": "Apagar"
+    },
+    "slots": {
+      "legend": "Horas a que pode servir",
+      "lunch": "Almoço",
+      "dinner": "Jantar",
+      "other": "Outras",
+      "remove": "Retirar {time}",
+      "otherTime": "Outra hora",
+      "add": "Acrescentar",
+      "none": "Sem horas escolhidas, os clientes podem pedir às 13:00 ou às 20:00.",
+      "max": "Máximo de {max} horas.",
+      "chosen": "{count, plural, =1 {# hora escolhida} other {# horas escolhidas}}: {list}."
+    }
+  },
+  "confirmIban": {
+    "title": "Confirmar o novo IBAN",
+    "incomplete": "Esta ligação está incompleta. Abre o email que te enviámos e carrega no botão de confirmação, ou <link>pede a alteração de novo</link>.",
+    "confirming": "A confirmar…",
+    "backToBilling": "Voltar à faturação",
+    "done": "Pronto: passamos a pagar-te para a conta nova. Por segurança, os pagamentos ficam retidos durante 72 horas e a equipa confirma a conta antes da primeira transferência.",
+    "seeBilling": "Ver a faturação"
+  },
+  "reviews": {
+    "title": "O que dizem os seus clientes",
+    "description": "Só clientes com reserva concluída avaliam. Pode responder uma vez a cada avaliação, e denunciar avaliações abusivas: a equipa decide.",
+    "empty": "Ainda sem avaliações. O pedido de avaliação é enviado 24 horas depois de cada reserva concluída.",
+    "quote": "«{text}»",
+    "noComment": "Avaliou sem deixar comentário.",
+    "seeRequest": "Ver pedido →",
+    "yourReply": "A sua resposta:",
+    "reply": {
+      "published": "Resposta publicada.",
+      "reported": "Denúncia enviada à equipa.",
+      "reportPrompt": "Porque é que esta avaliação é abusiva?",
+      "reply": "Responder",
+      "report": "Denunciar",
+      "label": "Resposta pública (só pode responder uma vez)",
+      "publish": "Publicar resposta",
+      "cancel": "Cancelar"
+    }
+  },
+  "request": {
+    "back": "← Pedidos",
+    "service": "Serviço",
+    "date": "Data",
+    "guests": "Pessoas / unidades",
+    "pickupCode": "Código de levantamento",
+    "pickupCodePending": "Gerado ao aceitar",
+    "address": "Morada",
+    "distance": "Distância",
+    "km": "{km} km",
+    "clientReview": "Avaliação do cliente"
+  },
+  "requests": {
+    "title": "Pedidos",
+    "summary": "{toAnswer} por responder · {count, plural, =1 {# reserva marcada} other {# reservas marcadas}}",
+    "toAnswer": "Por responder",
+    "toAnswerHint": "Os pedidos expiram ao fim de 48 horas.",
+    "toAnswerEmpty": "Sem pedidos novos. Quando um cliente pedir, aparece aqui e recebe um email.",
+    "toComplete": "Por concluir",
+    "toCompleteHint": "Marque como concluída: o cliente recebe o pedido de avaliação.",
+    "upcoming": "Próximas reservas",
+    "upcomingEmpty": "Sem reservas marcadas.",
+    "history": "Histórico",
+    "showHistory": "Mostrar concluídos, recusados e cancelados",
+    "hideHistory": "Esconder",
+    "row": {
+      "answerIn": "Responder em {hours} h",
+      "guests": "{count, plural, =1 {# pessoa} other {# pessoas}}",
+      "quote": "Orçamento {amount}",
+      "needsQuote": "Sob orçamento · falta o seu preço",
+      "open": "Abrir pedido e conversa →"
+    },
+    "actions": {
+      "sendQuote": "Enviar orçamento",
+      "accept": "Aceitar",
+      "proposeChange": "Propor alteração",
+      "decline": "Recusar",
+      "confirmsItself": "A reserva confirma-se sozinha assim que o sinal entrar. Não é preciso fazer nada.",
+      "depositReceived": "Sinal recebido · confirmar",
+      "markCompleted": "Marcar concluída",
+      "completableFrom": "Pode marcar como concluída a partir de {date}",
+      "confirmCancel": "Cancelar esta reserva? O cliente é avisado.",
+      "cancel": "Cancelar",
+      "declineReason": "Motivo (o cliente vê esta mensagem)",
+      "declinePlaceholder": "Já tenho um evento nesse dia",
+      "declineRequest": "Recusar pedido",
+      "quoteIntro": "O cliente espera o seu preço. Veja as notas do pedido e indique o valor total do serviço. Se o cliente aceitar, paga o sinal na app e a data fica garantida.",
+      "totalValue": "Valor total (€)",
+      "minimum": "Mínimo {amount}",
+      "otherDate": "Outra data (opcional)",
+      "timeOptional": "Hora (opcional)",
+      "sendQuoteToClient": "Enviar orçamento ao cliente",
+      "newDate": "Nova data",
+      "time": "Hora",
+      "quoteValue": "Orçamento (€)",
+      "optional": "Opcional",
+      "sendProposal": "Enviar proposta"
+    }
+  },
+  "contact": {
+    "title": "Contacto",
+    "call": "Ligar",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "greeting": "{hasName, select, yes {Olá {name}!} other {Olá!}} Sou do Ao Lume{hasRef, select, yes {, sobre a reserva {ref}} other {}}."
+  },
+  "money": {
+    "title": "Dinheiro",
+    "saved": "Guardado.",
+    "deposit": {
+      "not_required": "Sem sinal",
+      "due": "À espera do cliente",
+      "pending": "A pagar agora",
+      "paid": "Pago",
+      "overdue": "Prazo passou",
+      "refunded": "Devolvido",
+      "partially_refunded": "Devolvido em parte"
+    },
+    "estimated": "Valor estimado: {amount}. Os valores ficam fixados quando aceitares o pedido.",
+    "toQuote": "Valor por orçamentar. Os valores ficam fixados quando aceitares o pedido.",
+    "serviceValue": "Valor do serviço",
+    "viaAoLume": "Pelo Ao Lume",
+    "clientDeposit": "Sinal do cliente",
+    "commission": "Comissão Ao Lume",
+    "youGet": "Recebes de nós",
+    "youWillGet": "Receberás de nós",
+    "depositPaid": "Sinal pago {when}. Transferimos depois do serviço concluído.",
+    "transferAfter": "Transferimos depois de o cliente pagar e o serviço estar concluído.",
+    "direct": "Diretamente contigo",
+    "receivedFromClient": "Recebido do cliente",
+    "clientOwes": "O cliente ainda te deve",
+    "markedReceived": "Marcado como recebido {when}.",
+    "notReceived": "Afinal não recebi",
+    "howMuch": "Quanto recebeste",
+    "howMuchHint": "Fica só para a tua conta. Não é cobrado nem transferido por nós.",
+    "saving": "A guardar…",
+    "markReceived": "Marcar como recebido",
+    "cancel": "Cancelar",
+    "clientPaidRest": "O cliente já me pagou o resto"
+  },
+  "agenda": {
+    "title": "Disponibilidade",
+    "description": "Os dias em que aceita pedidos. Os clientes só veem e pedem os dias abertos.",
+    "prevMonth": "Mês anterior",
+    "nextMonth": "Mês seguinte",
+    "noDaysTitle": "Ainda não abriu nenhum dia.",
+    "noDaysText": "Escolha os seus dias fixos, que ficam abertos todas as semanas, ou toque em cada dia do calendário.",
+    "noOffersToo": "Lembre-se de criar também uma oferta, em Ofertas.",
+    "dayState": {
+      "open": "aberto",
+      "closed": "fechado",
+      "booked": "reserva",
+      "past": "passado"
+    },
+    "dayLabel": "{day} de {month}: {state}",
+    "legendOpen": "Aberto",
+    "legendClosed": "Fechado",
+    "legendBooked": "Com reserva",
+    "presets": {
+      "everyDay": "Todos os dias",
+      "weekends": "Fins de semana",
+      "weekdays": "Dias úteis"
+    },
+    "weeklySaved": "Dias fixos guardados.",
+    "monthOpened": "Dias abertos em {month}.",
+    "openCount": "{count, plural, =1 {# dia aberto} other {# dias abertos}}",
+    "howItWorks": "Como funciona",
+    "green": "<b>Verde</b>: dia aberto, os clientes podem pedir reserva.",
+    "white": "<b>Branco</b>: dia fechado, ninguém consegue pedir.",
+    "blue": "<b>Azul</b>: já tem reserva nesse dia.",
+    "tapHint": "Toque num dia para o abrir ou fechar; fica guardado logo. Fechar um dia fixo fecha só esse dia, e abrir outro dia abre só esse.",
+    "weeklyTitle": "Dias fixos",
+    "weeklyText": "Os dias da semana em que costuma cozinhar. Ficam abertos todas as semanas, sem data de fim.",
+    "quickPicks": "Escolhas rápidas",
+    "weekdaysLabel": "Dias da semana",
+    "clearWeekly": "Deixar de ter dias fixos",
+    "saveWeekly": "Guardar dias fixos",
+    "openMonthOnly": "Abrir só em {month}",
+    "weeklySummary": "Abertos todas as semanas: {days}. Para uma folga ou férias, feche esse dia no calendário.",
+    "noWeekly": "Ainda sem dias fixos: só ficam abertos os dias que abrir no calendário."
+  },
+  "logistics": {
+    "title": "Deslocações, entregas e levantamentos",
+    "weekLabel": "Semana",
+    "dayCount": "{count, plural, =0 {livre} =1 {# serviço} other {# serviços}}",
+    "pickups": "{count, plural, =1 {# levantamento} other {# levantamentos}}",
+    "deliveries": "{count, plural, =1 {# entrega} other {# entregas}}",
+    "atHome": "{count} em casa do cliente",
+    "kmToDrive": "{km} km a conduzir",
+    "noServices": "Sem serviços",
+    "day": {
+      "typeHome": "Em casa do cliente",
+      "typeDelivery": "Entrega",
+      "typePickup": "Levantamento",
+      "filterLabel": "Tipo",
+      "all": "Todos",
+      "home": "Em casa",
+      "delivery": "Entregas",
+      "pickup": "Levantamentos",
+      "freeDay": "Dia livre",
+      "freeDayText": "Sem serviços marcados. Pode fechar este dia em Disponibilidade.",
+      "pickedUp": "Levantado",
+      "delivered": "Entregue",
+      "done": "Concluído",
+      "depositReceived": "Sinal recebido",
+      "awaitingDeposit": "Aguarda sinal",
+      "place": "Local",
+      "clientAddress": "Morada do cliente",
+      "atKitchen": "Na sua cozinha · {area}",
+      "pickupCode": "Código de levantamento",
+      "distance": "Distância",
+      "openMaps": "Abrir no Maps",
+      "call": "Ligar",
+      "whatsapp": "WhatsApp",
+      "message": "Mensagem",
+      "undo": "Desfazer",
+      "markPickedUp": "Marcar levantado",
+      "markDelivered": "Marcar entregue",
+      "markDone": "Marcar concluído"
+    },
+    "settings": {
+      "saved": "Guardado.",
+      "homeTitle": "Em casa do cliente",
+      "radius": "Raio de deslocação",
+      "radiusNote": "Aparece a clientes até {km} km de {area}. A deslocação e a hora de chegada combinam-se com cada cliente.",
+      "deliveries": "Entregas",
+      "zones": "Zonas",
+      "newZone": "Nova zona",
+      "zonePlaceholder": "+ freguesia",
+      "windows": "Janelas",
+      "fee": "Taxa (€)",
+      "freeOver": "Grátis acima de (€)",
+      "whoDelivers": "Quem entrega",
+      "me": "Eu",
+      "courier": "Estafeta",
+      "pickup": "Levantamento",
+      "hours": "Horários",
+      "newSlot": "Novo horário",
+      "pickupNote": "A morada combina-se com o cliente quando a encomenda estiver pronta. Cada levantamento tem um código de 4 dígitos para confirmar a entrega.",
+      "saving": "A guardar…",
+      "save": "Guardar logística"
+    }
+  },
+  "payments": {
+    "title": "Pagamentos",
+    "description": "O cliente paga o sinal na app. Depois de cada serviço concluído, transferimos-te esse sinal menos a nossa comissão.",
+    "status": {
+      "due": "A pagar",
+      "held": "Retido",
+      "batched": "Em transferência",
+      "paid": "Pago",
+      "cancelled": "Anulado"
+    },
+    "missingTitle": "Falta preencher a faturação",
+    "missingText": "Sem os teus dados fiscais, o IBAN verificado e o contrato aceite não podemos transferir-te nada. O dinheiro fica à tua espera, não se perde.",
+    "complete": "Completar agora",
+    "stats": {
+      "balance": "Saldo a teu favor",
+      "due": "Pronto a transferir",
+      "waiting": "Ainda em retenção",
+      "paidThisYear": "Pago este ano"
+    },
+    "movements": "Movimentos",
+    "empty": "Ainda não há pagamentos. Aparecem aqui depois do primeiro serviço concluído.",
+    "adjustment": "Acerto",
+    "expected": "previsto {date}",
+    "held": "Retido: {reason}",
+    "documents": {
+      "title": "Documentos",
+      "empty": "Ainda não há documentos. Recebes um com cada pagamento.",
+      "intro": "Guarda-os para a contabilidade: cada um diz o que recebeste e o que ficou de comissão.",
+      "void": "anulado",
+      "download": "Descarregar"
+    }
+  },
+  "billing": {
+    "title": "Faturação e pagamentos",
+    "description": "O cliente paga o sinal na app. Depois do serviço concluído, transferimos-te esse sinal menos a nossa comissão, com um documento que explica a conta.",
+    "steps": {
+      "fiscal": "Dados fiscais completos",
+      "dac7": "Dados exigidos por lei (DAC7)",
+      "iban": "IBAN indicado",
+      "ibanPending": "Há uma alteração por confirmar no teu email.",
+      "ibanVerified": "IBAN verificado pela equipa",
+      "ibanVerifiedNote": "Verificamos contas novas antes do primeiro pagamento.",
+      "contract": "Contrato aceite"
+    },
+    "missing": "{count, plural, =0 {Está tudo pronto para receberes} =1 {Falta uma coisa} other {Faltam # coisas}}",
+    "onHold": "Os pagamentos estão retidos por segurança depois da alteração do IBAN. Voltam ao normal automaticamente.",
+    "blocked": "Os teus pagamentos estão suspensos. Fala connosco para resolvermos.",
+    "blockedWithReason": "Os teus pagamentos estão suspensos ({reason}). Fala connosco para resolvermos.",
+    "form": {
+      "saved": "Dados guardados.",
+      "title": "Os teus dados fiscais",
+      "intro": "São estes dados que aparecem no documento que recebes com cada pagamento. Só tu e a nossa equipa os veem.",
+      "entityType": "Trabalhas como",
+      "individual": "Nome individual",
+      "company": "Empresa / sociedade",
+      "companyName": "Denominação social",
+      "fullName": "Nome completo",
+      "nif": "NIF",
+      "nifHint": "Nove dígitos. Confirmamos o dígito de controlo.",
+      "vat": "Regime de IVA",
+      "vatHint": "Na dúvida, é o que o teu contabilista indicou ao abrir atividade.",
+      "vatExempt": "Isento (artigo 53.º)",
+      "vatNormal": "Regime normal",
+      "address": "Morada fiscal",
+      "postalCode": "Código postal",
+      "city": "Localidade",
+      "legendCompany": "Registo comercial · exigido por lei (DAC7)",
+      "legendBirth": "Nascimento · exigido por lei (DAC7)",
+      "dac7Text": "Desde que passámos a intermediar pagamentos, somos obrigados a comunicar estes dados à Autoridade Tributária uma vez por ano, com os valores que recebeste. Dizemos-te sempre o que foi comunicado.",
+      "regNumber": "Número de registo comercial",
+      "birthDate": "Data de nascimento",
+      "birthPlace": "Local de nascimento",
+      "saving": "A guardar…",
+      "save": "Guardar dados fiscais"
+    },
+    "iban": {
+      "requested": "Enviámos-te um email para confirmares. A conta atual não muda até lá.",
+      "title": "Onde recebes",
+      "intro": "A conta para onde transferimos o teu dinheiro depois de cada serviço. Guardamo-la cifrada e nunca a mostramos por inteiro.",
+      "current": "Conta atual",
+      "notGiven": "Por indicar",
+      "holder": "Titular",
+      "status": "Estado",
+      "verified": "Verificada",
+      "awaiting": "A aguardar verificação da equipa",
+      "pendingChange": "Há uma alteração à espera de confirmação (conta terminada em {last4}). Abre a ligação que te enviámos por email. Enquanto não confirmares, continuamos a pagar para a conta atual.",
+      "change": "Alterar o IBAN",
+      "give": "Indicar o IBAN",
+      "iban": "IBAN",
+      "invalid": "Ainda não confere. Verifica os dígitos.",
+      "holderLabel": "Titular da conta",
+      "holderHint": "Tem de ser o titular da conta, como está no banco.",
+      "bic": "BIC / SWIFT",
+      "bicHint": "Opcional. Só para contas fora de Portugal.",
+      "security": "Por segurança: enviamos-te um email para confirmares a alteração, avisamos o endereço anterior, e os pagamentos ficam retidos 72 horas depois da mudança.",
+      "sending": "A enviar…",
+      "send": "Enviar confirmação",
+      "cancel": "Cancelar"
+    },
+    "agreement": {
+      "accepted": "Contrato aceite. Enviámos-lhe uma cópia por email.",
+      "title": "Contrato",
+      "version": "versão {version}",
+      "versionAccepted": "versão {version} · aceite",
+      "commission": "Comissão em vigor: <strong>{percent}%</strong> do valor da reserva, com um mínimo de <strong>{min}</strong>, descontada ao sinal. Transferimos-lhe o restante depois do serviço concluído.",
+      "outdated": "O contrato mudou desde que o aceitou (tinha a versão {version}). Leia e aceite a nova versão para continuarmos a pagar-lhe.",
+      "readFull": "Ler o contrato completo",
+      "consent": "Li e aceito o Contrato de intermediação de pagamentos.",
+      "registering": "A registar…",
+      "accept": "Aceitar contrato"
+    }
+  },
+  "legal": {
+    "title": "Termos e contrato",
+    "success": "Aceitação registada. Enviámos-lhe uma cópia por email.",
+    "acceptBoth": "Li e aceito os <terms>Termos e condições</terms> e o <contract>Contrato de intermediação de pagamentos</contract>.",
+    "acceptTerms": "Li e aceito os <terms>Termos e condições</terms>.",
+    "acceptContract": "Li e aceito o <contract>Contrato de intermediação de pagamentos</contract>.",
+    "registering": "A registar…",
+    "accept": "Aceitar"
+  },
+  "profile": {
+    "title": "O seu perfil",
+    "createTitle": "Crie o seu perfil de chef",
+    "createDescription": "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão.",
+    "zonesLabel": "Secções do perfil",
+    "zones": {
+      "profile": "Perfil",
+      "data": "Dados",
+      "photos": "Fotografias",
+      "dishes": "{count} pratos",
+      "dishesOf": "{count} de 3 pratos",
+      "cooking": "Cozinha",
+      "categories": "{count} categorias",
+      "missing": "Em falta",
+      "title": "Título"
+    },
+    "photosTitle": "Fotografias",
+    "photosText": "A sua cara e a sua comida: é o que os clientes veem primeiro.",
+    "cookingTitle": "Cozinha e serviços",
+    "cookingText": "O que cozinha e como trabalha. Aparece no seu perfil e serve de filtro na pesquisa.",
+    "saved": "Perfil guardado.",
+    "needSocial": "Indique o Instagram ou o site. Basta um, e serve só para a equipa ver o seu trabalho antes de aprovar.",
+    "areaNotFound": "Não encontrámos essa zona. Escreva o bairro e a cidade, por exemplo \"Alvalade, Lisboa\".",
+    "form": {
+      "instagram": "Instagram",
+      "instagramPlaceholder": "@o.seu.perfil",
+      "site": "Site",
+      "yourPage": "A sua página",
+      "aboutYou": "Sobre si",
+      "displayName": "Nome público",
+      "link": "Link",
+      "slugPlaceholder": "o-seu-nome",
+      "appearAs": "Como quer aparecer",
+      "appearHint": "Com certificado verificado, passa a aparecer como Chef.",
+      "cook": "Cozinheiro",
+      "cookFemale": "Cozinheira",
+      "profileType": "Perfil",
+      "homeCook": "Cozinheiro caseiro",
+      "homeCookFemale": "Cozinheira caseira",
+      "professional": "Profissional de cozinha",
+      "headline": "Uma frase para o seu perfil",
+      "headlineHint": "Aparece por baixo do seu nome. Até 80 caracteres.",
+      "headlinePlaceholder": "Cozinha alentejana para jantares em casa",
+      "bio": "Sobre si",
+      "bioPlaceholder": "A sua história, o que cozinha, como trabalha.",
+      "baseArea": "Zona de base",
+      "areaPlaceholder": "Bairro ou freguesia",
+      "areaHint": "Os clientes veem a zona, nunca a sua morada.",
+      "radius": "Raio de serviço (km)",
+      "years": "Anos de experiência",
+      "deposit": "Sinal pedido (%)",
+      "depositTooLow": "Tem de ser pelo menos {min}%.",
+      "depositHint": "O cliente paga-o na app. Mínimo {min}%.",
+      "depositHintNoMin": "O cliente paga-o na app para confirmar a reserva.",
+      "socialLegend": "Instagram ou site",
+      "oneOfTwo": "Basta um dos dois.",
+      "languages": "Idiomas que fala (opcional)",
+      "languagesHint": "Aparecem no seu perfil, para clientes que falam outras línguas.",
+      "locating": "A procurar a zona…",
+      "continue": "Continuar",
+      "save": "Guardar perfil",
+      "create": "Criar perfil"
+    },
+    "verification": {
+      "sent": "Enviado para revisão. Respondemos por email.",
+      "status": {
+        "draft": "rascunho",
+        "pending": "em revisão",
+        "approved": "aprovado",
+        "rejected": "alterações pedidas",
+        "suspended": "suspenso"
+      },
+      "title": "Verificação",
+      "intro": "Uma fotografia de perfil, uma selfie de verificação (privada), o Instagram ou site, e pelo menos três fotos de pratos. A equipa compara a selfie com a fotografia de perfil antes de o perfil ficar público.",
+      "done": "Feito",
+      "missing": "Em falta",
+      "manage": "Gerir fotografias",
+      "saveFirst": "Guarde o perfil primeiro; depois carregue as fotografias.",
+      "statusLine": "Estado: {status}",
+      "submit": "Enviar para revisão",
+      "terms": "Ao enviar, aceita os termos para chefs: é responsável pela legalidade, higiene, impostos e pagamentos do seu serviço."
+    },
+    "submit": {
+      "title": "Enviar para revisão",
+      "intro": "A equipa compara a selfie com a fotografia de perfil e vê os seus pratos. Respondemos por email, normalmente no mesmo dia útil. Depois disso o seu perfil aparece nas pesquisas.",
+      "changesRequested": "Pedimos alterações: {notes}",
+      "done": "Feito",
+      "missing": "Em falta →",
+      "sending": "A enviar…",
+      "submit": "Enviar para revisão"
+    }
+  },
+  "cooking": {
+    "saved": "Guardado.",
+    "services": {
+      "home": "Cozinha e serve em casa do cliente",
+      "delivery": "Leva os pratos à morada do cliente",
+      "pickup": "O cliente recolhe na sua cozinha",
+      "events": "Grupos grandes, sob orçamento",
+      "meal_prep": "Refeições para a semana"
+    },
+    "noCategory": "Sem categoria",
+    "categoriesTitle": "Categorias de cozinha",
+    "categoriesCount": "{count} de {max}",
+    "chooseUpTo": "Escolha até {max}. Os clientes filtram a pesquisa por estas categorias.",
+    "notListed": "A sua cozinha não está na lista?",
+    "addPlaceholder": "Por exemplo: Açoriana",
+    "adding": "A acrescentar…",
+    "add": "Acrescentar",
+    "addHint": "Fica escolhida de imediato, se ainda não tiver cinco. Depois, guarde as alterações.",
+    "servicesTitle": "Serviços que oferece",
+    "diets": "Dietas que consegue fazer",
+    "preview": "Como aparece na pesquisa",
+    "previewPrice": "<strong>{rating}</strong> · desde {from}",
+    "previewNote": "As alterações aparecem na pesquisa assim que guardar.",
+    "save": "Guardar alterações"
+  },
+  "title": {
+    "statementSent": "Obrigado! A equipa lê a sua descrição e responde por email.",
+    "verifiedTitle": "Chef verificado",
+    "verifiedText": "A equipa confirmou o seu título. Aparece aos clientes como <strong>Chef {name}</strong>, com a marca «Chef verificado».",
+    "title": "Título de Chef",
+    "intro": "Hoje aparece como <strong>{current}</strong>. Para passar a <strong>Chef {name}</strong>, com a marca «Chef verificado», envie um certificado (curso de cozinha, escola de hotelaria, diploma profissional). Não tem? Conte-nos a sua experiência: anos a cozinhar, onde cozinhou, se ensina. A equipa lê cada pedido.",
+    "inReview": "Em verificação",
+    "statement": "Descrição da sua experiência",
+    "modeLabel": "Como quer pedir o título",
+    "haveCert": "Tenho certificado",
+    "noCert": "Não tenho certificado",
+    "experience": "A sua experiência na cozinha",
+    "experienceHint": "Só a equipa do Ao Lume lê este texto. Não aparece no seu perfil.",
+    "experiencePlaceholder": "Cozinho há 20 anos, fui cozinheiro no restaurante… Hoje dou aulas de cozinha em…",
+    "sending": "A enviar…",
+    "sendToTeam": "Enviar para a equipa",
+    "certName": "Nome do certificado",
+    "certPlaceholder": "Curso de Cozinha, Escola de Hotelaria",
+    "file": "Ficheiro",
+    "fileHint": "PDF, JPG ou PNG até 10 MB. Só a equipa do Ao Lume o pode abrir.",
+    "sendCert": "Enviar certificado",
+    "upload": {
+      "needName": "Indique o nome do certificado.",
+      "needFile": "Escolha o ficheiro do certificado.",
+      "fileType": "Use um PDF, JPG ou PNG.",
+      "tooBig": "O ficheiro tem mais de 10 MB.",
+      "demo": "Modo de demonstração: o certificado não é guardado.",
+      "failed": "Não foi possível enviar o ficheiro. Tente de novo.",
+      "sent": "Certificado enviado. A equipa responde por email."
+    }
+  },
+  "photos": {
+    "portraitAlt": "A sua fotografia de perfil",
+    "portraitTitle": "Fotografia de perfil",
+    "portraitText": "Uma fotografia sua, de cara visível. É a que os clientes veem no seu perfil público.",
+    "changePortrait": "Trocar fotografia",
+    "uploadPortrait": "Carregar fotografia",
+    "selfieSteps": {
+      "take": "Tire uma selfie agora, de frente, com a cara bem visível e boa luz. Sem óculos de sol nem filtros.",
+      "compare": "A equipa compara-a com a sua fotografia de perfil, para confirmar que é a mesma pessoa.",
+      "retake": "Se não estiver nítida, pedimos-lhe outra por email. Pode trocá-la aqui quando quiser.",
+      "deleted": "Quando o perfil é aprovado, a selfie é apagada. Não fica guardada."
+    },
+    "selfieAlt": "A sua selfie de verificação",
+    "verified": "Verificado",
+    "noSelfie": "Ainda sem selfie",
+    "selfieTitle": "Selfie de verificação",
+    "private": "Privada · só a equipa vê",
+    "selfieDeleted": "A sua identidade foi confirmada e a selfie já foi apagada. Não precisa de fazer mais nada.",
+    "retakeSelfie": "Tirar outra selfie",
+    "takeSelfie": "Tirar selfie",
+    "zonesLabel": "Zonas das fotografias",
+    "zones": {
+      "profile": "Perfil",
+      "done": "Feita",
+      "missing": "Em falta",
+      "verification": "Verificação",
+      "verified": "Verificado",
+      "sent": "Enviada",
+      "dishes": "Pratos",
+      "dishesCount": "{count} fotografias",
+      "dishesOf": "{count} de 3"
+    },
+    "dishesTitle": "Pratos · {count}",
+    "dishesText": "Mostre o que cozinha e escreva o que é cada prato. A primeira fotografia é a capa nos resultados de pesquisa. São precisas pelo menos três para enviar o perfil para revisão.",
+    "addPhotos": "Adicionar fotografias",
+    "emptyTitle": "Ainda sem fotografias de pratos",
+    "emptyText": "Boas fotografias, com luz natural, são o que mais faz um cliente pedir uma reserva.",
+    "uploading": "A carregar…",
+    "uploadingN": "A carregar {done} de {total}…",
+    "dish": {
+      "captionLabel": "Descrição do prato",
+      "captionPlaceholder": "O que é este prato? Ex.: Arroz de pato à antiga",
+      "saving": "A guardar…",
+      "unsaved": "Por guardar",
+      "saved": "Guardado",
+      "charsLeft": "{count} caracteres",
+      "alt": "Prato",
+      "cover": "Capa",
+      "useAsCover": "Usar como capa",
+      "moveBack": "Mover para trás",
+      "moveForward": "Mover para a frente",
+      "confirmDelete": "Apagar esta fotografia?",
+      "delete": "Apagar"
+    },
+    "upload": {
+      "demo": "Modo de demonstração: as fotografias não são guardadas.",
+      "selfieFailed": "A selfie não foi carregada. Use uma fotografia JPG ou PNG, ou tire-a com a câmara.",
+      "failed": "{count, plural, =1 {Uma fotografia não foi carregada} other {# fotografias não foram carregadas}}. Use JPG, PNG ou WEBP.",
+      "selfieSent": "Selfie enviada. Só a equipa a vê.",
+      "uploaded": "{count, plural, =1 {Fotografia carregada.} other {# fotografias carregadas.}}"
+    }
+  },
+  "setup": {
+    "photos": {
+      "title": "Fotografias",
+      "text": "Uma fotografia sua e pelo menos três dos seus pratos, com descrição.",
+      "action": "Carregar fotografias"
+    },
+    "offer": {
+      "title": "Crie uma oferta",
+      "text": "Um menu, uma caixa ou uma encomenda, com preço. É o que os clientes reservam.",
+      "action": "Criar oferta"
+    },
+    "days": {
+      "title": "Abra os dias em que pode cozinhar",
+      "text": "Os clientes só podem pedir reserva nos dias que abrir. Pode abrir já os dias da semana em que costuma cozinhar.",
+      "action": "Abrir dias"
+    },
+    "review": {
+      "title": "Envie para revisão",
+      "text": "A equipa confirma as fotografias e o perfil fica público.",
+      "textRejected": "Pedimos alterações: {notes}",
+      "seeEmail": "veja o email que enviámos.",
+      "action": "Enviar para revisão",
+      "actionRejected": "Rever e reenviar"
+    },
+    "billing": {
+      "title": "Dados de faturação",
+      "text": "Nome legal, NIF, morada fiscal, IBAN e o contrato. Sem isto podemos receber o sinal por ti, mas não to podemos transferir.",
+      "action": "Preencher faturação"
+    },
+    "headingWaiting": "O seu perfil está em revisão",
+    "headingOnlyBilling": "Falta a faturação para te podermos pagar",
+    "headingApproved": "Falta pouco para receber reservas",
+    "heading": "Primeiros passos",
+    "progress": "{done} de {total}",
+    "waitingText": "A equipa responde por email. Entretanto pode afinar as ofertas e a disponibilidade.",
+    "onlyBillingText": "Já podes receber pedidos. O sinal que os clientes pagarem fica à tua ordem. Só não to conseguimos transferir enquanto não tivermos os teus dados fiscais, o IBAN e o contrato aceite. Não se perde nada: fica à tua espera.",
+    "srDone": ": feito",
+    "srNext": ": próximo passo",
+    "open": "Abrir"
+  },
+  "lumi": {
+    "label": "Ajuda da Lumi",
+    "hideGroup": "Esconder a ajuda da Lumi",
+    "hideQuestion": "Esconder a ajuda da Lumi?",
+    "justNow": "Só por agora",
+    "never": "Nunca mais mostrar",
+    "explain": "«Só por agora» volta na próxima visita. «Nunca mais mostrar» vale para todas as páginas; pode reativá-la quando quiser.",
+    "cancel": "Cancelar",
+    "turnOff": "Deixar de mostrar a ajuda da Lumi",
+    "activating": "A ativar…",
+    "show": "Mostrar a ajuda da Lumi",
+    "settingTitle": "Ajuda da Lumi",
+    "settingText": "Dicas curtas nas páginas do painel até concluir os primeiros passos. Pode desligá-la a qualquer momento."
+  },
+  "tips": {
+    "onboarding": {
+      "rejected": {
+        "title": "Alguns pontos a rever",
+        "text": "A equipa deixou indicações no último passo. Basta corrigir esses pontos e enviar novamente."
+      },
+      "resume": {
+        "title": "Continue onde ficou",
+        "text": "Os dados que guardou estão preservados. O nome público é como os clientes o conhecem no Ao Lume: o seu nome ou o nome com que assina a sua cozinha."
+      },
+      "welcome": {
+        "title": "Bem-vindo ao Ao Lume",
+        "text": "Sou a Lumi e vou acompanhá-lo, campo a campo. O nome público é como os clientes o conhecem no Ao Lume: o seu nome ou o nome com que assina a sua cozinha."
+      },
+      "link": {
+        "title": "O endereço da sua página",
+        "text": "É o link para o seu perfil, fácil de encontrar e de partilhar com clientes. É criado a partir do nome público; prefira algo curto e simples."
+      },
+      "appear": {
+        "title": "Como quer aparecer",
+        "text": "Define o título no seu perfil público: cozinheiro ou cozinheira. Com um certificado verificado, passa a aparecer como Chef."
+      },
+      "profile": {
+        "title": "Tipo de perfil",
+        "text": "É o que aparece no seu perfil público, junto ao nome: cozinha caseira ou profissional de cozinha. Escolha o que melhor descreve a sua experiência."
+      },
+      "headline": {
+        "title": "Uma frase sobre si",
+        "text": "Uma descrição rápida da sua cozinha, que os clientes leem logo abaixo do nome. Por exemplo: cozinha alentejana para jantares em casa."
+      },
+      "bio": {
+        "title": "A sua história na cozinha",
+        "text": "Conte como começou, onde aprendeu, o que gosta de cozinhar e como trabalha. É o que dá a conhecer quem vai cozinhar em casa do cliente."
+      },
+      "area": {
+        "title": "Onde presta serviço",
+        "text": "Indique a zona onde quer cozinhar para os seus clientes. Os clientes veem apenas a zona, nunca a sua morada."
+      },
+      "radius": {
+        "title": "Até onde se desloca",
+        "text": "A distância, em quilómetros a partir da sua zona, que está disposto a percorrer para um serviço."
+      },
+      "social": {
+        "title": "Instagram ou site",
+        "text": "Serve só para a equipa ver que cozinha a sério: pratos que já fez, eventos, clientes. Não precisa de ser uma página profissional nem de ter muitos seguidores; uma conta pessoal com fotografias da sua comida chega."
+      },
+      "portrait": {
+        "title": "Fotografia de perfil",
+        "done": "Fotografia carregada. Pode trocá-la quando quiser.",
+        "todo": "É pública: a imagem que os clientes veem antes de o receberem em casa. Prefira uma fotografia nítida, de frente e com boa luz."
+      },
+      "selfie": {
+        "title": "Selfie de verificação",
+        "done": "Selfie recebida. Apenas a equipa a vê e é eliminada após a aprovação.",
+        "todo": "É privada e apenas a equipa tem acesso. Confirma que a fotografia de perfil é sua e é eliminada após a aprovação."
+      },
+      "dishes": {
+        "title": "Fotografias de pratos",
+        "needThree": "São precisas pelo menos três. São o que mais influencia um pedido de reserva: privilegie luz natural e o prato em destaque.",
+        "missing": "{count, plural, =1 {Falta #.} other {Faltam #.}} São o que mais influencia um pedido de reserva: privilegie luz natural e o prato em destaque.",
+        "enough": "Já tem fotografias suficientes. A primeira é a capa nos resultados de pesquisa; pode reordená-las."
+      },
+      "continue": {
+        "title": "Fotografias concluídas",
+        "text": "Pode avançar para o último passo e enviar o perfil para revisão."
+      },
+      "ready": {
+        "title": "Perfil pronto para revisão",
+        "text": "A equipa analisa cada perfil, normalmente no mesmo dia útil. O NIF e o IBAN só são pedidos antes do primeiro pagamento."
+      },
+      "notReady": {
+        "title": "Ainda há elementos em falta",
+        "text": "Selecione «Em falta» em cada item para o concluir. Tudo o que já guardou fica preservado."
+      }
+    },
+    "agenda": {
+      "weekly": {
+        "title": "Os seus dias fixos",
+        "text": "Escolha os dias da semana em que costuma cozinhar e guarde: ficam abertos todas as semanas, sem ter de voltar cá todos os meses."
+      },
+      "calendar": {
+        "title": "Os seus dias abertos",
+        "text": "Toque num dia para o abrir ou fechar, por exemplo numa folga ou num dia extra; fica guardado de imediato. Os clientes só podem pedir nos dias abertos."
+      }
+    },
+    "offers": {
+      "first": {
+        "title": "Crie a sua primeira oferta",
+        "text": "Uma oferta é o que os clientes reservam: um menu, uma caixa ou uma encomenda. Comece por uma, com um título claro e o preço."
+      },
+      "list": {
+        "title": "As suas ofertas",
+        "text": "Pode ter várias, para ocasiões diferentes. Desmarque «Visível no perfil» nas que não pode fazer por agora."
+      },
+      "title": {
+        "title": "Título e descrição",
+        "text": "Um título que diga o que é, e na descrição os pratos e o que está incluído. É o que ajuda o cliente a decidir."
+      },
+      "where": {
+        "title": "Onde é servida",
+        "text": "Em casa do cliente, entregue na morada dele ou levantada na sua cozinha. Cada oferta tem o seu modo."
+      },
+      "price": {
+        "title": "Como cobra",
+        "text": "Por pessoa ou unidade, um valor fixo, ou sob orçamento quando cada pedido é diferente, por exemplo em eventos."
+      },
+      "hours": {
+        "title": "Horas",
+        "text": "Toque nas horas a que pode servir. Ao pedir, o cliente escolhe uma delas."
+      },
+      "leadTime": {
+        "title": "Antecedência",
+        "text": "Com quantas horas de aviso precisa de receber um pedido. Os clientes não conseguem pedir com menos tempo do que isso."
+      }
+    },
+    "cooking": {
+      "categories": {
+        "title": "Categorias de cozinha",
+        "text": "Escolha até cinco: é por elas que os clientes o encontram na pesquisa. Se a sua cozinha não estiver na lista, pode acrescentá-la."
+      },
+      "services": {
+        "title": "Serviços que oferece",
+        "text": "Ative apenas o que faz de facto. Os serviços aparecem no seu perfil e os clientes filtram a pesquisa por eles."
+      }
+    },
+    "photos": {
+      "portrait": {
+        "title": "A sua fotografia",
+        "text": "Nítida, de frente e com boa luz. É a primeira coisa que um cliente vê antes de o receber em casa."
+      },
+      "dishes": {
+        "title": "Os seus pratos",
+        "text": "Escreva o que é cada prato e ordene-os: a primeira fotografia é a capa nos resultados de pesquisa."
+      }
+    },
+    "requests": {
+      "quote": {
+        "title": "Este pedido é sob orçamento",
+        "text": "O cliente espera o seu preço. Leia as notas, carregue em «Enviar orçamento» e indique o valor total. Se o cliente aceitar, paga o sinal na app e a data fica garantida."
+      }
+    }
+  }
+}

@@ -1,8 +1,10 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { ChefDoor } from "@/components/auth/ChefDoor";
 import { ChefHat } from "@/components/brand/ChefHat";
 import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";
 import { AzulejoField, TileMark } from "@/components/brand/Azulejo";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import { MobileMenu } from "@/components/MobileMenu";
 import { PanToss } from "@/components/brand/PanToss";
 import { SITE_DOMAIN } from "@/lib/constants";
@@ -28,17 +30,17 @@ export function Wordmark({ suffix, animated = false }: { suffix?: string; animat
 
 type NavItem = { href: string; label: string };
 
-const CLIENT_NAV: NavItem[] = [
-  { href: "/procurar", label: "Procurar chefs" },
-  { href: "/#como", label: "Como funciona" },
-  { href: "/pedido", label: "Acompanhar pedido" },
-];
+const CLIENT_NAV = [
+  { href: "/procurar", key: "search" },
+  { href: "/#como", key: "howItWorks" },
+  { href: "/pedido", key: "trackRequest" },
+] as const;
 
-const CHEF_NAV: NavItem[] = [
-  { href: "/para-chefs#ferramenta", label: "Ferramenta" },
-  { href: "/para-chefs#marketing", label: "Marketing" },
-  { href: "/para-chefs#perguntas", label: "Perguntas" },
-];
+const CHEF_NAV = [
+  { href: "/para-chefs#ferramenta", key: "tool" },
+  { href: "/para-chefs#marketing", key: "marketing" },
+  { href: "/para-chefs#perguntas", key: "faq" },
+] as const;
 
 /** Changing side (client ↔ chef) is still navigation, just the only one that matters: bold. */
 /**
@@ -63,25 +65,26 @@ function AudienceSwitch({ href, label, toChef, className = "" }: NavItem & { toC
 }
 
 export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
-  const nav = chefs ? CHEF_NAV : CLIENT_NAV;
+  const t = useTranslations("nav");
+  const nav: NavItem[] = (chefs ? CHEF_NAV : CLIENT_NAV).map((i) => ({ href: i.href, label: t(`links.${i.key}`) }));
   const home = chefs ? "/para-chefs" : "/";
   const brand = (
-    <Link href={home} className="no-underline" aria-label="Ao Lume, página inicial">
-      <Wordmark suffix={chefs ? "para chefs" : undefined} animated />
+    <Link href={home} className="no-underline" aria-label={t("homeLabel")}>
+      <Wordmark suffix={chefs ? t("forChefs") : undefined} animated />
     </Link>
   );
-  const primary = chefs ? { href: "/entrar?chef=1", label: "Criar perfil" } : { href: "/entrar", label: "Entrar" };
+  const primary = chefs ? { href: "/entrar?chef=1", label: t("createProfile") } : { href: "/entrar", label: t("signIn") };
   const secondary = chefs
-    ? { href: "/entrar?next=/dashboard", label: "Entrar" }
-    : { href: "/entrar?chef=1", label: "Criar perfil de chef" };
-  const other: NavItem = chefs ? { href: "/", label: "Sou cliente" } : { href: "/para-chefs", label: "Sou chef" };
+    ? { href: "/entrar?next=/dashboard", label: t("signIn") }
+    : { href: "/entrar?chef=1", label: t("createChefProfile") };
+  const other: NavItem = chefs ? { href: "/", label: t("imClient") } : { href: "/para-chefs", label: t("imChef") };
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur-[6px]">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-5 md:px-8">
         {brand}
         <div className="flex items-center gap-1">
-          <nav aria-label="Principal" className="hidden items-center gap-1 text-[15px] font-medium text-ink-2 md:flex">
+          <nav aria-label={t("main")} className="hidden items-center gap-1 text-[15px] font-medium text-ink-2 md:flex">
             {nav.map((item) => (
               <Link key={item.href} href={item.href} className="rounded-md px-2 py-2 no-underline hover:bg-paper lg:px-3">
                 {item.label}
@@ -89,6 +92,7 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
             ))}
             <AudienceSwitch {...other} toChef={!chefs} />
           </nav>
+          <LanguageSwitch className="hidden text-[13px] text-ink-2 md:flex" linkClassName="rounded-md px-1.5 py-1 text-ink-2 hover:bg-paper" />
           <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-line md:block lg:mx-2" />
           {chefs && (
             <Link href={secondary.href} className="btn btn-o btn-sm hidden md:inline-flex">
@@ -116,6 +120,7 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
                 ) : (
                   <ChefDoor className="-mx-5 mt-2" />
                 )}
+                <LanguageSwitch variant="long" className="mt-3 gap-4 text-[16px]" linkClassName="py-1 text-ink" />
               </>
             }
           />
@@ -126,6 +131,8 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
 }
 
 export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
+  const t = useTranslations("nav.footer");
+  const link = "py-1.5 text-[#c9d6ee] no-underline hover:text-white";
   return (
     <footer className="bg-cobalt-deep text-white">
       <div className="h-12 overflow-hidden" aria-hidden="true">
@@ -136,42 +143,41 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           <span className="wordmark text-[26px] text-white">ao lume</span>
           {/* As regras do sinal vivem nos Termos e na página de cada chef, onde são lidas antes de
               se pedir. Aqui em baixo serviam de pouco e eram a última coisa que alguém levava do site. */}
-          <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">
-            Juntamos quem gosta de comer bem a quem sabe cozinhar. O resto acontece à sua mesa.
-          </p>
+          <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">{t("tagline")}</p>
           <a href={`mailto:${EMAIL.support}`} className="text-[15px] text-[#c9d6ee] no-underline hover:text-white">
             {EMAIL.support}
           </a>
         </div>
-        <nav aria-label="Para clientes" className="flex flex-col text-[15px]">
-          <span className="mb-1 font-semibold">Clientes</span>
-          <Link href="/procurar" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Procurar chefs
+        <nav aria-label={t("forClients")} className="flex flex-col text-[15px]">
+          <span className="mb-1 font-semibold">{t("clients")}</span>
+          <Link href="/procurar" className={link}>
+            {t("search")}
           </Link>
-          <Link href="/#como" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Como funciona
+          <Link href="/#como" className={link}>
+            {t("howItWorks")}
           </Link>
-          <Link href="/pedido" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Acompanhar pedido
+          <Link href="/pedido" className={link}>
+            {t("trackRequest")}
           </Link>
-          <Link href="/entrar" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Entrar
+          <Link href="/entrar" className={link}>
+            {t("signIn")}
           </Link>
-          <Link href="/apoio" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Apoio
+          <Link href="/apoio" className={link}>
+            {t("support")}
           </Link>
         </nav>
-        <nav aria-label="Para chefs" className="flex flex-col text-[15px]">
-          <span className="mb-1 font-semibold">{chefs ? "Ao Lume" : "Chefs"}</span>
-          <Link href="/para-chefs" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Ao Lume para chefs
+        <nav aria-label={t("forChefs")} className="flex flex-col text-[15px]">
+          <span className="mb-1 font-semibold">{chefs ? "Ao Lume" : t("chefs")}</span>
+          <Link href="/para-chefs" className={link}>
+            {t("aoLumeForChefs")}
           </Link>
-          <Link href="/termos" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Termos
+          <Link href="/termos" className={link}>
+            {t("terms")}
           </Link>
-          <Link href="/privacidade" className="py-1.5 text-[#c9d6ee] no-underline hover:text-white">
-            Privacidade
+          <Link href="/privacidade" className={link}>
+            {t("privacy")}
           </Link>
+          <LanguageSwitch variant="long" className="mt-3 gap-3" linkClassName="text-[#c9d6ee] hover:text-white" />
         </nav>
       </div>
       <div className="border-t border-white/15">
@@ -182,7 +188,7 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           <span className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {/* Required on Portuguese sites, visibly (DL 74/2017). */}
             <a href={COMPLAINTS_BOOK_URL} target="_blank" rel="noopener noreferrer" className="text-[#c9d6ee] underline hover:text-white">
-              Livro de Reclamações
+              {t("complaintsBook")}
             </a>
             {publicEnv.metaPixelId && (
               <CookieSettingsButton className="cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-[14px] text-[#c9d6ee] underline hover:text-white" />

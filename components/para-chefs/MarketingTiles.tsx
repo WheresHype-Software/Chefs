@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { SITE_DOMAIN } from "@/lib/constants";
 import { revealDelay } from "@/lib/motion";
@@ -45,19 +46,16 @@ const ICONS: Record<string, ReactNode> = {
   ),
 };
 
-type Tile = { icon: keyof typeof ICONS; title: string; text: string; showLink?: boolean; warm?: boolean };
+type TileKey = "link" | "share" | "near" | "star" | "seal" | "season";
+type Tile = { icon: keyof typeof ICONS; key: TileKey; showLink?: boolean; warm?: boolean };
 
 const TILES: Tile[] = [
-  { icon: "link", title: "Um link para a bio", text: "Substitui o formulário e o “manda mensagem”.", showLink: true },
-  { icon: "share", title: "Kit de partilha", text: "Código QR, imagens para stories e cartões com as suas melhores avaliações." },
-  { icon: "near", title: "Perto de quem procura", text: "Clientes da sua zona encontram-no sem saberem o seu nome." },
-  { icon: "star", title: "Avaliações verificadas", text: "Só quem concluiu uma reserva avalia, e pode responder a cada uma." },
-  {
-    icon: "seal",
-    title: "Título de Chef verificado",
-    text: "Envie um certificado de cozinha e apareça como Chef, com o selo ao lado do nome.",
-  },
-  { icon: "season", title: "Encomendas de época", text: "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite." },
+  { icon: "link", key: "link", showLink: true },
+  { icon: "share", key: "share" },
+  { icon: "near", key: "near" },
+  { icon: "star", key: "star" },
+  { icon: "seal", key: "seal" },
+  { icon: "season", key: "season" },
 ];
 
 /**
@@ -66,24 +64,25 @@ const TILES: Tile[] = [
  * lands on the thing worth wanting instead of wandering over six identical slabs.
  */
 export function MarketingTiles() {
+  const t = useTranslations("paraChefs.marketing");
   return (
     <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(270px,100%),1fr))] gap-px border border-line bg-line p-0">
-      {TILES.map((t, i) => (
+      {TILES.map((tile, i) => (
         <li
-          key={t.title}
+          key={tile.key}
           className={`al-rv flex flex-col gap-3 p-6 transition-colors duration-200 md:p-7 ${
-            t.warm ? "bg-yolk-soft" : "bg-white hover:bg-paper"
+            tile.warm ? "bg-yolk-soft" : "bg-white hover:bg-paper"
           }`}
           style={revealDelay(i)}
         >
           <span aria-hidden="true" className="text-cobalt">
-            {ICONS[t.icon]}
+            {ICONS[tile.icon]}
           </span>
-          <span className="d text-[21px] leading-[1.15] md:text-[23px]">{t.title}</span>
-          <span className="text-[15px] leading-relaxed text-muted">{t.text}</span>
-          {t.showLink && (
+          <span className="d text-[21px] leading-[1.15] md:text-[23px]">{t(`tiles.${tile.key}.title`)}</span>
+          <span className="text-[15px] leading-relaxed text-muted">{t(`tiles.${tile.key}.text`)}</span>
+          {tile.showLink && (
             <span className="num mt-1 w-fit bg-cobalt px-3 py-1.5 text-[14px] text-white">
-              {SITE_DOMAIN}/chef/<span className="text-yolk">o-seu-nome</span>
+              {SITE_DOMAIN}/chef/<span className="text-yolk">{t("slugPlaceholder")}</span>
             </span>
           )}
         </li>

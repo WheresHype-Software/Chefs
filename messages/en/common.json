@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "continue": "Continue",
+    "send": "Send",
+    "sending": "Sending…",
+    "edit": "Edit",
+    "delete": "Delete",
+    "remove": "Remove",
+    "add": "Add",
+    "retry": "Try again",
+    "copy": "Copy",
+    "copied": "Copied",
+    "seeMore": "See more",
+    "seeAll": "See all",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "states": {
+    "loading": "Loading…",
+    "required": "required",
+    "optional": "optional",
+    "new": "New"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again in a moment.",
+    "network": "No connection. Check your internet and try again."
+  },
+  "photos": {
+    "table": "A table with several home-cooked dishes served to share",
+    "cooking": "Hands cooking in a home kitchen",
+    "plated": "A dish plated by a chef",
+    "grill": "Skewers grilling over charcoal",
+    "soup": "A bowl of home-made soup",
+    "cake": "A home-made birthday cake",
+    "bowl": "A healthy meal in a bowl",
+    "salad": "A fresh seasonal salad",
+    "spread": "A colourful meal seen from above"
+  }
+}

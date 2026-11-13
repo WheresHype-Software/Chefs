@@ -1,0 +1,43 @@
+{
+  "main": "Principal",
+  "homeLabel": "Ao Lume, página inicial",
+  "forChefs": "para chefs",
+  "createProfile": "Criar perfil",
+  "signIn": "Entrar",
+  "createChefProfile": "Criar perfil de chef",
+  "imClient": "Sou cliente",
+  "imChef": "Sou chef",
+  "links": {
+    "search": "Procurar chefs",
+    "howItWorks": "Como funciona",
+    "trackRequest": "Acompanhar pedido",
+    "tool": "Ferramenta",
+    "marketing": "Marketing",
+    "faq": "Perguntas"
+  },
+  "language": {
+    "label": "Idioma",
+    "switchTo": "Mudar para {language}"
+  },
+  "footer": {
+    "tagline": "Juntamos quem gosta de comer bem a quem sabe cozinhar. O resto acontece à sua mesa.",
+    "forClients": "Para clientes",
+    "clients": "Clientes",
+    "search": "Procurar chefs",
+    "howItWorks": "Como funciona",
+    "trackRequest": "Acompanhar pedido",
+    "signIn": "Entrar",
+    "support": "Apoio",
+    "forChefs": "Para chefs",
+    "chefs": "Chefs",
+    "aoLumeForChefs": "Ao Lume para chefs",
+    "terms": "Termos",
+    "privacy": "Privacidade",
+    "complaintsBook": "Livro de Reclamações"
+  },
+  "menu": {
+    "open": "Abrir menu",
+    "close": "Fechar menu"
+  },
+  "signOut": "Sair"
+}

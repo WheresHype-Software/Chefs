@@ -1,12 +1,15 @@
+import { useTranslations } from "next-intl";
+
 /** The three promises the chef ads lead with, repeated where the chef decides. */
-const PROMISES = ["O sinal é pago na app", "Decide o menu, os dias e o preço", "Perfil criado em poucos minutos"];
+const PROMISES = ["depositInApp", "youDecide", "quickProfile"] as const;
 
 export function Promises({ tone = "ink" }: { tone?: "ink" | "white" }) {
+  const t = useTranslations("paraChefs.promises");
   const dark = tone === "white";
   return (
     <ul className={`m-0 flex list-none flex-wrap gap-x-6 gap-y-2.5 p-0 text-[15px] ${dark ? "text-[#c9d6ee]" : "text-ink-3"}`}>
-      {PROMISES.map((p) => (
-        <li key={p} className="flex items-center gap-2">
+      {PROMISES.map((key) => (
+        <li key={key} className="flex items-center gap-2">
           <span
             aria-hidden="true"
             className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full ${
@@ -17,7 +20,7 @@ export function Promises({ tone = "ink" }: { tone?: "ink" | "white" }) {
               <path d="M5 12.5 10 17 19 7" />
             </svg>
           </span>
-          {p}
+          {t(key)}
         </li>
       ))}
     </ul>

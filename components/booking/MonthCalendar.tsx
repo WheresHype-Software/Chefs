@@ -1,6 +1,8 @@
 "use client";
 
-import { isoDay, monthLabel } from "@/lib/format";
+import { useLocale, useTranslations } from "next-intl";
+import { isoDay, monthLabel, weekdayInitials } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { Calendar } from "@/lib/types";
 
 type Props = {
@@ -18,8 +20,6 @@ type Props = {
   noneSoon?: boolean;
 };
 
-const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"];
-
 /** Month grid of a chef's free days: outlined = available, struck = booked. */
 export function MonthCalendar({
   year,
@@ -33,6 +33,9 @@ export function MonthCalendar({
   onRetry,
   noneSoon = false,
 }: Props) {
+  const t = useTranslations("booking.form");
+  const locale = useLocale() as Locale;
+  const weekdays = weekdayInitials(locale);
   const lead = (new Date(year, month, 1).getDay() + 6) % 7; // Monday first
   const days = new Date(year, month + 1, 0).getDate();
   const available = new Set(calendar?.available ?? []);
@@ -41,25 +44,25 @@ export function MonthCalendar({
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex items-baseline justify-between border-b border-line pb-2.5">
-        <h3 className="step-title required m-0 text-[15px] font-semibold">Dia</h3>
+        <h3 className="step-title required m-0 text-[15px] font-semibold">{t("day")}</h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
             className="ctl !h-8 !w-8 !text-sm"
             onClick={() => onShift(-1)}
             disabled={!canGoBack}
-            aria-label="Mês anterior"
+            aria-label={t("prevMonth")}
           >
             ‹
           </button>
-          <span className="d min-w-36 text-center text-base italic">{monthLabel(year, month)}</span>
-          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onShift(1)} aria-label="Mês seguinte">
+          <span className="d min-w-36 text-center text-base italic">{monthLabel(year, month, locale)}</span>
+          <button type="button" className="ctl !h-8 !w-8 !text-sm" onClick={() => onShift(1)} aria-label={t("nextMonth")}>
             ›
           </button>
         </div>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[.1em] text-muted" aria-hidden="true">
-        {WEEKDAYS.map((d, i) => (
+        {weekdays.map((d, i) => (
           <span key={i}>{d}</span>
         ))}
       </div>
@@ -80,7 +83,7 @@ export function MonthCalendar({
               data-s={state}
               disabled={!isFree}
               onClick={() => onSelect(iso)}
-              aria-label={`${i + 1}${isFree ? ", disponível" : isBooked ? ", reservado" : ", indisponível"}`}
+              aria-label={t(isFree ? "dayAvailable" : isBooked ? "dayBooked" : "dayUnavailable", { day: i + 1 })}
               aria-pressed={selected === iso}
             >
               {i + 1}
@@ -90,32 +93,32 @@ export function MonthCalendar({
       </div>
       {failed ? (
         <p role="alert" className="m-0 flex flex-wrap items-center gap-x-2 text-sm text-danger">
-          Não foi possível carregar os dias livres.
+          {t("calendarFailed")}
           {onRetry && (
             <button
               type="button"
               onClick={onRetry}
               className="cursor-pointer border-0 bg-transparent p-0 font-semibold text-cobalt underline"
             >
-              Tentar de novo
+              {t("retry")}
             </button>
           )}
         </p>
       ) : noneSoon && calendar && available.size === 0 ? (
-        <p className="m-0 text-sm text-ink-3">Sem dias livres nos próximos meses. Volte a ver em breve.</p>
+        <p className="m-0 text-sm text-ink-3">{t("noneSoon")}</p>
       ) : calendar && available.size === 0 ? (
         <p className="m-0 flex flex-wrap items-center gap-x-2 text-sm text-ink-3">
-          Sem dias livres neste mês.
+          {t("noneThisMonth")}
           <button
             type="button"
             onClick={() => onShift(1)}
             className="cursor-pointer border-0 bg-transparent p-0 font-semibold text-cobalt underline"
           >
-            Ver o mês seguinte
+            {t("seeNextMonth")}
           </button>
         </p>
       ) : (
-        <span className="text-xs text-muted">Com contorno: disponível · Riscado: já reservado</span>
+        <span className="text-xs text-muted">{t("legend")}</span>
       )}
     </div>
   );

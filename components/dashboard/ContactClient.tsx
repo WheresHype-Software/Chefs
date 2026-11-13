@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { contactPhone, whatsappLink } from "@/lib/contact";
 
 /**
@@ -8,7 +9,7 @@ import { contactPhone, whatsappLink } from "@/lib/contact";
  * um dígito. A mensagem do WhatsApp já vai começada com a referência da reserva, para o cliente
  * perceber quem está do outro lado antes de atender um número que não conhece.
  */
-export function ContactClient({
+export async function ContactClient({
   name,
   phone,
   email,
@@ -19,28 +20,34 @@ export function ContactClient({
   email?: string | null;
   bookingRef?: string;
 }) {
+  const t = await getTranslations("dashboard.contact");
   const p = contactPhone(phone);
   if (!p && !email) return null;
 
-  const greeting = `Olá${name ? ` ${name.split(" ")[0]}` : ""}! Sou do Ao Lume${bookingRef ? `, sobre a reserva ${bookingRef}` : ""}.`;
+  const greeting = t("greeting", {
+    hasName: name ? "yes" : "no",
+    name: name ? name.split(" ")[0]! : "",
+    hasRef: bookingRef ? "yes" : "no",
+    ref: bookingRef ?? "",
+  });
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="lab text-muted">Contacto</span>
+      <span className="lab text-muted">{t("title")}</span>
       <div className="flex flex-wrap gap-1.5">
         {p && (
           <>
             <a href={`tel:${p.tel}`} className="btn btn-sm btn-o">
-              Ligar
+              {t("call")}
             </a>
             <a href={whatsappLink(p, greeting)} target="_blank" rel="noopener" className="btn btn-sm btn-o">
-              WhatsApp
+              {t("whatsapp")}
             </a>
           </>
         )}
         {email && (
           <a href={`mailto:${email}`} className="btn btn-sm btn-o">
-            Email
+            {t("email")}
           </a>
         )}
       </div>

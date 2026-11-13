@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmIbanChange } from "@/app/dashboard/actions/billing";
 import { callAction } from "@/lib/call-action";
@@ -10,6 +11,7 @@ import { callAction } from "@/lib/call-action";
  * link in their email; asking twice only makes people hesitate over something they asked for.
  */
 export function IbanConfirmation({ token }: { token: string }) {
+  const t = useTranslations("dashboard.confirmIban");
   const [state, setState] = useState<{ status: "working" | "done" | "failed"; error?: string }>({ status: "working" });
   const ran = useRef(false);
 
@@ -22,7 +24,7 @@ export function IbanConfirmation({ token }: { token: string }) {
     })();
   }, [token]);
 
-  if (state.status === "working") return <p className="m-0 text-muted">A confirmar…</p>;
+  if (state.status === "working") return <p className="m-0 text-muted">{t("confirming")}</p>;
   if (state.status === "failed")
     return (
       <div className="flex flex-col gap-3">
@@ -30,19 +32,16 @@ export function IbanConfirmation({ token }: { token: string }) {
           {state.error}
         </p>
         <Link href="/dashboard/faturacao" className="btn btn-o btn-sm self-start">
-          Voltar à faturação
+          {t("backToBilling")}
         </Link>
       </div>
     );
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="m-0">
-        Pronto: passamos a pagar-te para a conta nova. Por segurança, os pagamentos ficam retidos durante 72 horas e a equipa confirma a
-        conta antes da primeira transferência.
-      </p>
+      <p className="m-0">{t("done")}</p>
       <Link href="/dashboard/faturacao" className="btn btn-sm self-start">
-        Ver a faturação
+        {t("seeBilling")}
       </Link>
     </div>
   );

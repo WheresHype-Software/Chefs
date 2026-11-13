@@ -1,5 +1,5 @@
 import "server-only";
-import { redirect } from "next/navigation";
+import { redirectLocalized } from "@/lib/i18n/server";
 import { cache } from "react";
 import { announceChefSignup, announceUserSignup } from "../notify/discord";
 import { createClient, hasSupabase } from "../supabase/server";
@@ -12,7 +12,7 @@ export const getSession = cache(async (): Promise<Session> => {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) redirect("/entrar");
+  if (!user) return redirectLocalized("/entrar");
   const { data: profile } = await sb.from("profiles").select("role, name, signup_announced_at").eq("id", user.id).single();
   const role = (profile?.role ?? "client") as Role;
   if (profile && !profile.signup_announced_at) void announceSignup(user.id, role, profile.name as string | null);
@@ -60,7 +60,7 @@ export const getMyChef = cache(async (): Promise<MyChef | null> => {
 
 export async function requireChef(): Promise<MyChef> {
   const chef = await getMyChef();
-  if (!chef) redirect("/dashboard/comecar");
+  if (!chef) return redirectLocalized("/dashboard/comecar");
   return chef;
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { setLumi } from "@/app/dashboard/actions/lumi";
@@ -83,6 +84,7 @@ export function LumiCoach({
   followScroll?: boolean;
   inline?: boolean;
 }) {
+  const tr = useTranslations("dashboard.lumi");
   // She lives in the page's layout, which only exists in the browser.
   const mounted = useSyncExternalStore(
     noop,
@@ -258,7 +260,7 @@ export function LumiCoach({
   if (!host) return null;
 
   const body = (
-    <aside key={tip.target} aria-label="Ajuda da Lumi" className="flex items-start gap-1">
+    <aside key={tip.target} aria-label={tr("label")} className="flex items-start gap-1">
       <span className="lumi-hop mt-3 shrink-0">
         <Lumi mood={tip.mood} size={wide ? 76 : wideScreen ? 64 : 52} animated />
       </span>
@@ -266,11 +268,11 @@ export function LumiCoach({
         {/* The balloon's tail, pointing at Lumi. */}
         <span aria-hidden="true" className="absolute -left-[7px] top-7 h-3.5 w-3.5 rotate-45 border-b border-l border-line-2 bg-white" />
         {confirming ? (
-          <div className="flex flex-col gap-2" role="group" aria-label="Esconder a ajuda da Lumi">
-            <p className="m-0 text-sm font-semibold text-ink">Esconder a ajuda da Lumi?</p>
+          <div className="flex flex-col gap-2" role="group" aria-label={tr("hideGroup")}>
+            <p className="m-0 text-sm font-semibold text-ink">{tr("hideQuestion")}</p>
             <div className="flex flex-wrap gap-2">
               <button type="button" className="btn btn-o btn-sm min-h-11" onClick={hideForNow}>
-                Só por agora
+                {tr("justNow")}
               </button>
               <button
                 type="button"
@@ -280,18 +282,16 @@ export function LumiCoach({
                   void setLumi(false);
                 }}
               >
-                Nunca mais mostrar
+                {tr("never")}
               </button>
             </div>
-            <p className="m-0 text-[13px] text-muted">
-              «Só por agora» volta na próxima visita. «Nunca mais mostrar» vale para todas as páginas; pode reativá-la quando quiser.
-            </p>
+            <p className="m-0 text-[13px] text-muted">{tr("explain")}</p>
             <button
               type="button"
               className="min-h-11 self-start text-[13px] text-muted underline hover:text-ink"
               onClick={() => setConfirming(false)}
             >
-              Cancelar
+              {tr("cancel")}
             </button>
           </div>
         ) : (
@@ -314,8 +314,8 @@ export function LumiCoach({
           type="button"
           hidden={confirming}
           onClick={() => setConfirming(true)}
-          aria-label="Deixar de mostrar a ajuda da Lumi"
-          title="Deixar de mostrar a ajuda da Lumi"
+          aria-label={tr("turnOff")}
+          title={tr("turnOff")}
           className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-full text-faint hover:text-ink"
         >
           <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
@@ -344,6 +344,7 @@ export function LumiCoach({
  * even before the chef can reach the switch in Perfil.
  */
 export function LumiRestore() {
+  const tr = useTranslations("dashboard.lumi");
   const save = useServerAction(setLumi);
   return (
     <button
@@ -353,7 +354,7 @@ export function LumiRestore() {
       className="flex min-h-11 items-center gap-2 self-start text-[13px] text-muted underline hover:text-cobalt"
     >
       <Lumi mood="espera" size={32} />
-      {save.pending ? "A ativar…" : "Mostrar a ajuda da Lumi"}
+      {save.pending ? tr("activating") : tr("show")}
     </button>
   );
 }

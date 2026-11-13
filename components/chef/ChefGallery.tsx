@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Photo } from "@/components/ui/Photo";
 import type { ChefProfile } from "@/lib/types";
 
@@ -13,12 +14,13 @@ const GRID: Record<number, string> = {
 
 /** Photos at the top of the chef page: a swipeable strip on phones, a mosaic from tablets up. */
 export function ChefGallery({ gallery }: { gallery: ChefProfile["gallery"] }) {
-  const photos = gallery.length ? gallery : [{ url: null, caption: "Fotografia" }];
+  const t = useTranslations("chef.gallery");
+  const photos = gallery.length ? gallery : [{ url: null, caption: t("placeholder") }];
   return (
     <section className="mx-auto max-w-[1240px] px-5 pt-4 md:px-8 md:pt-6">
       {/* Phones: swipe through every photo. */}
       <ul
-        aria-label="Fotografias"
+        aria-label={t("label")}
         className="-mx-5 m-0 flex list-none snap-x snap-mandatory scroll-px-5 gap-2.5 overflow-x-auto px-5 [scrollbar-width:none] md:hidden"
       >
         {photos.map((p, i) => (

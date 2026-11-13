@@ -1,10 +1,16 @@
 import "server-only";
 import { sendEmail, siteUrl } from "../email";
 import { renderEmail } from "../email-template";
-import { euro } from "../format";
+import { euro, longDay } from "../format";
+import { clientLocaleFrom, profileLocaleFrom } from "../i18n/recipient";
+import { DEFAULT_LOCALE, localizePath, type Locale } from "../i18n/routing";
+import { getTranslator } from "../i18n/translator";
 import { createAdminClient } from "../supabase/admin";
 import { eupago } from "./eupago";
 import type { ProviderStatus } from "./types";
+
+/** A date as a fact: ISO in Portuguese emails (as they always were), spelled out in English. */
+const emailDay = (iso: string, locale: Locale) => (locale === "pt" ? iso : longDay(iso, locale));
 
 /**
  * The only place a payment is allowed to change state.
@@ -150,28 +156,41 @@ export async function announceReference(args: {
 }): Promise<void> {
   const sb = createAdminClient();
   if (!sb) return;
-  const { data } = await sb.from("bookings").select("ref, client_id, clients(email)").eq("id", args.bookingId).maybeSingle();
-  const booking = data as unknown as { ref: string; client_id: string; clients: { email: string } | null } | null;
+  const { data } = await sb
+    .from("bookings")
+    .select("ref, client_id, clients(email, locale, profiles(locale))")
+    .eq("id", args.bookingId)
+    .maybeSingle();
+  const booking = data as unknown as {
+    ref: string;
+    client_id: string;
+    clients: { email: string; locale: string | null; profiles: { locale: string | null } | null } | null;
+  } | null;
   if (!booking?.clients?.email || !args.reference) return;
 
+  const locale = clientLocaleFrom(booking.clients);
+  const e = getTranslator(locale, "emails");
   const facts: [string, string][] = [
-    ["Entidade", args.entity ?? "—"],
-    ["Referência", args.reference],
-    ["Valor", euro(args.amount)],
+    [e("facts.entity"), args.entity ?? "—"],
+    [e("facts.reference"), args.reference],
+    [e("facts.amount"), euro(args.amount, locale)],
   ];
-  if (args.expiresAt) facts.push(["Pague até", new Date(args.expiresAt).toLocaleDateString("pt-PT", { dateStyle: "long" })]);
+  if (args.expiresAt) facts.push([e("facts.payBy"), new Date(args.expiresAt).toLocaleDateString(locale === "pt" ? "pt-PT" : "en-GB", { dateStyle: "long" })]);
 
-  const doc = renderEmail({
-    preheader: `Referência para pagar o sinal da reserva ${booking.ref}`,
-    heading: "Os dados para pagar o sinal",
-    lead: "Pode pagar no homebanking ou numa caixa Multibanco.",
-    facts,
-    paragraphs: ["A reserva fica confirmada automaticamente assim que o pagamento entrar."],
-    cta: { label: "Ver a reserva", href: await guestLink(args.bookingId, booking.client_id) },
-  });
+  const doc = renderEmail(
+    {
+      preheader: e("reference.preheader", { ref: booking.ref }),
+      heading: e("reference.heading"),
+      lead: e("reference.lead"),
+      facts,
+      paragraphs: [e("reference.body")],
+      cta: { label: e("reference.cta"), href: await guestLink(args.bookingId, booking.client_id, locale) },
+    },
+    locale,
+  );
   await sendEmail({
     to: booking.clients.email,
-    subject: `Referência para o sinal · reserva ${booking.ref}`,
+    subject: e("reference.subject", { ref: booking.ref }),
     text: doc.text,
     html: doc.html,
   }).catch((err) => console.error("[payments] reference email:", err));
@@ -186,11 +205,12 @@ export async function announceReference(args: {
  *
  * The proxy moves the token out of the address bar into an httpOnly cookie on arrival.
  */
-export async function guestLink(bookingId: string, clientId: string | null): Promise<string> {
+export async function guestLink(bookingId: string, clientId: string | null, locale: Locale = DEFAULT_LOCALE): Promise<string> {
+  const path = (suffix = "") => siteUrl(localizePath(`/reserva/${bookingId}${suffix}`, locale));
   const sb = createAdminClient();
-  if (!sb || !clientId) return siteUrl(`/reserva/${bookingId}`);
+  if (!sb || !clientId) return path();
   const { data: token } = await sb.rpc("new_guest_token", { p_client_id: clientId });
-  return token ? siteUrl(`/reserva/${bookingId}?t=${token}`) : siteUrl(`/reserva/${bookingId}`);
+  return token ? path(`?t=${token}`) : path();
 }
 
 // --- Telling people -----------------------------------------------------------
@@ -204,7 +224,7 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
   const { data } = await sb
     .from("bookings")
     .select(
-      "ref, client_id, date, time_label, booking_value, quoted_price, estimate, deposit_amount, deposit_due_at, deposit_status, offer_title, guests, chefs(display_name), clients(email, name)",
+      "ref, client_id, date, time_label, booking_value, quoted_price, estimate, deposit_amount, deposit_due_at, deposit_status, offer_title, guests, chefs(display_name), clients(email, name, locale, profiles(locale))",
     )
     .eq("id", bookingId)
     .maybeSingle();
@@ -224,36 +244,40 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
     offer_title: string;
     guests: number;
     chefs: { display_name: string } | null;
-    clients: { email: string; name: string | null } | null;
+    clients: { email: string; name: string | null; locale: string | null; profiles: { locale: string | null } | null } | null;
   };
   if (booking.deposit_status !== "due" || !booking.clients?.email || !Number(booking.deposit_amount)) return;
 
+  const locale = clientLocaleFrom(booking.clients);
+  const e = getTranslator(locale, "emails");
   const deadline = booking.deposit_due_at ? new Date(booking.deposit_due_at) : null;
   const deposit = Number(booking.deposit_amount);
   const total = Number(booking.booking_value ?? booking.quoted_price ?? booking.estimate ?? 0);
   const rest = Math.round((total - deposit) * 100) / 100;
+  const when = `${emailDay(booking.date, locale)}${booking.time_label ? ` · ${booking.time_label}` : ""}`;
 
   const facts: [string, string][] = [
-    ["Reserva", `${booking.ref} · ${booking.offer_title}`],
-    ["Quando", `${booking.date}${booking.time_label ? ` · ${booking.time_label}` : ""} · ${booking.guests} pessoas`],
+    [e("facts.booking"), e("facts.refOffer", { ref: booking.ref, offer: booking.offer_title })],
+    [e("facts.when"), e("facts.withGuests", { what: when, guests: booking.guests })],
   ];
-  if (total > 0) facts.push(["Valor do serviço", euro(total)]);
-  facts.push(["A pagar agora (sinal)", euro(deposit)]);
-  if (total > 0 && rest > 0) facts.push(["Depois, ao chef", euro(rest)]);
-  if (deadline) facts.push(["Pague até", deadline.toLocaleString("pt-PT", { dateStyle: "long", timeStyle: "short" })]);
+  if (total > 0) facts.push([e("facts.serviceValue"), euro(total, locale)]);
+  facts.push([e("depositDue.payNow"), euro(deposit, locale)]);
+  if (total > 0 && rest > 0) facts.push([e("depositDue.rest"), euro(rest, locale)]);
+  if (deadline) facts.push([e("facts.payBy"), deadline.toLocaleString(locale === "pt" ? "pt-PT" : "en-GB", { dateStyle: "long", timeStyle: "short" })]);
 
-  const doc = renderEmail({
-    preheader: `Falta o sinal da reserva ${booking.ref}`,
-    heading: `${booking.chefs?.display_name ?? "O chef"} aceitou o seu pedido`,
-    lead: "Falta pagar o sinal para a reserva ficar confirmada.",
-    facts,
-    paragraphs: [
-      "Pode pagar por MB WAY ou por referência Multibanco na página da reserva.",
-      "O restante valor do serviço é combinado e pago diretamente ao chef.",
-    ],
-    cta: { label: "Pagar o sinal", href: await guestLink(bookingId, booking.client_id) },
-  });
-  await sendEmail({ to: booking.clients.email, subject: `Falta o sinal · reserva ${booking.ref}`, text: doc.text, html: doc.html }).catch(
+  const chefName = booking.chefs?.display_name;
+  const doc = renderEmail(
+    {
+      preheader: e("depositDue.preheader", { ref: booking.ref }),
+      heading: chefName ? e("depositDue.heading", { chef: chefName }) : e("depositDue.headingNoName"),
+      lead: e("depositDue.lead"),
+      facts,
+      paragraphs: [e("depositDue.howToPay"), e("depositDue.restToChef")],
+      cta: { label: e("depositDue.cta"), href: await guestLink(bookingId, booking.client_id, locale) },
+    },
+    locale,
+  );
+  await sendEmail({ to: booking.clients.email, subject: e("depositDue.subject", { ref: booking.ref }), text: doc.text, html: doc.html }).catch(
     (err) => console.error("[payments] deposit due email:", err),
   );
 }
@@ -264,7 +288,7 @@ async function announcePaid(bookingId: string): Promise<void> {
   const { data } = await sb
     .from("bookings")
     .select(
-      "id, ref, date, time_label, offer_title, deposit_amount, payout_amount, guests, chefs(display_name, profiles(email)), clients(name, email)",
+      "id, ref, date, time_label, offer_title, deposit_amount, payout_amount, guests, chefs(display_name, profiles(email, locale)), clients(name, email, locale, profiles(locale))",
     )
     .eq("id", bookingId)
     .maybeSingle();
@@ -282,54 +306,66 @@ async function announcePaid(bookingId: string): Promise<void> {
     deposit_amount: string | number | null;
     payout_amount: string | number | null;
     guests: number;
-    chefs: { display_name: string; profiles: { email: string | null } | null } | null;
-    clients: { name: string | null; email: string } | null;
+    chefs: { display_name: string; profiles: { email: string | null; locale: string | null } | null } | null;
+    clients: { name: string | null; email: string; locale: string | null; profiles: { locale: string | null } | null } | null;
   };
 
-  const when = `${booking.date}${booking.time_label ? ` · ${booking.time_label}` : ""}`;
   const chefEmail = booking.chefs?.profiles?.email;
   const clientEmail = booking.clients?.email;
   const paid = Number(booking.deposit_amount ?? 0);
   const total = Number(booking.booking_value ?? booking.quoted_price ?? booking.estimate ?? 0);
   const owed = Math.round((total - paid) * 100) / 100;
+  const chefName = booking.chefs?.display_name;
 
   if (clientEmail) {
-    const doc = renderEmail({
-      preheader: `Reserva ${booking.ref} confirmada`,
-      heading: "Sinal recebido, reserva confirmada",
-      lead: `${booking.chefs?.display_name ?? "O chef"} já sabe que está tudo confirmado.`,
-      facts: [
-        ["Reserva", `${booking.ref} · ${booking.offer_title}`],
-        ["Quando", `${when} · ${booking.guests} pessoas`],
-        ...(total > 0 ? ([["Valor do serviço", euro(total)]] as [string, string][]) : []),
-        ["Sinal pago", euro(paid)],
-        ...(total > 0 && owed > 0 ? ([["Falta pagar ao chef, no dia", euro(owed)]] as [string, string][]) : []),
-      ],
-      paragraphs: [
-        `A data está garantida. ${booking.chefs?.display_name ?? "O chef"} combina consigo o restante valor, que é pago diretamente a ele no dia do serviço.`,
-        "Guarde este email: a ligação abaixo abre a reserva e a conversa com o chef.",
-      ],
-      cta: { label: "Ver a reserva", href: await guestLink(bookingId, booking.client_id) },
-    });
-    await sendEmail({ to: clientEmail, subject: `Reserva ${booking.ref} confirmada`, text: doc.text, html: doc.html }).catch((err) =>
+    const locale = clientLocaleFrom(booking.clients);
+    const e = getTranslator(locale, "emails");
+    const when = `${emailDay(booking.date, locale)}${booking.time_label ? ` · ${booking.time_label}` : ""}`;
+    const doc = renderEmail(
+      {
+        preheader: e("paid.client.preheader", { ref: booking.ref }),
+        heading: e("paid.client.heading"),
+        lead: chefName ? e("paid.client.lead", { chef: chefName }) : e("paid.client.leadNoName"),
+        facts: [
+          [e("facts.booking"), e("facts.refOffer", { ref: booking.ref, offer: booking.offer_title })],
+          [e("facts.when"), e("facts.withGuests", { what: when, guests: booking.guests })],
+          ...(total > 0 ? ([[e("facts.serviceValue"), euro(total, locale)]] as [string, string][]) : []),
+          [e("paid.client.depositPaid"), euro(paid, locale)],
+          ...(total > 0 && owed > 0 ? ([[e("paid.client.owed"), euro(owed, locale)]] as [string, string][]) : []),
+        ],
+        paragraphs: [
+          chefName ? e("paid.client.dateSecured", { chef: chefName }) : e("paid.client.dateSecuredNoName"),
+          e("paid.client.keep"),
+        ],
+        cta: { label: e("paid.client.cta"), href: await guestLink(bookingId, booking.client_id, locale) },
+      },
+      locale,
+    );
+    await sendEmail({ to: clientEmail, subject: e("paid.client.subject", { ref: booking.ref }), text: doc.text, html: doc.html }).catch((err) =>
       console.error("[payments] client email:", err),
     );
   }
 
   if (chefEmail) {
-    const doc = renderEmail({
-      preheader: `Sinal recebido · ${booking.ref}`,
-      heading: "O sinal entrou",
-      lead: `A reserva ${booking.ref} está confirmada.`,
-      facts: [
-        ["Serviço", `${booking.offer_title} · ${booking.guests} pessoas`],
-        ["Quando", when],
-        ["Vais receber", euro(Number(booking.payout_amount ?? 0))],
-      ],
-      paragraphs: ["Transferimos este valor depois do serviço concluído, com o documento de pagamento."],
-      cta: { label: "Ver o pedido", href: siteUrl(`/dashboard/pedidos/${bookingId}`) },
-    });
-    await sendEmail({ to: chefEmail, subject: `Sinal recebido · reserva ${booking.ref}`, text: doc.text, html: doc.html }).catch((err) =>
+    const locale = profileLocaleFrom(booking.chefs?.profiles);
+    const e = getTranslator(locale, "emails");
+    const when = `${emailDay(booking.date, locale)}${booking.time_label ? ` · ${booking.time_label}` : ""}`;
+    const doc = renderEmail(
+      {
+        preheader: e("paid.chef.preheader", { ref: booking.ref }),
+        heading: e("paid.chef.heading"),
+        lead: e("paid.chef.lead", { ref: booking.ref }),
+        facts: [
+          [e("facts.service"), e("facts.withGuests", { what: booking.offer_title, guests: booking.guests })],
+          [e("facts.when"), when],
+          [e("paid.chef.youReceive"), euro(Number(booking.payout_amount ?? 0), locale)],
+        ],
+        paragraphs: [e("paid.chef.body")],
+        cta: { label: e("paid.chef.cta"), href: `/dashboard/pedidos/${bookingId}` },
+      },
+      locale,
+    );
+    await sendEmail({ to: chefEmail, subject: e("paid.chef.subject", { ref: booking.ref }), text: doc.text, html: doc.html }).catch((err) =>
       console.error("[payments] chef email:", err),
     );
   }

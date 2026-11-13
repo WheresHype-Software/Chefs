@@ -1,0 +1,116 @@
+{
+  "hero": {
+    "title": "Chefs e cozinheiros caseiros perto de si.",
+    "lead": "Jantares cozinhados em sua casa, marmitas para a semana, bolos e petiscos para levantar. Escolha, peça a reserva e só paga depois de o chef aceitar.",
+    "promises": {
+      "noAccount": "Sem criar conta",
+      "payAfterAccept": "Só paga depois de o chef aceitar",
+      "depositInApp": "Sinal pago em segurança na app",
+      "payChefDirectly": "Combina o pagamento diretamente com o chef"
+    },
+    "mapLink": "Ou veja todos os chefs no mapa →"
+  },
+  "services": {
+    "title": "O que pode pedir",
+    "items": {
+      "home": { "title": "Chef em casa", "text": "Jantares e datas especiais, cozinhados e servidos na sua cozinha." },
+      "meal_prep": { "title": "Marmitas da semana", "text": "Refeições caseiras para os dias de trabalho." },
+      "pickup": { "title": "Bolos e encomendas", "text": "Pastelaria e doces de época para levantar." },
+      "delivery": { "title": "Entrega", "text": "Pratos do chef levados até à sua porta." },
+      "events": { "title": "Eventos", "text": "Aniversários, batizados e jantares de empresa." }
+    }
+  },
+  "howItWorks": {
+    "title": "Como funciona",
+    "introPaymentsOn": "O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço; o sinal é pago aqui e o resto diretamente ao chef.",
+    "introPaymentsOff": "O Ao Lume liga-o ao chef e organiza o pedido. O chef define o preço; o pagamento é combinado diretamente com o chef.",
+    "steps": {
+      "find": {
+        "title": "Encontre quem cozinha perto",
+        "text": "Pesquise pela sua zona ou explore o mapa, e veja menus, preços e avaliações de quem já reservou."
+      },
+      "request": {
+        "title": "Peça a reserva",
+        "text": "Escolha o dia livre e diga o que precisa. Não precisa de criar conta e ainda não paga nada."
+      },
+      "payDeposit": {
+        "title": "Pague o sinal e está feito",
+        "text": "Quando o chef aceita, paga aqui o sinal por MB WAY ou Multibanco e a reserva fica confirmada. O resto combina com o chef, no dia."
+      },
+      "agree": {
+        "title": "Combine com o chef e está feito",
+        "text": "Quando o chef aceita, falam pelo pedido e combinam o sinal e o pagamento entre os dois. A reserva fica confirmada assim que o chef o confirmar."
+      }
+    }
+  },
+  "nearby": {
+    "title": "Quem cozinha perto de si",
+    "text": "Toque num chef no mapa para ver a zona, o preço e o menu. Os chefs mostram a zona onde trabalham, nunca a morada.",
+    "seeAll": "Ver todos os chefs →"
+  },
+  "trust": {
+    "title": "Porque pode confiar",
+    "points": {
+      "reviewed": {
+        "title": "Cada chef é revisto antes de aparecer",
+        "text": "A equipa confirma a fotografia de perfil, as fotos dos pratos e o Instagram ou site de cada chef antes de o perfil ficar público."
+      },
+      "reviews": {
+        "title": "Avaliações só de quem reservou",
+        "text": "Só pode avaliar quem fez uma reserva concluída com esse chef. Nada de avaliações compradas ou de desconhecidos."
+      },
+      "written": {
+        "title": "Tudo combinado por escrito",
+        "text": "Cada reserva tem o seu chat e uma página com o estado do pedido, o preço e a política de cancelamento do chef."
+      }
+    }
+  },
+  "faq": {
+    "title": "Perguntas frequentes",
+    "lead": "O essencial antes do primeiro pedido.",
+    "account": {
+      "q": "Preciso de criar conta?",
+      "a": "Não. Escolhe o chef, o dia e envia o pedido com o seu nome, email e telemóvel. Recebe um link para acompanhar o pedido e falar com o chef. A conta é opcional e guarda o histórico."
+    },
+    "cost": {
+      "q": "Quanto custa?",
+      "a": "O preço é o do chef e aparece no perfil antes de pedir. Enviar um pedido não custa nada."
+    },
+    "payment": {
+      "q": "Como e quando pago?",
+      "aPaymentsOn": "Só depois de o chef aceitar o pedido. Nessa altura paga aqui o sinal, por MB WAY ou referência Multibanco, e a reserva fica confirmada. O restante valor combina-o diretamente com o chef, no dia.",
+      "aPaymentsOff": "Só depois de o chef aceitar o pedido. O pagamento é combinado diretamente entre si e o chef, pelos meios que ele aceitar. Enviar o pedido não custa nada."
+    },
+    "chefUnavailable": {
+      "q": "E se o chef não puder?",
+      "a": "O chef tem 48 horas para aceitar, recusar ou propor outra data ou preço. Até aceitar, não está comprometido a nada."
+    },
+    "cancel": {
+      "q": "Posso cancelar?",
+      "a": "Sim, na página do pedido. Cada chef mostra a sua política de cancelamento no perfil e na reserva, para saber as condições antes de pedir."
+    },
+    "track": {
+      "q": "Como acompanho o meu pedido?",
+      "a": "Pelo link que recebe ao enviar o pedido, ou em <link>Acompanhar pedido</link> com o número do pedido e o seu email."
+    }
+  },
+  "chefsCta": {
+    "title": "Cozinha bem? Receba pedidos de clientes perto de si.",
+    "text": "Uma página com os seus menus e avaliações, um calendário com os dias livres e um chat por reserva. Para chefs profissionais e cozinheiros caseiros.",
+    "createProfile": "Criar o meu perfil",
+    "howItWorks": "Como funciona para chefs"
+  },
+  "chefDoor": {
+    "title": "Sou chef ou cozinheiro caseiro",
+    "text": "Criar perfil e receber pedidos · sem mensalidades"
+  },
+  "cookies": {
+    "label": "Cookies",
+    "title": "Utilizamos cookies",
+    "text": "Utilizamos cookies necessários ao funcionamento do site e, com a sua autorização, cookies da Meta para medir a eficácia dos nossos anúncios no Facebook e no Instagram. Pode mudar a sua escolha a qualquer momento, em «Cookies», no fundo da página.",
+    "learnMore": "Saiba mais",
+    "reject": "Rejeitar",
+    "accept": "Aceitar",
+    "settings": "Cookies"
+  }
+}

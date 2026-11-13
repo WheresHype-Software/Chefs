@@ -1,0 +1,309 @@
+{
+  "meta": {
+    "title": "For chefs",
+    "descriptionPaymentsOn": "A shop window, requests, calendar and reviews for private chefs and home cooks. The client pays the deposit in the app; we pay you after the service.",
+    "descriptionPaymentsOff": "A shop window, requests, calendar and reviews for private chefs and home cooks. No monthly fees and no commission."
+  },
+  "createProfile": "Create my profile",
+  "hero": {
+    "title": "Make a living from your<br></br><accent>kitchen.</accent>",
+    "lead": "Your shop window, new clients, requests, calendar and reviews, all in one place. Dinners at home, events, weekly meals, cakes or savouries: you choose what you make, when and for how much.",
+    "seeTool": "See the tools",
+    "footnotePaymentsOn": "Every profile is checked by our team · the deposit is paid in the app",
+    "footnotePaymentsOff": "Every profile is checked by our team · no monthly fees and no commission",
+    "imageAlt": "The chef's dashboard on a phone: requests awaiting a reply, this week's services, average rating and new requests waiting for an answer.",
+    "imageCaption": "App screen with demo data."
+  },
+  "promises": {
+    "depositInApp": "The deposit is paid in the app",
+    "youDecide": "You decide the menu, the days and the price",
+    "quickProfile": "Profile set up in minutes"
+  },
+  "tool": {
+    "title": "Everything a request needs, in one place.",
+    "tabsLabel": "Features",
+    "caption": "App screens with demo data.",
+    "tabs": {
+      "page": {
+        "label": "Page",
+        "alt": "The top of a chef's public page: five photos of dishes, her name, the verification marks and the booking request box.",
+        "title": "Your shop window, ready to share",
+        "text": "Photos, menus, prices and reviews behind a short link that fits in your Instagram bio.",
+        "points": {
+          "a": "Your own link: {link}",
+          "b": "Fixed price, per person or on request",
+          "c": "Payment and cancellation terms visible to the client"
+        }
+      },
+      "requests": {
+        "label": "Requests",
+        "alt": "The list of requests on a phone, each with date, guests, amount and buttons to accept, suggest a change or decline.",
+        "title": "Accept, decline or suggest another date",
+        "text": "Every request arrives with the date, number of guests, address and dietary needs. Reply with a tap.",
+        "points": {
+          "a": "Requests expire after 48 hours",
+          "b": "Bookings are marked complete automatically the next day",
+          "c": "Alerts by email, and later by WhatsApp"
+        }
+      },
+      "calendar": {
+        "label": "Calendar",
+        "alt": "The availability calendar on a phone, with open days in green, closed days in white and booked days in blue.",
+        "title": "Only get requests when you're free",
+        "text": "Mark your free days, block out holidays and set how far you'll travel. You only appear to clients within your area.",
+        "points": {
+          "a": "Free, booked and blocked days",
+          "b": "Service radius in km or specific places",
+          "c": "Open all the weekdays you cook in one go"
+        }
+      },
+      "chat": {
+        "label": "Chat",
+        "alt": "A booking's conversation on a phone, with messages from the client and the chef and the text box.",
+        "title": "Everything agreed in one place",
+        "text": "Menu, allergies, deposit and arrival time all stay in the booking's conversation.",
+        "points": {
+          "a": "One conversation per booking",
+          "b": "Share photos and menus",
+          "c": "History always available"
+        }
+      },
+      "reviews": {
+        "label": "Reviews",
+        "alt": "Reviews received, on a phone, with stars, the client's name and the chef's reply.",
+        "title": "Your reputation stays with you",
+        "text": "Only people who completed a booking can leave a review. Reply once to each one and report abusive ones.",
+        "points": {
+          "a": "Only from clients with a completed booking",
+          "b": "One public reply from you per review",
+          "c": "Average and total shown on your profile"
+        }
+      }
+    }
+  },
+  "zone": {
+    "title": "Be first in your area.",
+    "lead": "Ao Lume is opening area by area. In each one, the first approved profiles are the ones that get the requests and collect the first reviews.",
+    "position": {
+      "title": "A place in your area",
+      "text": "Each chef sets the radius they work in and shows up to anyone searching inside it. Most areas of the country don't have a single approved chef yet."
+    },
+    "reputation": {
+      "title": "Reputation takes time",
+      "text": "Reviews only come to those who've already had bookings. Whoever starts first builds the reputation that shapes the next clients' choices."
+    },
+    "launch": {
+      "title": "Free at launch",
+      "text": "Creating your profile, appearing in searches and getting requests costs nothing. Any change to the terms is announced 15 days in advance."
+    }
+  },
+  "demo": {
+    "title": "Try it: this is how a booking arrives.",
+    "lead": "Clients find you on Ao Lume or through your link, choose a menu and a free day and send a request. Play the chef and take this example request all the way through.",
+    "steps": {
+      "arrives": {
+        "title": "A request arrives",
+        "text": "The client picks the menu and a free day and writes what they need. You get it by email and on your dashboard."
+      },
+      "accept": {
+        "title": "Accept or suggest another date",
+        "text": "You have 48 hours to reply. The client sees your answer on the request page."
+      },
+      "chat": {
+        "title": "Agree the details in the chat",
+        "text": "One conversation per booking: allergies, timings, address. Everything is kept on record."
+      },
+      "deposit": {
+        "title": "The client pays the deposit",
+        "text": "The client pays the deposit in the app and the date goes into your calendar. The rest you settle with the client on the day."
+      },
+      "review": {
+        "title": "You get a review",
+        "text": "After the service, the client leaves a review. Only people who booked can review, and you can reply."
+      }
+    },
+    "status": {
+      "new": "New request",
+      "accepted": "Accepted",
+      "confirmed": "Confirmed",
+      "completed": "Completed"
+    },
+    "currentStep": "(current step)",
+    "panelLabel": "Interactive example · your dashboard",
+    "restart": "Start again",
+    "requestSummary": "Dinner at home · 6 guests · Saturday, 20:00",
+    "clientMessage": "It's my mum's birthday. One person is vegetarian.",
+    "chefReply": "Sounds good! I'll make a mushroom rice for her. The {deposit} deposit is paid here in the app.",
+    "clientPaid": "Perfect, I've just sent it.",
+    "confirmedNote": "Booking confirmed · Saturday in the calendar",
+    "reviewText": "“My mum loved it. They took care of everything, even the washing-up.”",
+    "accept": "Accept",
+    "proposeDate": "Suggest another date",
+    "openChat": "Open the chat",
+    "depositReceived": "Deposit received · confirm",
+    "markCompleted": "Mark as completed",
+    "done": "That's how a booking goes on Ao Lume."
+  },
+  "compare": {
+    "title": "Fewer messages. More time in the kitchen.",
+    "today": {
+      "title": "Today",
+      "lead": "Your business spread across three apps."
+    },
+    "withUs": {
+      "title": "With Ao Lume",
+      "lead": "Everything where the request happens."
+    },
+    "rows": {
+      "requests": {
+        "topic": "Requests",
+        "today": "A form few people fill in to the end.",
+        "withUs": "A page with menus, prices and booking."
+      },
+      "conversations": {
+        "topic": "Conversations",
+        "today": "Instagram, WhatsApp and texts, all mixed up.",
+        "withUs": "One chat per booking, with everything on record."
+      },
+      "calendar": {
+        "topic": "Calendar",
+        "today": "Dates in a notebook, or in your head.",
+        "withUs": "A calendar that shows only your free days."
+      },
+      "trust": {
+        "topic": "Trust",
+        "today": "New clients with no real reviews to read.",
+        "withUs": "Reviews from people who completed a booking."
+      }
+    }
+  },
+  "tools": {
+    "title": "The essentials for cooking on your own account.",
+    "lead": "Dinners at home, events, weekly meals, cakes and savouries or seasonal orders: everything you need to receive and organise requests is already included.",
+    "items": {
+      "calendar": { "title": "Calendar", "text": "Free days, blocked dates and service area." },
+      "chat": { "title": "Chat with clients", "text": "One conversation per booking, no lost messages." },
+      "menus": { "title": "Menus and prices", "text": "Fixed price, per person or on request." },
+      "cancellation": { "title": "Cancellation", "text": "Flexible, moderate, strict or your own terms." },
+      "categories": { "title": "Cuisine categories", "text": "Up to three, so clients find you in the filters." },
+      "travel": { "title": "Travel and delivery", "text": "Radius, areas, fees and the day's route." },
+      "pickup": { "title": "Collections", "text": "Pick-up times at your kitchen and a confirmation code." },
+      "reviews": { "title": "Verified reviews", "text": "Only from people who booked, with your public reply." }
+    }
+  },
+  "marketing": {
+    "title": "More clients, without paying for ads.",
+    "lead": "Every happy client and every Instagram share brings the next one. We give you the pieces.",
+    "slugPlaceholder": "your-name",
+    "tiles": {
+      "link": { "title": "One link for your bio", "text": "Replaces the order form and the “send me a message”." },
+      "share": { "title": "Sharing kit", "text": "QR code, images for stories and cards with your best reviews." },
+      "near": { "title": "Close to people searching", "text": "Clients in your area find you without knowing your name." },
+      "star": { "title": "Verified reviews", "text": "Only people who completed a booking can review, and you can reply to each one." },
+      "seal": {
+        "title": "Verified Chef title",
+        "text": "Send a cookery certificate and appear as a Chef, with the badge next to your name."
+      },
+      "season": {
+        "title": "Seasonal orders",
+        "text": "Bolo-rei, folar, June sardine feasts: open pre-orders with a closing date."
+      }
+    },
+    "path": {
+      "title": "Your path",
+      "lead": "You get requests from the day you're approved. The Chef title comes later, if you have cookery training.",
+      "cook": {
+        "label": "Step 1 · on joining",
+        "title": "Cook",
+        "text": "Everyone starts here. Your page goes public after our team's review, and requests come in from day one."
+      },
+      "chef": {
+        "label": "Step 2 · with a certificate",
+        "title": "Chef",
+        "text": "Upload a cookery certificate in your dashboard. Once it's verified, you appear as a Chef, with the badge next to your name in every search."
+      }
+    }
+  },
+  "pricing": {
+    "badge": "No monthly fees",
+    "title": "You only pay for each<br></br>guaranteed service.",
+    "earlyNote": "<strong>We charge our first chefs nothing.</strong> While we're getting started, payment is arranged directly with you and we take no commission. That's how it will work once we switch payments on, and anyone already here will get at least 30 days' notice.",
+    "text": "Nothing for creating your page, nothing for appearing in searches, nothing for getting requests. When the client pays the deposit, the date is guaranteed, and so is our commission of {pct}% of the booking value, taken from that deposit. No booking, nothing to pay.",
+    "benefits": {
+      "noChasing": {
+        "title": "No more chasing people who book and vanish",
+        "text": "The deposit confirms the date. No deposit, no booking."
+      },
+      "noAsking": {
+        "title": "You never have to ask anyone for money",
+        "text": "The deposit request comes from us, not from you."
+      },
+      "yourMoney": {
+        "title": "The money is yours from the first minute",
+        "text": "We receive it on your behalf and hand it over once the service is done."
+      }
+    }
+  },
+  "calculator": {
+    "pricePerPerson": "You charge per person",
+    "guests": "Guests at the table",
+    "perMonth": "Services per month",
+    "yearLabel": "In a year, you keep",
+    "yearDetail": "{count, plural, =1 {# service} other {# services}} a month, at {amount} each.",
+    "keeps": "You keep <b>{amount}</b>",
+    "aoLume": "Ao Lume <b>{amount}</b>",
+    "depositNote": "For each service, the client pays a <b>{deposit}</b> deposit here to confirm the date. The other <b>{rest}</b> they settle with you, as always.",
+    "points": {
+      "noMonthly": "No monthly fee",
+      "noPerRequest": "No charge per request",
+      "payWhenPaid": "You only pay when you get paid"
+    }
+  },
+  "signup": {
+    "title": "Creating your profile takes just a few minutes.",
+    "steps": {
+      "account": { "title": "Create your account", "text": "Name, email and a password. A few minutes." },
+      "work": { "title": "Show your work", "text": "A photo of you, your Instagram or website, and three photos of dishes." },
+      "approval": { "title": "Approval", "text": "Our team reviews every profile before it goes public." },
+      "share": { "title": "Share your link", "text": "Put {link} in your bio and start getting requests." }
+    }
+  },
+  "faq": {
+    "title": "Questions",
+    "cost": {
+      "q": "How much does it cost?",
+      "aPaymentsOn": "Creating your profile, appearing in searches and getting requests costs nothing. We only charge when you earn: a commission of {pct}% of the booking value, taken from the deposit the client pays in the app. The current rate is always shown in your dashboard, and any change is announced at least 30 days ahead.",
+      "aPaymentsOff": "Today, nothing: creating your profile, appearing in searches, getting requests and arranging the service cost nothing at all, and we don't charge commission. Later on there will be a commission on each guaranteed booking, always taken from what the client pays and never charged to you separately. Anyone already here will get at least 30 days' notice."
+    },
+    "payout": {
+      "q": "How do I get paid?",
+      "aPaymentsOn": "The client pays the deposit in the app and it's held for you. Once you've completed the service, we transfer it to your IBAN with the commission already deducted, together with a statement showing your tax details, the deposit received, the commission and the amount transferred. The rest of the service is still agreed and paid directly between you and the client.",
+      "aPaymentsOff": "Directly from the client, however the two of you agree: Ao Lume never touches the money. The app is there to help clients find you, organise the request and keep the conversation."
+    },
+    "chefCancels": {
+      "q": "What if I cancel after accepting?",
+      "aPaymentsOn": "The deposit is refunded to the client in full and we charge no commission. Repeated cancellations are taken into account on your account.",
+      "aPaymentsOff": "Let the client know through the booking page, so there's a record. Repeated cancellations are taken into account on your account."
+    },
+    "data": {
+      "q": "What details do I need to give?",
+      "aPaymentsOn": "Legal name, NIF (tax number), tax address and IBAN, under Dashboard → Billing. The law also requires us to report to the Portuguese Tax Authority (Autoridade Tributária), once a year, how much you received through the platform (DAC7), and we always tell you what was reported.",
+      "aPaymentsOff": "Only what appears on your profile: who you are, where you cook and what you make. While payment is arranged directly with you, we don't ask for your NIF or IBAN."
+    },
+    "homeCook": {
+      "q": "I'm a home cook. Can I join?",
+      "a": "Yes. Everyone starts as a Cook and is reviewed by our team before appearing in searches. If you have cookery training, send your certificate and you'll appear as a Chef."
+    },
+    "licences": {
+      "q": "Do I need licences?",
+      "a": "Each chef is responsible for the rules that apply to their activity, such as HACCP training and registering the activity with the tax office (Finanças). We'll publish a guide to help."
+    },
+    "clientCancels": {
+      "q": "What if a client cancels?",
+      "a": "You set your own cancellation policy: flexible, moderate, strict or your own terms. The client sees it before asking."
+    }
+  },
+  "closing": {
+    "title": "Put on your chef's whites.<br></br><accent>Leave the rest to us.</accent>"
+  }
+}

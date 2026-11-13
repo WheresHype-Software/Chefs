@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { AddressSearch } from "@/components/AddressSearch";
 import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { ProfileVerification, type VerificationPhotos } from "@/components/dashboard/ProfileVerification";
@@ -7,10 +8,11 @@ import { Chip } from "@/components/ui/Chip";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
-import { LANGUAGES } from "@/lib/languages";
+import type { Locale } from "@/lib/i18n/routing";
+import { languageOptions } from "@/lib/languages";
 import { slugify } from "@/lib/slug";
 import { SITE_DOMAIN } from "@/lib/constants";
 
@@ -22,6 +24,8 @@ import { SITE_DOMAIN } from "@/lib/constants";
  * hides keep their values in the form and are saved as they are.
  */
 export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | null; minDeposit?: number; next?: string }) {
+  const t = useTranslations("dashboard.profile.form");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const { form, set, areaQuery, typeArea, pickArea, save, busy, locating, message } = useProfileForm(chef, {
     requireSocial: Boolean(next),
@@ -30,10 +34,10 @@ export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | 
   const full = !next;
   const social = (
     <>
-      <Field label="Instagram">
-        <input maxLength={80} value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@o.seu.perfil" />
+      <Field label={t("instagram")}>
+        <input maxLength={80} value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder={t("instagramPlaceholder")} />
       </Field>
-      <Field label="Site">
+      <Field label={t("site")}>
         <input type="url" maxLength={200} value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://" />
       </Field>
     </>
@@ -47,9 +51,9 @@ export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | 
         save();
       }}
     >
-      <h2 className="d m-0 text-2xl font-normal">{full ? "A sua página" : "Sobre si"}</h2>
+      <h2 className="d m-0 text-2xl font-normal">{full ? t("yourPage") : t("aboutYou")}</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
-        <Field label="Nome público" lumi="nome">
+        <Field label={t("displayName")} lumi="nome">
           <input
             required
             maxLength={80}
@@ -58,81 +62,76 @@ export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | 
             onBlur={() => !form.slug && set("slug", slugify(form.display_name))}
           />
         </Field>
-        <Field label="Link" lumi="link" hint={`${SITE_DOMAIN}/chef/${form.slug || "o-seu-nome"}`}>
+        <Field label={t("link")} lumi="link" hint={`${SITE_DOMAIN}/chef/${form.slug || t("slugPlaceholder")}`}>
           <input
             required
             maxLength={60}
             value={form.slug}
             onChange={(e) => set("slug", slugify(e.target.value))}
-            placeholder="o-seu-nome"
+            placeholder={t("slugPlaceholder")}
           />
         </Field>
-        <Field label="Como quer aparecer" lumi="aparecer" hint="Com certificado verificado, passa a aparecer como Chef.">
+        <Field label={t("appearAs")} lumi="aparecer" hint={t("appearHint")}>
           <select value={form.cook_form} onChange={(e) => set("cook_form", e.target.value as typeof form.cook_form)}>
-            <option value="cozinheiro">Cozinheiro</option>
-            <option value="cozinheira">Cozinheira</option>
+            <option value="cozinheiro">{t("cook")}</option>
+            <option value="cozinheira">{t("cookFemale")}</option>
           </select>
         </Field>
-        <Field label="Perfil" lumi="perfil">
+        <Field label={t("profileType")} lumi="perfil">
           <select value={form.tier} onChange={(e) => set("tier", e.target.value as MyChef["tier"])}>
-            <option value="home">{form.cook_form === "cozinheira" ? "Cozinheira caseira" : "Cozinheiro caseiro"}</option>
-            <option value="professional">Profissional de cozinha</option>
+            <option value="home">{form.cook_form === "cozinheira" ? t("homeCookFemale") : t("homeCook")}</option>
+            <option value="professional">{t("professional")}</option>
           </select>
         </Field>
-        <Field
-          lumi="frase"
-          className="col-span-full"
-          label="Uma frase para o seu perfil"
-          hint="Aparece por baixo do seu nome. Até 80 caracteres."
-        >
+        <Field lumi="frase" className="col-span-full" label={t("headline")} hint={t("headlineHint")}>
           <input
             maxLength={80}
             value={form.headline}
             onChange={(e) => set("headline", e.target.value)}
-            placeholder="Cozinha alentejana para jantares em casa"
+            placeholder={t("headlinePlaceholder")}
           />
         </Field>
       </div>
-      <Field label="Sobre si" lumi="bio">
+      <Field label={t("bio")} lumi="bio">
         <textarea
           rows={4}
           maxLength={2000}
           value={form.bio}
           onChange={(e) => set("bio", e.target.value)}
-          placeholder="A sua história, o que cozinha, como trabalha."
+          placeholder={t("bioPlaceholder")}
         />
       </Field>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
         <LumiSlot name="zona" />
         <div className="field lab" data-lumi="zona">
-          Zona de base
+          {t("baseArea")}
           <AddressSearch
-            label="Zona de base"
+            label={t("baseArea")}
             value={areaQuery}
             onChange={typeArea}
             onSelect={pickArea}
-            placeholder="Bairro ou freguesia"
+            placeholder={t("areaPlaceholder")}
             inputClassName="w-full"
           />
-          <span className="hint">Os clientes veem a zona, nunca a sua morada.</span>
+          <span className="hint">{t("areaHint")}</span>
         </div>
-        <Field label="Raio de serviço (km)" lumi="raio">
+        <Field label={t("radius")} lumi="raio">
           <NumberInput min={1} max={100} emptyValue={10} value={form.service_radius_km} onChange={(v) => set("service_radius_km", v)} />
         </Field>
         {full && social}
         {full && (
           <>
-            <Field label="Anos de experiência">
+            <Field label={t("years")}>
               <NumberInput min={0} max={70} value={form.years_experience} onChange={(v) => set("years_experience", v)} />
             </Field>
             <Field
-              label="Sinal pedido (%)"
+              label={t("deposit")}
               hint={
                 minDeposit > 0
                   ? (form.deposit_percent ?? 0) > 0 && (form.deposit_percent ?? 0) < minDeposit
-                    ? `Tem de ser pelo menos ${minDeposit}%.`
-                    : `O cliente paga-o na app. Mínimo ${minDeposit}%.`
-                  : "O cliente paga-o na app para confirmar a reserva."
+                    ? t("depositTooLow", { min: minDeposit })
+                    : t("depositHint", { min: minDeposit })
+                  : t("depositHintNoMin")
               }
             >
               <NumberInput min={0} max={100} emptyValue={0} value={form.deposit_percent} onChange={(v) => set("deposit_percent", v)} />
@@ -143,16 +142,16 @@ export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | 
       {!full && <LumiSlot name="social" />}
       {!full && (
         <fieldset className="m-0 flex flex-col gap-3 rounded-[3px] border border-line-2 bg-paper p-4" data-lumi="social">
-          <legend className="lab px-1">Instagram ou site</legend>
-          <p className="m-0 text-sm text-ink-3">Basta um dos dois.</p>
+          <legend className="lab px-1">{t("socialLegend")}</legend>
+          <p className="m-0 text-sm text-ink-3">{t("oneOfTwo")}</p>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">{social}</div>
         </fieldset>
       )}
       {full && (
         <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-          <legend className="field lab mb-2 p-0">Idiomas que fala (opcional)</legend>
+          <legend className="field lab mb-2 p-0">{t("languages")}</legend>
           <div className="flex flex-wrap gap-1.5">
-            {LANGUAGES.map(([code, name]) => (
+            {languageOptions(locale).map(([code, name]) => (
               <Chip
                 key={code}
                 pressed={form.languages.includes(code)}
@@ -164,12 +163,12 @@ export function ProfileDetails({ chef, minDeposit = 0, next }: { chef: MyChef | 
               </Chip>
             ))}
           </div>
-          <span className="hint">Aparecem no seu perfil, para clientes que falam outras línguas.</span>
+          <span className="hint">{t("languagesHint")}</span>
         </fieldset>
       )}
       <FormMessage message={message} />
       <button type="submit" className="btn self-start" disabled={busy}>
-        {locating ? "A procurar a zona…" : next ? "Continuar" : chef ? "Guardar perfil" : "Criar perfil"}
+        {locating ? t("locating") : next ? t("continue") : chef ? t("save") : t("create")}
       </button>
     </form>
   );

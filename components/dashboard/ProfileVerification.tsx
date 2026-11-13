@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { submitForReview } from "@/app/dashboard/actions/profile";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
@@ -8,60 +9,49 @@ import type { MyChef } from "@/lib/dashboard";
 
 export type VerificationPhotos = { portrait: number; selfie: number; gallery: number; approved: boolean };
 
-const STATUS_LABEL: Record<MyChef["status"], string> = {
-  draft: "rascunho",
-  pending: "em revisão",
-  approved: "aprovado",
-  rejected: "alterações pedidas",
-  suspended: "suspenso",
-};
-
 /** Checklist, photo uploads and "send for review". */
 export function ProfileVerification({ chef, photos }: { chef: MyChef | null; photos: VerificationPhotos }) {
-  const submit = useServerAction(submitForReview, { successMessage: "Enviado para revisão. Respondemos por email." });
+  const t = useTranslations("dashboard.profile.verification");
+  const ti = useTranslations("dashboard.onboarding.items");
+  const submit = useServerAction(submitForReview, { successMessage: t("sent") });
   const canSubmit = chef?.status === "draft" || chef?.status === "rejected";
-  const checklist: [string, boolean][] = [
-    ["Fotografia de perfil", photos.portrait > 0],
+  const list: [string, boolean][] = [
+    [ti("portrait"), photos.portrait > 0],
     // An approved profile's selfie was deleted after the check.
-    ["Selfie de verificação", photos.selfie > 0 || photos.approved],
-    ["Instagram ou site", Boolean(chef?.socials.instagram || chef?.socials.website)],
-    [`Fotos de pratos (${photos.gallery}/3)`, photos.gallery >= 3],
+    [ti("selfie"), photos.selfie > 0 || photos.approved],
+    [ti("social"), Boolean(chef?.socials.instagram || chef?.socials.website)],
+    [ti("dishes", { count: photos.gallery }), photos.gallery >= 3],
   ];
 
   return (
     <aside className="flex min-w-0 flex-[2_1_300px] flex-col gap-3.5">
       <div className="box flex flex-col gap-3 p-6">
-        <h2 className="d m-0 text-2xl font-normal">Verificação</h2>
-        <span className="text-sm text-muted">
-          Uma fotografia de perfil, uma selfie de verificação (privada), o Instagram ou site, e pelo menos três fotos de pratos. A equipa
-          compara a selfie com a fotografia de perfil antes de o perfil ficar público.
-        </span>
+        <h2 className="d m-0 text-2xl font-normal">{t("title")}</h2>
+        <span className="text-sm text-muted">{t("intro")}</span>
         <ul className="m-0 list-none border-t border-line p-0 text-sm">
-          {checklist.map(([label, done]) => (
+          {list.map(([label, done]) => (
             <li key={label} className="flex justify-between border-b border-line py-2.5">
               <span>{label}</span>
-              <span className={done ? "text-ok" : "text-muted"}>{done ? "Feito" : "Em falta"}</span>
+              <span className={done ? "text-ok" : "text-muted"}>{done ? t("done") : t("missing")}</span>
             </li>
           ))}
         </ul>
         {chef ? (
           <Link href="#fotografias" className="btn btn-sm btn-o">
-            Gerir fotografias
+            {t("manage")}
           </Link>
         ) : (
-          <span className="text-sm text-muted">Guarde o perfil primeiro; depois carregue as fotografias.</span>
+          <span className="text-sm text-muted">{t("saveFirst")}</span>
         )}
-        <span className="lab mt-2 text-muted">Estado: {STATUS_LABEL[chef?.status ?? "draft"]}</span>
+        <span className="lab mt-2 text-muted">{t("statusLine", { status: t(`status.${chef?.status ?? "draft"}`) })}</span>
         {chef?.status === "rejected" && chef.verification_notes && <span className="text-sm text-danger">{chef.verification_notes}</span>}
         {canSubmit && (
           <button type="button" className="btn" disabled={submit.pending} onClick={() => submit.run()}>
-            Enviar para revisão
+            {t("submit")}
           </button>
         )}
         <FormMessage message={submit.message} />
-        <span className="text-xs text-muted">
-          Ao enviar, aceita os termos para chefs: é responsável pela legalidade, higiene, impostos e pagamentos do seu serviço.
-        </span>
+        <span className="text-xs text-muted">{t("terms")}</span>
       </div>
     </aside>
   );

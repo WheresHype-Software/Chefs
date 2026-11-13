@@ -1,15 +1,7 @@
+import { useTranslations } from "next-intl";
 import { revealDelay } from "@/lib/motion";
 
-const TOOLS: [string, string][] = [
-  ["Calendário", "Dias livres, bloqueios e área de serviço."],
-  ["Chat com clientes", "Uma conversa por reserva, sem perder mensagens."],
-  ["Menus e preços", "Preço fixo, por pessoa ou sob orçamento."],
-  ["Cancelamento", "Flexível, moderado, rígido ou à sua medida."],
-  ["Categorias de cozinha", "Até três, para os clientes o encontrarem nos filtros."],
-  ["Deslocações e entregas", "Raio, zonas, taxas e o percurso do dia."],
-  ["Levantamentos", "Horários na sua cozinha e código de confirmação."],
-  ["Avaliações verificadas", "Só de quem reservou, com a sua resposta pública."],
-];
+const TOOLS = ["calendar", "chat", "menus", "cancellation", "categories", "travel", "pickup", "reviews"] as const;
 
 function Check() {
   return (
@@ -23,14 +15,15 @@ function Check() {
 
 /** What chefs get to run their bookings, as cards. */
 export function ToolList() {
+  const t = useTranslations("paraChefs.tools.items");
   return (
     <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
-      {TOOLS.map(([title, text], i) => (
-        <li key={title} className="al-rv flex gap-3 rounded-[10px] border border-line bg-white p-4" style={revealDelay(i % 4, 5)}>
+      {TOOLS.map((key, i) => (
+        <li key={key} className="al-rv flex gap-3 rounded-[10px] border border-line bg-white p-4" style={revealDelay(i % 4, 5)}>
           <Check />
           <div className="flex min-w-0 flex-col gap-0.5">
-            <strong className="text-[16px]">{title}</strong>
-            <span className="text-[14px] text-muted">{text}</span>
+            <strong className="text-[16px]">{t(`${key}.title`)}</strong>
+            <span className="text-[14px] text-muted">{t(`${key}.text`)}</span>
           </div>
         </li>
       ))}

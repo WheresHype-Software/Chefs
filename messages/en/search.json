@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "title": "Find chefs",
+    "description": "Private chefs and home cooks near you: dinners at home, weekly meal prep, cakes and pastries, delivery and events."
+  },
+  "loading": "Finding chefs",
+  "heading": {
+    "near": "Chefs near {place}",
+    "all": "Chefs on Ao Lume",
+    "noneNear": "No chefs near {place} yet",
+    "none": "No chefs for this search yet"
+  },
+  "summary": {
+    "count": "{count, plural, one {# chef} other {# chefs}}",
+    "countOnDate": "{count, plural, one {# chef} other {# chefs}} free on {day}",
+    "hint": "{found}. Open a chef to see their menus and free days and to request a booking, no account needed."
+  },
+  "filters": {
+    "service": "Type of service",
+    "cuisine": "Cuisine",
+    "all": "All",
+    "allCuisines": "All cuisines",
+    "moreCuisines": "More cuisines"
+  },
+  "empty": {
+    "label": "Results",
+    "text": "No chefs are free with these filters yet. Ao Lume is opening area by area: try another date, another service or a nearby area.",
+    "anyDate": "Any date",
+    "allServices": "All services",
+    "allChefs": "See all chefs"
+  },
+  "bar": {
+    "label": "Find chefs",
+    "where": "Where",
+    "whereLabel": "Address or neighbourhood",
+    "wherePlaceholder": "Area or address",
+    "what": "What",
+    "serviceLabel": "Type of service",
+    "anything": "Anything",
+    "when": "When",
+    "date": "Date",
+    "submit": "Search",
+    "submitting": "Searching…"
+  },
+  "results": {
+    "label": "Results",
+    "showMap": "Show map",
+    "showList": "Show list",
+    "locationDenied": "No access to your location. You can turn it on in your browser settings.",
+    "locationUnavailable": "We couldn't find your location."
+  },
+  "tile": {
+    "verifiedChef": "Verified chef",
+    "dishBy": "A dish by {name}",
+    "new": "New on Ao Lume",
+    "veryClose": "very close",
+    "distance": "{km} km away",
+    "quote": "On request",
+    "from": "from <strong>{price}</strong>"
+  },
+  "mapCard": {
+    "close": "Close",
+    "from": "from <strong>{price}</strong>",
+    "radius": "{area} · travels up to {km} km",
+    "tripFromMe": "About {km} km from you · estimate to the chef's area",
+    "tripFromPlace": "About {km} km from the area you searched · estimate to the chef's area",
+    "travel": {
+      "walk": "On foot",
+      "bike": "By bike",
+      "car": "By car"
+    },
+    "cta": "See profile and request a booking"
+  },
+  "map": {
+    "region": "Map of chefs",
+    "explorer": "Chef map",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "toggle3d": "Switch between 2D and 3D",
+    "recenter": "Centre map",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen",
+    "fitAll": "Show all chefs",
+    "locate": "Use my location",
+    "myLocation": "Your location",
+    "groupCount": "{count} chefs",
+    "groupLabel": "{count} chefs in this area: zoom in",
+    "dragHint": "Drag to explore · tap a chef",
+    "selectedChef": "Selected chef",
+    "defaultPlace": "Lisbon",
+    "available": "{place} · {count, plural, one {# chef available} other {# chefs available}}",
+    "title": "A chef near you.",
+    "address": "Address",
+    "addressPlaceholder": "Your address or neighbourhood",
+    "serviceLabel": "Type of service",
+    "filtersAll": "All",
+    "cuisine": "Cuisine",
+    "allCuisines": "All cuisines",
+    "photo": "Photo",
+    "from": "from {price}",
+    "empty": "No chefs for this search yet. Try another type of service or another address."
+  },
+  "address": {
+    "searching": "Looking for areas…",
+    "none": "No areas found. Try the neighbourhood and the city, for example “Alvalade, Lisboa”.",
+    "useTyped": "Use “{value}”",
+    "notListedUseTyped": "Not in the list? Use “{value}”"
+  },
+  "breadcrumbs": "Breadcrumb",
+  "city": {
+    "title": "Private chefs and home cooks in {city}",
+    "description": "Private chefs and home cooks who cook in {city}: dinners at home, meal prep, cakes and events. See menus, prices and free days, and request a booking without creating an account.",
+    "intro": "{count, plural, one {# chef cooks} other {# chefs cook}} in {city}: dinners in your home, meals for the week, cakes and events. See menus, prices and free days, and request a booking without creating an account. You only pay once the chef accepts.",
+    "empty": "No chefs are cooking in {city} yet. Ao Lume is opening area by area.",
+    "allChefs": "See all chefs",
+    "cookHere": "Do you cook in {city}? Create your profile",
+    "others": "Chefs in other cities"
+  },
+  "cuisines": {
+    "portuguese": "Portuguese",
+    "petiscos": "Petiscos (small plates)",
+    "seafood": "Seafood and fish",
+    "grills": "Grills",
+    "signature": "Signature cuisine",
+    "mediterranean": "Mediterranean",
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "healthy": "Healthy",
+    "pastry": "Pastry and cakes",
+    "brazilian": "Brazilian",
+    "asian": "Asian",
+    "japanese": "Japanese",
+    "sushi": "Sushi",
+    "indian": "Indian",
+    "goan": "Goan",
+    "italian": "Italian",
+    "chinese": "Chinese",
+    "thai": "Thai",
+    "vietnamese": "Vietnamese",
+    "korean": "Korean",
+    "mexican": "Mexican",
+    "peruvian": "Peruvian",
+    "french": "French",
+    "spanish": "Spanish",
+    "greek": "Greek",
+    "middleEastern": "Middle Eastern",
+    "moroccan": "Moroccan",
+    "african": "African",
+    "capeVerdean": "Cape Verdean",
+    "angolan": "Angolan",
+    "mozambican": "Mozambican",
+    "american": "American",
+    "fusion": "Fusion",
+    "barbecue": "Barbecue"
+  },
+  "diets": {
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "glutenFree": "Gluten-free",
+    "lactoseFree": "Lactose-free",
+    "halal": "Halal",
+    "kids": "Kid-friendly"
+  }
+}

@@ -1,8 +1,10 @@
 import "server-only";
 import { sha256 } from "../crypto";
-import { sendEmail, siteUrl } from "../email";
+import { sendEmail } from "../email";
 import { renderEmail } from "../email-template";
 import { euro } from "../format";
+import { profileLocaleFrom } from "../i18n/recipient";
+import { getTranslator } from "../i18n/translator";
 import { COMPANY, EMAIL } from "../legal";
 import { toCents } from "../money";
 import { serverEnv } from "../env.server";
@@ -277,27 +279,35 @@ export async function issueDocuments(batchId: string): Promise<number> {
 async function notifyChefPaid(chefId: string, snapshot: DocumentSnapshot): Promise<void> {
   const sb = createAdminClient();
   if (!sb) return;
-  const { data } = await sb.from("chefs").select("profiles(email)").eq("id", chefId).maybeSingle();
-  const email = (data as unknown as { profiles: { email: string | null } | null } | null)?.profiles?.email;
+  const { data } = await sb.from("chefs").select("profiles(email, locale)").eq("id", chefId).maybeSingle();
+  const profile = (data as unknown as { profiles: { email: string | null; locale: string | null } | null } | null)?.profiles;
+  const email = profile?.email;
   if (!email) return;
 
-  const doc = renderEmail({
-    preheader: `Transferimos ${euro(snapshot.amounts.payout)}`,
-    heading: "Pagámos-te",
-    lead: `Referente à reserva ${snapshot.booking.ref}.`,
-    facts: [
-      ["Sinal recebido", euro(snapshot.amounts.deposit)],
-      ["Comissão", `− ${euro(snapshot.amounts.commission)}`],
-      ["Transferido", euro(snapshot.amounts.payout)],
-      ["Conta", `•••• ${snapshot.transfer.ibanLast4}`],
-    ],
-    paragraphs: ["O documento com a conta detalhada está no teu painel, em Pagamentos."],
-    cta: { label: "Ver o documento", href: siteUrl("/dashboard/pagamentos") },
-    footnote: `Documento ${snapshot.number}`,
-  });
+  // The chef's language.
+  const locale = profileLocaleFrom(profile);
+  const e = getTranslator(locale, "emails");
+  const payout = euro(snapshot.amounts.payout, locale);
+  const doc = renderEmail(
+    {
+      preheader: e("payout.preheader", { amount: payout }),
+      heading: e("payout.heading"),
+      lead: e("payout.lead", { ref: snapshot.booking.ref }),
+      facts: [
+        [e("payout.depositReceived"), euro(snapshot.amounts.deposit, locale)],
+        [e("payout.commission"), `− ${euro(snapshot.amounts.commission, locale)}`],
+        [e("payout.transferred"), payout],
+        [e("payout.account"), `•••• ${snapshot.transfer.ibanLast4}`],
+      ],
+      paragraphs: [e("payout.body")],
+      cta: { label: e("payout.cta"), href: "/dashboard/pagamentos" },
+      footnote: e("payout.footnote", { number: snapshot.number }),
+    },
+    locale,
+  );
   await sendEmail({
     to: email,
-    subject: `Pagamento ${euro(snapshot.amounts.payout)} · ${snapshot.booking.ref}`,
+    subject: e("payout.subject", { amount: payout, ref: snapshot.booking.ref }),
     text: doc.text,
     html: doc.html,
   });

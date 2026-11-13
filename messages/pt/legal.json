@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "terms": {
+      "title": "Termos e condições",
+      "description": "Termos e condições de utilização do Ao Lume, para clientes e para chefs."
+    },
+    "privacy": {
+      "title": "Política de privacidade",
+      "description": "Como o Ao Lume trata os seus dados pessoais, nos termos do RGPD: que dados, para quê, com quem e os seus direitos."
+    },
+    "contract": {
+      "title": "Contrato de intermediação de pagamentos",
+      "description": "O contrato que cada chef aceita ao criar conta no Ao Lume."
+    },
+    "archive": {
+      "title": "Texto aceite"
+    }
+  },
+  "page": {
+    "updated": "Última atualização: {date}",
+    "toc": "Índice"
+  },
+  "notice": {
+    "title": "Tradução de cortesia",
+    "body": "Esta versão é uma tradução de cortesia, apenas para facilitar a leitura. A versão vinculativa é a portuguesa, que prevalece em caso de divergência.",
+    "link": "Ler a versão em português"
+  },
+  "contract": {
+    "intro": "O contrato entre o Ao Lume e cada chef. Aplica-se em conjunto com os <terms>Termos e condições</terms>."
+  },
+  "archive": {
+    "label": "Texto arquivado",
+    "versionTerms": "Versão de {version} · arquivado a {date}",
+    "versionContract": "Versão {version} · arquivado a {date}",
+    "note": "Este é o texto exato que foi aceite, mesmo que entretanto exista uma versão mais recente. Pode guardá-lo ou imprimi-lo pelo navegador. Impressão digital (SHA-256): <hash>{sha}</hash>"
+  }
+}

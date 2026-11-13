@@ -1,0 +1,116 @@
+{
+  "hero": {
+    "title": "Private chefs and home cooks near you.",
+    "lead": "Dinners cooked in your own home, meals for the week ahead, cakes and snacks to collect. Choose, send a booking request and only pay once the chef accepts.",
+    "promises": {
+      "noAccount": "No account needed",
+      "payAfterAccept": "Only pay once the chef accepts",
+      "depositInApp": "Deposit paid securely in the app",
+      "payChefDirectly": "Arrange payment directly with the chef"
+    },
+    "mapLink": "Or see every chef on the map →"
+  },
+  "services": {
+    "title": "What you can order",
+    "items": {
+      "home": { "title": "Chef at home", "text": "Dinners and special occasions, cooked and served in your kitchen." },
+      "meal_prep": { "title": "Meals for the week", "text": "Home-cooked meals for your working days." },
+      "pickup": { "title": "Cakes and orders", "text": "Pastries and seasonal sweets to collect." },
+      "delivery": { "title": "Delivery", "text": "The chef's dishes brought to your door." },
+      "events": { "title": "Events", "text": "Birthdays, christenings and work dinners." }
+    }
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "introPaymentsOn": "Ao Lume puts you in touch with the chef and keeps the request organised. The chef sets the price; the deposit is paid here and the rest directly to the chef.",
+    "introPaymentsOff": "Ao Lume puts you in touch with the chef and keeps the request organised. The chef sets the price; payment is arranged directly with the chef.",
+    "steps": {
+      "find": {
+        "title": "Find someone cooking nearby",
+        "text": "Search your area or explore the map, and see menus, prices and reviews from people who have already booked."
+      },
+      "request": {
+        "title": "Request a booking",
+        "text": "Pick a free day and say what you need. No account needed, and you don't pay anything yet."
+      },
+      "payDeposit": {
+        "title": "Pay the deposit and you're done",
+        "text": "Once the chef accepts, you pay the deposit here by MB WAY or Multibanco and the booking is confirmed. The rest you settle with the chef on the day."
+      },
+      "agree": {
+        "title": "Agree with the chef and you're done",
+        "text": "Once the chef accepts, you talk through the request and agree the deposit and payment between you. The booking is confirmed as soon as the chef confirms it."
+      }
+    }
+  },
+  "nearby": {
+    "title": "Who's cooking near you",
+    "text": "Tap a chef on the map to see their area, price and menu. Chefs show the area they work in, never their address.",
+    "seeAll": "See all chefs →"
+  },
+  "trust": {
+    "title": "Why you can trust them",
+    "points": {
+      "reviewed": {
+        "title": "Every chef is checked before they appear",
+        "text": "Our team checks each chef's profile photo, dish photos and Instagram or website before the profile goes public."
+      },
+      "reviews": {
+        "title": "Reviews only from people who booked",
+        "text": "Only someone who completed a booking with that chef can review them. No bought reviews, no reviews from strangers."
+      },
+      "written": {
+        "title": "Everything agreed in writing",
+        "text": "Every booking has its own chat and a page showing the request status, the price and the chef's cancellation policy."
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "lead": "What you need to know before your first request.",
+    "account": {
+      "q": "Do I need an account?",
+      "a": "No. Choose the chef and the day, then send the request with your name, email and mobile number. You'll get a link to follow the request and talk to the chef. An account is optional and keeps your history."
+    },
+    "cost": {
+      "q": "How much does it cost?",
+      "a": "The price is set by the chef and shown on their profile before you ask. Sending a request costs nothing."
+    },
+    "payment": {
+      "q": "How and when do I pay?",
+      "aPaymentsOn": "Only after the chef accepts your request. At that point you pay the deposit here, by MB WAY or Multibanco reference, and the booking is confirmed. You settle the rest directly with the chef on the day.",
+      "aPaymentsOff": "Only after the chef accepts your request. Payment is arranged directly between you and the chef, using whichever methods they accept. Sending the request costs nothing."
+    },
+    "chefUnavailable": {
+      "q": "What if the chef can't make it?",
+      "a": "The chef has 48 hours to accept, decline or suggest another date or price. Until they accept, they aren't committed to anything."
+    },
+    "cancel": {
+      "q": "Can I cancel?",
+      "a": "Yes, on the request page. Each chef shows their cancellation policy on their profile and on the booking, so you know the terms before you ask."
+    },
+    "track": {
+      "q": "How do I follow my request?",
+      "a": "Through the link you get when you send the request, or under <link>Track a request</link> with your request number and email."
+    }
+  },
+  "chefsCta": {
+    "title": "Good cook? Get requests from clients near you.",
+    "text": "A page with your menus and reviews, a calendar showing your free days and a chat for every booking. For professional chefs and home cooks.",
+    "createProfile": "Create my profile",
+    "howItWorks": "How it works for chefs"
+  },
+  "chefDoor": {
+    "title": "I'm a chef or home cook",
+    "text": "Create a profile and get requests · no monthly fees"
+  },
+  "cookies": {
+    "label": "Cookies",
+    "title": "We use cookies",
+    "text": "We use cookies the site needs to work and, with your permission, Meta cookies to measure how well our Facebook and Instagram ads perform. You can change your choice at any time under “Cookies” at the bottom of the page.",
+    "learnMore": "Find out more",
+    "reject": "Reject",
+    "accept": "Accept",
+    "settings": "Cookies"
+  }
+}

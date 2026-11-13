@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Help",
+    "description": "Get in touch about a booking, a payment or your Ao Lume account."
+  },
+  "page": {
+    "title": "How can we help?",
+    "lead": "Write to us and we usually reply the same working day. If it's about a booking, include the request number: it saves us an email back and forth."
+  },
+  "paymentsFaq": {
+    "title": "Questions about payments",
+    "whenDeposit": {
+      "q": "When do I pay the deposit?",
+      "a": "Only after the chef accepts your request. You'll get an email with the amount and the deadline, and you pay on the booking page by MB WAY or Multibanco reference."
+    },
+    "rest": {
+      "q": "What about the rest?",
+      "a": "It's agreed and paid directly to the chef. Ao Lume only takes the deposit, and only to secure the booking."
+    },
+    "refund": {
+      "q": "The chef cancelled. Do I get my money back?",
+      "a": "Yes, the deposit is refunded in full. If you paid by MB WAY or card, it goes back the same way; if you paid by Multibanco reference, we ask for your IBAN on your booking page. Never by email or phone."
+    },
+    "howToPay": {
+      "q": "When and how do I pay?",
+      "a": "Only after the chef accepts your request. Payment, including any deposit, is arranged directly between you and the chef, using whichever methods they accept. Ao Lume charges clients nothing."
+    },
+    "chefCancelled": {
+      "q": "The chef cancelled. What about what I've already paid?",
+      "a": "Talk to them through the booking page, where the conversation is kept on record. If you can't reach an agreement, write to us: we'll help sort it out, and it's noted on their Ao Lume account."
+    },
+    "ibanScam": {
+      "q": "Someone asked for my IBAN by message. Is that Ao Lume?",
+      "a": "No. We only ask for bank details inside your booking page, while you're signed in. If you get a request by email, text or phone, don't reply, and let us know at <mail>{email}</mail>."
+    }
+  },
+  "contacts": {
+    "title": "Other ways to reach us",
+    "support": { "label": "Help", "what": "bookings, payments, your account" },
+    "privacy": { "label": "Privacy", "what": "access, correct or delete your data" },
+    "legal": { "label": "Legal", "what": "terms, content, moderation" },
+    "company": "{name}, NIF (tax no.) {nif} · {address}",
+    "more": "You can also use the <book>Complaints Book (Livro de Reclamações)</book>, or read our <terms>terms</terms> and <privacy>privacy policy</privacy>."
+  },
+  "form": {
+    "categories": {
+      "reserva": "A booking",
+      "pagamento": "A payment",
+      "conta": "My account",
+      "chef": "I'm a chef",
+      "outro": "Something else"
+    },
+    "name": "Your name",
+    "email": "Email",
+    "emailHint": "This is where we'll reply.",
+    "phone": "Mobile",
+    "phoneHint": "Optional, if you'd rather we called.",
+    "category": "What it's about",
+    "bookingRef": "Request number",
+    "bookingRefHint": "It starts with AL- and is in the email you received. It helps us reply faster.",
+    "subject": "Subject",
+    "body": "Your message",
+    "submit": "Send message",
+    "sentTitle": "Message sent",
+    "sentText": "Your reference is <b>{ref}</b>. We've emailed you a copy and usually reply the same working day.",
+    "writeAnother": "Write another message"
+  },
+  "errorPage": {
+    "documentTitle": "Something went wrong · Ao Lume",
+    "title": "Something went wrong.",
+    "text": "We can't show this page right now. Try again in a moment; if it keeps happening, come back later.",
+    "backHome": "Back to the home page",
+    "reference": "Reference: {digest}"
+  },
+  "notFound": {
+    "title": "This page isn't on the menu.",
+    "backHome": "Back to the home page"
+  }
+}

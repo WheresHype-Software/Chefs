@@ -3,8 +3,9 @@
 import { z } from "zod";
 import { getSession } from "@/lib/dashboard";
 import { notifyAdmin, siteUrl } from "@/lib/email";
+import { requestTranslator } from "@/lib/i18n/server";
 import { fail, failWith, ok, type ActionResult as Result } from "@/lib/result";
-import { chefContext, done, NO_CHEF } from "./context";
+import { chefContext, done } from "./context";
 
 // A cooking certificate the team checks before the chef may be called "Chef".
 const CertificateInput = z.object({
@@ -14,21 +15,23 @@ const CertificateInput = z.object({
 });
 
 export async function addCertificate(title: string, path: string): Promise<Result> {
+  const t = await requestTranslator("errors");
   const parsed = CertificateInput.safeParse({ title, path });
-  if (!parsed.success) return fail("Indique o nome do certificado (por exemplo, Curso de Cozinha).");
+  if (!parsed.success) return fail(t("dashboard.certificates.titleRequired"));
   const ctx = await chefContext();
   if (ctx.demo) return ok();
-  if (!ctx.chef) return fail(NO_CHEF);
+  if (!ctx.chef) return fail(t("dashboard.noChef"));
   // Only files the chef uploaded to their own folder (the storage policy allows nothing else).
   const session = await getSession();
-  if (!parsed.data.path.startsWith(`${session.userId}/`)) return fail("Documento inválido.");
+  if (!parsed.data.path.startsWith(`${session.userId}/`)) return fail(t("invalidDocument"));
   const { error } = await ctx.sb.from("chef_certifications").insert({
     chef_id: ctx.chef.id,
     title: parsed.data.title,
     document_path: parsed.data.path,
   });
-  if (error) return failWith(error, "addCertificate", "Não foi possível guardar o certificado. Tente de novo.");
+  if (error) return failWith(error, "addCertificate", t("dashboard.certificates.saveFailed"));
 
+  // To the team: Portuguese.
   await notifyAdmin({
     subject: `Certificado para verificar: ${ctx.chef.display_name}`,
     preheader: `${ctx.chef.display_name} enviou «${parsed.data.title}» e pede o título de Chef.`,
@@ -52,14 +55,16 @@ const StatementInput = z.string().trim().min(20).max(1500);
  * teaching, where they cooked) and the team decides. The text is private to the cook and the team.
  */
 export async function addTitleStatement(body: string): Promise<Result> {
+  const t = await requestTranslator("errors");
   const parsed = StatementInput.safeParse(body);
-  if (!parsed.success) return fail("Conte-nos um pouco mais: pelo menos uma ou duas frases sobre a sua experiência.");
+  if (!parsed.success) return fail(t("dashboard.certificates.statementTooShort"));
   const ctx = await chefContext();
   if (ctx.demo) return ok();
-  if (!ctx.chef) return fail(NO_CHEF);
+  if (!ctx.chef) return fail(t("dashboard.noChef"));
   const { error } = await ctx.sb.from("chef_title_statements").insert({ chef_id: ctx.chef.id, body: parsed.data });
-  if (error) return failWith(error, "addTitleStatement", "Não foi possível enviar a sua descrição. Tente de novo.");
+  if (error) return failWith(error, "addTitleStatement", t("dashboard.certificates.statementFailed"));
 
+  // To the team: Portuguese.
   await notifyAdmin({
     subject: `Pedido de título de Chef: ${ctx.chef.display_name}`,
     preheader: `${ctx.chef.display_name} descreveu a sua experiência e pede o título de Chef.`,

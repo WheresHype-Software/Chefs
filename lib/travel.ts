@@ -1,4 +1,5 @@
 import { distanceKm, type LatLng } from "./geo";
+import { DEFAULT_LOCALE, type Locale } from "./i18n/routing";
 
 /** Streets wind: a trip is roughly this much longer than the straight line. */
 const ROAD_FACTOR = 1.3;
@@ -8,13 +9,14 @@ const MAX_SENSIBLE_MINUTES = 90;
 
 /** Average door-to-door city speeds in km/h, traffic and stops included. */
 const MODES = [
-  { mode: "walk", label: "A pé", kmh: 4.8 },
-  { mode: "bike", label: "De bicicleta", kmh: 14 },
-  { mode: "car", label: "De carro", kmh: 25 },
+  { mode: "walk", kmh: 4.8 },
+  { mode: "bike", kmh: 14 },
+  { mode: "car", kmh: 25 },
 ] as const;
 
+/** Labels: search.mapCard.travel.<mode>. */
 export type TravelMode = (typeof MODES)[number]["mode"];
-export type TravelEstimate = { mode: TravelMode; label: string; minutes: number };
+export type TravelEstimate = { mode: TravelMode; minutes: number };
 
 /**
  * Rough travel times between two points, from distance and average speeds. Free and instant;
@@ -22,16 +24,17 @@ export type TravelEstimate = { mode: TravelMode; label: string; minutes: number 
  */
 export function travelEstimates(from: LatLng, to: LatLng): { km: number; times: TravelEstimate[] } {
   const km = distanceKm(from, to) * ROAD_FACTOR;
-  const times = MODES.map(({ mode, label, kmh }) => ({ mode, label, minutes: Math.max(5, Math.round(((km / kmh) * 60) / 5) * 5) })).filter(
+  const times = MODES.map(({ mode, kmh }) => ({ mode, minutes: Math.max(5, Math.round(((km / kmh) * 60) / 5) * 5) })).filter(
     (t) => t.mode === "car" || t.minutes <= MAX_SENSIBLE_MINUTES,
   );
   return { km: Math.round(km * 10) / 10, times };
 }
 
-/** "45 min", "1 h 20". */
-export function durationLabel(minutes: number): string {
+/** "45 min", "1 h 20" in Portuguese; "1 h 20 min" in English. */
+export function durationLabel(minutes: number, locale: Locale = DEFAULT_LOCALE): string {
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m ? `${h} h ${String(m).padStart(2, "0")}` : `${h} h`;
+  if (!m) return `${h} h`;
+  return locale === "pt" ? `${h} h ${String(m).padStart(2, "0")}` : `${h} h ${m} min`;
 }

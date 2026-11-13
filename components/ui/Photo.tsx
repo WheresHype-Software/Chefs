@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { AzulejoTile, type AzulejoVariant } from "@/components/brand/Azulejo";
 import { photoSrcSet, photoUrl, type StockPhoto } from "@/lib/photos";
@@ -17,6 +18,7 @@ type Props = {
 
 /** Cropped photo that degrades to an azulejo tile instead of a broken image. */
 export function Photo({ photo, alt, sizes = "(min-width: 768px) 33vw, 100vw", className = "", priority, fallback = "glaze" }: Props) {
+  const t = useTranslations("common.photos");
   const [failed, setFailed] = useState(false);
   const img = useRef<HTMLImageElement>(null);
 
@@ -41,7 +43,7 @@ export function Photo({ photo, alt, sizes = "(min-width: 768px) 33vw, 100vw", cl
       src={isStock ? photoUrl(photo) : photo}
       srcSet={isStock ? photoSrcSet(photo) : undefined}
       sizes={isStock ? sizes : undefined}
-      alt={alt ?? (isStock ? photo.alt : "")}
+      alt={alt ?? (isStock ? t(photo.key) : "")}
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : undefined}
       decoding="async"

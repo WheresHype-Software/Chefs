@@ -1,6 +1,9 @@
 import "server-only";
-import { sendEmail, siteUrl } from "./email";
-import { renderEmail } from "./email-template";
+import { sendEmail } from "./email";
+import { renderEmail, type EmailDoc } from "./email-template";
+import { localesOfProfiles } from "./i18n/recipient";
+import { type Locale } from "./i18n/routing";
+import { getTranslator } from "./i18n/translator";
 import { createAdminClient } from "./supabase/admin";
 
 /**
@@ -11,7 +14,7 @@ import { createAdminClient } from "./supabase/admin";
  * helps whoever comes back on their own.
  *
  * One email per stage per person, recorded before it is sent so a crash cannot turn a reminder
- * into a campaign.
+ * into a campaign. Each goes out in the chef's language (profiles.locale).
  */
 
 type Stage = "no_profile" | "draft_incomplete" | "draft_ready";
@@ -25,52 +28,26 @@ type Candidate = {
   since: string;
 };
 
-function message(c: Candidate) {
-  const first = (c.chef_name ?? c.name ?? "").split(" ")[0] || "olá";
-  switch (c.stage) {
-    case "no_profile":
-      return {
-        subject: "Falta criar a sua página no Ao Lume",
-        doc: {
-          preheader: "Levou dois minutos a criar a conta; falta a página.",
-          heading: `${first}, a sua página ainda não existe`,
-          lead: "Criou a conta mas não chegou a criar o perfil, por isso ninguém o encontra ainda.",
-          paragraphs: [
-            "Precisa do nome que quer mostrar, a zona onde cozinha e uma frase sobre si. As fotografias e os menus podem vir depois.",
-            "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
-          ],
-          cta: { label: "Criar a minha página", href: siteUrl("/dashboard/comecar") },
-        },
-      };
-    case "draft_incomplete":
-      return {
-        subject: "Faltam fotografias e um menu para a sua página ficar pública",
-        doc: {
-          preheader: "O perfil está criado, falta o que os clientes veem.",
-          heading: `${first}, está quase`,
-          lead: "O seu perfil existe, mas ainda não tem o que os clientes precisam de ver para pedir uma reserva.",
-          paragraphs: [
-            "Faltam três fotografias de pratos e pelo menos um menu com preço. É o que decide quem reserva e quem fecha a página.",
-            "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
-          ],
-          cta: { label: "Continuar o perfil", href: siteUrl("/dashboard/comecar") },
-        },
-      };
-    case "draft_ready":
-      return {
-        subject: "Está tudo pronto: falta enviar o perfil para revisão",
-        doc: {
-          preheader: "Um botão entre si e os primeiros pedidos.",
-          heading: `${first}, falta um botão`,
-          lead: "Tem fotografias, tem menu, e o perfil continua por enviar para revisão.",
-          paragraphs: [
-            "A nossa equipa revê cada perfil antes de ficar público. Depois disso começa a aparecer nas pesquisas da sua zona.",
-            "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
-          ],
-          cta: { label: "Enviar para revisão", href: siteUrl("/dashboard/comecar?passo=3") },
-        },
-      };
-  }
+const STAGE_KEY = {
+  no_profile: "nudges.noProfile",
+  draft_incomplete: "nudges.draftIncomplete",
+  draft_ready: "nudges.draftReady",
+} as const;
+
+function message(c: Candidate, locale: Locale): { subject: string; doc: EmailDoc } {
+  const e = getTranslator(locale, "emails");
+  const key = STAGE_KEY[c.stage];
+  const first = (c.chef_name ?? c.name ?? "").split(" ")[0] || e("nudges.hello");
+  return {
+    subject: e(`${key}.subject`),
+    doc: {
+      preheader: e(`${key}.preheader`),
+      heading: e(`${key}.heading`, { name: first }),
+      lead: e(`${key}.lead`),
+      paragraphs: [e(`${key}.body`), e("nudges.notAgain")],
+      cta: { label: e(`${key}.cta`), href: c.stage === "draft_ready" ? "/dashboard/comecar?passo=3" : "/dashboard/comecar" },
+    },
+  };
 }
 
 export async function nudgeStalledChefs(limit = 50): Promise<{ sent: number; skipped: number }> {
@@ -83,17 +60,22 @@ export async function nudgeStalledChefs(limit = 50): Promise<{ sent: number; ski
     return { sent: 0, skipped: 0 };
   }
 
+  const candidates = (data ?? []) as Candidate[];
+  // Each chef's language in one lookup, rather than a query per email.
+  const localeOf = await localesOfProfiles(candidates.map((c) => c.profile_id));
+
   let sent = 0;
   let skipped = 0;
-  for (const c of (data ?? []) as Candidate[]) {
+  for (const c of candidates) {
     // Recorded first: a send that half-works must not be repeated tomorrow.
     const { error: markError } = await sb.rpc("record_chef_nudge", { p_profile: c.profile_id, p_stage: c.stage });
     if (markError) {
       skipped += 1;
       continue;
     }
-    const { subject, doc } = message(c);
-    const rendered = renderEmail(doc);
+    const locale = localeOf(c.profile_id);
+    const { subject, doc } = message(c, locale);
+    const rendered = renderEmail(doc, locale);
     const ok = await sendEmail({ to: c.email, subject, text: rendered.text, html: rendered.html }).catch((err) => {
       console.error("[nudges] send:", err);
       return false;

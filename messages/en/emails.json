@@ -1,0 +1,207 @@
+{
+  "layout": {
+    "tagline": "Chefs and home cooks near you"
+  },
+  "facts": {
+    "request": "Request",
+    "booking": "Booking",
+    "when": "When",
+    "where": "Where",
+    "service": "Service",
+    "guests": "People / units",
+    "dateTime": "{date} · {time}",
+    "withGuests": "{what} · {guests, plural, one {# person} other {# people}}",
+    "refOffer": "{ref} · {offer}",
+    "serviceValue": "Price of the service",
+    "payBy": "Pay by",
+    "entity": "Entity",
+    "reference": "Reference",
+    "amount": "Amount",
+    "subject": "Subject"
+  },
+  "bookingRequest": {
+    "client": {
+      "subject": "Request {ref} sent to {chef}",
+      "preheader": "{chef} has 48 hours to reply to your request.",
+      "heading": "Request sent to {chef}",
+      "lead": "Hello {name}. Your request is on its way and {chef} has 48 hours to accept it, decline it or suggest another date.",
+      "depositLater": "You pay nothing yet. If {chef} accepts, we will ask you for a deposit to confirm the date; the rest of the price is arranged directly with the chef.",
+      "payChef": "You pay nothing yet: payment is arranged directly with the chef.",
+      "cta": "Follow your request",
+      "footnote": "Keep this email: the link above is how you open your request and talk to the chef, without creating an account."
+    },
+    "chef": {
+      "subject": "New request {ref}: {offer}",
+      "preheader": "{client} would like to book {offer} for {date}.",
+      "heading": "You have a new request",
+      "lead": "Hello {name}. {client} has sent a request and is waiting for your reply.",
+      "notes": "What the client wrote: “{notes}”",
+      "cta": "Reply to the request",
+      "footnote": "You have 48 hours to accept, decline or suggest another date. After that the request expires on its own."
+    }
+  },
+  "reviewRequest": {
+    "subject": "How did it go with {chef}?",
+    "preheader": "Ten seconds to review {chef}.",
+    "heading": "How did it go with {chef}?",
+    "lead": "We hope you enjoyed “{offer}”.",
+    "body": "A review takes ten seconds: just choose the stars. Your review helps other people choose, and only people who have completed a booking can write one.",
+    "cta": "Review {chef}",
+    "footnote": "You have 14 days to leave a review."
+  },
+  "ibanChange": {
+    "subject": "Confirm the change to your IBAN",
+    "preheader": "Confirm the IBAN change",
+    "heading": "Confirm your new IBAN",
+    "lead": "You asked to receive your payments into an account ending in {last4}.",
+    "confirm": "Open the link below to confirm. Until you confirm, payments keep going to your previous account.",
+    "validity": "The link is valid for one hour and only works while you are signed in.",
+    "notYou": "If this wasn't you, don't open the link and contact us immediately: your account may have been compromised.",
+    "cta": "Confirm the IBAN",
+    "footnote": "Once confirmed, payments are held for 72 hours for security."
+  },
+  "nudges": {
+    "hello": "Hello",
+    "notAgain": "If you have changed your mind, just ignore this email. We won't remind you again.",
+    "noProfile": {
+      "subject": "Your Ao Lume page is still to be created",
+      "preheader": "Creating the account took two minutes; the page is still missing.",
+      "heading": "{name}, your page doesn't exist yet",
+      "lead": "You created your account but never got round to creating your profile, so nobody can find you yet.",
+      "body": "You'll need the name you want to show, the area where you cook and a sentence about yourself. Photos and menus can come later.",
+      "cta": "Create my page"
+    },
+    "draftIncomplete": {
+      "subject": "Your page needs photos and a menu before it can go public",
+      "preheader": "Your profile is created; what clients see is still missing.",
+      "heading": "{name}, you're nearly there",
+      "lead": "Your profile exists, but it doesn't yet have what clients need to see before requesting a booking.",
+      "body": "It still needs three photos of dishes and at least one menu with a price. That is what decides who books and who closes the page.",
+      "cta": "Continue my profile"
+    },
+    "draftReady": {
+      "subject": "Everything's ready: just send your profile for review",
+      "preheader": "One button between you and your first requests.",
+      "heading": "{name}, one button to go",
+      "lead": "You have photos, you have a menu, and your profile still hasn't been sent for review.",
+      "body": "Our team reviews every profile before it goes public. After that you start appearing in searches in your area.",
+      "cta": "Send for review"
+    }
+  },
+  "support": {
+    "subject": "We have received your message · {ref}",
+    "preheader": "We have received your message ({ref})",
+    "heading": "We have received your message",
+    "lead": "We usually reply on the same working day.",
+    "addMore": "If you need to add anything, reply to this email and mention the reference.",
+    "complaints": "You can also use the Complaints Book (Livro de Reclamações): {url}"
+  },
+  "acceptance": {
+    "termsTitle": "Terms and Conditions",
+    "contractTitle": "Payment Intermediation Agreement",
+    "termsItem": "the {title} (version of {version})",
+    "contractItem": "the {title} (version {version})",
+    "termsLink": "{title} you accepted",
+    "contractLink": "{title} you accepted",
+    "stamp": "{day} at {time}",
+    "hello": "Hello.",
+    "helloName": "Hello, {name}.",
+    "signup": {
+      "subject": "Your Ao Lume account has been created",
+      "chef": {
+        "preheader": "The next step is to create your chef profile.",
+        "heading": "Your chef account has been created",
+        "lead": "{hello} The next step is to create your profile: three steps, about ten minutes, and the team reviews it before it goes public.",
+        "cta": "Create my profile"
+      },
+      "client": {
+        "preheader": "You can now look for chefs near you.",
+        "heading": "Welcome to Ao Lume",
+        "lead": "{hello} Your account has been created. You can now look for chefs near you and make your first request.",
+        "cta": "Find chefs"
+      }
+    },
+    "receipt": {
+      "subject": "We have recorded your acceptance",
+      "preheader": "You accepted {list}.",
+      "heading": "We have recorded your acceptance",
+      "lead": "{hello} On {when}, you accepted {list}. Keep this email: the links below open the exact text you accepted, which you can save and print."
+    },
+    "and": " and "
+  },
+  "reference": {
+    "subject": "Reference for the deposit · booking {ref}",
+    "preheader": "Reference to pay the deposit for booking {ref}",
+    "heading": "Details to pay the deposit",
+    "lead": "You can pay through online banking or at a Multibanco cash machine.",
+    "body": "The booking is confirmed automatically as soon as the payment comes in.",
+    "cta": "View the booking"
+  },
+  "depositDue": {
+    "subject": "Deposit due · booking {ref}",
+    "preheader": "The deposit for booking {ref} is due",
+    "heading": "{chef} has accepted your request",
+    "headingNoName": "The chef has accepted your request",
+    "lead": "The deposit still needs to be paid for the booking to be confirmed.",
+    "payNow": "To pay now (deposit)",
+    "rest": "Later, to the chef",
+    "howToPay": "You can pay by MB WAY or by Multibanco reference on the booking page.",
+    "restToChef": "The rest of the price of the service is arranged with and paid directly to the chef.",
+    "cta": "Pay the deposit"
+  },
+  "paid": {
+    "client": {
+      "subject": "Booking {ref} confirmed",
+      "preheader": "Booking {ref} confirmed",
+      "heading": "Deposit received, booking confirmed",
+      "lead": "{chef} already knows everything is confirmed.",
+      "leadNoName": "The chef already knows everything is confirmed.",
+      "depositPaid": "Deposit paid",
+      "owed": "Still to pay the chef, on the day",
+      "dateSecured": "The date is secured. {chef} will arrange the rest of the price with you, which is paid directly to them on the day of the service.",
+      "dateSecuredNoName": "The date is secured. The chef will arrange the rest of the price with you, which is paid directly to them on the day of the service.",
+      "keep": "Keep this email: the link below opens the booking and your conversation with the chef.",
+      "cta": "View the booking"
+    },
+    "chef": {
+      "subject": "Deposit received · booking {ref}",
+      "preheader": "Deposit received · {ref}",
+      "heading": "The deposit is in",
+      "lead": "Booking {ref} is confirmed.",
+      "youReceive": "You will receive",
+      "body": "We transfer this amount once the service is completed, with the payment document.",
+      "cta": "View the request"
+    }
+  },
+  "payout": {
+    "subject": "Payment {amount} · {ref}",
+    "preheader": "We have transferred {amount}",
+    "heading": "We've paid you",
+    "lead": "For booking {ref}.",
+    "depositReceived": "Deposit received",
+    "commission": "Commission",
+    "transferred": "Transferred",
+    "account": "Account",
+    "body": "The document with the detailed breakdown is in your dashboard, under Payments.",
+    "cta": "View the document",
+    "footnote": "Document {number}"
+  },
+  "auth": {
+    "confirm": {
+      "subject": "Confirm your email",
+      "preheader": "One more step to activate your Ao Lume account.",
+      "heading": "Confirm your email",
+      "lead": "Hi{name}. To activate your Ao Lume account, please confirm this email address is yours.",
+      "cta": "Confirm email",
+      "footnote": "If you didn't create an Ao Lume account, you can ignore this email: without confirmation, the account stays inactive."
+    },
+    "recovery": {
+      "subject": "Choose a new password",
+      "preheader": "The link to change the password of your Ao Lume account.",
+      "heading": "New password",
+      "lead": "We received a request to change the password of your Ao Lume account. Use the button below to choose a new one.",
+      "cta": "Choose a new password",
+      "footnote": "The link works only once and expires shortly. If you didn't ask for this, ignore this email: your password stays the same."
+    }
+  }
+}

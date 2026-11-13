@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "terms": {
+      "title": "Terms and conditions",
+      "description": "Ao Lume's terms and conditions of use, for clients and for chefs."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "How Ao Lume processes your personal data under the GDPR: what data, what for, who with, and your rights."
+    },
+    "contract": {
+      "title": "Payment intermediation agreement",
+      "description": "The agreement every chef accepts when creating an account on Ao Lume."
+    },
+    "archive": {
+      "title": "Accepted text"
+    }
+  },
+  "page": {
+    "updated": "Last updated: {date}",
+    "toc": "Contents"
+  },
+  "notice": {
+    "title": "Courtesy translation",
+    "body": "This English version is a courtesy translation, provided for convenience only. The Portuguese version is the binding one and prevails in the event of any discrepancy.",
+    "link": "Read the Portuguese version"
+  },
+  "contract": {
+    "intro": "The agreement between Ao Lume and each chef. It applies together with the <terms>Terms and conditions</terms>."
+  },
+  "archive": {
+    "label": "Archived text",
+    "versionTerms": "Version of {version} · archived on {date}",
+    "versionContract": "Version {version} · archived on {date}",
+    "note": "This is the exact text that was accepted, even if a more recent version now exists. It is shown in Portuguese, the language in which it was accepted. You can save or print it from your browser. Fingerprint (SHA-256): <hash>{sha}</hash>"
+  }
+}

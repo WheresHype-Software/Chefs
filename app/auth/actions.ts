@@ -1,7 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
+import { isLocale, toDbLocale, type Locale } from "@/lib/i18n/routing";
+import { redirectLocalized } from "@/lib/i18n/server";
 import { z } from "zod";
 import { recordAcceptance } from "@/lib/acceptance";
 import { siteUrl } from "@/lib/email";
@@ -9,7 +11,7 @@ import { createClient, hasSupabase } from "@/lib/supabase/server";
 
 export async function signOut(): Promise<void> {
   if (hasSupabase) await (await createClient()).auth.signOut();
-  redirect("/");
+  return redirectLocalized("/");
 }
 
 const SignUpInput = z.object({
@@ -29,7 +31,9 @@ export type SignUpResult = { ok: true; session: boolean } | { ok: false; error: 
  * for a chef, the contract). It runs on the server so the record has the visitor's IP and browser
  * as they arrived, not whatever a browser chose to say about itself.
  *
- * `error` is Supabase's own message: the form turns it into a Portuguese sentence it can act on.
+ * `error` is Supabase's own message: the form turns it into a sentence, in the visitor's language,
+ * that they can act on. The account keeps the language it was created in (profiles.locale, read
+ * from the `locale` metadata by the sign-up trigger), so its emails go out in that language.
  */
 export async function signUpWithTerms(input: Omit<z.infer<typeof SignUpInput>, "accepted"> & { accepted: boolean }): Promise<SignUpResult> {
   const parsed = SignUpInput.safeParse(input);
@@ -46,7 +50,7 @@ export async function signUpWithTerms(input: Omit<z.infer<typeof SignUpInput>, "
     options: {
       // Only used if email confirmation is switched on in Supabase.
       emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      data: { name, role: asChef ? "chef" : "client" },
+      data: { name, role: asChef ? "chef" : "client", locale: toDbLocale((await getLocale()) as Locale) },
     },
   });
   if (error) return { ok: false, error: error.message };
@@ -61,4 +65,18 @@ export async function signUpWithTerms(input: Omit<z.infer<typeof SignUpInput>, "
     if (!recorded) console.error(`[auth] acceptance not recorded for ${user.id}`);
   }
   return { ok: true, session: Boolean(data.session) };
+}
+
+/**
+ * A signed-in person switched language: their account keeps it, so the emails we send them
+ * (requests, deposits, payouts) follow. Signed out, or anything unexpected: nothing to do.
+ */
+export async function saveMyLocale(locale: string): Promise<void> {
+  if (!hasSupabase || !isLocale(locale)) return;
+  const sb = await createClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return;
+  await sb.from("profiles").update({ locale: toDbLocale(locale) }).eq("id", user.id);
 }

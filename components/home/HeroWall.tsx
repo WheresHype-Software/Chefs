@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { AzulejoTile, type AzulejoVariant } from "@/components/brand/Azulejo";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Photo } from "@/components/ui/Photo";
@@ -25,11 +26,8 @@ const TILES: (Tile & { mobile?: boolean })[] = [
  * A terceira promessa depende de a app cobrar alguma coisa. Com os pagamentos desligados o sinal
  * é combinado com o chef, e prometer aqui um pagamento seguro na app seria prometer o que não há.
  */
-const promises = (paymentsOn: boolean) => [
-  "Sem criar conta",
-  "Só paga depois de o chef aceitar",
-  paymentsOn ? "Sinal pago em segurança na app" : "Combina o pagamento diretamente com o chef",
-];
+const promises = (paymentsOn: boolean) =>
+  ["noAccount", "payAfterAccept", paymentsOn ? "depositInApp" : "payChefDirectly"] as const;
 
 function Check() {
   return (
@@ -75,7 +73,8 @@ function MosaicTile({ tile, index, className = "" }: { tile: Tile; index: number
  * right that sets itself tile by tile. On phones the mosaic becomes a strip of three photos.
  */
 export function HeroWall({ paymentsOn = false }: { paymentsOn?: boolean }) {
-  const PROMISES = promises(paymentsOn);
+  const t = useTranslations("home.hero");
+  const PROMISES = promises(paymentsOn).map((key) => t(`promises.${key}`));
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-white">
       <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-5 pb-12 pt-10 md:px-8 md:pb-16 md:pt-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14 lg:pb-24 lg:pt-20">
@@ -85,11 +84,10 @@ export function HeroWall({ paymentsOn = false }: { paymentsOn?: boolean }) {
               id="hero-title"
               className="al-in d m-0 max-w-[16ch] text-[clamp(38px,5vw,66px)] font-extrabold leading-[0.98] tracking-[-0.035em] text-ink"
             >
-              Chefs e cozinheiros caseiros perto de si.
+              {t("title")}
             </h1>
             <p className="al-in m-0 max-w-[52ch] text-[17px] leading-relaxed text-ink-3 [animation-delay:120ms] md:text-[18px]">
-              Jantares cozinhados em sua casa, marmitas para a semana, bolos e petiscos para levantar. Escolha, peça a reserva e só paga
-              depois de o chef aceitar.
+              {t("lead")}
             </p>
           </div>
           <div className="al-in [animation-delay:220ms]">
@@ -105,7 +103,7 @@ export function HeroWall({ paymentsOn = false }: { paymentsOn?: boolean }) {
               ))}
             </ul>
             <Link href="/procurar" className="self-start text-[15px] font-semibold text-cobalt no-underline hover:underline">
-              Ou veja todos os chefs no mapa →
+              {t("mapLink")}
             </Link>
           </div>
         </div>

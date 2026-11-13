@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "title": "Procurar chefs",
+    "description": "Chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas, pastelaria, entregas e eventos."
+  },
+  "loading": "A procurar chefs",
+  "heading": {
+    "near": "Chefs perto de {place}",
+    "all": "Chefs no Ao Lume",
+    "noneNear": "Ainda sem chefs perto de {place}",
+    "none": "Ainda sem chefs para esta pesquisa"
+  },
+  "summary": {
+    "count": "{count, plural, one {# chef} other {# chefs}}",
+    "countOnDate": "{count, plural, one {# chef} other {# chefs}}, livres {day}",
+    "hint": "{found}. Abra um chef para ver o menu, os dias livres e pedir reserva, sem criar conta."
+  },
+  "filters": {
+    "service": "Tipo de serviço",
+    "cuisine": "Cozinha",
+    "all": "Todos",
+    "allCuisines": "Todas as cozinhas",
+    "moreCuisines": "Mais cozinhas"
+  },
+  "empty": {
+    "label": "Resultados",
+    "text": "Ainda não há chefs livres com estes filtros. O Ao Lume está a abrir zona a zona: experimente outra data, outro serviço ou uma zona próxima.",
+    "anyDate": "Qualquer data",
+    "allServices": "Todos os serviços",
+    "allChefs": "Ver todos os chefs"
+  },
+  "bar": {
+    "label": "Procurar chefs",
+    "where": "Onde",
+    "whereLabel": "Morada ou bairro",
+    "wherePlaceholder": "Zona ou morada",
+    "what": "O quê",
+    "serviceLabel": "Tipo de serviço",
+    "anything": "Tudo",
+    "when": "Quando",
+    "date": "Data",
+    "submit": "Procurar",
+    "submitting": "A procurar…"
+  },
+  "results": {
+    "label": "Resultados",
+    "showMap": "Ver no mapa",
+    "showList": "Ver lista",
+    "locationDenied": "Sem acesso à localização. Pode ativá-la nas definições do navegador.",
+    "locationUnavailable": "Não foi possível encontrar a sua localização."
+  },
+  "tile": {
+    "verifiedChef": "Chef verificado",
+    "dishBy": "Prato de {name}",
+    "new": "Novo no Ao Lume",
+    "veryClose": "muito perto",
+    "distance": "a {km} km",
+    "quote": "Sob orçamento",
+    "from": "desde <strong>{price}</strong>"
+  },
+  "mapCard": {
+    "close": "Fechar",
+    "from": "desde <strong>{price}</strong>",
+    "radius": "{area} · desloca-se até {km} km",
+    "tripFromMe": "Cerca de {km} km de si · estimativa até à zona do chef",
+    "tripFromPlace": "Cerca de {km} km da zona pesquisada · estimativa até à zona do chef",
+    "travel": {
+      "walk": "A pé",
+      "bike": "De bicicleta",
+      "car": "De carro"
+    },
+    "cta": "Ver perfil e pedir reserva"
+  },
+  "map": {
+    "region": "Mapa dos chefs",
+    "explorer": "Mapa de chefs",
+    "zoomIn": "Aproximar",
+    "zoomOut": "Afastar",
+    "toggle3d": "Alternar vista 2D e 3D",
+    "recenter": "Centrar mapa",
+    "fullscreen": "Ecrã inteiro",
+    "exitFullscreen": "Sair do ecrã inteiro",
+    "fitAll": "Ver todos os chefs",
+    "locate": "Usar a minha localização",
+    "myLocation": "A sua localização",
+    "groupCount": "{count} chefs",
+    "groupLabel": "{count} chefs nesta zona: aproximar o mapa",
+    "dragHint": "Arraste para explorar · toque num chef",
+    "selectedChef": "Chef selecionado",
+    "defaultPlace": "Lisboa",
+    "available": "{place} · {count, plural, one {# chef disponível} other {# chefs disponíveis}}",
+    "title": "Um chef perto de si.",
+    "address": "Morada",
+    "addressPlaceholder": "A sua morada ou bairro",
+    "serviceLabel": "Tipo de serviço",
+    "filtersAll": "Todos",
+    "cuisine": "Cozinha",
+    "allCuisines": "Todas as cozinhas",
+    "photo": "Foto",
+    "from": "desde {price}",
+    "empty": "Ainda não há chefs para esta pesquisa. Experimente outro tipo de serviço ou outra morada."
+  },
+  "address": {
+    "searching": "A procurar zonas…",
+    "none": "Nenhuma zona encontrada. Experimente o bairro e a cidade, por exemplo «Alvalade, Lisboa».",
+    "useTyped": "Usar «{value}»",
+    "notListedUseTyped": "Não está na lista? Usar «{value}»"
+  },
+  "breadcrumbs": "Caminho",
+  "city": {
+    "title": "Chefs privados e cozinheiros em {city}",
+    "description": "Chefs privados e cozinheiros caseiros que cozinham em {city}: jantares em casa, marmitas, bolos e eventos. Veja menus, preços e dias livres, e peça a reserva sem criar conta.",
+    "intro": "{count, plural, one {# chef cozinha} other {# chefs cozinham}} em {city}: jantares em sua casa, marmitas para a semana, bolos e eventos. Veja menus, preços e dias livres, e peça a reserva sem criar conta. Só paga depois de o chef aceitar.",
+    "empty": "Ainda não há chefs a cozinhar em {city}. O Ao Lume está a abrir zona a zona.",
+    "allChefs": "Ver todos os chefs",
+    "cookHere": "Cozinha em {city}? Crie o seu perfil",
+    "others": "Chefs noutras cidades"
+  },
+  "cuisines": {
+    "portuguese": "Portuguesa",
+    "petiscos": "Petiscos",
+    "seafood": "Marisco e peixe",
+    "grills": "Grelhados",
+    "signature": "Cozinha de autor",
+    "mediterranean": "Mediterrânica",
+    "vegetarian": "Vegetariana",
+    "vegan": "Vegan",
+    "healthy": "Saudável",
+    "pastry": "Pastelaria",
+    "brazilian": "Brasileira",
+    "asian": "Asiática",
+    "japanese": "Japonesa",
+    "sushi": "Sushi",
+    "indian": "Indiana",
+    "goan": "Goesa",
+    "italian": "Italiana",
+    "chinese": "Chinesa",
+    "thai": "Tailandesa",
+    "vietnamese": "Vietnamita",
+    "korean": "Coreana",
+    "mexican": "Mexicana",
+    "peruvian": "Peruana",
+    "french": "Francesa",
+    "spanish": "Espanhola",
+    "greek": "Grega",
+    "middleEastern": "Médio Oriente",
+    "moroccan": "Marroquina",
+    "african": "Africana",
+    "capeVerdean": "Cabo-verdiana",
+    "angolan": "Angolana",
+    "mozambican": "Moçambicana",
+    "american": "Americana",
+    "fusion": "Fusão",
+    "barbecue": "Churrasco"
+  },
+  "diets": {
+    "vegetarian": "Vegetariano",
+    "vegan": "Vegan",
+    "glutenFree": "Sem glúten",
+    "lactoseFree": "Sem lactose",
+    "halal": "Halal",
+    "kids": "Para crianças"
+  }
+}
