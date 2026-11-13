@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { DEFAULT_LOCALE } from "@/lib/i18n/routing";
-import { Link } from "@/lib/i18n/navigation";
+import { DEFAULT_LOCALE, localizePath } from "@/lib/i18n/routing";
 import { LEGAL_UPDATED } from "@/lib/legal";
 
 export type LegalSection = { id: string; title: string; body: ReactNode };
@@ -22,9 +21,10 @@ export function CourtesyNotice({ path }: { path: string }) {
       <strong className="text-ink">{t("title")}</strong>
       <span>
         {t("body")}{" "}
-        <Link href={path} locale={DEFAULT_LOCALE} hrefLang="pt-PT" className="font-semibold">
+        {/* A plain link to the bare Portuguese URL (a locale Link would go through /pt/… and redirect). */}
+        <a href={localizePath(path, DEFAULT_LOCALE)} hrefLang="pt-PT" lang="pt-PT" className="font-semibold">
           {t("link")}
-        </Link>
+        </a>
       </span>
     </aside>
   );

@@ -2,8 +2,8 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import type { MouseEvent } from "react";
-import { Link, usePathname, useRouter } from "@/lib/i18n/navigation";
-import { LOCALE_NAME, LOCALES, type Locale } from "@/lib/i18n/routing";
+import { usePathname, useRouter } from "@/lib/i18n/navigation";
+import { LOCALE_NAME, LOCALES, localizePath, type Locale } from "@/lib/i18n/routing";
 
 type Props = {
   /** "short": PT · EN pills (header); "long": the language names (footer, mobile menu). */
@@ -13,8 +13,9 @@ type Props = {
 };
 
 /**
- * Same page, other language. The href is the real localized URL (works without JS and for
- * crawlers); with JS, the click also keeps the query string (search filters, ?chef=1).
+ * Same page, other language. The href is the page's own URL in that language (a plain <a>: a
+ * locale Link would point at /pt/… and redirect), so it works without JS and for crawlers; with
+ * JS, the click also keeps the query string (search filters, ?chef=1).
  */
 export function LanguageSwitch({ variant = "short", className = "", linkClassName = "" }: Props) {
   const t = useTranslations("nav.language");
@@ -36,10 +37,9 @@ export function LanguageSwitch({ variant = "short", className = "", linkClassNam
             {variant === "short" ? l.toUpperCase() : LOCALE_NAME[l]}
           </span>
         ) : (
-          <Link
+          <a
             key={l}
-            href={pathname}
-            locale={l}
+            href={localizePath(pathname, l)}
             hrefLang={l}
             lang={l}
             onClick={(e) => go(e, l)}
@@ -47,7 +47,7 @@ export function LanguageSwitch({ variant = "short", className = "", linkClassNam
             aria-label={t("switchTo", { language: LOCALE_NAME[l] })}
           >
             {variant === "short" ? l.toUpperCase() : LOCALE_NAME[l]}
-          </Link>
+          </a>
         ),
       )}
     </nav>
