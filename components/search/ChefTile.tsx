@@ -1,16 +1,17 @@
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Photo } from "@/components/ui/Photo";
 import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { Star } from "@/components/ui/Star";
-import { chefTitle, fromPrice, initials, isVerifiedChef, SERVICE_LABEL, titledName } from "@/lib/format";
+import { cuisineLabel } from "@/lib/constants";
+import { chefTitle, decimal, initials, isVerifiedChef, minPrice, serviceLabel, titledName } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { ChefCard } from "@/lib/types";
 
-function distanceLabel(km: number): string {
-  return km < 0.5 ? "muito perto" : `a ${String(km).replace(".", ",")} km`;
-}
-
-/** Verified chefs carry a filled "Chef verificado" mark; cooks a plain "Cozinheiro" one. */
+/** Verified chefs carry a filled "verified chef" mark; cooks a plain "Cook" one. */
 function TitleBadge({ badges }: { badges: string[] }) {
+  const t = useTranslations("search.tile");
+  const locale = useLocale() as Locale;
   const verified = isVerifiedChef(badges);
   return (
     <span
@@ -19,7 +20,7 @@ function TitleBadge({ badges }: { badges: string[] }) {
       }`}
     >
       {verified && <VerifiedIcon />}
-      {verified ? "Chef verificado" : chefTitle(badges)}
+      {verified ? t("verifiedChef") : chefTitle(badges, locale)}
     </span>
   );
 }
@@ -44,6 +45,8 @@ function Face({ chef }: { chef: ChefCard }) {
 
 /** Their food: one large dish and up to two more beside it. */
 function Dishes({ chef, priority }: { chef: ChefCard; priority: boolean }) {
+  const t = useTranslations("search.tile");
+  const dishAlt = t("dishBy", { name: chef.name });
   const dishes = (chef.dishes.length ? chef.dishes : [chef.cover]).slice(0, 3);
   const zoom = "h-full w-full transition-transform duration-500 ease-[var(--ease-out)] group-hover:scale-[1.04]";
   if (dishes.length === 1) {
@@ -51,7 +54,7 @@ function Dishes({ chef, priority }: { chef: ChefCard; priority: boolean }) {
       <div className="aspect-[4/3] overflow-hidden rounded-[12px] bg-paper">
         <Photo
           photo={dishes[0]}
-          alt={`Prato de ${chef.name}`}
+          alt={dishAlt}
           sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
           priority={priority}
           className={zoom}
@@ -68,7 +71,7 @@ function Dishes({ chef, priority }: { chef: ChefCard; priority: boolean }) {
         >
           <Photo
             photo={url}
-            alt={i === 0 ? `Prato de ${chef.name}` : ""}
+            alt={i === 0 ? dishAlt : ""}
             sizes={i === 0 ? "(min-width: 1024px) 20vw, 66vw" : "(min-width: 1024px) 10vw, 33vw"}
             priority={priority && i === 0}
             className={zoom}
@@ -80,11 +83,13 @@ function Dishes({ chef, priority }: { chef: ChefCard; priority: boolean }) {
 }
 
 function RatingLine({ chef }: { chef: ChefCard }) {
-  if (!chef.rating || chef.reviewCount === 0) return <span className="font-semibold text-cobalt">Novo no Ao Lume</span>;
+  const t = useTranslations("search.tile");
+  const locale = useLocale() as Locale;
+  if (!chef.rating || chef.reviewCount === 0) return <span className="font-semibold text-cobalt">{t("new")}</span>;
   return (
     <span className="flex items-center gap-1 font-semibold">
       <Star />
-      <span>{Number(chef.rating).toFixed(1).replace(".", ",")}</span>
+      <span>{decimal(Number(chef.rating), 1, locale)}</span>
       <span className="font-normal text-muted">({chef.reviewCount})</span>
     </span>
   );
@@ -92,7 +97,14 @@ function RatingLine({ chef }: { chef: ChefCard }) {
 
 /** A chef in a grid: their dishes and, large, their face; then who, where, what they do and from how much. */
 export function ChefTile({ chef, priority = false }: { chef: ChefCard; priority?: boolean }) {
-  const price = fromPrice(chef.offers);
+  const t = useTranslations("search.tile");
+  const tc = useTranslations("search.cuisines");
+  const cuisine = (name: string) => cuisineLabel((k) => tc(k), name);
+  const locale = useLocale() as Locale;
+  const price = minPrice(chef.offers, locale);
+  // Keep the stored precision (not fixed to 1 dp); only the decimal mark changes between languages.
+  const km = chef.distanceKm != null ? (locale === "pt" ? String(chef.distanceKm).replace(".", ",") : String(chef.distanceKm)) : null;
+  const distance = chef.distanceKm == null ? null : chef.distanceKm < 0.5 ? t("veryClose") : t("distance", { km: km! });
   return (
     <Link href={`/chef/${chef.slug}`} className="group flex flex-col text-ink no-underline hover:text-ink">
       <div className="relative">
@@ -103,33 +115,33 @@ export function ChefTile({ chef, priority = false }: { chef: ChefCard; priority?
       <div className="flex flex-col gap-1 pt-12">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="m-0 min-w-0 text-[19px] font-bold leading-tight tracking-[-0.01em] [overflow-wrap:anywhere] group-hover:text-cobalt">
-            {titledName(chef)}
+            {titledName(chef, locale)}
           </h3>
           <span className="shrink-0 text-[14px]">
             <RatingLine chef={chef} />
           </span>
         </div>
         {chef.headline && <span className="text-[15px] text-ink-3">{chef.headline}</span>}
-        {chef.categories.length > 0 && <span className="text-[14px] font-medium text-cobalt">{chef.categories.join(" · ")}</span>}
+        {chef.categories.length > 0 && (
+          <span className="text-[14px] font-medium text-cobalt">{chef.categories.map((c) => cuisine(c)).join(" · ")}</span>
+        )}
         <span className="text-[14px] text-muted">
           {chef.area}
-          {chef.distanceKm != null && ` · ${distanceLabel(chef.distanceKm)}`}
+          {distance && ` · ${distance}`}
         </span>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-2.5">
           <ul className="m-0 flex min-w-0 list-none flex-wrap gap-1 p-0">
             {chef.services.slice(0, 3).map((s) => (
               <li key={s} className="rounded-full bg-paper px-2 py-0.5 text-[12px] text-ink-3">
-                {SERVICE_LABEL[s]}
+                {serviceLabel(s, locale)}
               </li>
             ))}
           </ul>
           <span className="shrink-0 text-[15px]">
-            {price === "orçamento" ? (
-              "Sob orçamento"
+            {price ? (
+              t.rich("from", { price, strong: (c) => <strong className="font-bold tabular-nums">{c}</strong> })
             ) : (
-              <>
-                desde <strong className="font-bold tabular-nums">{price}</strong>
-              </>
+              t("quote")
             )}
           </span>
         </div>

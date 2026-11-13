@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { searchPlaces, type Place } from "@/lib/geocode";
 
@@ -48,6 +49,7 @@ export function AddressSearch({
   allowCustom = false,
   invalid = false,
 }: Props) {
+  const t = useTranslations("search.address");
   const [items, setItems] = useState<Place[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -150,7 +152,7 @@ export function AddressSearch({
         >
           {items.length === 0 && !(allowCustom && !loading) && (
             <li role="option" aria-selected={false} aria-disabled className="px-4 py-3 text-sm text-muted">
-              {loading ? "A procurar zonas…" : "Nenhuma zona encontrada. Experimente o bairro e a cidade, por exemplo «Alvalade, Lisboa»."}
+              {loading ? t("searching") : t("none")}
             </li>
           )}
           {items.map((p, i) => (
@@ -178,7 +180,7 @@ export function AddressSearch({
               }}
               className="cursor-pointer px-4 py-3 text-sm text-cobalt hover:bg-paper"
             >
-              {items.length ? "Não está na lista? " : ""}Usar «{value.trim()}»
+              {items.length ? t("notListedUseTyped", { value: value.trim() }) : t("useTyped", { value: value.trim() })}
             </li>
           )}
         </ul>

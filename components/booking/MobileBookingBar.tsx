@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useBelowViewport } from "@/hooks/useBelowViewport";
 
 type Props = { targetId: string; price: string; rating: string };
 
 /** Phones and tablets (the form is beside the content from lg up): keeps "Pedir reserva" in reach until the booking form scrolls into view. */
 export function MobileBookingBar({ targetId, price, rating }: Props) {
+  const t = useTranslations("chef.mobileBar");
   const show = useBelowViewport(targetId);
   return (
     <div
@@ -16,12 +18,12 @@ export function MobileBookingBar({ targetId, price, rating }: Props) {
       <div className="mx-auto flex max-w-[640px] items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col">
           <span className="text-[15px]">
-            desde <strong className="num font-bold">{price}</strong>
+            {t.rich("from", { price, strong: (c) => <strong className="num font-bold">{c}</strong> })}
           </span>
           <span className="truncate text-[13px] text-muted">{rating}</span>
         </div>
         <a href={`#${targetId}`} className="btn shrink-0">
-          Pedir reserva
+          {t("book")}
         </a>
       </div>
     </div>

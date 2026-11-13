@@ -1,5 +1,7 @@
 import "server-only";
 import { cache } from "react";
+import { DEFAULT_LOCALE, type Locale } from "./i18n/routing";
+import { getTranslator } from "./i18n/translator";
 import { createAnonClient, hasSupabase } from "./supabase/server";
 import type { Calendar, ChefCard, ChefProfile } from "./types";
 
@@ -77,8 +79,13 @@ type ReviewRow = {
   bookings: { offer_title: string; guests: number } | null;
 };
 
-export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | null> => {
+/**
+ * A chef's public profile. The few texts we compose (review lines, "–present", category names) are
+ * in `locale`; payment methods and the cancellation preset stay codes for the page to translate.
+ */
+export const getChefProfile = cache(async (slug: string, locale: Locale = DEFAULT_LOCALE): Promise<ChefProfile | null> => {
   if (!hasSupabase) return null;
+  const t = getTranslator(locale, "chef");
   const sb = createAnonClient();
   const card = (await getChefs()).find((c) => c.slug === slug);
   if (!card) return null;
@@ -108,13 +115,13 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
     languages: chef.data?.languages ?? [],
     socials: chef.data?.socials ?? {},
     yearsExperience: chef.data?.years_experience ?? null,
-    paymentMethods: (chef.data?.payment_methods ?? []).map((m: string) => PAYMENT_LABEL[m] ?? m),
+    paymentMethods: chef.data?.payment_methods ?? [],
     depositPercent: chef.data?.deposit_percent ?? null,
     cancellation: policy.data ? { preset: policy.data.preset, text: policy.data.custom_text } : null,
     experience: (exp.data ?? []).map((e) => ({
       place: e.place,
       role: e.role,
-      years: `${e.start_year ?? ""}–${e.end_year ?? "hoje"}`,
+      years: `${e.start_year ?? ""}–${e.end_year ?? t("about.present")}`,
     })),
     certifications: certs.data ?? [],
     portrait: photos.data?.find((p) => p.kind === "portrait")?.url ?? null,
@@ -123,20 +130,14 @@ export const getChefProfile = cache(async (slug: string): Promise<ChefProfile | 
       id: r.id,
       author: r.author_name,
       date: r.created_at,
-      what: r.bookings ? `${r.bookings.offer_title} · ${r.bookings.guests} pessoas` : "",
+      what: r.bookings ? t("reviews.what", { offer: r.bookings.offer_title, guests: r.bookings.guests }) : "",
       comment: r.comment,
       overall: Number(r.overall),
       reply: r.chef_reply,
     })),
     ratingDistribution: starCounts(rv.map((r) => Number(r.overall))),
     categoryAverages: rv.length
-      ? [
-          { label: "Comida", value: avg("food") },
-          { label: "Apresentação", value: avg("presentation") },
-          { label: "Pontualidade", value: avg("punctuality") },
-          { label: "Comunicação", value: avg("communication") },
-          { label: "Qualidade/preço", value: avg("value") },
-        ]
+      ? REVIEW_CATEGORIES.map((k) => ({ label: t(`reviews.categories.${k}`), value: avg(k) }))
       : [],
   };
 });
@@ -148,15 +149,8 @@ export function starCounts(overalls: number[]): number[] {
   return counts;
 }
 
-export const PAYMENT_LABEL: Record<string, string> = {
-  mbway: "MB WAY",
-  transfer: "Transferência",
-  cash: "Dinheiro",
-};
+/** Review score categories, in display order (labels: chef.reviews.categories). */
+export const REVIEW_CATEGORIES = ["food", "presentation", "punctuality", "communication", "value"] as const;
 
-export const CANCELLATION_LABEL: Record<string, string> = {
-  flexible: "Flexível: grátis até 24 h antes",
-  moderate: "Moderado: grátis até 5 dias antes",
-  strict: "Rígido: sinal não reembolsável",
-  custom: "Política do chef",
-};
+// Payment methods (mbway, transfer, cash) and cancellation presets (flexible, moderate, strict,
+// custom) are stored as codes; their labels are chef.terms.payment.* and chef.terms.policy.*.

@@ -50,7 +50,6 @@ export function useBookingForm(
   // After a submit with gaps, each missing field is highlighted until it's filled.
   const [attempted, setAttempted] = useState(false);
   const invalid = (field: keyof typeof missing) => attempted && missing[field];
-  const ctaLabel = "Pedir reserva";
 
   function chooseOffer(index: number) {
     const next = chef.offers[index]!;
@@ -118,7 +117,6 @@ export function useBookingForm(
     ready,
     missing,
     invalid,
-    ctaLabel,
     submit,
     pending,
     error,

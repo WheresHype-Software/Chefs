@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { notFound } from "next/navigation";
 import { AzulejoTile } from "@/components/brand/Azulejo";
 import { SearchResults } from "@/components/search/SearchResults";
-import { Breadcrumbs, type Crumb } from "@/components/seo/Breadcrumbs";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { CITIES, cityBySlug, type City } from "@/lib/cities";
+import { CITIES, cityBySlug } from "@/lib/cities";
 import { getChefs } from "@/lib/data";
-import { breadcrumbJsonLd, chefListJsonLd } from "@/lib/seo";
+import type { Locale } from "@/lib/i18n/routing";
+import { alternates, breadcrumbJsonLd, chefListJsonLd } from "@/lib/seo";
 
 // New chefs and approvals show up within a few minutes.
 export const revalidate = 300;
@@ -18,21 +20,26 @@ export function generateStaticParams() {
   return CITIES.map((c) => ({ cidade: c.slug }));
 }
 
-const crumbsFor = (city: City): Crumb[] => [
-  { name: "Ao Lume", href: "/" },
-  { name: "Chefs em Portugal", href: "/procurar" },
-  { name: `Chefs em ${city.name}`, href: `/chefs/${city.slug}` },
-];
+async function crumbsFor(cityName: string, slug: string, locale: Locale) {
+  const t = await getTranslations({ locale, namespace: "meta.crumbs" });
+  return [
+    { name: "Ao Lume", href: "/" },
+    { name: t("chefsInPortugal"), href: "/procurar" },
+    { name: t("chefsIn", { city: cityName }), href: `/chefs/${slug}` },
+  ];
+}
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/chefs/[cidade]">): Promise<Metadata> {
-  const city = cityBySlug((await params).cidade);
+  const { locale, cidade } = await params;
+  const city = cityBySlug(cidade);
   if (!city) return {};
+  const t = await getTranslations({ locale: locale as Locale, namespace: "search.city" });
   const chefs = await getChefs(city.lat, city.lng);
-  const title = `Chefs privados e cozinheiros em ${city.name}`;
+  const title = t("title", { city: city.name });
   return {
     title,
-    description: `Chefs privados e cozinheiros caseiros que cozinham em ${city.name}: jantares em casa, marmitas, bolos e eventos. Veja menus, preços e dias livres, e peça a reserva sem criar conta.`,
-    alternates: { canonical: `/chefs/${city.slug}` },
+    description: t("description", { city: city.name }),
+    alternates: alternates(`/chefs/${city.slug}`, locale as Locale),
     // An empty city page is thin content: keep it out of search until someone cooks there.
     robots: chefs.length ? undefined : { index: false, follow: true },
     openGraph: { title },
@@ -40,10 +47,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/chefs/[c
 }
 
 export default async function CityPage({ params }: PageProps<"/[locale]/chefs/[cidade]">) {
-  const city = cityBySlug((await params).cidade);
+  const { locale, cidade } = await params;
+  const city = cityBySlug(cidade);
   if (!city) notFound();
+  const t = await getTranslations("search.city");
   const chefs = await getChefs(city.lat, city.lng);
-  const crumbs = crumbsFor(city);
+  const crumbs = await crumbsFor(city.name, city.slug, locale as Locale);
   const others = CITIES.filter((c) => c.slug !== city.slug);
 
   return (
@@ -53,11 +62,9 @@ export default async function CityPage({ params }: PageProps<"/[locale]/chefs/[c
         <section className="border-b border-line bg-paper">
           <div className="mx-auto flex max-w-[1280px] flex-col gap-4 px-5 pb-8 pt-8 md:px-8 md:pt-10">
             <Breadcrumbs items={crumbs} />
-            <h1 className="d m-0 text-[clamp(30px,4vw,48px)] leading-[1.05]">Chefs privados e cozinheiros em {city.name}</h1>
+            <h1 className="d m-0 text-[clamp(30px,4vw,48px)] leading-[1.05]">{t("title", { city: city.name })}</h1>
             <p className="m-0 max-w-[70ch] text-[17px] text-ink-3">
-              {chefs.length
-                ? `${chefs.length === 1 ? "1 chef cozinha" : `${chefs.length} chefs cozinham`} em ${city.name}: jantares em sua casa, marmitas para a semana, bolos e eventos. Veja menus, preços e dias livres, e peça a reserva sem criar conta. Só paga depois de o chef aceitar.`
-                : `Ainda não há chefs a cozinhar em ${city.name}. O Ao Lume está a abrir zona a zona.`}
+              {chefs.length ? t("intro", { count: chefs.length, city: city.name }) : t("empty", { city: city.name })}
             </p>
           </div>
         </section>
@@ -71,10 +78,10 @@ export default async function CityPage({ params }: PageProps<"/[locale]/chefs/[c
             </div>
             <div className="flex flex-wrap gap-2">
               <Link href="/procurar" className="btn btn-sm">
-                Ver todos os chefs
+                {t("allChefs")}
               </Link>
               <Link href="/para-chefs" className="btn btn-o btn-sm">
-                Cozinha em {city.name}? Crie o seu perfil
+                {t("cookHere", { city: city.name })}
               </Link>
             </div>
           </section>
@@ -82,7 +89,7 @@ export default async function CityPage({ params }: PageProps<"/[locale]/chefs/[c
 
         <section aria-labelledby="cidades-title" className="mx-auto max-w-[1280px] px-5 py-12 md:px-8">
           <h2 id="cidades-title" className="m-0 mb-4 text-[18px] font-bold">
-            Chefs noutras cidades
+            {t("others")}
           </h2>
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
             {others.map((c) => (
@@ -96,7 +103,7 @@ export default async function CityPage({ params }: PageProps<"/[locale]/chefs/[c
         </section>
       </main>
       <SiteFooter />
-      <JsonLd data={[breadcrumbJsonLd(crumbs), chefListJsonLd(chefs)]} />
+      <JsonLd data={[breadcrumbJsonLd(crumbs, locale as Locale), chefListJsonLd(chefs, locale as Locale)]} />
     </div>
   );
 }

@@ -1,10 +1,12 @@
+import { useTranslations } from "next-intl";
 import { SiteHeader } from "@/components/SiteChrome";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 /** Shown at once when opening a chef, so the previous page never lingers. */
 export default function Loading() {
+  const t = useTranslations("chef");
   return (
-    <div role="status" aria-label="A carregar o perfil do chef">
+    <div role="status" aria-label={t("loading")}>
       <SiteHeader />
       <div className="mx-auto max-w-[1240px] px-5 pt-4 md:px-8 md:pt-6">
         <Skeleton className="aspect-[4/3] w-full rounded-[10px] md:aspect-auto md:h-[440px]" />

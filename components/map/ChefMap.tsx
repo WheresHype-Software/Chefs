@@ -2,9 +2,11 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MLMap, Marker } from "maplibre-gl";
+import { useLocale } from "next-intl";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { LISBON, loadMapLibre, loadStyle, restyle } from "@/components/map/map-style";
 import { createPin } from "@/components/map/pin";
+import type { Locale } from "@/lib/i18n/routing";
 import type { ChefCard } from "@/lib/types";
 
 const TILT = 54;
@@ -32,6 +34,9 @@ export const ChefMap = forwardRef<ChefMapHandle, Props>(function ChefMap(
   { chefs, visible, selectedId, onPick, onInteract, home, padRight },
   ref,
 ) {
+  const locale = useLocale() as Locale;
+  const localeRef = useRef(locale);
+  localeRef.current = locale;
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const markers = useRef(new Map<string, { marker: Marker; node: HTMLDivElement }>());
@@ -89,7 +94,7 @@ export const ChefMap = forwardRef<ChefMapHandle, Props>(function ChefMap(
       chefs.forEach((c, i) => {
         seen.add(c.id);
         if (markers.current.has(c.id)) return;
-        const node = createPin(c, (id) => pickRef.current(id), 300 + i * 110);
+        const node = createPin(c, (id) => pickRef.current(id), localeRef.current, 300 + i * 110);
         const marker = new lib.Marker({ element: node, anchor: "bottom", pitchAlignment: "viewport", rotationAlignment: "viewport" })
           .setLngLat([c.lng, c.lat])
           .addTo(m);

@@ -1,11 +1,13 @@
+import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 
 export type Crumb = { name: string; href: string };
 
 /** "Ao Lume › Chefs em Lisboa › Chef Ana": where you are, and the way back up. */
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
+  const t = useTranslations("search");
   return (
-    <nav aria-label="Caminho" className="text-[14px] text-muted">
+    <nav aria-label={t("breadcrumbs")} className="text-[14px] text-muted">
       <ol className="m-0 flex list-none flex-wrap items-center gap-x-1.5 gap-y-1 p-0">
         {items.map((c, i) => (
           <li key={c.href} className="flex items-center gap-1.5">

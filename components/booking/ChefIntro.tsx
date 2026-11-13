@@ -1,9 +1,15 @@
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
+import { cuisineLabel } from "@/lib/constants";
 import { chefTitle, titledName, rating, toneFor } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { ChefCard } from "@/lib/types";
 
 /** Cover photo, name, categories and bio at the top of the map's booking panel. */
 export function ChefIntro({ chef, onClose }: { chef: ChefCard; onClose?: () => void }) {
+  const t = useTranslations("booking.intro");
+  const tc = useTranslations("search.cuisines");
+  const locale = useLocale() as Locale;
   return (
     <>
       <div className="relative flex h-[200px] items-end p-[18px]" style={{ background: chef.cover ? undefined : toneFor(chef.id) }}>
@@ -11,10 +17,10 @@ export function ChefIntro({ chef, onClose }: { chef: ChefCard; onClose?: () => v
           // eslint-disable-next-line @next/next/no-img-element
           <img src={chef.cover} alt="" className="absolute inset-0 h-full w-full object-cover" />
         ) : (
-          <span className="lab text-muted">Fotografia · {chef.offers[0]?.title}</span>
+          <span className="lab text-muted">{t("photo", { title: chef.offers[0]?.title ?? "" })}</span>
         )}
         {onClose && (
-          <button type="button" className="ctl absolute right-3.5 top-3.5 !border-white" onClick={onClose} aria-label="Fechar">
+          <button type="button" className="ctl absolute right-3.5 top-3.5 !border-white" onClick={onClose} aria-label={t("close")}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111110" strokeWidth="1.8" aria-hidden="true">
               <path d="M5 5l14 14M19 5L5 19" />
             </svg>
@@ -23,23 +29,24 @@ export function ChefIntro({ chef, onClose }: { chef: ChefCard; onClose?: () => v
       </div>
       <div className="flex flex-col gap-2.5 px-7 pt-[26px]">
         <span className="lab text-muted">
-          {chefTitle(chef.badges)} · {chef.area}
+          {chefTitle(chef.badges, locale)} · {chef.area}
         </span>
-        <h2 className="d m-0 text-[40px] leading-none">{titledName(chef)}</h2>
+        <h2 className="d m-0 text-[40px] leading-none">{titledName(chef, locale)}</h2>
         <div className="flex flex-wrap gap-1.5">
           {chef.categories.map((k) => (
             <span key={k} className="lab rounded-[2px] border border-ink px-[9px] py-[5px]">
-              {k}
+              {cuisineLabel((key) => tc(key), k)}
             </span>
           ))}
         </div>
         <span className="num text-sm text-muted">
-          {rating(chef.rating, chef.reviewCount)}
-          {chef.responseHours ? ` · responde em cerca de ${chef.responseHours} h` : ""}
+          {chef.responseHours
+            ? t("ratingResponds", { rating: rating(chef.rating, chef.reviewCount, locale), hours: chef.responseHours })
+            : rating(chef.rating, chef.reviewCount, locale)}
         </span>
         {chef.bio && <p className="mb-0 mt-1 text-[15px] text-ink-2">{chef.bio}</p>}
         <Link href={`/chef/${chef.slug}`} className="self-start text-[13px] tracking-[.04em]">
-          Ver perfil completo →
+          {t("fullProfile")}
         </Link>
       </div>
     </>

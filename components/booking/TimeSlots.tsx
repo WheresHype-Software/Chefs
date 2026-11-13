@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/Chip";
 
 type Props = { slots: string[]; selected: string | null; onSelect: (slot: string) => void };
@@ -5,9 +6,10 @@ type Props = { slots: string[]; selected: string | null; onSelect: (slot: string
 const DEFAULT_SLOTS = ["13:00", "20:00"];
 
 export function TimeSlots({ slots, selected, onSelect }: Props) {
+  const t = useTranslations("booking.form");
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="step-title required m-0 border-b border-line pb-2.5 text-[15px] font-semibold">Hora</h3>
+      <h3 className="step-title required m-0 border-b border-line pb-2.5 text-[15px] font-semibold">{t("time")}</h3>
       <div className="flex flex-wrap gap-1.5">
         {(slots.length ? slots : DEFAULT_SLOTS).map((t) => (
           <Chip key={t} pressed={selected === t} onClick={() => onSelect(t)}>

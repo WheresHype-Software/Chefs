@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import type { Place } from "@/components/AddressSearch";
 import { BookingPanel } from "@/components/booking/BookingPanel";
@@ -16,6 +17,7 @@ const PANEL_WIDTH = 470;
 
 /** The home page map: search card, 3D map with pins, chef rail and the booking panel. */
 export function MapExplorer({ chefs, service }: { chefs: ChefCard[]; service?: ServiceFilter }) {
+  const t = useTranslations("search.map");
   const map = useRef<ChefMapHandle>(null);
   const filters = useChefFilters(chefs, service);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -46,7 +48,7 @@ export function MapExplorer({ chefs, service }: { chefs: ChefCard[]; service?: S
   }
 
   return (
-    <section id="mapa" aria-label="Mapa de chefs" className="relative h-[740px] overflow-hidden md:h-[880px]">
+    <section id="mapa" aria-label={t("explorer")} className="relative h-[740px] overflow-hidden md:h-[880px]">
       <ChefMap
         ref={map}
         chefs={chefs}
@@ -72,14 +74,14 @@ export function MapExplorer({ chefs, service }: { chefs: ChefCard[]; service?: S
 
       {!touched && (
         <span className="lab pointer-events-none absolute bottom-[226px] left-1/2 z-[3] hidden -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-cobalt px-4 py-[11px] text-white md:block">
-          Arraste para explorar · toque num chef
+          {t("dragHint")}
         </span>
       )}
 
       <ChefRail chefs={filters.matches} selectedId={selectedId} onSelect={selectChef} panelOpen={Boolean(chef)} />
 
       <aside
-        aria-label="Chef selecionado"
+        aria-label={t("selectedChef")}
         className={`fixed bottom-0 left-0 right-0 z-[7] h-[90dvh] overflow-y-auto rounded-t-xl border border-b-0 border-line bg-white shadow-[0_30px_80px_rgba(17,17,16,.14)] transition-transform duration-[650ms] ease-[cubic-bezier(.2,.8,.2,1)] md:absolute md:bottom-4 md:left-auto md:right-4 md:top-4 md:h-auto md:w-[440px] md:max-w-[calc(100%-32px)] md:rounded-[3px] md:border-b ${
           chef ? "translate-x-0 translate-y-0" : "translate-y-[105%] md:translate-x-[calc(100%+40px)] md:translate-y-0"
         }`}

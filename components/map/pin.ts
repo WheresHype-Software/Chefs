@@ -1,5 +1,6 @@
 import type { Map as MLMap } from "maplibre-gl";
 import { fromPrice, initials, titledName } from "@/lib/format";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/routing";
 import type { ChefCard } from "@/lib/types";
 
 /**
@@ -38,7 +39,7 @@ function face(chef: ChefCard, className: string): HTMLSpanElement {
  * `delayMs` staggers the drop-in on the map's first draw; without it the marker appears still,
  * as pins that come and go while zooming should.
  */
-export function createPin(chef: ChefCard, onPick: (id: string) => void, delayMs?: number): HTMLDivElement {
+export function createPin(chef: ChefCard, onPick: (id: string) => void, locale: Locale = DEFAULT_LOCALE, delayMs?: number): HTMLDivElement {
   const node = document.createElement("div");
   node.className = "al-pin";
   const bub = document.createElement("div");
@@ -50,9 +51,11 @@ export function createPin(chef: ChefCard, onPick: (id: string) => void, delayMs?
   button.append(face(chef, "face"));
   const price = document.createElement("span");
   price.className = "price";
-  price.textContent = fromPrice(chef.offers).replace("orçamento", "Orçamento");
+  // The starting price, or the "quote" word with a capital for the pin.
+  const p = fromPrice(chef.offers, locale);
+  price.textContent = /^\p{L}/u.test(p) ? p.charAt(0).toUpperCase() + p.slice(1) : p;
   button.append(price);
-  button.setAttribute("aria-label", [titledName(chef), chef.headline, chef.area].filter(Boolean).join(", "));
+  button.setAttribute("aria-label", [titledName(chef, locale), chef.headline, chef.area].filter(Boolean).join(", "));
   button.addEventListener("click", (e) => {
     e.stopPropagation();
     onPick(chef.id);
@@ -64,8 +67,11 @@ export function createPin(chef: ChefCard, onPick: (id: string) => void, delayMs?
   return node;
 }
 
+/** Labels for a cluster pin: the count on it and its aria-label (search.map.groupCount / groupLabel). */
+export type GroupLabels = { count: string; aria: string };
+
 /** Several chefs in one spot: up to two faces, "+n", and how many. Clicking zooms in on them. */
-export function createGroup(chefs: ChefCard[], onOpen: () => void, delayMs?: number): HTMLDivElement {
+export function createGroup(chefs: ChefCard[], onOpen: () => void, labels: GroupLabels, delayMs?: number): HTMLDivElement {
   const node = document.createElement("div");
   node.className = "al-group";
   if (delayMs === undefined) node.dataset.still = "";
@@ -83,9 +89,9 @@ export function createGroup(chefs: ChefCard[], onOpen: () => void, delayMs?: num
   }
   const label = document.createElement("span");
   label.className = "count";
-  label.textContent = `${chefs.length} chefs`;
+  label.textContent = labels.count;
   button.append(stack, label);
-  button.setAttribute("aria-label", `${chefs.length} chefs nesta zona: aproximar o mapa`);
+  button.setAttribute("aria-label", labels.aria);
   button.addEventListener("click", (e) => {
     e.stopPropagation();
     onOpen();

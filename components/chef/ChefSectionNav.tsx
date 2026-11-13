@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 export type NavSection = { id: string; label: string };
 
 /** Sticky jump links under the site header; the section being read is highlighted. */
 export function ChefSectionNav({ sections, bookable }: { sections: NavSection[]; bookable: boolean }) {
+  const t = useTranslations("chef.nav");
   const [active, setActive] = useState(sections[0]?.id ?? "");
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export function ChefSectionNav({ sections, bookable }: { sections: NavSection[];
 
   return (
     <nav
-      aria-label="Secções do perfil"
+      aria-label={t("label")}
       className="sticky top-16 z-10 -mx-5 border-b border-line bg-paper/95 px-5 backdrop-blur-[6px] md:mx-0 md:rounded-[12px] md:border md:bg-white/95 md:px-2"
     >
       <div className="flex items-center gap-1 overflow-x-auto py-2 [scrollbar-width:none]">
@@ -46,7 +48,7 @@ export function ChefSectionNav({ sections, bookable }: { sections: NavSection[];
           // The wrapper hides it from lg up (the form sits beside the content); .btn would override lg:hidden.
           <span className="ml-auto shrink-0 lg:hidden">
             <a href="#reservar" className="btn btn-sm">
-              Pedir reserva
+              {t("book")}
             </a>
           </span>
         )}

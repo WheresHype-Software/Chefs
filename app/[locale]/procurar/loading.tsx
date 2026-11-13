@@ -1,9 +1,11 @@
+import { useTranslations } from "next-intl";
 import { SiteHeader } from "@/components/SiteChrome";
 
 /** Shown instantly while a new search runs on the server. */
 export default function Loading() {
+  const t = useTranslations("search");
   return (
-    <div className="min-h-screen" aria-busy="true" aria-label="A procurar chefs">
+    <div className="min-h-screen" aria-busy="true" aria-label={t("loading")}>
       <SiteHeader />
       <div className="border-b border-line bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-5 pb-6 pt-8 md:px-8 md:pt-10">

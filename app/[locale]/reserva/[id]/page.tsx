@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { BookingChat } from "@/components/booking/BookingChat";
 import { DepositPayment } from "@/components/booking/DepositPayment";
@@ -9,35 +10,33 @@ import { ReviewForm } from "@/components/booking/ReviewForm";
 import { GuestLookupForm } from "@/components/booking/GuestLookup";
 import { RememberBooking } from "@/components/booking/RememberBooking";
 import { StatusSteps } from "@/components/booking/StatusSteps";
+import { paymentKey, policyKey } from "@/components/chef/labels";
 import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { CANCELLATION_LABEL, PAYMENT_LABEL } from "@/lib/data";
 import { getBookingView } from "@/lib/bookings";
 import { cardPaymentsPossible } from "@/lib/env";
 import { getPaymentState, getRefundAwaitingIban } from "@/lib/deposit";
-import { dayLabel, euro, titledFirst, titledName, MODE_LABEL, shortStamp, STATUS_LABEL } from "@/lib/format";
+import { dayLabel, euro, modeLabel, shortStamp, statusLabel, titledFirst, titledName } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import type { BookingStatus } from "@/lib/types";
 
-export const metadata: Metadata = { title: "A sua reserva", robots: { index: false } };
+export async function generateMetadata({ params }: PageProps<"/[locale]/reserva/[id]">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: locale as Locale, namespace: "booking.status" });
+  return { title: t("metaTitle"), robots: { index: false } };
+}
 
-const STEPS: { key: BookingStatus; label: string; hint: string }[] = [
-  { key: "requested", label: "Pedido enviado", hint: "O chef tem 48 horas para responder" },
-  { key: "accepted", label: "Aceite pelo chef", hint: "Pague o sinal para confirmar" },
-  { key: "confirmed", label: "Confirmado", hint: "Assim que o sinal entrar" },
-  { key: "completed", label: "Concluído", hint: "Depois do serviço poderá avaliar" },
-];
+const STEP_KEYS = ["requested", "accepted", "confirmed", "completed"] as const;
 
 /** Opened without access (no link, other device, or a wrong id): offer the lookup instead of a 404. */
-function NoAccess() {
+async function NoAccess() {
+  const t = await getTranslations("booking.status.noAccess");
   return (
     <div className="flex min-h-screen flex-col bg-paper">
       <SiteHeader />
       <main className="mx-auto box-border flex w-full max-w-[760px] flex-1 flex-col gap-6 px-5 pb-16 pt-8 md:px-8 md:pt-12">
-        <h1 className="d m-0 text-[clamp(30px,5vw,44px)] leading-[1.05]">Não conseguimos abrir este pedido aqui.</h1>
-        <p className="m-0 max-w-[60ch] text-muted">
-          Os pedidos abrem com o link que guardou (ou que recebeu por email), no dispositivo onde o pediu, ou com o número do pedido e o seu
-          email.
-        </p>
+        <h1 className="d m-0 text-[clamp(30px,5vw,44px)] leading-[1.05]">{t("title")}</h1>
+        <p className="m-0 max-w-[60ch] text-muted">{t("text")}</p>
         <GuestLookupForm />
       </main>
       <SiteFooter />
@@ -45,37 +44,45 @@ function NoAccess() {
   );
 }
 
-function headline(status: BookingStatus, chef: string): string {
+type HeadlineT = Awaited<ReturnType<typeof getTranslations<"booking.status.headline">>>;
+
+function headline(t: HeadlineT, status: BookingStatus, chef: string): string {
   switch (status) {
     case "requested":
-      return `Pedido enviado a ${chef}`;
+      return t("requested", { name: chef });
     case "accepted":
-      return `${chef} aceitou o seu pedido`;
+      return t("accepted", { name: chef });
     case "change_proposed":
-      return `${chef} propôs uma alteração`;
+      return t("changeProposed", { name: chef });
     case "confirmed":
-      return "Reserva confirmada";
+      return t("confirmed");
     case "completed":
-      return "Reserva concluída";
+      return t("completed");
     case "declined":
-      return `${chef} não pode aceitar este pedido`;
+      return t("declined", { name: chef });
     case "cancelled":
-      return "Reserva cancelada";
+      return t("cancelled");
     case "expired":
-      return "O pedido expirou";
+      return t("expired");
   }
 }
 
 export default async function ReservaPage({ params }: PageProps<"/[locale]/reserva/[id]">) {
   const { id } = await params;
+  const locale = (await getLocale()) as Locale;
   // A guest's ?t= token was already moved into an httpOnly cookie by the proxy.
   const view = await getBookingView(id);
   if (!view) return <NoAccess />;
 
+  const t = await getTranslations("booking.status");
+  const td = await getTranslations("booking.status.details");
+  const tHead = await getTranslations("booking.status.headline");
+  const tSteps = await getTranslations("booking.status.steps");
+  const tTerms = await getTranslations("chef.terms");
   const { booking: b, chef } = view;
-  const first = titledFirst(chef);
+  const first = titledFirst(chef, locale);
   const reached = (k: BookingStatus) => view.events.find((e) => e.to === k);
-  const currentIdx = STEPS.findIndex((s) => s.key === (b.status === "change_proposed" ? "requested" : b.status));
+  const currentIdx = STEP_KEYS.findIndex((s) => s === (b.status === "change_proposed" ? "requested" : b.status));
   // Once the chef accepts, the amounts are frozen on the booking; before that, an estimate.
   const deposit = b.deposit_amount ?? (chef.depositPercent && b.estimate ? Math.round((b.estimate * chef.depositPercent) / 100) : null);
   const ended = ["declined", "cancelled", "expired"].includes(b.status);
@@ -85,37 +92,47 @@ export default async function ReservaPage({ params }: PageProps<"/[locale]/reser
   const refundWaiting = view.viewer === "client" ? await getRefundAwaitingIban(id) : null;
 
   const intro: Record<BookingStatus, string> = {
-    requested: `${first} tem 48 horas para aceitar, recusar ou propor outra data. Ainda não paga nada.`,
-    accepted: awaitingDeposit
-      ? "Falta pagar o sinal. Assim que o pagamento entrar, a reserva fica confirmada."
-      : "Combine o sinal diretamente com o chef. Quando o chef o marcar como recebido, a reserva fica confirmada.",
-    change_proposed: "Veja a proposta abaixo. Se lhe servir, aceite e a reserva segue.",
-    confirmed: "Está tudo combinado. Recebe um lembrete na véspera.",
-    completed: "Conte como correu. A sua avaliação ajuda outros clientes e o chef.",
-    declined: "Pode procurar outro chef disponível na mesma data.",
-    cancelled: "Esta reserva foi cancelada.",
-    expired: "O chef não respondeu a tempo. Experimente outro chef disponível na mesma data.",
+    requested: t("intro.requested", { name: first }),
+    accepted: awaitingDeposit ? t("intro.acceptedDeposit") : t("intro.acceptedDirect"),
+    change_proposed: t("intro.changeProposed"),
+    confirmed: t("intro.confirmed"),
+    completed: t("intro.completed"),
+    declined: t("intro.declined"),
+    cancelled: t("intro.cancelled"),
+    expired: t("intro.expired"),
   };
+
+  const payment = chef.paymentMethods
+    .map((m) => {
+      const mk = paymentKey(m);
+      return mk ? tTerms(`payment.${mk}`) : m;
+    })
+    .join(" · ");
+  const pk = view.policy ? policyKey(view.policy.preset) : null;
+  const cancellation = view.policy ? view.policy.text ?? (pk ? tTerms(`policy.${pk}`) : "") : null;
 
   const details: (DetailRow | false | null)[] = [
     [
-      "Chef",
+      td("chef"),
       <Link key="c" href={`/chef/${chef.slug}`}>
-        {titledName(chef)}
+        {titledName(chef, locale)}
       </Link>,
     ],
-    ["Serviço", `${b.offer_title} · ${MODE_LABEL[b.fulfilment_mode]}`],
-    ["Data", `${dayLabel(b.date)}${b.time_label ? ` · ${b.time_label}` : ""}`],
-    ["Pessoas / unidades", String(b.guests)],
+    [td("service"), `${b.offer_title} · ${modeLabel(b.fulfilment_mode, locale)}`],
+    [td("date"), `${dayLabel(b.date, locale)}${b.time_label ? ` · ${b.time_label}` : ""}`],
+    [td("guests"), String(b.guests)],
     b.fulfilment_mode === "pickup"
-      ? ["Levantamento", view.pickupAddress ?? `${chef.area} · morada enviada quando o pedido for aceite`]
-      : ["Morada", b.address ?? "—"],
-    !!b.pickup_code && ["Código de levantamento", b.pickup_code],
-    ["Estimativa", b.quoted_price ? euro(b.quoted_price) : b.estimate ? euro(b.estimate) : "Sob orçamento"],
-    deposit !== null && [b.deposit_amount != null ? "Sinal" : `Sinal (${chef.depositPercent} %)`, euro(deposit)],
-    b.deposit_status === "paid" && ["Sinal pago", b.deposit_paid_at ? shortStamp(b.deposit_paid_at) : "sim"],
-    ["Pagamento", chef.paymentMethods.map((m) => PAYMENT_LABEL[m] ?? m).join(" · ")],
-    view.policy && ["Cancelamento", view.policy.text ?? CANCELLATION_LABEL[view.policy.preset] ?? ""],
+      ? [td("pickup"), view.pickupAddress ?? td("pickupPending", { area: chef.area ?? "" })]
+      : [td("address"), b.address ?? "—"],
+    !!b.pickup_code && [td("pickupCode"), b.pickup_code],
+    [td("estimate"), b.quoted_price ? euro(b.quoted_price, locale) : b.estimate ? euro(b.estimate, locale) : td("quote")],
+    deposit !== null && [
+      b.deposit_amount != null ? td("deposit") : td("depositPercent", { percent: chef.depositPercent ?? 0 }),
+      euro(deposit, locale),
+    ],
+    b.deposit_status === "paid" && [td("depositPaid"), b.deposit_paid_at ? shortStamp(b.deposit_paid_at, locale) : td("yes")],
+    [td("payment"), payment],
+    cancellation != null && [td("cancellation"), cancellation],
   ];
 
   return (
@@ -123,12 +140,12 @@ export default async function ReservaPage({ params }: PageProps<"/[locale]/reser
       <SiteHeader />
       <div className="mx-auto flex max-w-[1240px] flex-col gap-8 px-5 pb-[72px] pt-10 md:px-8">
         <div className="flex flex-col gap-2.5">
-          <h1 className="d m-0 text-[clamp(32px,4.4vw,48px)] leading-[1.05]">{headline(b.status, first)}</h1>
-          <span className="text-[15px] font-medium text-muted">Pedido n.º {b.ref}</span>
+          <h1 className="d m-0 text-[clamp(32px,4.4vw,48px)] leading-[1.05]">{headline(tHead, b.status, first)}</h1>
+          <span className="text-[15px] font-medium text-muted">{t("ref", { ref: b.ref })}</span>
           <p className="m-0 max-w-[640px] text-muted">{intro[b.status]}</p>
           {ended && (
             <Link href="/procurar" className="btn btn-o mt-2 self-start">
-              Procurar outro chef
+              {t("findAnother")}
             </Link>
           )}
         </div>
@@ -136,11 +153,11 @@ export default async function ReservaPage({ params }: PageProps<"/[locale]/reser
         {!ended && (
           <StatusSteps
             // Completed is the last step and done, so nothing stays "current" after it.
-            current={b.status === "completed" ? STEPS.length : currentIdx + (b.status === "change_proposed" ? 0 : 1)}
-            action={b.status === "change_proposed" ? "Responda à proposta do chef" : undefined}
-            steps={STEPS.map((s) => {
-              const ev = reached(s.key);
-              return { label: s.label, detail: ev ? shortStamp(ev.at) : s.hint };
+            current={b.status === "completed" ? STEP_KEYS.length : currentIdx + (b.status === "change_proposed" ? 0 : 1)}
+            action={b.status === "change_proposed" ? tSteps("answerProposal") : undefined}
+            steps={STEP_KEYS.map((key) => {
+              const ev = reached(key);
+              return { label: statusLabel(key, locale), detail: ev ? shortStamp(ev.at, locale) : tSteps(key) };
             })}
           />
         )}
@@ -154,38 +171,37 @@ export default async function ReservaPage({ params }: PageProps<"/[locale]/reser
           />
         )}
         {refundWaiting && <RefundIban bookingId={b.id} refund={refundWaiting} />}
-        {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: titledName(chef), date: b.date }} />}
+        {view.viewer === "client" && <RememberBooking booking={{ id: b.id, ref: b.ref, chef: titledName(chef, locale), date: b.date }} />}
 
         <div className="flex flex-wrap items-start gap-8">
           <section className="box flex min-w-0 flex-[1_1_340px] flex-col gap-4 p-6">
-            <h2 className="d m-0 text-[28px]">Detalhes</h2>
+            <h2 className="d m-0 text-[28px]">{td("title")}</h2>
             <DetailList items={details} />
             {b.status === "change_proposed" && (
               <div className="rounded-[2px] bg-paper p-3.5 text-sm">
-                <strong className="font-semibold">{b.estimate == null ? `Orçamento de ${first}:` : `Proposta de ${first}:`}</strong>{" "}
-                {[b.proposed_date && dayLabel(b.proposed_date), b.proposed_time, b.quoted_price && euro(b.quoted_price)]
+                <strong className="font-semibold">
+                  {b.estimate == null ? t("proposal.quote", { name: first }) : t("proposal.change", { name: first })}
+                </strong>{" "}
+                {[b.proposed_date && dayLabel(b.proposed_date, locale), b.proposed_time, b.quoted_price && euro(b.quoted_price, locale)]
                   .filter(Boolean)
                   .join(" · ")}
               </div>
             )}
             <ClientBookingActions key={b.id} id={b.id} status={b.status} quote={b.estimate == null && b.quoted_price != null} />
             <span className="text-xs text-muted">
-              {STATUS_LABEL[b.status]} ·{" "}
-              {b.deposit_amount != null
-                ? "O sinal é pago na app; o restante valor é combinado diretamente com o chef."
-                : "O serviço, preços e pagamentos são combinados diretamente com o chef."}
+              {statusLabel(b.status, locale)} · {b.deposit_amount != null ? t("footnote.deposit") : t("footnote.direct")}
             </span>
           </section>
 
           <div className="flex min-w-0 flex-[2_1_520px] flex-col gap-8">
             {b.status === "completed" && !view.review && <ReviewForm id={b.id} chef={first} />}
-            {view.review && <BookingReview review={view.review} title="A sua avaliação" />}
+            {view.review && <BookingReview review={view.review} title={t("yourReview")} />}
             <BookingChat
               key={b.id}
               view={view}
-              title={titledName(chef)}
+              title={titledName(chef, locale)}
               photo={chef.portrait}
-              subtitle={chef.responseHours ? `Responde normalmente em ${chef.responseHours} horas` : undefined}
+              subtitle={chef.responseHours ? t("responds", { hours: chef.responseHours }) : undefined}
             />
           </div>
         </div>

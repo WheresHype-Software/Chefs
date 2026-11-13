@@ -1,1 +1,144 @@
-{}
+{
+  "meta": {
+    "title": "{name} · {headline} em {area}",
+    "defaultHeadline": "Cozinha"
+  },
+  "loading": "A carregar o perfil do chef",
+  "nav": {
+    "label": "Secções do perfil",
+    "about": "Sobre",
+    "menus": "Menus",
+    "terms": "Pagamento",
+    "reviews": "Avaliações",
+    "reviewsCount": "Avaliações ({count})",
+    "book": "Pedir reserva"
+  },
+  "gallery": {
+    "label": "Fotografias",
+    "placeholder": "Fotografia"
+  },
+  "header": {
+    "verifiedChef": "Chef verificado",
+    "photoOf": "Fotografia de {name}",
+    "rating": "{rating} · {count, plural, one {# avaliação} other {# avaliações}}",
+    "new": "Novo no Ao Lume"
+  },
+  "badges": {
+    "identity": "Identidade verificada",
+    "portfolio": "Portefólio verificado",
+    "certified": "Certificado",
+    "founder": "Fundador"
+  },
+  "facts": {
+    "price": "Preço",
+    "quote": "Sob orçamento",
+    "from": "desde {price}",
+    "menusSoon": "Menus em breve",
+    "area": "Zona",
+    "areaValue": "{area} · até {km} km",
+    "languages": "Idiomas",
+    "responds": "Responde",
+    "respondsValue": "em ~{hours} h"
+  },
+  "languages": {
+    "pt": "Português",
+    "en": "Inglês",
+    "es": "Espanhol",
+    "fr": "Francês",
+    "it": "Italiano",
+    "de": "Alemão"
+  },
+  "about": {
+    "title": "Sobre {name}",
+    "subtitle": "Quem cozinha, como trabalha e a sua experiência.",
+    "noBio": "{name} ainda não escreveu sobre si. Veja os menus abaixo.",
+    "years": "{count, plural, one {# ano de experiência} other {# anos de experiência}}",
+    "speaks": "Fala {languages}",
+    "pathTitle": "Percurso",
+    "pathSubtitle": "Onde trabalhou e a formação que tem.",
+    "verifiedDocument": "Documento verificado",
+    "present": "hoje"
+  },
+  "cuisines": {
+    "title": "O que cozinha",
+    "subtitle": "Tipos de cozinha e como pode receber.",
+    "kinds": "Tipos de cozinha",
+    "services": "Serviços"
+  },
+  "offers": {
+    "title": "Menus e preços",
+    "subtitle": "Escolha um menu para pedir reserva com ele.",
+    "none": "Ainda sem menus publicados.",
+    "range": "{min}–{max} {unit}",
+    "minimum": "A partir de {min} {unit}",
+    "leadDays": "Reservar com {days, plural, one {# dia} other {# dias}} de antecedência",
+    "leadHours": "Reservar com {hours} h de antecedência",
+    "cta": "Pedir este menu →"
+  },
+  "terms": {
+    "title": "Pagamento e cancelamento",
+    "subtitle": "As regras de {name}, para saber antes de pedir.",
+    "when": "Quando paga",
+    "whenApp": "Nada ao enviar o pedido. Se {name} aceitar, paga aqui o sinal para confirmar a data.",
+    "whenDirect": "Nada ao enviar o pedido. Só depois de {name} aceitar, diretamente a {name}.",
+    "rest": "Como paga o resto",
+    "deposit": "Sinal",
+    "depositApp": "{percent} % do valor, pago na app por MB WAY ou Multibanco. O resto combina com {name}.",
+    "depositDirect": "{percent} % para confirmar a data; o resto como combinarem.",
+    "cancellation": "Cancelamento",
+    "footApp": "O sinal é pago no Ao Lume e entregue ao chef depois do serviço. O restante valor é combinado diretamente com o chef.",
+    "footDirect": "O serviço e o pagamento são combinados diretamente com o chef.",
+    "payment": {
+      "mbway": "MB WAY",
+      "transfer": "Transferência",
+      "cash": "Dinheiro"
+    },
+    "policy": {
+      "flexible": "Flexível: grátis até 24 h antes",
+      "moderate": "Moderado: grátis até 5 dias antes",
+      "strict": "Rígido: sinal não reembolsável",
+      "custom": "Política do chef"
+    }
+  },
+  "reviews": {
+    "title": "Avaliações",
+    "subtitle": "Só clientes com uma reserva concluída podem avaliar.",
+    "none": "Ainda sem avaliações. As primeiras chegam depois das primeiras reservas concluídas.",
+    "count": "{count, plural, one {# avaliação} other {# avaliações}}",
+    "distribution": "Distribuição das avaliações",
+    "byCategory": "Por categoria",
+    "categories": {
+      "food": "Comida",
+      "presentation": "Apresentação",
+      "punctuality": "Pontualidade",
+      "communication": "Comunicação",
+      "value": "Qualidade/preço"
+    },
+    "stars": "{count} de 5 estrelas",
+    "verified": "Reserva verificada",
+    "verifiedWhat": "Reserva verificada · {what}",
+    "what": "{offer} · {guests} pessoas",
+    "reply": "Resposta do chef:",
+    "sort": "Ordenar avaliações",
+    "sorts": {
+      "recent": "Mais recentes",
+      "best": "Melhor avaliadas",
+      "worst": "Pior avaliadas"
+    },
+    "more": "Ver mais avaliações ({count})"
+  },
+  "booking": {
+    "title": "Pedir reserva",
+    "responds": "responde em ~{hours} h",
+    "noAccount": "Sem criar conta",
+    "noPayment": "Não paga ao pedir",
+    "answer": "Resposta em até 48 h",
+    "preparing": "{name} ainda está a preparar os menus. Volte em breve.",
+    "preparingInstagram": "{name} ainda está a preparar os menus. Volte em breve, ou acompanhe no Instagram.",
+    "termsLink": "Pagamento, sinal e cancelamento →"
+  },
+  "mobileBar": {
+    "from": "desde <strong>{price}</strong>",
+    "book": "Pedir reserva"
+  }
+}

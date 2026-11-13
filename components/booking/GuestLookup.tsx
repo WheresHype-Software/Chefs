@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { useRouter } from "@/lib/i18n/navigation";
 import { useState, useSyncExternalStore, useTransition } from "react";
@@ -8,6 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormMessage, type FormMessageValue } from "@/components/ui/FormMessage";
 import { callAction } from "@/lib/call-action";
 import { dayLabel } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 import { readRecentBookings, type RecentBooking } from "@/lib/recent-bookings";
 
 const EMPTY: RecentBooking[] = [];
@@ -27,6 +29,8 @@ function snapshot(): RecentBooking[] {
 
 /** Bookings made or opened on this device. */
 export function RecentBookings() {
+  const t = useTranslations("booking.lookup");
+  const locale = useLocale() as Locale;
   const list = useSyncExternalStore(
     (onChange) => {
       window.addEventListener("storage", onChange);
@@ -39,7 +43,7 @@ export function RecentBookings() {
   return (
     <section aria-labelledby="neste-dispositivo" className="flex flex-col gap-3">
       <h2 id="neste-dispositivo" className="lab m-0 border-b border-line-2 pb-2.5">
-        Neste dispositivo
+        {t("recent")}
       </h2>
       <ul className="box m-0 list-none px-5 py-1">
         {list.map((b) => (
@@ -51,10 +55,10 @@ export function RecentBookings() {
               <span className="flex flex-col">
                 <span className="d text-xl">{b.chef}</span>
                 <span className="text-[13px] text-muted">
-                  {b.ref} · {dayLabel(b.date)}
+                  {b.ref} · {dayLabel(b.date, locale)}
                 </span>
               </span>
-              <span className="text-sm font-semibold text-cobalt">Abrir →</span>
+              <span className="text-sm font-semibold text-cobalt">{t("open")}</span>
             </Link>
           </li>
         ))}
@@ -65,6 +69,7 @@ export function RecentBookings() {
 
 /** Find a booking with its number and the email used to book. */
 export function GuestLookupForm({ initialRef = "" }: { initialRef?: string }) {
+  const t = useTranslations("booking.lookup");
   const router = useRouter();
   const [ref, setRef] = useState(initialRef);
   const [email, setEmail] = useState("");
@@ -84,10 +89,10 @@ export function GuestLookupForm({ initialRef = "" }: { initialRef?: string }) {
         });
       }}
     >
-      <h2 className="d m-0 text-2xl font-normal">Procurar um pedido</h2>
-      <p className="m-0 text-sm text-muted">O número está no ecrã de confirmação e no email, por exemplo AL-1027-0482.</p>
+      <h2 className="d m-0 text-2xl font-normal">{t("title")}</h2>
+      <p className="m-0 text-sm text-muted">{t("hint")}</p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Número do pedido">
+        <Field label={t("ref")}>
           <input
             required
             value={ref}
@@ -97,13 +102,13 @@ export function GuestLookupForm({ initialRef = "" }: { initialRef?: string }) {
             autoComplete="off"
           />
         </Field>
-        <Field label="Email usado no pedido">
+        <Field label={t("email")}>
           <input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
       </div>
       <FormMessage message={message} />
       <button type="submit" className="btn self-start" disabled={pending}>
-        {pending ? "A procurar…" : "Ver o pedido"}
+        {pending ? t("searching") : t("submit")}
       </button>
     </form>
   );
