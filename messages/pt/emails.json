@@ -1,1 +1,189 @@
-{}
+{
+  "layout": {
+    "tagline": "Chefs e cozinheiros caseiros perto de si"
+  },
+  "facts": {
+    "request": "Pedido",
+    "booking": "Reserva",
+    "when": "Quando",
+    "where": "Onde",
+    "service": "Serviço",
+    "guests": "Pessoas / unidades",
+    "dateTime": "{date} · {time}",
+    "withGuests": "{what} · {guests, plural, one {# pessoa} other {# pessoas}}",
+    "refOffer": "{ref} · {offer}",
+    "serviceValue": "Valor do serviço",
+    "payBy": "Pague até",
+    "entity": "Entidade",
+    "reference": "Referência",
+    "amount": "Valor",
+    "subject": "Assunto"
+  },
+  "bookingRequest": {
+    "client": {
+      "subject": "Pedido {ref} enviado a {chef}",
+      "preheader": "{chef} tem 48 horas para responder ao seu pedido.",
+      "heading": "Pedido enviado a {chef}",
+      "lead": "Olá {name}. O seu pedido seguiu e {chef} tem 48 horas para aceitar, recusar ou propor outra data.",
+      "depositLater": "Ainda não paga nada. Se {chef} aceitar, pedimos-lhe um sinal para confirmar a data; o restante valor é combinado diretamente com o chef.",
+      "payChef": "Ainda não paga nada: o pagamento é combinado diretamente com o chef.",
+      "cta": "Acompanhar o pedido",
+      "footnote": "Guarde este email: a ligação acima é a sua forma de abrir o pedido e falar com o chef, sem criar conta."
+    },
+    "chef": {
+      "subject": "Novo pedido {ref}: {offer}",
+      "preheader": "{client} quer reservar {offer} para {date}.",
+      "heading": "Tem um pedido novo",
+      "lead": "Olá {name}. {client} enviou um pedido e está à espera da sua resposta.",
+      "notes": "O que o cliente escreveu: «{notes}»",
+      "cta": "Responder ao pedido",
+      "footnote": "Tem 48 horas para aceitar, recusar ou propor outra data. Depois disso o pedido expira sozinho."
+    }
+  },
+  "reviewRequest": {
+    "subject": "Como correu com {chef}?",
+    "preheader": "Dez segundos para avaliar {chef}.",
+    "heading": "Como correu com {chef}?",
+    "lead": "Esperamos que tenha gostado de «{offer}».",
+    "body": "Avaliar leva dez segundos: basta escolher as estrelas. A sua avaliação ajuda outras pessoas a escolher, e só quem concluiu uma reserva pode escrever uma.",
+    "cta": "Avaliar {chef}",
+    "footnote": "Tem 14 dias para avaliar."
+  },
+  "ibanChange": {
+    "subject": "Confirma a alteração do teu IBAN",
+    "preheader": "Confirma a alteração do IBAN",
+    "heading": "Confirma o teu novo IBAN",
+    "lead": "Pediste para passar a receber os pagamentos numa conta terminada em {last4}.",
+    "confirm": "Abre a ligação abaixo para confirmar. Enquanto não confirmares, os pagamentos continuam a ir para a conta anterior.",
+    "validity": "A ligação é válida durante uma hora e só funciona com a tua sessão iniciada.",
+    "notYou": "Se não foste tu, não abras a ligação e fala connosco imediatamente: a tua conta pode estar comprometida.",
+    "cta": "Confirmar o IBAN",
+    "footnote": "Depois de confirmado, os pagamentos ficam retidos 72 horas por segurança."
+  },
+  "nudges": {
+    "hello": "olá",
+    "notAgain": "Se mudou de ideias, ignore este email. Não voltamos a insistir.",
+    "noProfile": {
+      "subject": "Falta criar a sua página no Ao Lume",
+      "preheader": "Levou dois minutos a criar a conta; falta a página.",
+      "heading": "{name}, a sua página ainda não existe",
+      "lead": "Criou a conta mas não chegou a criar o perfil, por isso ninguém o encontra ainda.",
+      "body": "Precisa do nome que quer mostrar, a zona onde cozinha e uma frase sobre si. As fotografias e os menus podem vir depois.",
+      "cta": "Criar a minha página"
+    },
+    "draftIncomplete": {
+      "subject": "Faltam fotografias e um menu para a sua página ficar pública",
+      "preheader": "O perfil está criado, falta o que os clientes veem.",
+      "heading": "{name}, está quase",
+      "lead": "O seu perfil existe, mas ainda não tem o que os clientes precisam de ver para pedir uma reserva.",
+      "body": "Faltam três fotografias de pratos e pelo menos um menu com preço. É o que decide quem reserva e quem fecha a página.",
+      "cta": "Continuar o perfil"
+    },
+    "draftReady": {
+      "subject": "Está tudo pronto: falta enviar o perfil para revisão",
+      "preheader": "Um botão entre si e os primeiros pedidos.",
+      "heading": "{name}, falta um botão",
+      "lead": "Tem fotografias, tem menu, e o perfil continua por enviar para revisão.",
+      "body": "A nossa equipa revê cada perfil antes de ficar público. Depois disso começa a aparecer nas pesquisas da sua zona.",
+      "cta": "Enviar para revisão"
+    }
+  },
+  "support": {
+    "subject": "Recebemos a sua mensagem · {ref}",
+    "preheader": "Recebemos a sua mensagem ({ref})",
+    "heading": "Recebemos a sua mensagem",
+    "lead": "Respondemos normalmente no mesmo dia útil.",
+    "addMore": "Se precisar de acrescentar alguma coisa, responda a este email e mencione a referência.",
+    "complaints": "Tem também à disposição o Livro de Reclamações: {url}"
+  },
+  "acceptance": {
+    "termsTitle": "Termos e condições",
+    "contractTitle": "Contrato de intermediação de pagamentos",
+    "termsItem": "os {title} (versão de {version})",
+    "contractItem": "o {title} (versão {version})",
+    "termsLink": "{title} aceites",
+    "contractLink": "{title} aceite",
+    "stamp": "{day} às {time}",
+    "hello": "Olá.",
+    "helloName": "Olá, {name}.",
+    "signup": {
+      "subject": "A sua conta no Ao Lume está criada",
+      "chef": {
+        "preheader": "O próximo passo é criar o seu perfil de chef.",
+        "heading": "A sua conta de chef está criada",
+        "lead": "{hello} O próximo passo é criar o seu perfil: três passos, uns dez minutos, e a equipa revê-o antes de ficar público.",
+        "cta": "Criar o meu perfil"
+      },
+      "client": {
+        "preheader": "Já pode procurar chefs perto de si.",
+        "heading": "Bem-vindo ao Ao Lume",
+        "lead": "{hello} A sua conta está criada. Já pode procurar chefs perto de si e fazer o seu primeiro pedido.",
+        "cta": "Procurar chefs"
+      }
+    },
+    "receipt": {
+      "subject": "Registámos a sua aceitação",
+      "preheader": "Aceitou {list}.",
+      "heading": "Registámos a sua aceitação",
+      "lead": "{hello} A {when}, aceitou {list}. Guarde este email: as ligações abaixo abrem o texto exato que aceitou, que pode guardar e imprimir."
+    },
+    "and": " e "
+  },
+  "reference": {
+    "subject": "Referência para o sinal · reserva {ref}",
+    "preheader": "Referência para pagar o sinal da reserva {ref}",
+    "heading": "Os dados para pagar o sinal",
+    "lead": "Pode pagar no homebanking ou numa caixa Multibanco.",
+    "body": "A reserva fica confirmada automaticamente assim que o pagamento entrar.",
+    "cta": "Ver a reserva"
+  },
+  "depositDue": {
+    "subject": "Falta o sinal · reserva {ref}",
+    "preheader": "Falta o sinal da reserva {ref}",
+    "heading": "{chef} aceitou o seu pedido",
+    "headingNoName": "O chef aceitou o seu pedido",
+    "lead": "Falta pagar o sinal para a reserva ficar confirmada.",
+    "payNow": "A pagar agora (sinal)",
+    "rest": "Depois, ao chef",
+    "howToPay": "Pode pagar por MB WAY ou por referência Multibanco na página da reserva.",
+    "restToChef": "O restante valor do serviço é combinado e pago diretamente ao chef.",
+    "cta": "Pagar o sinal"
+  },
+  "paid": {
+    "client": {
+      "subject": "Reserva {ref} confirmada",
+      "preheader": "Reserva {ref} confirmada",
+      "heading": "Sinal recebido, reserva confirmada",
+      "lead": "{chef} já sabe que está tudo confirmado.",
+      "leadNoName": "O chef já sabe que está tudo confirmado.",
+      "depositPaid": "Sinal pago",
+      "owed": "Falta pagar ao chef, no dia",
+      "dateSecured": "A data está garantida. {chef} combina consigo o restante valor, que é pago diretamente a ele no dia do serviço.",
+      "dateSecuredNoName": "A data está garantida. O chef combina consigo o restante valor, que é pago diretamente a ele no dia do serviço.",
+      "keep": "Guarde este email: a ligação abaixo abre a reserva e a conversa com o chef.",
+      "cta": "Ver a reserva"
+    },
+    "chef": {
+      "subject": "Sinal recebido · reserva {ref}",
+      "preheader": "Sinal recebido · {ref}",
+      "heading": "O sinal entrou",
+      "lead": "A reserva {ref} está confirmada.",
+      "youReceive": "Vais receber",
+      "body": "Transferimos este valor depois do serviço concluído, com o documento de pagamento.",
+      "cta": "Ver o pedido"
+    }
+  },
+  "payout": {
+    "subject": "Pagamento {amount} · {ref}",
+    "preheader": "Transferimos {amount}",
+    "heading": "Pagámos-te",
+    "lead": "Referente à reserva {ref}.",
+    "depositReceived": "Sinal recebido",
+    "commission": "Comissão",
+    "transferred": "Transferido",
+    "account": "Conta",
+    "body": "O documento com a conta detalhada está no teu painel, em Pagamentos.",
+    "cta": "Ver o documento",
+    "footnote": "Documento {number}"
+  }
+}

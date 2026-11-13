@@ -1,8 +1,9 @@
 "use server";
 
 import { z } from "zod";
+import { requestTranslator } from "@/lib/i18n/server";
 import { fail, failWith, ok, type ActionResult } from "@/lib/result";
-import { chefContext, done, NO_CHEF } from "./context";
+import { chefContext, done } from "./context";
 
 /**
  * The chef's own bookkeeping on a booking: the part of the price that is paid directly to them,
@@ -16,11 +17,12 @@ const RestPaid = z.object({
 });
 
 export async function setRestPaid(input: z.infer<typeof RestPaid>): Promise<ActionResult> {
+  const t = await requestTranslator("errors");
   const parsed = RestPaid.safeParse(input);
-  if (!parsed.success) return fail("Pedido inválido.");
+  if (!parsed.success) return fail(t("invalidRequest"));
   const ctx = await chefContext();
   if (ctx.demo) return ok();
-  if (!ctx.chef) return fail(NO_CHEF);
+  if (!ctx.chef) return fail(t("dashboard.noChef"));
 
   const { error } = await ctx.sb.rpc("chef_set_rest_paid", {
     p_booking: parsed.data.bookingId,
@@ -28,9 +30,9 @@ export async function setRestPaid(input: z.infer<typeof RestPaid>): Promise<Acti
     p_amount: parsed.data.amount ?? null,
   });
   if (error) {
-    if (error.message.includes("booking_not_confirmed")) return fail("Só depois de a reserva estar confirmada.");
-    if (error.message.includes("not_allowed")) return fail("Esta reserva não é tua.");
-    return failWith(error, "setRestPaid", "Não foi possível guardar. Tente de novo.");
+    if (error.message.includes("booking_not_confirmed")) return fail(t("dashboard.money.onlyConfirmed"));
+    if (error.message.includes("not_allowed")) return fail(t("dashboard.money.notYours"));
+    return failWith(error, "setRestPaid", t("dashboard.saveFailed"));
   }
   return done(`/dashboard/pedidos/${parsed.data.bookingId}`);
 }

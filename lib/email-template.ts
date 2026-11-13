@@ -6,6 +6,8 @@
  * Built as tables with inline styles: Outlook and Gmail drop stylesheets, flexbox and grid.
  */
 import { siteUrl } from "./env";
+import { DEFAULT_LOCALE, LOCALE_TAG, localizePath, type Locale } from "./i18n/routing";
+import { getTranslator } from "./i18n/translator";
 
 export type EmailDoc = {
   /** The grey line the inbox shows next to the subject. */
@@ -15,7 +17,7 @@ export type EmailDoc = {
   /** What the reader needs before deciding, as label and value. */
   facts?: [string, string][];
   paragraphs?: string[];
-  /** A path ("/admin#aprovar") or a full URL. */
+  /** A path ("/admin#aprovar"), put in the email's language, or a full URL (used as given). */
   cta?: { label: string; href: string };
   footnote?: string;
   /** Small links at the foot, side by side (the texts someone accepted, for example). */
@@ -38,7 +40,8 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-const absolute = (href: string) => (href.startsWith("/") ? siteUrl(href) : href);
+/** A path in the email's language ("/reserva/x" → "/en/reserva/x"), or a full URL as given. */
+const absolute = (href: string, locale: Locale) => (href.startsWith("/") ? siteUrl(localizePath(href, locale)) : href);
 
 /**
  * A cobalt rule with one warm notch in it.
@@ -73,16 +76,21 @@ function factRows(facts: [string, string][]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;">${rows}</table>`;
 }
 
-function button(cta: { label: string; href: string }): string {
+function button(cta: { label: string; href: string }, locale: Locale): string {
   return (
     `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0;"><tr>` +
     `<td align="center" bgcolor="${COBALT}" style="border-radius:6px;">` +
-    `<a href="${esc(absolute(cta.href))}" style="display:inline-block;padding:13px 24px;font-family:${FONT};font-size:16px;font-weight:600;line-height:1;color:#ffffff;text-decoration:none;border-radius:6px;">${esc(cta.label)}</a>` +
+    `<a href="${esc(absolute(cta.href, locale))}" style="display:inline-block;padding:13px 24px;font-family:${FONT};font-size:16px;font-weight:600;line-height:1;color:#ffffff;text-decoration:none;border-radius:6px;">${esc(cta.label)}</a>` +
     `</td></tr></table>`
   );
 }
 
-export function renderEmail(doc: EmailDoc): { html: string; text: string } {
+/**
+ * `locale` is the recipient's language (lib/i18n/recipient.ts), never the visitor's unless they are
+ * the same person. The content arrives already translated; this only adds the fixed parts.
+ */
+export function renderEmail(doc: EmailDoc, locale: Locale = DEFAULT_LOCALE): { html: string; text: string } {
+  const t = getTranslator(locale, "emails");
   const paragraphs = [...(doc.lead ? [doc.lead] : []), ...(doc.paragraphs ?? [])];
   const body =
     paragraphs
@@ -92,20 +100,20 @@ export function renderEmail(doc: EmailDoc): { html: string; text: string } {
       )
       .join("") +
     (doc.facts?.length ? factRows(doc.facts) : "") +
-    (doc.cta ? button(doc.cta) : "") +
+    (doc.cta ? button(doc.cta, locale) : "") +
     (doc.footnote
       ? `<p style="margin:26px 0 0;font-family:${FONT};font-size:14px;line-height:1.6;color:${MUTED};">${esc(doc.footnote)}</p>`
       : "") +
     (doc.footLinks?.length
       ? `<p style="margin:${doc.footnote ? "6px" : "26px"} 0 0;font-family:${FONT};font-size:14px;line-height:1.8;color:${MUTED};">` +
         doc.footLinks
-          .map((l) => `<a href="${esc(absolute(l.href))}" style="color:${COBALT};">${esc(l.label)}</a>`)
+          .map((l) => `<a href="${esc(absolute(l.href, locale))}" style="color:${COBALT};">${esc(l.label)}</a>`)
           .join(" &nbsp;·&nbsp; ") +
         `</p>`
       : "");
 
   const html = `<!doctype html>
-<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>${esc(doc.heading)}</title></head>
+<html lang="${LOCALE_TAG[locale]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>${esc(doc.heading)}</title></head>
 <body style="margin:0;padding:0;background:${PAPER};-webkit-font-smoothing:antialiased;">
 <div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;color:transparent;">${esc(doc.preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${PAPER};">
@@ -124,7 +132,7 @@ ${body}
 </td></tr>
 <tr><td style="background:${COBALT_DEEP};padding:20px 30px;">
 <div style="font-family:${FONT};font-size:18px;font-weight:700;letter-spacing:-0.02em;color:#ffffff;">ao lume</div>
-<div style="margin-top:4px;font-family:${FONT};font-size:13px;line-height:1.6;color:#c9d6ee;">Chefs e cozinheiros caseiros perto de si · <a href="${siteUrl("/")}" style="color:#ffffff;text-decoration:none;">aolume.com</a></div>
+<div style="margin-top:4px;font-family:${FONT};font-size:13px;line-height:1.6;color:#c9d6ee;">${esc(t("layout.tagline"))} · <a href="${siteUrl(localizePath("/", locale))}" style="color:#ffffff;text-decoration:none;">aolume.com</a></div>
 </td></tr>
 </table>
 </td></tr>
@@ -136,9 +144,9 @@ ${body}
     "",
     ...paragraphs.flatMap((p) => [p, ""]),
     ...(doc.facts?.length ? [...doc.facts.map(([label, value]) => `${label}: ${value}`), ""] : []),
-    ...(doc.cta ? [`${doc.cta.label}: ${absolute(doc.cta.href)}`, ""] : []),
+    ...(doc.cta ? [`${doc.cta.label}: ${absolute(doc.cta.href, locale)}`, ""] : []),
     ...(doc.footnote ? [doc.footnote, ""] : []),
-    ...(doc.footLinks?.length ? [...doc.footLinks.map((l) => `${l.label}: ${absolute(l.href)}`), ""] : []),
+    ...(doc.footLinks?.length ? [...doc.footLinks.map((l) => `${l.label}: ${absolute(l.href, locale)}`), ""] : []),
     "Ao Lume",
   ].join("\n");
 

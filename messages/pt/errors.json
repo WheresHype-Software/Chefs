@@ -1,1 +1,213 @@
-{}
+{
+  "generic": "Algo correu mal. Tente de novo dentro de momentos.",
+  "offline": "Sem ligação à internet. Verifique a ligação e tente de novo.",
+  "invalidRequest": "Pedido inválido.",
+  "invalidData": "Dados inválidos.",
+  "invalidDocument": "Documento inválido.",
+  "invalidIban": "Esse IBAN não é válido. Confirme os dígitos com o seu banco.",
+  "form": {
+    "check": "Verifique os dados do formulário.",
+    "checkField": "Verifique o campo «{label}»."
+  },
+  "booking": {
+    "fields": {
+      "offerId": "Escolha uma oferta.",
+      "date": "Escolha um dia no calendário.",
+      "time": "Escolha uma hora.",
+      "guests": "Pessoas",
+      "name": "Indique o seu nome.",
+      "email": "O email não parece válido.",
+      "phone": "Indique um número de telemóvel.",
+      "address": "Morada",
+      "notes": "Notas para o chef"
+    },
+    "rpc": {
+      "invalid_email": "O email não parece válido.",
+      "phone_required": "Indique um número de telemóvel.",
+      "offer_not_found": "Esta oferta já não está disponível.",
+      "chef_not_available": "Este chef não está disponível de momento.",
+      "guests_out_of_range": "O número de pessoas está fora do que o chef aceita para esta oferta.",
+      "too_late_for_this_date": "Já não há tempo para preparar esta data. Escolha um dia mais à frente.",
+      "date_not_available": "Esse dia já não está livre. Escolha outro.",
+      "address_required": "Indique a morada.",
+      "outside_service_area": "A morada fica fora da área de serviço deste chef.",
+      "too_many_requests": "Enviou muitos pedidos na última hora. Tente mais tarde.",
+      "cannot_book_own_offer": "Não pode reservar a sua própria oferta. Para testar, use uma janela privada e um email diferente."
+    },
+    "sendFailed": "Não foi possível enviar o pedido. Tente de novo dentro de momentos.",
+    "lookup": {
+      "invalidEmail": "O email não parece válido.",
+      "refRequired": "Indique o número do pedido.",
+      "tooManyAttempts": "Demasiadas tentativas. Tente de novo daqui a uma hora.",
+      "searchFailed": "Não foi possível procurar o pedido. Tente de novo dentro de momentos.",
+      "notFound": "Não encontrámos um pedido com esse número e esse email."
+    },
+    "invalidMessage": "Mensagem inválida.",
+    "notFound": "Reserva não encontrada.",
+    "conversationNotFound": "Conversa não encontrada.",
+    "messageFailed": "Não foi possível enviar a mensagem.",
+    "clientActionFailed": "Não foi possível concluir. Atualize a página e tente de novo.",
+    "quoteFirst": "Este pedido é sob orçamento: envie primeiro o seu orçamento.",
+    "quoteRequired": "Indique o valor do orçamento.",
+    "completeFromServiceDay": "Só pode marcar como concluída a partir do dia do serviço.",
+    "quoteTooLow": "O orçamento é demasiado baixo para o sinal cobrir a comissão mínima. Indique um valor mais alto.",
+    "stateChanged": "Este pedido já mudou de estado. Atualize a página para ver o estado atual.",
+    "updateFailed": "Não foi possível atualizar a reserva. Tente de novo.",
+    "requestNotFound": "Não encontrámos este pedido. Atualize a página.",
+    "invalidReview": "Avaliação inválida.",
+    "reviewFailed": "Não foi possível publicar a avaliação."
+  },
+  "deposit": {
+    "tooManyAttempts": "Demasiadas tentativas. Aguarde alguns minutos e tente de novo.",
+    "cardOnlyLive": "O pagamento com cartão só funciona no site publicado. Use MB WAY ou referência Multibanco.",
+    "mbwayPhone": "Indique um número de telemóvel português associado ao MB WAY.",
+    "notAllowed": "Não conseguimos abrir este pedido aqui.",
+    "notAwaiting": "Esta reserva já não está à espera do sinal. Atualize a página.",
+    "nothingToPay": "Esta reserva não tem sinal a pagar.",
+    "startFailed": "Não foi possível iniciar o pagamento. Tente de novo.",
+    "startFailedShort": "Não foi possível iniciar o pagamento.",
+    "providerFailed": "Não foi possível iniciar o pagamento. Tente de novo dentro de momentos.",
+    "unavailable": "Os pagamentos ainda não estão disponíveis. Tente mais tarde.",
+    "alreadyPaid": "Este pagamento já foi feito.",
+    "cancelFailed": "Não foi possível cancelar. Atualize a página.",
+    "cannotStore": "Não conseguimos registar os dados agora. Tente mais tarde.",
+    "refundInProgress": "Esta devolução já está a ser tratada.",
+    "saveFailed": "Não foi possível guardar os dados. Tente de novo."
+  },
+  "support": {
+    "fields": {
+      "name": "Indique o seu nome.",
+      "email": "O email não parece válido.",
+      "subject": "Escreva um assunto.",
+      "body": "Escreva a sua mensagem com algum detalhe.",
+      "website": "Não foi possível enviar a mensagem."
+    },
+    "tooMany": "Recebemos várias mensagens suas. Dê-nos um pouco de tempo para responder.",
+    "sendFailed": "Não foi possível enviar a mensagem. Tente de novo dentro de momentos."
+  },
+  "dashboard": {
+    "noChef": "Crie primeiro o seu perfil de chef, em Perfil.",
+    "saveFailed": "Não foi possível guardar. Tente de novo.",
+    "agenda": {
+      "invalidDate": "Data inválida",
+      "dayFailed": "Não foi possível atualizar este dia. Tente de novo.",
+      "weeklyFailed": "Não foi possível guardar os dias fixos. Tente de novo.",
+      "openFailed": "Não foi possível abrir esses dias. Tente de novo.",
+      "fulfilledFailed": "Não foi possível atualizar o serviço. Tente de novo."
+    },
+    "billing": {
+      "fields": {
+        "legal_name": "Nome legal completo",
+        "nif": "NIF",
+        "address_line": "Morada fiscal",
+        "postal_code": "Indique o código postal no formato 0000-000.",
+        "city": "Localidade",
+        "birth_date": "Data de nascimento",
+        "birth_place": "Local de nascimento",
+        "company_reg_number": "Número de registo comercial"
+      },
+      "invalidNif": "Esse NIF não é válido. Confirme os nove dígitos.",
+      "postalCode": "Indique o código postal no formato 0000-000.",
+      "birthRequired": "A data e o local de nascimento são obrigatórios: a lei obriga-nos a comunicá-los à Autoridade Tributária.",
+      "companyRegRequired": "Indique o número de registo comercial da empresa.",
+      "ibanFields": {
+        "iban": "IBAN",
+        "holder": "Titular da conta"
+      },
+      "cannotStoreBank": "A plataforma ainda não está preparada para guardar dados bancários. Falamos consigo.",
+      "invalidLink": "Ligação inválida. Peça a alteração de novo.",
+      "linkExpired": "A ligação expirou. Peça a alteração de novo.",
+      "noPendingChange": "Não há nenhuma alteração à espera de confirmação."
+    },
+    "certificates": {
+      "titleRequired": "Indique o nome do certificado (por exemplo, Curso de Cozinha).",
+      "saveFailed": "Não foi possível guardar o certificado. Tente de novo.",
+      "statementTooShort": "Conte-nos um pouco mais: pelo menos uma ou duas frases sobre a sua experiência.",
+      "statementFailed": "Não foi possível enviar a sua descrição. Tente de novo."
+    },
+    "cooking": {
+      "badName": "Escreva o nome da cozinha, entre 3 e 40 caracteres.",
+      "tooMany": "Já acrescentou três cozinhas novas. Para mais, fale connosco.",
+      "addFailed": "Não foi possível acrescentar a cozinha. Tente de novo.",
+      "maxCategories": "Escolha até {max} categorias."
+    },
+    "legal": {
+      "signInFirst": "Entre primeiro na sua conta.",
+      "acceptFailed": "Não foi possível registar a aceitação. Tente de novo dentro de momentos."
+    },
+    "logistics": {
+      "fields": {
+        "travel_radius_km": "Raio de deslocação",
+        "free_distance_km": "Grátis até (km)",
+        "fee_per_km": "Depois, por km",
+        "arrival_minutes_before": "Chegada antes do serviço",
+        "delivery_windows": "Janelas",
+        "delivery_fee": "Taxa de entrega",
+        "free_delivery_over": "Grátis acima de",
+        "kitchen_address": "Morada da cozinha"
+      },
+      "saveFailed": "Não foi possível guardar a logística. Tente de novo.",
+      "partialSave": "Parte da logística não foi guardada. Tente de novo."
+    },
+    "lumi": {
+      "saveFailed": "Não foi possível guardar a preferência."
+    },
+    "money": {
+      "onlyConfirmed": "Só depois de a reserva estar confirmada.",
+      "notYours": "Esta reserva não é tua."
+    },
+    "offers": {
+      "fields": {
+        "title": "Nome da oferta",
+        "description": "Descrição",
+        "price": "Valor",
+        "unit_label": "Unidade",
+        "min_guests": "Mínimo",
+        "max_guests": "Máximo",
+        "lead_time_hours": "Antecedência",
+        "time_slots": "Horas"
+      },
+      "priceRequired": "Indique o preço.",
+      "saveFailed": "Não foi possível guardar a oferta. Tente de novo.",
+      "deleteFailed": "Não foi possível apagar a oferta. Tente de novo."
+    },
+    "photos": {
+      "invalid": "Fotografia inválida.",
+      "saveFailed": "Não foi possível guardar a fotografia. Tente de novo.",
+      "selfieFailed": "Não foi possível guardar a selfie. Tente de novo.",
+      "captionFailed": "Não foi possível guardar a descrição. Tente de novo.",
+      "deleteFailed": "Não foi possível apagar a fotografia. Tente de novo.",
+      "moveFailed": "Não foi possível mudar a ordem. Tente de novo."
+    },
+    "profile": {
+      "fields": {
+        "display_name": "Nome público",
+        "slug": "O link só pode ter letras, números e hífenes.",
+        "headline": "Frase de apresentação",
+        "bio": "Sobre si",
+        "area_name": "Zona de base",
+        "service_radius_km": "Raio de serviço",
+        "instagram": "Instagram",
+        "website": "Site",
+        "years_experience": "Anos de experiência",
+        "deposit_percent": "Sinal pedido"
+      },
+      "depositMin": "O sinal tem de ser pelo menos {min}%: é o que cobre a nossa comissão de {commission}% e ainda te deixa receber alguma coisa.",
+      "instagram": "Instagram: escreva só o nome de utilizador, por exemplo @o.seu.perfil, ou cole o link do perfil.",
+      "clientAccount": "Esta é uma conta de cliente. Para ter um perfil de chef, crie uma conta de chef.",
+      "slugTaken": "Esse link já está a ser usado. Escolha outro.",
+      "saveFailed": "Não foi possível guardar o perfil. Tente de novo.",
+      "noPortrait": "Falta a fotografia de perfil.",
+      "noSelfie": "Falta a selfie de verificação, em Fotografias.",
+      "needDishes": "Carregue pelo menos três fotos de pratos.",
+      "needLink": "Indique o Instagram ou o site.",
+      "acceptFirst": "Aceite os termos e o contrato antes de enviar para revisão.",
+      "submitFailed": "Não foi possível enviar para revisão. Tente de novo."
+    },
+    "reviews": {
+      "replyRequired": "Escreva a resposta.",
+      "replyFailed": "Não foi possível publicar a resposta. Só pode responder uma vez a cada avaliação.",
+      "reportFailed": "Não foi possível enviar a denúncia. Tente de novo."
+    }
+  }
+}

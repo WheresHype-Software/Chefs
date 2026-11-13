@@ -1,10 +1,13 @@
 "use server";
 
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { sendEmail, siteUrl } from "@/lib/email";
 import { renderEmail } from "@/lib/email-template";
 import { notifyAdmin } from "@/lib/email";
+import type { Locale } from "@/lib/i18n/routing";
+import { getTranslator } from "@/lib/i18n/translator";
 import { COMPLAINTS_BOOK_URL } from "@/lib/legal";
 import { callerIp, rateLimit } from "@/lib/rate-limit";
 import { failWith } from "@/lib/result";
@@ -33,17 +36,14 @@ const TicketInput = z.object({
 export type TicketResult = { ok: true; ref: string } | { ok: false; error: string };
 
 export async function submitTicket(input: z.infer<typeof TicketInput>): Promise<TicketResult> {
+  const locale = (await getLocale()) as Locale;
+  const err = getTranslator(locale, "errors");
   const parsed = TicketInput.safeParse(input);
   if (!parsed.success) {
     const field = String(parsed.error.issues[0]?.path[0] ?? "");
-    const labels: Record<string, string> = {
-      name: "Indique o seu nome.",
-      email: "O email não parece válido.",
-      subject: "Escreva um assunto.",
-      body: "Escreva a sua mensagem com algum detalhe.",
-      website: "Não foi possível enviar a mensagem.",
-    };
-    return { ok: false, error: labels[field] ?? "Verifique os dados do formulário." };
+    const names = ["name", "email", "subject", "body", "website"] as const;
+    const fields = Object.fromEntries(names.map((f) => [f, err(`support.fields.${f}`)]));
+    return { ok: false, error: fields[field] ?? err("form.check") };
   }
   const t = parsed.data;
 
@@ -51,7 +51,7 @@ export async function submitTicket(input: z.infer<typeof TicketInput>): Promise<
 
   const ip = callerIp(await headers());
   const limit = rateLimit(`support:${ip}`, 5, 3600);
-  if (!limit.allowed) return { ok: false, error: "Recebemos várias mensagens suas. Dê-nos um pouco de tempo para responder." };
+  if (!limit.allowed) return { ok: false, error: err("support.tooMany") };
 
   // Anonymous client when nobody is signed in, so a guest can write without an account.
   const signedIn = await createClient();
@@ -72,30 +72,32 @@ export async function submitTicket(input: z.infer<typeof TicketInput>): Promise<
   });
   if (error) {
     if (error.message.includes("too_many_requests")) {
-      return { ok: false, error: "Recebemos várias mensagens suas. Dê-nos um pouco de tempo para responder." };
+      return { ok: false, error: err("support.tooMany") };
     }
-    const failure = failWith(error, "submitTicket", "Não foi possível enviar a mensagem. Tente de novo dentro de momentos.");
+    const failure = failWith(error, "submitTicket", err("support.sendFailed"));
     return { ok: false, error: failure.ok ? "" : failure.error };
   }
 
   const ticket = data as { id: string; ref: string };
 
   // Best effort from here: the message is already saved, so an email problem must not undo it.
-  const receipt = renderEmail({
-    preheader: `Recebemos a sua mensagem (${ticket.ref})`,
-    heading: "Recebemos a sua mensagem",
-    lead: "Respondemos normalmente no mesmo dia útil.",
-    facts: [
-      ["Referência", ticket.ref],
-      ["Assunto", t.subject],
-    ],
-    paragraphs: [
-      "Se precisar de acrescentar alguma coisa, responda a este email e mencione a referência.",
-      `Tem também à disposição o Livro de Reclamações: ${COMPLAINTS_BOOK_URL}`,
-    ],
-  });
-  await sendEmail({ to: t.email, subject: `Recebemos a sua mensagem · ${ticket.ref}`, text: receipt.text, html: receipt.html }).catch(
-    (err) => console.error("[support] receipt email:", err),
+  // The receipt goes to the person who wrote, in the language they wrote in.
+  const e = getTranslator(locale, "emails");
+  const receipt = renderEmail(
+    {
+      preheader: e("support.preheader", { ref: ticket.ref }),
+      heading: e("support.heading"),
+      lead: e("support.lead"),
+      facts: [
+        [e("facts.reference"), ticket.ref],
+        [e("facts.subject"), t.subject],
+      ],
+      paragraphs: [e("support.addMore"), e("support.complaints", { url: COMPLAINTS_BOOK_URL })],
+    },
+    locale,
+  );
+  await sendEmail({ to: t.email, subject: e("support.subject", { ref: ticket.ref }), text: receipt.text, html: receipt.html }).catch(
+    (mailErr) => console.error("[support] receipt email:", mailErr),
   );
   await notifyAdmin({
     subject: `Apoio · ${ticket.ref} · ${t.subject}`,
