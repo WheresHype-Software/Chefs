@@ -1,5 +1,7 @@
+import { useTranslations } from "next-intl";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 
 export default function Loading() {
-  return <PageSkeleton label="A carregar as suas reservas" boxes={2} />;
+  const t = useTranslations("account");
+  return <PageSkeleton label={t("loading")} boxes={2} />;
 }

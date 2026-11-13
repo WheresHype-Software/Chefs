@@ -1,37 +1,55 @@
 "use client";
 
-import { useRouter } from "@/lib/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { signUpWithTerms } from "@/app/auth/actions";
 import { RoleChoice, type Role } from "@/components/auth/RoleChoice";
+import { Link, useRouter } from "@/lib/i18n/navigation";
+import { DEFAULT_LOCALE, localizePath, splitLocale, type Locale } from "@/lib/i18n/routing";
 import { trackPixel } from "@/lib/meta-pixel";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup" | "recover";
 
-const TABS: [Mode, string][] = [
-  ["signin", "Entrar"],
-  ["signup", "Criar conta"],
+const TABS = ["signin", "signup"] as const;
+
+type ErrorKey =
+  | "invalidCredentials"
+  | "notConfigured"
+  | "network"
+  | "emailNotConfirmed"
+  | "alreadyRegistered"
+  | "passwordTooShort"
+  | "rateLimited"
+  | "termsNotAccepted";
+
+// Supabase answers in English; show the common cases in the visitor's language.
+const ERRORS: [RegExp, ErrorKey][] = [
+  [/invalid login credentials/i, "invalidCredentials"],
+  [/supabase is not configured/i, "notConfigured"],
+  [/failed to fetch|networkerror|load failed/i, "network"],
+  [/email not confirmed/i, "emailNotConfirmed"],
+  [/already registered|already exists/i, "alreadyRegistered"],
+  [/password should be at least/i, "passwordTooShort"],
+  [/rate limit|too many/i, "rateLimited"],
+  [/terms not accepted/i, "termsNotAccepted"],
 ];
 
-// Supabase answers in English; show the common cases in Portuguese.
-const ERRORS: [RegExp, string][] = [
-  [/invalid login credentials/i, "Email ou palavra-passe errados."],
-  [/supabase is not configured/i, "A ligação à base de dados não está carregada nesta página. Recarregue (Ctrl+Shift+R) e tente de novo."],
-  [/failed to fetch|networkerror|load failed/i, "Não conseguimos falar com o servidor. Verifique a ligação e tente de novo."],
-  [/email not confirmed/i, "Confirme primeiro o seu email."],
-  [/already registered|already exists/i, "Já existe uma conta com este email. Entre com a palavra-passe."],
-  [/password should be at least/i, "A palavra-passe precisa de pelo menos 8 caracteres."],
-  [/rate limit|too many/i, "Demasiadas tentativas. Tente de novo dentro de alguns minutos."],
-  [/terms not accepted/i, "Para criar a conta, aceite os termos."],
-];
-
-function errorText(err: unknown): string {
+function errorKey(err: unknown): ErrorKey | "generic" {
   const raw = err instanceof Error ? err.message : String(err ?? "");
   // The person gets a sentence they can act on; the detail goes to the console, where whoever is
   // debugging can actually see which of these it was.
   console.error("[auth]", err);
-  return ERRORS.find(([re]) => re.test(raw))?.[1] ?? "Não foi possível entrar. Tente de novo.";
+  return ERRORS.find(([re]) => re.test(raw))?.[1] ?? "generic";
+}
+
+/**
+ * Where a `next` path goes: "/en/conta" stays in English, an unprefixed "/conta" opens in the
+ * language the form is shown in (an English visitor is not dropped into Portuguese on sign-in).
+ */
+function destination(to: string, current: Locale): { path: string; locale: Locale } {
+  const s = splitLocale(to);
+  return { path: s.path, locale: s.locale === DEFAULT_LOCALE ? current : s.locale };
 }
 
 type Props = {
@@ -45,6 +63,8 @@ type Props = {
 
 export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Props) {
   const router = useRouter();
+  const t = useTranslations("auth.form");
+  const locale = useLocale() as Locale;
   const [mode, setMode] = useState<Mode>(chefDoor || startOnSignup ? "signup" : "signin");
   // Who the new account is for. Nothing is chosen until the person says so.
   const [role, setRole] = useState<Role | null>(chefDoor ? "chef" : null);
@@ -57,7 +77,8 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   function go(to = next) {
-    router.push(to);
+    const d = destination(to, locale);
+    router.push(d.path, { locale: d.locale });
     router.refresh();
   }
   // A new chef starts on the profile steps; a client goes where they were heading.
@@ -73,25 +94,27 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
         // Always the same answer, whether or not the address has an account: telling a stranger
         // which emails are registered here is not ours to tell.
         const { error } = await sb.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/palavra-passe")}`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizePath("/palavra-passe", locale))}`,
         });
         if (error) throw error;
-        setMsg({ ok: true, text: `Se existir uma conta com ${email}, enviámos-lhe uma ligação para definir uma nova palavra-passe.` });
+        setMsg({ ok: true, text: t("recoverSent", { email }) });
       } else if (mode === "signin") {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
         go();
       } else {
         // On the server, so the acceptance of the terms is recorded with the account, in one go.
-        const res = await signUpWithTerms({ name, email, password, asChef, next: afterSignup, accepted });
+        // The link in the confirmation email is a plain URL: it carries the language in its path.
+        const d = destination(afterSignup, locale);
+        const res = await signUpWithTerms({ name, email, password, asChef, next: localizePath(d.path, d.locale), accepted });
         if (!res.ok) throw new Error(res.error);
         // Ads measurement: no-op unless the visitor accepted cookies.
         trackPixel("CompleteRegistration", { content_name: asChef ? "chef" : "client" });
         if (res.session) go(afterSignup);
-        else setMsg({ ok: true, text: `Conta criada. Confirme o email que enviámos para ${email}.` });
+        else setMsg({ ok: true, text: t("confirmEmail", { email }) });
       }
     } catch (err) {
-      setMsg({ ok: false, text: errorText(err) });
+      setMsg({ ok: false, text: t(`errors.${errorKey(err)}`) });
     } finally {
       setBusy(false);
     }
@@ -99,8 +122,8 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
 
   return (
     <div className="flex flex-col gap-5">
-      <div role="tablist" aria-label="Entrar ou criar conta" className="grid grid-cols-2 gap-1 rounded-[3px] border border-line-2 p-1">
-        {TABS.map(([k, label]) => (
+      <div role="tablist" aria-label={t("tabsLabel")} className="grid grid-cols-2 gap-1 rounded-[3px] border border-line-2 p-1">
+        {TABS.map((k) => (
           <button
             key={k}
             type="button"
@@ -114,7 +137,7 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
               (k === "signin" ? mode !== "signup" : mode === "signup") ? "bg-cobalt text-white" : "bg-transparent text-ink hover:bg-paper"
             }`}
           >
-            {label}
+            {t(`tabs.${k}`)}
           </button>
         ))}
       </div>
@@ -134,30 +157,30 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
               }`}
             >
               <span className="font-semibold">
-                {asChef ? "Conta de chef: para cozinhar e receber pedidos" : "Conta de cliente: para reservar"}
+                {asChef ? t("role.chef") : t("role.client")}
               </span>
               <button
                 type="button"
                 onClick={() => setRole(null)}
                 className={`shrink-0 cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-[14px] underline ${asChef ? "text-yolk" : "text-cobalt"}`}
               >
-                Trocar
+                {t("role.change")}
               </button>
             </div>
           )}
           {mode === "signup" && (
             <label className="field lab">
-              Nome
+              {t("name")}
               <input required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
             </label>
           )}
           <label className="field lab">
-            Email
+            {t("email")}
             <input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </label>
           {mode !== "recover" && (
             <label className="field lab">
-              Palavra-passe
+              {t("password")}
               <input
                 required
                 type="password"
@@ -166,7 +189,7 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {mode === "signup" && <span className="hint">Pelo menos 8 caracteres.</span>}
+              {mode === "signup" && <span className="hint">{t("passwordHint")}</span>}
             </label>
           )}
           {mode === "signup" && (
@@ -174,43 +197,41 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
             <label className="flex cursor-pointer items-start gap-2.5 text-sm">
               <input type="checkbox" required checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-1" />
               <span>
-                Li e aceito os{" "}
-                <a href="/termos" target="_blank" rel="noopener">
-                  Termos e condições
-                </a>
-                {asChef && (
-                  <>
-                    {" "}
-                    e o{" "}
-                    <a href="/contrato-chefs" target="_blank" rel="noopener">
-                      Contrato de intermediação de pagamentos
-                    </a>
-                  </>
-                )}
-                .{" "}
-                <span className="text-muted">
-                  Saiba como tratamos os seus dados na{" "}
-                  <a href="/privacidade" target="_blank" rel="noopener">
-                    Política de privacidade
-                  </a>
-                  .
-                </span>
+                {t.rich("acceptTerms", {
+                  role: asChef ? "chef" : "client",
+                  terms: (c) => (
+                    <Link href="/termos" target="_blank" rel="noopener">
+                      {c}
+                    </Link>
+                  ),
+                  contract: (c) => (
+                    <Link href="/contrato-chefs" target="_blank" rel="noopener">
+                      {c}
+                    </Link>
+                  ),
+                  privacy: (c) => (
+                    <Link href="/privacidade" target="_blank" rel="noopener">
+                      {c}
+                    </Link>
+                  ),
+                  muted: (c) => <span className="text-muted">{c}</span>,
+                })}
               </span>
             </label>
           )}
           {mode === "recover" && (
-            <p className="m-0 text-sm text-muted">Enviamos-lhe uma ligação por email para escolher uma nova palavra-passe.</p>
+            <p className="m-0 text-sm text-muted">{t("recoverHint")}</p>
           )}
           <button type="submit" className="btn" disabled={busy || (mode === "signup" && !accepted)}>
             {busy
-              ? "Um momento…"
+              ? t("busy")
               : mode === "recover"
-                ? "Enviar ligação"
+                ? t("submit.recover")
                 : mode === "signin"
-                  ? "Entrar"
+                  ? t("submit.signin")
                   : asChef
-                    ? "Criar conta de chef"
-                    : "Criar conta"}
+                    ? t("submit.signupChef")
+                    : t("submit.signup")}
           </button>
           {mode === "signin" && (
             <button
@@ -221,7 +242,7 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
                 setMsg(null);
               }}
             >
-              Esqueceu-se da palavra-passe?
+              {t("forgotPassword")}
             </button>
           )}
           {mode === "recover" && (
@@ -233,12 +254,12 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
                 setMsg(null);
               }}
             >
-              Voltar a entrar
+              {t("backToSignIn")}
             </button>
           )}
           {mode === "signin" && (
             <p className="m-0 border-t border-line pt-3 text-sm text-muted">
-              Chefs e clientes entram aqui com o mesmo formulário.{" "}
+              {t("sameForm")}{" "}
               <button
                 type="button"
                 className="cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-sm font-semibold text-cobalt underline"
@@ -247,7 +268,7 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
                   setMsg(null);
                 }}
               >
-                Ainda não tem conta?
+                {t("noAccount")}
               </button>
             </p>
           )}

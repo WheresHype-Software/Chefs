@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { NewPasswordForm } from "@/components/NewPasswordForm";
 import { SiteHeader } from "@/components/SiteChrome";
+import type { Locale } from "@/lib/i18n/routing";
+import { alternates } from "@/lib/seo";
 import { createClient, hasSupabase } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Nova palavra-passe", robots: { index: false } };
+export async function generateMetadata({ params }: PageProps<"/[locale]/palavra-passe">): Promise<Metadata> {
+  const locale = (await params).locale as Locale;
+  const t = await getTranslations({ locale, namespace: "auth.meta" });
+  return { title: t("newPassword"), robots: { index: false }, alternates: alternates("/palavra-passe", locale) };
+}
 
 /**
  * Where the recovery link lands, once /auth/callback has turned its code into a session.
@@ -24,6 +31,7 @@ export default async function NovaPalavraPasse() {
   // No session means the link expired, was already used, or was opened in another browser.
   if (!user) return redirectLocalized("/entrar?erro=link");
 
+  const t = await getTranslations("auth.newPassword");
   const { data: profile } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
   const next = profile?.role === "admin" ? "/admin" : profile?.role === "chef" ? "/dashboard" : "/conta";
 
@@ -32,14 +40,14 @@ export default async function NovaPalavraPasse() {
       <SiteHeader />
       <main className="mx-auto flex w-full max-w-[520px] flex-col gap-6 px-5 py-12 md:px-8 md:py-16">
         <div className="flex flex-col gap-3">
-          <h1 className="d m-0 text-[clamp(30px,4vw,42px)] leading-[1.05]">Escolha uma nova palavra-passe</h1>
-          <p className="m-0 text-muted">Está a definir a palavra-passe de {user.email}.</p>
+          <h1 className="d m-0 text-[clamp(30px,4vw,42px)] leading-[1.05]">{t("title")}</h1>
+          <p className="m-0 text-muted">{t("settingFor", { email: user.email ?? "" })}</p>
         </div>
         <div className="box p-5 sm:p-7">
           <NewPasswordForm next={next} />
         </div>
         <p className="m-0 text-sm text-muted">
-          Não foi o utilizador que pediu? <Link href="/apoio">Fale connosco</Link>. Alguém pode ter tentado entrar na sua conta.
+          {t.rich("notYou", { support: (c) => <Link href="/apoio">{c}</Link> })}
         </p>
       </main>
     </div>

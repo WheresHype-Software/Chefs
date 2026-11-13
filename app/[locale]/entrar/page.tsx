@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { ChefHat } from "@/components/brand/ChefHat";
 import { SignInForm } from "@/components/SignInForm";
 import { SignInMosaic } from "@/components/SignInMosaic";
 import { SiteHeader } from "@/components/SiteChrome";
 import { Photo } from "@/components/ui/Photo";
 import { PHOTOS } from "@/lib/photos";
+import { Link } from "@/lib/i18n/navigation";
+import type { Locale } from "@/lib/i18n/routing";
+import { alternates } from "@/lib/seo";
 import { hasSupabase } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Entrar" };
+export async function generateMetadata({ params }: PageProps<"/[locale]/entrar">): Promise<Metadata> {
+  const locale = (await params).locale as Locale;
+  const t = await getTranslations({ locale, namespace: "auth.meta" });
+  return { title: t("signIn"), alternates: alternates("/entrar", locale) };
+}
 
 export default async function EntrarPage({ searchParams }: PageProps<"/[locale]/entrar">) {
+  const t = await getTranslations("auth.signInPage");
   const sp = await searchParams;
   const asChef = sp.chef === "1";
   const startOnSignup = sp.criar === "1";
@@ -19,19 +28,17 @@ export default async function EntrarPage({ searchParams }: PageProps<"/[locale]/
   const expired =
     sp.erro === "link" ? (
       <p role="alert" className="m-0 text-sm text-danger">
-        Esta ligação expirou ou já foi usada. Entre com o email e a palavra-passe, ou peça uma nova em «Esqueceu-se da palavra-passe?».
+        {t("linkExpired")}
       </p>
     ) : null;
 
   const demo = (
     <div className="flex flex-col gap-3">
-      <span className="d text-2xl">Modo de demonstração</span>
-      <p className="m-0 text-sm text-muted">
-        A autenticação liga-se quando o projeto Supabase estiver configurado. Até lá pode ver o painel do chef com dados de exemplo.
-      </p>
-      <a href="/dashboard" className="btn self-start">
-        Ver painel de exemplo
-      </a>
+      <span className="d text-2xl">{t("demo.title")}</span>
+      <p className="m-0 text-sm text-muted">{t("demo.text")}</p>
+      <Link href="/dashboard" className="btn self-start">
+        {t("demo.cta")}
+      </Link>
     </div>
   );
 
@@ -55,32 +62,27 @@ export default async function EntrarPage({ searchParams }: PageProps<"/[locale]/
           <div className="mx-auto flex max-w-[1180px] flex-col gap-4 px-5 py-12 md:px-8 md:py-16">
             <ChefHat size={48} className="text-yolk" />
             <h1 className="d m-0 max-w-[16ch] text-[clamp(32px,5vw,52px)] leading-[1.02] text-white">
-              Vista a jaleca.
+              {t("chef.title")}
               <br />
-              <span className="text-yolk">O resto é connosco.</span>
+              <span className="text-yolk">{t("chef.titleAccent")}</span>
             </h1>
-            <p className="m-0 max-w-[52ch] text-[17px] text-[#d6e1f5]">
-              Crie a sua página, decida os menus, os dias e os preços, e receba pedidos de quem está perto de si.
-            </p>
+            <p className="m-0 max-w-[52ch] text-[17px] text-[#d6e1f5]">{t("chef.lead")}</p>
           </div>
         </section>
 
         <div className="mx-auto grid max-w-[1180px] items-start gap-10 px-5 py-10 md:px-8 md:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-16">
           <div className="flex min-w-0 flex-col gap-6">
             <div className="al-in flex flex-col gap-3">
-              <h2 className="d m-0 text-[clamp(24px,3vw,32px)] leading-[1.05]">Crie o seu perfil de chef.</h2>
-              <p className="m-0 max-w-[480px] text-[16px] text-ink-3">
-                Conta, fotografia, Instagram ou site e três fotos de pratos. A nossa equipa revê cada perfil antes de aparecer nas
-                pesquisas. Os dados fiscais e o IBAN só são pedidos mais tarde, antes do primeiro pagamento.
-              </p>
+              <h2 className="d m-0 text-[clamp(24px,3vw,32px)] leading-[1.05]">{t("chef.formTitle")}</h2>
+              <p className="m-0 max-w-[480px] text-[16px] text-ink-3">{t("chef.formLead")}</p>
               {expired}
             </div>
             <div className="box al-in min-w-0 max-w-[480px] p-5 shadow-[0_24px_60px_-30px_rgb(20_32_51/0.4)] [animation-delay:120ms] sm:p-7">
               {hasSupabase ? <SignInForm next={next} asChef /> : demo}
             </div>
-            <a href="/entrar" className="w-fit text-[14px] text-muted no-underline hover:text-ink">
-              Afinal só quero reservar um chef →
-            </a>
+            <Link href="/entrar" className="w-fit text-[14px] text-muted no-underline hover:text-ink">
+              {t("chef.justBook")}
+            </Link>
           </div>
           <div className="hidden lg:block">
             <SignInMosaic forChefs />
@@ -102,18 +104,14 @@ export default async function EntrarPage({ searchParams }: PageProps<"/[locale]/
       <div className="mx-auto grid max-w-[1180px] items-start gap-10 px-5 py-8 md:px-8 md:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-16">
         <div className="flex min-w-0 flex-col gap-5">
           <div className="al-in flex flex-col gap-2">
-            <h1 className="d m-0 text-[clamp(30px,4vw,44px)] leading-[1.03]">Entrar no Ao Lume</h1>
-            <p className="m-0 max-w-[460px] text-[16px] text-ink-3">
-              Para quem quer comer bem e para quem cozinha. Se ainda não tem conta, diga-nos primeiro como a vai usar.
-            </p>
+            <h1 className="d m-0 text-[clamp(30px,4vw,44px)] leading-[1.03]">{t("client.title")}</h1>
+            <p className="m-0 max-w-[460px] text-[16px] text-ink-3">{t("client.lead")}</p>
             {expired}
           </div>
           <div className="box al-in w-full min-w-0 max-w-[480px] p-5 shadow-[0_24px_60px_-30px_rgb(20_32_51/0.4)] [animation-delay:120ms] sm:p-7">
             {hasSupabase ? <SignInForm next={next} asChef={false} startOnSignup={startOnSignup} /> : demo}
           </div>
-          <p className="m-0 max-w-[480px] text-[14px] text-muted">
-            Para pedir uma reserva não precisa de conta: o link no email abre o pedido e a conversa com o chef.
-          </p>
+          <p className="m-0 max-w-[480px] text-[14px] text-muted">{t("client.noAccountNeeded")}</p>
         </div>
         <div className="hidden lg:block">
           <SignInMosaic forChefs={false} />
