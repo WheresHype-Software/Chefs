@@ -1,7 +1,7 @@
 "use client";
 
 import { LumiSlot } from "@/components/dashboard/LumiCoach";
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { OfferForm } from "@/components/dashboard/OfferForm";
 import type { DashOffer } from "@/lib/dashboard";

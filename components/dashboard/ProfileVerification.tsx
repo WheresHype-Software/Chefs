@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { submitForReview } from "@/app/dashboard/actions/profile";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";

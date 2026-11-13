@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { contactPhone, whatsappLink } from "@/lib/contact";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useState, useTransition } from "react";
 import { markFulfilled } from "@/app/dashboard/actions/agenda";
 import { Chip } from "@/components/ui/Chip";

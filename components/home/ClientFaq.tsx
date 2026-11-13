@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { Faq, type FaqItem } from "@/components/ui/Faq";
 
 const questions = (paymentsOn: boolean): FaqItem[] => [

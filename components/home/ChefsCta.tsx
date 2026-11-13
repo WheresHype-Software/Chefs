@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { AzulejoField } from "@/components/brand/Azulejo";
 
 /** Invitation to chefs, set into a wall of tiles like the hero panel. */

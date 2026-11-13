@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { AzulejoTile, type AzulejoVariant } from "@/components/brand/Azulejo";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Photo } from "@/components/ui/Photo";

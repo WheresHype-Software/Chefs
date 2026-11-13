@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateLocalized } from "@/lib/i18n/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
@@ -74,7 +74,7 @@ export async function clientAction(id: string, action: z.infer<typeof ClientActi
   if (!input.success) return fail("Pedido inválido.");
   const sb = await createClient();
   const { error } = await sb.rpc("client_update_booking", { p_booking_id: id, p_action: action, p_token: await guestToken(id) });
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   return error ? failWith(error, "clientAction", "Não foi possível concluir. Atualize a página e tente de novo.") : ok();
 }
 
@@ -112,7 +112,7 @@ export async function chefUpdateBooking(id: string, update: ChefUpdate): Promise
   }
   // select() returns the row, so "nothing was updated" (not this chef's booking) is caught too.
   const { data, error } = await sb.from("bookings").update(parsed.data).eq("id", id).select("id").maybeSingle();
-  revalidatePath("/dashboard", "layout");
+  revalidateLocalized("/dashboard", "layout");
   if (error?.message.includes("price_required")) return fail("Este pedido é sob orçamento: envie primeiro o seu orçamento.");
   if (error?.message.includes("quote_below_minimum")) {
     return fail("O orçamento é demasiado baixo para o sinal cobrir a comissão mínima. Indique um valor mais alto.");
@@ -153,6 +153,6 @@ export async function submitReview(id: string, review: z.infer<typeof ReviewInpu
     p_allow_showcase: allowShowcase,
     p_token: await guestToken(id),
   });
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   return error ? failWith(error, "submitReview", "Não foi possível publicar a avaliação.") : ok();
 }

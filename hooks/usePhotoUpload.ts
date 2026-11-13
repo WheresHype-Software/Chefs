@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { addPhoto, addSelfie } from "@/app/dashboard/actions/photos";
 import type { FormMessageValue } from "@/components/ui/FormMessage";

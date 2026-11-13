@@ -1,6 +1,8 @@
 // schema.org data for search engines: who we are, where a page sits, and each chef as a local
 // business with its zone, menus, rating and reviews (so results can show stars and prices).
+import type { Metadata } from "next";
 import type { Crumb } from "@/components/seo/Breadcrumbs";
+import { DEFAULT_LOCALE, LOCALE_TAG, LOCALES, localizePath, type Locale } from "./i18n/routing";
 import { nearestCity } from "./cities";
 import { siteUrl } from "./env";
 import { fromPrice, titledName } from "./format";
@@ -8,18 +10,28 @@ import type { ChefCard, ChefProfile } from "./types";
 
 const SITE_NAME = "Ao Lume";
 
-export function siteJsonLd() {
+/**
+ * Canonical URL and hreflang alternates for a page that exists in every language:
+ * alternates("/para-chefs", "en") → canonical /en/para-chefs, pt-PT → /para-chefs, en-GB → /en/para-chefs.
+ */
+export function alternates(path: string, locale: Locale): NonNullable<Metadata["alternates"]> {
+  const languages: Record<string, string> = Object.fromEntries(LOCALES.map((l) => [LOCALE_TAG[l], siteUrl(localizePath(path, l))]));
+  languages["x-default"] = siteUrl(localizePath(path, DEFAULT_LOCALE));
+  return { canonical: siteUrl(localizePath(path, locale)), languages };
+}
+
+export function siteJsonLd(locale: Locale = DEFAULT_LOCALE) {
   return [
     { "@context": "https://schema.org", "@type": "Organization", name: SITE_NAME, url: siteUrl("/"), logo: siteUrl("/email/logo.png") },
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: SITE_NAME,
-      url: siteUrl("/"),
-      inLanguage: "pt-PT",
+      url: siteUrl(localizePath("/", locale)),
+      inLanguage: LOCALE_TAG[locale],
       potentialAction: {
         "@type": "SearchAction",
-        target: { "@type": "EntryPoint", urlTemplate: siteUrl("/procurar?onde={search_term_string}") },
+        target: { "@type": "EntryPoint", urlTemplate: siteUrl(`${localizePath("/procurar", locale)}?onde={search_term_string}`) },
         "query-input": "required name=search_term_string",
       },
     },

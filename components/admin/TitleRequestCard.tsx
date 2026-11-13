@@ -1,7 +1,7 @@
 "use client";
 
 import { chefTitle } from "@/lib/format";
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { refuseChefTitle, verifyChefTitle } from "@/app/admin/actions";
 import { CertificateLinks } from "@/components/admin/CertificateLinks";

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateLocalized } from "@/lib/i18n/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, UUID_RE } from "@/lib/booking-token";
@@ -210,7 +210,7 @@ export async function startDepositPayment(id: string, method: PaymentMethod, pho
     }).catch((err) => console.error("[deposit] reference email:", err));
   }
 
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   const state = await getPaymentState(id);
   return state ? { ok: true, state } : { ok: false, error: "Não foi possível iniciar o pagamento. Tente de novo." };
 }
@@ -226,7 +226,7 @@ export async function cancelDepositPayment(id: string): Promise<ActionResult> {
   const admin = createAdminClient();
   if (!admin) return fail("Não foi possível cancelar. Atualize a página.");
   const { error } = await admin.rpc("mark_payment_unpaid", { p_payment: state.payment.id, p_status: "failed" });
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   return error ? failWith(error, "cancelDepositPayment", "Não foi possível cancelar. Atualize a página.") : { ok: true };
 }
 
@@ -276,7 +276,7 @@ export async function submitRefundIban(id: string, input: z.infer<typeof RefundI
     if (error.message.includes("not_waiting_for_iban")) return fail("Esta devolução já está a ser tratada.");
     return failWith(error, "submitRefundIban", "Não foi possível guardar os dados. Tente de novo.");
   }
-  revalidatePath(`/reserva/${id}`);
+  revalidateLocalized(`/reserva/${id}`);
   return { ok: true };
 }
 

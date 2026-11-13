@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { Photo } from "@/components/ui/Photo";
 import { fromPrice, initials, titledName } from "@/lib/format";
 import type { LatLng } from "@/lib/geo";

@@ -7,7 +7,7 @@ import { Chip } from "@/components/ui/Chip";
 import { Field } from "@/components/ui/Field";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { FormMessage } from "@/components/ui/FormMessage";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import type { MyChef } from "@/lib/dashboard";
 import { LANGUAGES } from "@/lib/languages";

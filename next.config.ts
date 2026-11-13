@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 import { securityHeaders } from "./lib/security-headers";
 
 const nextConfig: NextConfig = {
@@ -11,6 +12,7 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders() },
       // Booking pages are private: never leak their URL to other sites.
       { source: "/reserva/:path*", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
+      { source: "/en/reserva/:path*", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
     ];
   },
   turbopack: {
@@ -23,4 +25,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts");
+
+export default withNextIntl(nextConfig);

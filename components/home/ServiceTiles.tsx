@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { Photo } from "@/components/ui/Photo";
 import { SERVICE_PHOTO } from "@/lib/photos";
 import type { ServiceType } from "@/lib/types";

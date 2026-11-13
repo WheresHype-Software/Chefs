@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import type { MyChef, SetupProgress } from "@/lib/dashboard";
 
 type Step = { title: string; text: string; href: string; action: string; done: boolean };

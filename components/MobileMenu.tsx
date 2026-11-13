@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "@/lib/i18n/navigation";
+import { usePathname } from "@/lib/i18n/navigation";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 
 export type MenuLink = { href: string; label: string; badge?: number };

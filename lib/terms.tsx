@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { Fragment, isValidElement, type ReactNode } from "react";
 import type { LegalSection } from "@/components/LegalPage";
 import { SITE_DOMAIN } from "@/lib/constants";

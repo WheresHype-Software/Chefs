@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirectLocalized } from "@/lib/i18n/server";
 import { z } from "zod";
 import { recordAcceptance } from "@/lib/acceptance";
 import { siteUrl } from "@/lib/email";
@@ -9,7 +9,7 @@ import { createClient, hasSupabase } from "@/lib/supabase/server";
 
 export async function signOut(): Promise<void> {
   if (hasSupabase) await (await createClient()).auth.signOut();
-  redirect("/");
+  return redirectLocalized("/");
 }
 
 const SignUpInput = z.object({

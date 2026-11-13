@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmIbanChange } from "@/app/dashboard/actions/billing";
 import { callAction } from "@/lib/call-action";

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateLocalized } from "@/lib/i18n/server";
 import { z } from "zod";
 import { maskIban } from "@/lib/crypto";
 import { getSession } from "@/lib/dashboard";
@@ -45,7 +45,7 @@ async function log(admin: Admin, action: string, target: string, details: Record
   await admin.sb.from("admin_logs").insert({ admin_id: admin.adminId, action, target, details });
 }
 
-const refresh = () => revalidatePath("/admin/pagamentos");
+const refresh = () => revalidateLocalized("/admin/pagamentos");
 
 const Reason = z.string().trim().min(3, "Escreva o motivo").max(500);
 const Uuid = z.string().uuid();
@@ -410,7 +410,7 @@ export async function saveSettings(input: z.infer<typeof Settings>): Promise<Act
     .eq("id", 1);
   if (error) return failWith(error, "saveSettings", "Não foi possível guardar as definições.");
   await log(admin, "settings.updated", "platform_settings", { before, after: values, reason: reason || null });
-  revalidatePath("/", "layout");
+  revalidateLocalized("/", "layout");
   return ok();
 }
 

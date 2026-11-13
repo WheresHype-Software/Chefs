@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { LumiSlot } from "@/components/dashboard/LumiCoach";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import type { DashBooking } from "@/lib/dashboard";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useState, useTransition } from "react";
 import { AddressSearch, type Place } from "@/components/AddressSearch";
 import { SERVICE_FILTERS, type ServiceFilter } from "@/lib/constants";

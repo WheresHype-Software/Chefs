@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { ChefDoor } from "@/components/auth/ChefDoor";
 import { ChefHat } from "@/components/brand/ChefHat";
 import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";

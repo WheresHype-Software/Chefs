@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "@/lib/i18n/navigation";
+import { usePathname } from "@/lib/i18n/navigation";
 
 export function SideNav({ pending, links }: { pending: number; links: readonly { href: string; label: string }[] }) {
   const path = usePathname();

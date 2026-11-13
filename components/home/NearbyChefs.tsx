@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { ResultsMap } from "@/components/map/ResultsMap";
 import { ChefTile } from "@/components/search/ChefTile";

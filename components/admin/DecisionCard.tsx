@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import { useState, type ReactNode } from "react";
 import { ChefDecision, type Decision } from "@/components/admin/ChefDecision";
 

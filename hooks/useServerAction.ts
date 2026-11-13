@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 import { useState, useTransition } from "react";
 import type { FormMessageValue } from "@/components/ui/FormMessage";
 import { callAction } from "@/lib/call-action";
