@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { Faq, type FaqItem } from "@/components/ui/Faq";
 import { Compare } from "@/components/para-chefs/Compare";
@@ -14,71 +16,46 @@ import { SITE_DOMAIN } from "@/lib/constants";
 import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { revealDelay } from "@/lib/motion";
 import { getPublicSettings } from "@/lib/settings";
+import { DEFAULT_LOCALE, routing } from "@/lib/i18n/routing";
+import { alternates } from "@/lib/seo";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[locale]/para-chefs">): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = hasLocale(routing.locales, raw) ? raw : DEFAULT_LOCALE;
+  const t = await getTranslations({ locale, namespace: "paraChefs.meta" });
   const { paymentsEnabled } = await getPublicSettings();
   return {
-    title: "Para chefs",
-    description: paymentsEnabled
-      ? "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. O cliente paga o sinal na app; pagamos-te depois do serviço."
-      : "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. Sem mensalidades e sem comissões.",
+    title: t("title"),
+    description: paymentsEnabled ? t("descriptionPaymentsOn") : t("descriptionPaymentsOff"),
+    alternates: alternates("/para-chefs", locale),
   };
 }
 
-const faq = (paymentsOn: boolean, pct: string): FaqItem[] => [
-  [
-    "Quanto custa?",
-    paymentsOn
-      ? `Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Só cobramos quando ganha: uma comissão de ${pct}% sobre o valor da reserva, descontada ao sinal que o cliente paga na app. A percentagem em vigor está sempre no seu painel, e qualquer alteração é avisada com pelo menos 30 dias.`
-      : "Hoje, nada: criar o perfil, aparecer nas pesquisas, receber pedidos e combinar o serviço não têm custo nenhum, e não cobramos comissão. Mais à frente passará a haver uma comissão por cada reserva garantida, sempre descontada ao que o cliente paga e nunca cobrada a si à parte. Quem já cá estiver é avisado com pelo menos 30 dias.",
-  ],
-  [
-    "Como recebo o pagamento?",
-    paymentsOn
-      ? "O sinal é pago pelo cliente na app e fica à sua ordem. Depois de concluir o serviço, transferimo-lo para o seu IBAN já com a comissão descontada, acompanhado de um documento com os seus dados fiscais, o sinal recebido, a comissão e o valor transferido. O restante valor do serviço continua a ser combinado e pago diretamente entre si e o cliente."
-      : "Diretamente do cliente, como combinarem entre os dois: o Ao Lume não toca no dinheiro. A app serve para o encontrar, organizar o pedido e guardar a conversa.",
-  ],
-  [
-    "E se eu cancelar depois de aceitar?",
-    paymentsOn
-      ? "O sinal é devolvido por inteiro ao cliente e não cobramos comissão nenhuma. Cancelamentos repetidos são tidos em conta na sua conta."
-      : "Avise o cliente pela página da reserva, para ficar registo. Cancelamentos repetidos são tidos em conta na sua conta.",
-  ],
-  ...(paymentsOn
-    ? ([
-        [
-          "Que dados preciso de dar?",
-          "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7), e dizemos-lhe sempre o que foi comunicado.",
-        ],
-      ] as FaqItem[])
-    : ([
-        [
-          "Que dados preciso de dar?",
-          "Só o que aparece no perfil: quem é, onde cozinha e o que faz. Enquanto o pagamento for combinado diretamente consigo, não lhe pedimos NIF nem IBAN.",
-        ],
-      ] as FaqItem[])),
-  [
-    "Sou cozinheiro caseiro. Posso entrar?",
-    "Sim. Todos começam como Cozinheiro e são revistos pela nossa equipa antes de aparecerem nas pesquisas. Quem tem formação em cozinha envia o certificado e passa a aparecer como Chef.",
-  ],
-  [
-    "Preciso de licenças?",
-    "Cada chef é responsável pelas regras da sua atividade, como a formação em HACCP e a declaração de atividade nas Finanças. Vamos publicar um guia para ajudar.",
-  ],
-  [
-    "E se um cliente cancelar?",
-    "Define a sua política de cancelamento: flexível, moderada, rígida ou à sua medida. O cliente vê-a antes de pedir.",
-  ],
-];
+const BENEFITS = ["noChasing", "noAsking", "yourMoney"] as const;
+const SIGNUP_STEPS = ["account", "work", "approval", "share"] as const;
 
 // The commission is a business setting, so the page states whatever it actually is, and is
 // rebuilt hourly rather than on every visit.
 export const revalidate = 3600;
 
-export default async function ParaChefs() {
+export default async function ParaChefs({ params }: PageProps<"/[locale]/para-chefs">) {
+  const { locale: raw } = await params;
+  const locale = hasLocale(routing.locales, raw) ? raw : DEFAULT_LOCALE;
+  setRequestLocale(locale);
+  const t = await getTranslations("paraChefs");
   const settings = await getPublicSettings();
-  const pct = String(settings.commissionPercent).replace(".", ",");
+  const pct = locale === "pt" ? String(settings.commissionPercent).replace(".", ",") : String(settings.commissionPercent);
   const paymentsOn = settings.paymentsEnabled;
+  const br = () => <br />;
+  const faq: FaqItem[] = [
+    [t("faq.cost.q"), paymentsOn ? t("faq.cost.aPaymentsOn", { pct }) : t("faq.cost.aPaymentsOff")],
+    [t("faq.payout.q"), paymentsOn ? t("faq.payout.aPaymentsOn") : t("faq.payout.aPaymentsOff")],
+    [t("faq.chefCancels.q"), paymentsOn ? t("faq.chefCancels.aPaymentsOn") : t("faq.chefCancels.aPaymentsOff")],
+    [t("faq.data.q"), paymentsOn ? t("faq.data.aPaymentsOn") : t("faq.data.aPaymentsOff")],
+    [t("faq.homeCook.q"), t("faq.homeCook.a")],
+    [t("faq.licences.q"), t("faq.licences.a")],
+    [t("faq.clientCancels.q"), t("faq.clientCancels.a")],
+  ];
   return (
     <div>
       <SiteHeader chefs />
@@ -86,29 +63,24 @@ export default async function ParaChefs() {
       <section className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-14 px-5 pb-[72px] pt-[88px] md:px-10">
         <div className="flex min-w-0 flex-[1_1_520px] flex-col gap-7">
           <h1 className="d al-in m-0 text-[clamp(48px,8.4vw,104px)] leading-[.94] tracking-[-0.02em]" style={{ animationDelay: "80ms" }}>
-            Viva da sua
-            <br />
-            <span className="text-cobalt">cozinha.</span>
+            {t.rich("hero.title", { br, accent: (c) => <span className="text-cobalt">{c}</span> })}
           </h1>
           <p className="al-in m-0 max-w-[500px] text-lg text-ink-3" style={{ animationDelay: "180ms" }}>
-            Montra, clientes novos, pedidos, agenda e avaliações, num só sítio. Jantares em casa, eventos, marmitas, bolos ou salgados:
-            escolhe o que faz, quando e por quanto.
+            {t("hero.lead")}
           </p>
           <div className="al-in" style={{ animationDelay: "220ms" }}>
             <Promises />
           </div>
           <div className="al-in flex flex-wrap gap-2.5" style={{ animationDelay: "260ms" }}>
             <Link href="/entrar?chef=1" className="btn">
-              Criar o meu perfil
+              {t("createProfile")}
             </Link>
             <a href="#ferramenta" className="btn btn-o">
-              Ver a ferramenta
+              {t("hero.seeTool")}
             </a>
           </div>
           <span className="al-in text-sm text-muted" style={{ animationDelay: "340ms" }}>
-            {paymentsOn
-              ? "Cada perfil é revisto pela equipa · o sinal é pago na app"
-              : "Cada perfil é revisto pela equipa · sem mensalidades e sem comissões"}
+            {paymentsOn ? t("hero.footnotePaymentsOn") : t("hero.footnotePaymentsOff")}
           </span>
         </div>
         <HeroStage />
@@ -117,7 +89,7 @@ export default async function ParaChefs() {
       <section id="ferramenta" className="scroll-mt-16 bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[760px] flex-col gap-4">
-            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Tudo o que um pedido precisa, num só sítio.</h2>
+            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">{t("tool.title")}</h2>
           </div>
           <ToolTabs />
         </div>
@@ -127,39 +99,21 @@ export default async function ParaChefs() {
         <div className="mx-auto flex max-w-[1280px] flex-col gap-9 px-5 py-14 md:px-10 md:py-20">
           <div className="al-rv flex max-w-[760px] flex-col gap-3">
             <h2 id="zona-title" className="d m-0 text-[clamp(32px,5vw,56px)] leading-none">
-              Chegue primeiro à sua zona.
+              {t("zone.title")}
             </h2>
-            <p className="m-0 max-w-[620px] text-lg text-ink-3">
-              O Ao Lume abre zona a zona. Em cada área, os primeiros perfis aprovados são os que recebem os pedidos e os que acumulam as
-              primeiras avaliações.
-            </p>
+            <p className="m-0 max-w-[620px] text-lg text-ink-3">{t("zone.lead")}</p>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] gap-px border border-line-2 bg-line-2">
-            <div className="flex flex-col gap-2 bg-white p-[26px]">
-              <strong className="d text-[22px]">Posição na sua área</strong>
-              <span className="text-[15px] text-ink-3">
-                Cada chef define o raio onde trabalha e aparece a quem procura dentro dele. A maior parte das zonas do país ainda não tem um
-                único chef aprovado.
-              </span>
-            </div>
-            <div className="flex flex-col gap-2 bg-white p-[26px]">
-              <strong className="d text-[22px]">Reputação leva tempo</strong>
-              <span className="text-[15px] text-ink-3">
-                As avaliações só chegam a quem já recebeu reservas. Quem começa primeiro constrói a reputação que decide as escolhas dos
-                clientes seguintes.
-              </span>
-            </div>
-            <div className="flex flex-col gap-2 bg-white p-[26px]">
-              <strong className="d text-[22px]">Sem custo no lançamento</strong>
-              <span className="text-[15px] text-ink-3">
-                Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Qualquer alteração às condições é comunicada com 15
-                dias de antecedência.
-              </span>
-            </div>
+            {(["position", "reputation", "launch"] as const).map((key) => (
+              <div key={key} className="flex flex-col gap-2 bg-white p-[26px]">
+                <strong className="d text-[22px]">{t(`zone.${key}.title`)}</strong>
+                <span className="text-[15px] text-ink-3">{t(`zone.${key}.text`)}</span>
+              </div>
+            ))}
           </div>
           <div className="al-rv">
             <Link href="/entrar?chef=1" className="btn">
-              Criar o meu perfil
+              {t("createProfile")}
             </Link>
           </div>
         </div>
@@ -169,12 +123,9 @@ export default async function ParaChefs() {
         <div className="mx-auto flex max-w-[1280px] flex-col gap-10 px-5 py-14 md:px-10 md:py-24">
           <div className="al-rv flex max-w-[760px] flex-col gap-3">
             <h2 id="demo-title" className="d m-0 text-[clamp(32px,5vw,56px)] leading-none">
-              Experimente: assim chega uma reserva.
+              {t("demo.title")}
             </h2>
-            <p className="m-0 text-lg text-ink-3">
-              Os clientes encontram-no no Ao Lume ou pelo seu link, escolhem um menu e um dia livre e enviam o pedido. Faça de chef e leve
-              este pedido de exemplo até ao fim.
-            </p>
+            <p className="m-0 text-lg text-ink-3">{t("demo.lead")}</p>
           </div>
           <RequestDemo />
         </div>
@@ -188,12 +139,9 @@ export default async function ParaChefs() {
       >
         <div className="al-rv flex max-w-[760px] flex-col gap-3">
           <h2 id="ferramentas-title" className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
-            O essencial de quem cozinha por conta própria.
+            {t("tools.title")}
           </h2>
-          <p className="m-0 text-lg text-ink-3">
-            Jantares em casa, eventos, marmitas da semana, bolos e salgados ou encomendas de época: tudo o que precisa para receber e
-            organizar pedidos já está incluído.
-          </p>
+          <p className="m-0 text-lg text-ink-3">{t("tools.lead")}</p>
         </div>
         <ToolList />
       </section>
@@ -201,27 +149,21 @@ export default async function ParaChefs() {
       <section id="marketing" className="scroll-mt-16 border-y border-line bg-white">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-16 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="al-rv flex max-w-[820px] flex-col gap-[18px]">
-            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">Mais clientes, sem pagar anúncios.</h2>
-            <p className="m-0 max-w-[600px] text-lg text-ink-3">
-              Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.
-            </p>
+            <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">{t("marketing.title")}</h2>
+            <p className="m-0 max-w-[600px] text-lg text-ink-3">{t("marketing.lead")}</p>
           </div>
           <MarketingTiles />
 
           <div className="al-rv flex flex-col gap-7">
             <div className="flex flex-col gap-2.5">
-              <h3 className="d m-0 text-[clamp(28px,4vw,42px)] leading-none">O seu percurso</h3>
-              <p className="m-0 max-w-[560px] text-ink-3">
-                Recebe pedidos desde o dia em que for aprovado. O título de Chef vem depois, se tiver formação em cozinha.
-              </p>
+              <h3 className="d m-0 text-[clamp(28px,4vw,42px)] leading-none">{t("marketing.path.title")}</h3>
+              <p className="m-0 max-w-[560px] text-ink-3">{t("marketing.path.lead")}</p>
             </div>
             <ol className="m-0 grid list-none gap-px border border-line bg-line p-0 md:grid-cols-[1fr_auto_1fr]">
               <li className="flex flex-col gap-2.5 bg-paper p-7 md:p-8">
-                <span className="lab text-muted">Passo 1 · à entrada</span>
-                <span className="d text-[clamp(28px,4vw,36px)] leading-none">Cozinheiro</span>
-                <span className="text-[15px] leading-relaxed text-ink-3">
-                  Todos começam aqui. A página fica pública depois da revisão da equipa e os pedidos entram desde o primeiro dia.
-                </span>
+                <span className="lab text-muted">{t("marketing.path.cook.label")}</span>
+                <span className="d text-[clamp(28px,4vw,36px)] leading-none">{t("marketing.path.cook.title")}</span>
+                <span className="text-[15px] leading-relaxed text-ink-3">{t("marketing.path.cook.text")}</span>
               </li>
               <li aria-hidden="true" className="flex items-center justify-center bg-white px-6 py-4 md:px-5">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-cobalt">
@@ -232,13 +174,10 @@ export default async function ParaChefs() {
               <li className="flex flex-col gap-2.5 bg-white p-7 text-ink md:p-8">
                 <span className="lab flex items-center gap-1.5 text-cobalt">
                   <VerifiedIcon size={15} />
-                  Passo 2 · com certificado
+                  {t("marketing.path.chef.label")}
                 </span>
-                <span className="d text-[clamp(28px,4vw,36px)] leading-none">Chef</span>
-                <span className="text-[15px] leading-relaxed text-ink-3">
-                  Envie um certificado de cozinha no painel. Depois de verificado, passa a aparecer como Chef, com o selo ao lado do nome em
-                  todas as pesquisas.
-                </span>
+                <span className="d text-[clamp(28px,4vw,36px)] leading-none">{t("marketing.path.chef.title")}</span>
+                <span className="text-[15px] leading-relaxed text-ink-3">{t("marketing.path.chef.text")}</span>
               </li>
             </ol>
           </div>
@@ -253,33 +192,23 @@ export default async function ParaChefs() {
                   explicá-la agora é melhor do que deixá-la para quando começar a sair da conta de
                   alguém. O que muda é o aviso em cima, que diz a quem chega hoje que ainda não paga. */}
               <span className="inline-flex w-fit items-center gap-2 bg-yolk-soft px-3 py-1.5 text-[14px] font-semibold text-ink">
-                Sem mensalidades
+                {t("pricing.badge")}
               </span>
               <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
-                Só paga por cada
-                <br />
-                serviço garantido.
+                {t.rich("pricing.title", { br })}
               </h2>
               {!paymentsOn && (
                 <p className="m-0 max-w-[520px] border-l-[3px] border-yolk bg-yolk-soft px-4 py-3 text-[15px] text-ink">
-                  <strong>Aos primeiros chefs não cobramos nada.</strong> Enquanto estivermos a começar, o pagamento é combinado diretamente
-                  consigo e não fica cá comissão nenhuma. É assim que vai funcionar quando ligarmos os pagamentos, e quem já cá estiver é
-                  avisado com pelo menos 30 dias.
+                  {t.rich("pricing.earlyNote", { strong: (c) => <strong>{c}</strong> })}
                 </p>
               )}
               <p className="m-0 max-w-[520px] text-lg text-ink-3">
-                Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a data
-                fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva, não há
-                nada a pagar.
+                {t("pricing.text", { pct })}
               </p>
             </div>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
-              {[
-                ["Deixa de andar atrás de quem marca e desaparece", "O sinal confirma a data. Sem sinal, não há reserva."],
-                ["Não tem de pedir dinheiro a ninguém", "O pedido do sinal parte de nós, não de si."],
-                ["O dinheiro é seu desde o primeiro minuto", "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."],
-              ].map(([t, d], i) => (
-                <li key={t} className="al-rv flex gap-3.5 border-t border-line pt-3.5" style={revealDelay(i)}>
+              {BENEFITS.map((key, i) => (
+                <li key={key} className="al-rv flex gap-3.5 border-t border-line pt-3.5" style={revealDelay(i)}>
                   <svg
                     width="20"
                     height="20"
@@ -293,8 +222,8 @@ export default async function ParaChefs() {
                     <path d="M5 12.5 10 17 19 7" />
                   </svg>
                   <span className="flex flex-col gap-0.5">
-                    <strong className="text-[17px]">{t}</strong>
-                    <span className="text-[15px] text-muted">{d}</span>
+                    <strong className="text-[17px]">{t(`pricing.benefits.${key}.title`)}</strong>
+                    <span className="text-[15px] text-muted">{t(`pricing.benefits.${key}.text`)}</span>
                   </span>
                 </li>
               ))}
@@ -308,23 +237,20 @@ export default async function ParaChefs() {
 
       <section className="border-t border-line">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-11 px-5 py-14 md:px-10 md:py-[120px]">
-          <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Criar o perfil leva poucos minutos.</h2>
+          <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">{t("signup.title")}</h2>
           <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-x-10 border-t border-line-2 p-0">
-            {[
-              ["1", "Crie a conta", "Nome, email e uma palavra-passe. Poucos minutos."],
-              ["2", "Mostre o seu trabalho", "Uma fotografia sua, o Instagram ou site, e três fotos de pratos."],
-              ["3", "Aprovação", "A nossa equipa revê cada perfil antes de ficar público."],
-              ["4", "Partilhe o link", `Ponha ${SITE_DOMAIN}/chef/o-seu-nome na bio e receba pedidos.`],
-            ].map(([n, t, d]) => (
-              <li key={n} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-[26px]">
+            {SIGNUP_STEPS.map((key, i) => (
+              <li key={key} className="al-rv flex flex-col gap-2.5 border-b border-line pb-[30px] pt-[26px]">
                 <span
                   aria-hidden="true"
                   className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-cobalt text-[18px] font-extrabold text-white"
                 >
-                  {n}
+                  {i + 1}
                 </span>
-                <strong className="text-lg font-semibold">{t}</strong>
-                <span className="text-muted">{d}</span>
+                <strong className="text-lg font-semibold">{t(`signup.steps.${key}.title`)}</strong>
+                <span className="text-muted">
+                  {t(`signup.steps.${key}.text`, { link: `${SITE_DOMAIN}/chef/${t("marketing.slugPlaceholder")}` })}
+                </span>
               </li>
             ))}
           </ol>
@@ -334,10 +260,10 @@ export default async function ParaChefs() {
       <section id="perguntas" className="scroll-mt-16 bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-wrap gap-12 px-5 py-14 md:px-10 md:py-[120px]">
           <div className="flex-[1_1_280px]">
-            <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">Perguntas</h2>
+            <h2 className="d al-rv m-0 text-[clamp(32px,6vw,68px)] leading-none">{t("faq.title")}</h2>
           </div>
           <div className="min-w-0 flex-[2_1_520px]">
-            <Faq items={faq(paymentsOn, pct)} />
+            <Faq items={faq} />
           </div>
         </div>
       </section>
@@ -345,12 +271,10 @@ export default async function ParaChefs() {
       <section className="bg-cobalt-deep text-white">
         <div className="al-rv mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-5 py-20 text-center md:px-10 md:py-[120px]">
           <h2 className="d m-0 max-w-[900px] text-[clamp(42px,7vw,88px)] leading-[.98]">
-            Vista a jaleca.
-            <br />
-            <span className="text-yolk">O resto é connosco.</span>
+            {t.rich("closing.title", { br, accent: (c) => <span className="text-yolk">{c}</span> })}
           </h2>
           <Link href="/entrar?chef=1" className="btn btn-w">
-            Criar o meu perfil
+            {t("createProfile")}
           </Link>
           <div className="flex justify-center">
             <Promises tone="white" />

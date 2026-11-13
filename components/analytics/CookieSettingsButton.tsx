@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { setConsent } from "@/lib/consent";
 
 /** Reopens the cookie banner so the visitor can change their answer. */
 export function CookieSettingsButton({ className }: { className?: string }) {
+  const t = useTranslations("home.cookies");
   return (
     <button
       type="button"
@@ -14,7 +16,7 @@ export function CookieSettingsButton({ className }: { className?: string }) {
       }}
       className={className}
     >
-      Cookies
+      {t("settings")}
     </button>
   );
 }

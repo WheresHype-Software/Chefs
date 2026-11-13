@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { computeBookingMoney, toCents, toEuros } from "@/lib/money";
+import { euro } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/routing";
 
 type Props = {
   commissionPercent: number;
@@ -10,7 +13,6 @@ type Props = {
   depositPercent: number;
 };
 
-const money = (n: number) => `${(Number.isInteger(n) ? String(n) : n.toFixed(2)).replace(".", ",")} €`;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /**
@@ -92,6 +94,9 @@ function Slider({
  * actually configured.
  */
 export function FeeCalculator({ commissionPercent, commissionMin, depositPercent }: Props) {
+  const locale = useLocale() as Locale;
+  const t = useTranslations("paraChefs.calculator");
+  const money = (n: number) => euro(round2(n), locale);
   const [price, setPrice] = useState(55);
   const [guests, setGuests] = useState(6);
   const [perMonth, setPerMonth] = useState(4);
@@ -114,17 +119,15 @@ export function FeeCalculator({ commissionPercent, commissionMin, depositPercent
   return (
     <div className="box flex min-w-0 flex-col gap-6 p-6 md:p-8">
       <div className="flex flex-col gap-4">
-        <Slider label="Cobra por pessoa" value={price} min={15} max={150} step={5} suffix=" €" onChange={setPrice} />
-        <Slider label="Pessoas à mesa" value={guests} min={2} max={20} step={1} suffix="" onChange={setGuests} />
-        <Slider label="Serviços por mês" value={perMonth} min={1} max={20} step={1} suffix="" onChange={setPerMonth} />
+        <Slider label={t("pricePerPerson")} value={price} min={15} max={150} step={5} suffix=" €" onChange={setPrice} />
+        <Slider label={t("guests")} value={guests} min={2} max={20} step={1} suffix="" onChange={setGuests} />
+        <Slider label={t("perMonth")} value={perMonth} min={1} max={20} step={1} suffix="" onChange={setPerMonth} />
       </div>
 
       <div className="flex flex-col gap-1.5 border-t border-line pt-6">
-        <span className="lab text-muted">Num ano, fica para si</span>
+        <span className="lab text-muted">{t("yearLabel")}</span>
         <span className="d num text-[clamp(40px,8vw,64px)] leading-none text-cobalt">{money(round2(shownYear))}</span>
-        <span className="text-[15px] text-muted">
-          {perMonth} {perMonth === 1 ? "serviço" : "serviços"} por mês, de {money(total)} cada.
-        </span>
+        <span className="text-[15px] text-muted">{t("yearDetail", { count: perMonth, amount: money(total) })}</span>
       </div>
 
       {/* The share bar: what a percentage cannot say on its own. */}
@@ -136,27 +139,30 @@ export function FeeCalculator({ commissionPercent, commissionMin, depositPercent
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-[14px]">
           <span className="flex items-center gap-1.5">
             <span aria-hidden="true" className="h-2.5 w-2.5 bg-cobalt" />
-            Fica consigo <strong className="num">{money(round2(shownKeeps))}</strong>
+            {t.rich("keeps", { amount: money(shownKeeps), b: (c) => <strong className="num">{c}</strong> })}
           </span>
           <span className="flex items-center gap-1.5 text-muted">
             <span aria-hidden="true" className="h-2.5 w-2.5 bg-yolk" />
-            Ao Lume <strong className="num">{money(round2(shownCommission))}</strong>
+            {t.rich("aoLume", { amount: money(shownCommission), b: (c) => <strong className="num">{c}</strong> })}
           </span>
         </div>
       </div>
 
       <p className="m-0 bg-paper p-3.5 text-[14px] leading-relaxed text-ink-3">
-        Em cada serviço, o cliente paga <strong className="num text-ink">{money(deposit)}</strong> de sinal aqui para confirmar a data. Os
-        outros <strong className="num text-ink">{money(round2(total - deposit))}</strong> combina-os consigo, como sempre.
+        {t.rich("depositNote", {
+          deposit: money(deposit),
+          rest: money(total - deposit),
+          b: (c) => <strong className="num text-ink">{c}</strong>,
+        })}
       </p>
 
       <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-1.5 p-0 text-[14px] text-muted">
-        {["Sem mensalidade", "Sem custo por pedido", "Só paga quando recebe"].map((t) => (
-          <li key={t} className="flex items-center gap-1.5">
+        {(["noMonthly", "noPerRequest", "payWhenPaid"] as const).map((key) => (
+          <li key={key} className="flex items-center gap-1.5">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-cobalt">
               <path d="M5 12.5 10 17 19 7" />
             </svg>
-            {t}
+            {t(`points.${key}`)}
           </li>
         ))}
       </ul>
