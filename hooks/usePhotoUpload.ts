@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { addPhoto, addSelfie } from "@/app/dashboard/actions/photos";
@@ -43,6 +44,7 @@ async function inParallel<T>(jobs: (() => Promise<T>)[], limit: number, onDone: 
  * up in the order the files were picked.
  */
 export function usePhotoUpload(userId: string | null, onUploaded?: (photo: ChefPhoto) => void) {
+  const t = useTranslations("dashboard.photos.upload");
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -51,7 +53,7 @@ export function usePhotoUpload(userId: string | null, onUploaded?: (photo: ChefP
   async function upload(kind: UploadKind, files: FileList | null) {
     if (!files?.length) return;
     if (!userId || !hasSupabase) {
-      setMessage({ ok: true, text: "Modo de demonstração: as fotografias não são guardadas." });
+      setMessage({ ok: true, text: t("demo") });
       return;
     }
     setUploading(true);
@@ -109,21 +111,9 @@ export function usePhotoUpload(userId: string | null, onUploaded?: (photo: ChefP
     setUploading(false);
     setProgress(null);
     if (failed) {
-      setMessage({
-        ok: false,
-        text: selfie
-          ? "A selfie não foi carregada. Use uma fotografia JPG ou PNG, ou tire-a com a câmara."
-          : `${failed === 1 ? "Uma fotografia não foi carregada" : `${failed} fotografias não foram carregadas`}. Use JPG, PNG ou WEBP.`,
-      });
+      setMessage({ ok: false, text: selfie ? t("selfieFailed") : t("failed", { count: failed }) });
     } else if (uploaded) {
-      setMessage({
-        ok: true,
-        text: selfie
-          ? "Selfie enviada. Só a equipa a vê."
-          : uploaded === 1
-            ? "Fotografia carregada."
-            : `${uploaded} fotografias carregadas.`,
-      });
+      setMessage({ ok: true, text: selfie ? t("selfieSent") : t("uploaded", { count: uploaded }) });
     }
     // The gallery is already showing them; this only reconciles the server's copy.
     if (uploaded) router.refresh();

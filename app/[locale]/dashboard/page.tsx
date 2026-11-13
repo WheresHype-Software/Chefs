@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatGrid } from "@/components/ui/StatGrid";
@@ -9,6 +10,9 @@ import { getBookings, getChefMoney, getMyChef, getPayouts, getSession, getSetupP
 import { dayLabel, euro, isoDay, longDay, rating } from "@/lib/format";
 
 export default async function Overview() {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.home");
+  const td = await getTranslations("dashboard");
   const session = await getSession();
   const chef = await getMyChef();
   if (!chef) {
@@ -43,24 +47,20 @@ export default async function Overview() {
         <LegalAcceptanceCard
           kinds={toAccept}
           context="dashboard"
-          title={toAccept.includes("chef_contract") ? "Há uma nova versão do contrato" : "Os termos foram atualizados"}
-          intro={
-            toAccept.includes("chef_contract")
-              ? "Leia e aceite para continuar a usar o Ao Lume. O contrato diz, entre outras coisas, que o serviço, a segurança alimentar e as licenças são da sua responsabilidade, e que esta aceitação vale como a sua assinatura."
-              : "Leia os termos atualizados e aceite para continuar a usar o Ao Lume."
-          }
+          title={toAccept.includes("chef_contract") ? t("contractTitle") : t("termsTitle")}
+          intro={toAccept.includes("chef_contract") ? t("contractIntro") : t("termsIntro")}
         />
       )}
       <SetupChecklist chef={chef} progress={progress} />
 
-      <PageHeader meta={longDay(today)} title={`Olá, ${chef.display_name.split(" ")[0]}`} />
+      <PageHeader meta={longDay(today, locale)} title={t("hello", { name: chef.display_name.split(" ")[0] })} />
 
       <StatGrid
         items={[
-          ["Pedidos por responder", String(requests.length)],
-          ["Serviços esta semana", String(week.length)],
-          ["Entregas", String(week.filter((b) => b.fulfilment_mode === "delivery").length)],
-          ["Avaliação", rating(chef.rating_avg, chef.review_count).replace("★ ", "")],
+          [t("stats.toAnswer"), String(requests.length)],
+          [t("stats.thisWeek"), String(week.length)],
+          [t("stats.deliveries"), String(week.filter((b) => b.fulfilment_mode === "delivery").length)],
+          [t("stats.rating"), rating(chef.rating_avg, chef.review_count, locale).replace("★ ", "")],
         ]}
       />
 
@@ -68,10 +68,10 @@ export default async function Overview() {
         <section aria-labelledby="dinheiro" className="flex flex-col gap-3">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 id="dinheiro" className="lab m-0 text-muted">
-              Dinheiro
+              {t("money.title")}
             </h2>
             <Link href="/dashboard/pagamentos" className="text-sm">
-              Ver pagamentos
+              {t("money.seePayments")}
             </Link>
           </div>
           <StatGrid
@@ -80,18 +80,16 @@ export default async function Overview() {
             // a small percentage feel like a bill, and the chef can see it per booking anyway,
             // on the booking itself and on the document that comes with each payment.
             items={[
-              ["A receber de nós", euro(payouts.summary.balance)],
-              ["Clientes devem-te", euro(money.restOwed)],
-              ["Recebido de nós este ano", euro(payouts.summary.paidThisYear)],
-              ["Recebido dos clientes este ano", euro(money.restPaid)],
+              [t("money.owedByUs"), euro(payouts.summary.balance, locale)],
+              [t("money.clientsOwe"), euro(money.restOwed, locale)],
+              [t("money.paidByUs"), euro(payouts.summary.paidThisYear, locale)],
+              [t("money.paidByClients"), euro(money.restPaid, locale)],
             ]}
           />
           {(money.awaitingDeposit > 0 || money.restToConfirm > 0) && (
             <p className="m-0 text-sm text-muted">
-              {money.awaitingDeposit > 0 &&
-                `${money.awaitingDeposit} ${money.awaitingDeposit === 1 ? "reserva à espera" : "reservas à espera"} do sinal. `}
-              {money.restToConfirm > 0 &&
-                `${money.restToConfirm} ${money.restToConfirm === 1 ? "reserva por confirmar" : "reservas por confirmar"} se o cliente já te pagou o resto.`}
+              {money.awaitingDeposit > 0 && `${t("money.awaitingDeposit", { count: money.awaitingDeposit })} `}
+              {money.restToConfirm > 0 && t("money.restToConfirm", { count: money.restToConfirm })}
             </p>
           )}
         </section>
@@ -100,9 +98,9 @@ export default async function Overview() {
       {requests.length > 0 && (
         <section className="box flex flex-col p-6">
           <div className="flex items-baseline justify-between border-b border-line-2 pb-3">
-            <h2 className="d m-0 text-2xl">Novos pedidos</h2>
+            <h2 className="d m-0 text-2xl">{t("newRequests")}</h2>
             <Link href="/dashboard/pedidos" className="text-sm">
-              Ver todos →
+              {t("seeAll")}
             </Link>
           </div>
           {requests.slice(0, 4).map((b) => (
@@ -112,12 +110,12 @@ export default async function Overview() {
               className="flex flex-wrap items-center justify-between gap-2.5 border-b border-line py-4 text-ink no-underline last:border-b-0"
             >
               <span className="flex flex-col">
-                <span className="d text-xl">{b.client?.name ?? "Cliente"}</span>
+                <span className="d text-xl">{b.client?.name ?? td("client")}</span>
                 <span className="text-[13px] text-muted">
-                  {b.offer_title} · {b.guests} · {dayLabel(b.date)}
+                  {b.offer_title} · {b.guests} · {dayLabel(b.date, locale)}
                 </span>
               </span>
-              <span className="lab rounded-[2px] bg-cobalt px-2.5 py-1.5 text-white">Responder</span>
+              <span className="lab rounded-[2px] bg-cobalt px-2.5 py-1.5 text-white">{t("reply")}</span>
             </Link>
           ))}
         </section>
@@ -126,14 +124,16 @@ export default async function Overview() {
       {busiest && (
         <div className="box flex flex-wrap items-center justify-between gap-4 p-6">
           <span className="flex flex-col gap-1">
-            <span className="d text-2xl">{longDay(busiest[0]).split(",")[0]} é o seu dia mais cheio</span>
+            <span className="d text-2xl">{t("busiest", { day: longDay(busiest[0], locale).split(",")[0] })}</span>
             <span className="text-muted">
-              {busiestItems.length} {busiestItems.length === 1 ? "serviço" : "serviços"}:{" "}
-              {busiestItems.map((b) => `${b.time_label ?? ""} ${b.offer_title}`.trim()).join(" · ")}
+              {t("busiestServices", {
+                count: busiestItems.length,
+                list: busiestItems.map((b) => `${b.time_label ?? ""} ${b.offer_title}`.trim()).join(" · "),
+              })}
             </span>
           </span>
           <Link href={`/dashboard/logistica?dia=${busiest[0]}`} className="btn">
-            Ver logística do dia
+            {t("seeDayLogistics")}
           </Link>
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { contactPhone, whatsappLink } from "@/lib/contact";
 import { useRouter } from "@/lib/i18n/navigation";
@@ -13,7 +14,6 @@ import type { DashBooking } from "@/lib/dashboard";
 import { isoDay } from "@/lib/format";
 import type { FulfilmentMode } from "@/lib/types";
 
-const TYPE_LABEL: Record<FulfilmentMode, string> = { home: "Em casa do cliente", delivery: "Entrega", pickup: "Levantamento" };
 const TAG: Record<FulfilmentMode, string> = {
   home: "bg-cobalt text-white",
   delivery: "border border-cobalt",
@@ -21,6 +21,10 @@ const TAG: Record<FulfilmentMode, string> = {
 };
 
 export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchenArea: string }) {
+  const t = useTranslations("dashboard.logistics.day");
+  const td = useTranslations("dashboard");
+  const locale = useLocale();
+  const TYPE_LABEL: Record<FulfilmentMode, string> = { home: t("typeHome"), delivery: t("typeDelivery"), pickup: t("typePickup") };
   const [type, setType] = useState<FulfilmentMode | "all">("all");
   const router = useRouter();
   // A booking completed in Pedidos is done here too, and stays done.
@@ -56,13 +60,13 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
 
   return (
     <>
-      <div role="group" aria-label="Tipo" className="flex flex-wrap gap-1.5">
+      <div role="group" aria-label={t("filterLabel")} className="flex flex-wrap gap-1.5">
         {(
           [
-            ["all", "Todos", items.length],
-            ["home", "Em casa", count("home")],
-            ["delivery", "Entregas", count("delivery")],
-            ["pickup", "Levantamentos", count("pickup")],
+            ["all", t("all"), items.length],
+            ["home", t("home"), count("home")],
+            ["delivery", t("delivery"), count("delivery")],
+            ["pickup", t("pickup"), count("pickup")],
           ] as [FulfilmentMode | "all", string, number][]
         ).map(([k, label, n]) => (
           <Chip key={k} pressed={type === k} onClick={() => setType(k)}>
@@ -75,8 +79,8 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
 
       {shown.length === 0 && (
         <div className="box flex flex-col gap-1.5 px-6 py-10 text-center">
-          <span className="d text-[26px]">Dia livre</span>
-          <span className="text-muted">Sem serviços marcados. Pode fechar este dia em Disponibilidade.</span>
+          <span className="d text-[26px]">{t("freeDay")}</span>
+          <span className="text-muted">{t("freeDayText")}</span>
         </div>
       )}
 
@@ -95,30 +99,30 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
                 <span className="lab text-muted">
                   {isDone
                     ? isPick
-                      ? "Levantado"
+                      ? t("pickedUp")
                       : i.fulfilment_mode === "delivery"
-                        ? "Entregue"
-                        : "Concluído"
+                        ? t("delivered")
+                        : t("done")
                     : i.status === "confirmed"
-                      ? "Sinal recebido"
-                      : "Aguarda sinal"}
+                      ? t("depositReceived")
+                      : t("awaitingDeposit")}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="d text-[22px] leading-[1.15]">{i.client?.name ?? "Cliente"}</span>
+                <span className="d text-[22px] leading-[1.15]">{i.client?.name ?? td("client")}</span>
                 <span className="text-sm text-ink-3">
                   {i.offer_title} · {i.guests}
                 </span>
               </div>
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3 border-t border-line pt-3">
                 <div className="flex flex-col gap-0.5">
-                  <span className="lab text-muted">{isPick ? "Local" : "Morada do cliente"}</span>
-                  <span className="text-sm">{isPick ? `Na sua cozinha · ${kitchenArea}` : i.address}</span>
+                  <span className="lab text-muted">{isPick ? t("place") : t("clientAddress")}</span>
+                  <span className="text-sm">{isPick ? t("atKitchen", { area: kitchenArea }) : i.address}</span>
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <span className="lab text-muted">{isPick ? "Código de levantamento" : "Distância"}</span>
+                  <span className="lab text-muted">{isPick ? t("pickupCode") : t("distance")}</span>
                   <span className="num text-sm">
-                    {isPick ? (i.pickup_code ?? "—") : i.distance_km ? `${String(i.distance_km).replace(".", ",")} km` : "—"}
+                    {isPick ? (i.pickup_code ?? "—") : i.distance_km ? `${String(i.distance_km).replace(".", locale === "pt" ? "," : ".")} km` : "—"}
                   </span>
                 </div>
               </div>
@@ -126,7 +130,7 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
               <div className="flex flex-wrap gap-1.5">
                 {maps && (
                   <a href={maps} target="_blank" rel="noopener" className="btn btn-sm btn-o">
-                    Abrir no Maps
+                    {t("openMaps")}
                   </a>
                 )}
                 {(() => {
@@ -134,34 +138,39 @@ export function DayItems({ items, kitchenArea }: { items: DashBooking[]; kitchen
                   return p ? (
                     <>
                       <a href={`tel:${p.tel}`} className="btn btn-sm btn-o">
-                        Ligar
+                        {t("call")}
                       </a>
                       <a
                         href={whatsappLink(
                           p,
-                          `Olá${i.client?.name ? ` ${i.client.name.split(" ")[0]}` : ""}! Sou do Ao Lume, sobre a reserva ${i.ref}.`,
+                          td("contact.greeting", {
+                            hasName: i.client?.name ? "yes" : "no",
+                            name: i.client?.name ? i.client.name.split(" ")[0]! : "",
+                            hasRef: "yes",
+                            ref: i.ref,
+                          }),
                         )}
                         target="_blank"
                         rel="noopener"
                         className="btn btn-sm btn-o"
                       >
-                        WhatsApp
+                        {t("whatsapp")}
                       </a>
                     </>
                   ) : null;
                 })()}
                 <Link href={`/dashboard/pedidos/${i.id}`} className="btn btn-sm btn-o">
-                  Mensagem
+                  {t("message")}
                 </Link>
                 {i.status !== "completed" && (
                   <button type="button" className="btn btn-sm" onClick={() => toggle(i.id)}>
                     {isDone
-                      ? "Desfazer"
+                      ? t("undo")
                       : isPick
-                        ? "Marcar levantado"
+                        ? t("markPickedUp")
                         : i.fulfilment_mode === "delivery"
-                          ? "Marcar entregue"
-                          : "Marcar concluído"}
+                          ? t("markDelivered")
+                          : t("markDone")}
                   </button>
                 )}
               </div>

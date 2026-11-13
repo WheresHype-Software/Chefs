@@ -10,7 +10,7 @@ export type PhotoZone = { id: string; label: string; status: string; done: boole
  * marked. Long pages of photos read as one list without it; with it, what's missing is visible
  * from anywhere. Sits under the phone's top bar, and the three fit side by side at phone width.
  */
-export function PhotoZones({ zones, label = "Zonas das fotografias" }: { zones: PhotoZone[]; label?: string }) {
+export function PhotoZones({ zones, label }: { zones: PhotoZone[]; label: string }) {
   const [active, setActive] = useState(zones[0]?.id);
   // The zones come as a fresh array on every render; observe again only when the zones change.
   const ids = zones.map((z) => z.id).join(" ");

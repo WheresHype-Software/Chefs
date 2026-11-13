@@ -1,108 +1,77 @@
 import type { LumiTip } from "@/components/dashboard/LumiCoach";
+import type { Locale } from "@/lib/i18n/routing";
+import { getTranslator } from "@/lib/i18n/translator";
 
 /**
  * What Lumi says on the dashboard pages, one short tip per part of the page and no more: enough
  * to show how the page works the first time, not a manual. Each `target` is a `data-lumi` name on
- * that page. The onboarding steps have their own, in onboarding-tips.ts.
+ * that page. The onboarding steps have their own, in onboarding-tips.ts. The words live in
+ * messages/<locale>/dashboard.json under `tips`.
  */
 
-export function agendaTips(openDays: number): { tips: LumiTip[]; start: string } {
+const tr = (locale: Locale) => getTranslator(locale, "dashboard");
+
+export function agendaTips(openDays: number, locale: Locale): { tips: LumiTip[]; start: string } {
+  const t = tr(locale);
   return {
     start: openDays === 0 ? "semana" : "calendario",
     tips: [
       {
         target: "semana",
         mood: openDays === 0 ? "ola" : "dica",
-        title: "Os seus dias fixos",
-        text: "Escolha os dias da semana em que costuma cozinhar e guarde: ficam abertos todas as semanas, sem ter de voltar cá todos os meses.",
+        title: t("tips.agenda.weekly.title"),
+        text: t("tips.agenda.weekly.text"),
       },
       {
         target: "calendario",
         mood: "dica",
-        title: "Os seus dias abertos",
-        text: "Toque num dia para o abrir ou fechar, por exemplo numa folga ou num dia extra; fica guardado de imediato. Os clientes só podem pedir nos dias abertos.",
+        title: t("tips.agenda.calendar.title"),
+        text: t("tips.agenda.calendar.text"),
       },
     ],
   };
 }
 
-export function offerTips(activeOffers: number): { tips: LumiTip[]; start: string } {
+export function offerTips(activeOffers: number, locale: Locale): { tips: LumiTip[]; start: string } {
+  const t = tr(locale);
   return {
     start: "ofertas",
     tips: [
       activeOffers === 0
-        ? {
-            target: "ofertas",
-            mood: "ola",
-            title: "Crie a sua primeira oferta",
-            text: "Uma oferta é o que os clientes reservam: um menu, uma caixa ou uma encomenda. Comece por uma, com um título claro e o preço.",
-          }
-        : {
-            target: "ofertas",
-            mood: "dica",
-            title: "As suas ofertas",
-            text: "Pode ter várias, para ocasiões diferentes. Desmarque «Visível no perfil» nas que não pode fazer por agora.",
-          },
-      {
-        target: "oferta-titulo",
-        mood: "dica",
-        title: "Título e descrição",
-        text: "Um título que diga o que é, e na descrição os pratos e o que está incluído. É o que ajuda o cliente a decidir.",
-      },
-      {
-        target: "oferta-onde",
-        mood: "dica",
-        title: "Onde é servida",
-        text: "Em casa do cliente, entregue na morada dele ou levantada na sua cozinha. Cada oferta tem o seu modo.",
-      },
-      {
-        target: "oferta-preco",
-        mood: "dica",
-        title: "Como cobra",
-        text: "Por pessoa ou unidade, um valor fixo, ou sob orçamento quando cada pedido é diferente, por exemplo em eventos.",
-      },
-      {
-        target: "oferta-horas",
-        mood: "dica",
-        title: "Horas",
-        text: "Toque nas horas a que pode servir. Ao pedir, o cliente escolhe uma delas.",
-      },
+        ? { target: "ofertas", mood: "ola", title: t("tips.offers.first.title"), text: t("tips.offers.first.text") }
+        : { target: "ofertas", mood: "dica", title: t("tips.offers.list.title"), text: t("tips.offers.list.text") },
+      { target: "oferta-titulo", mood: "dica", title: t("tips.offers.title.title"), text: t("tips.offers.title.text") },
+      { target: "oferta-onde", mood: "dica", title: t("tips.offers.where.title"), text: t("tips.offers.where.text") },
+      { target: "oferta-preco", mood: "dica", title: t("tips.offers.price.title"), text: t("tips.offers.price.text") },
+      { target: "oferta-horas", mood: "dica", title: t("tips.offers.hours.title"), text: t("tips.offers.hours.text") },
       {
         target: "oferta-antecedencia",
         mood: "dica",
-        title: "Antecedência",
-        text: "Com quantas horas de aviso precisa de receber um pedido. Os clientes não conseguem pedir com menos tempo do que isso.",
+        title: t("tips.offers.leadTime.title"),
+        text: t("tips.offers.leadTime.text"),
       },
     ],
   };
 }
 
-export const COOKING_TIPS: LumiTip[] = [
-  {
-    target: "categorias",
-    mood: "dica",
-    title: "Categorias de cozinha",
-    text: "Escolha até cinco: é por elas que os clientes o encontram na pesquisa. Se a sua cozinha não estiver na lista, pode acrescentá-la.",
-  },
-  {
-    target: "servicos",
-    mood: "dica",
-    title: "Serviços que oferece",
-    text: "Ative apenas o que faz de facto. Os serviços aparecem no seu perfil e os clientes filtram a pesquisa por eles.",
-  },
-];
+export function cookingTips(locale: Locale): LumiTip[] {
+  const t = tr(locale);
+  return [
+    { target: "categorias", mood: "dica", title: t("tips.cooking.categories.title"), text: t("tips.cooking.categories.text") },
+    { target: "servicos", mood: "dica", title: t("tips.cooking.services.title"), text: t("tips.cooking.services.text") },
+  ];
+}
 
-export const PHOTO_TIPS: LumiTip[] = [
-  {
-    target: "retrato",
-    mood: "dica",
-    title: "A sua fotografia",
-    text: "Nítida, de frente e com boa luz. É a primeira coisa que um cliente vê antes de o receber em casa.",
-  },
-  {
-    target: "pratos",
-    mood: "dica",
-    title: "Os seus pratos",
-    text: "Escreva o que é cada prato e ordene-os: a primeira fotografia é a capa nos resultados de pesquisa.",
-  },
-];
+export function photoTips(locale: Locale): LumiTip[] {
+  const t = tr(locale);
+  return [
+    { target: "retrato", mood: "dica", title: t("tips.photos.portrait.title"), text: t("tips.photos.portrait.text") },
+    { target: "pratos", mood: "dica", title: t("tips.photos.dishes.title"), text: t("tips.photos.dishes.text") },
+  ];
+}
+
+/** On Pedidos, beside the first request still waiting for a price. */
+export function quoteTip(locale: Locale): LumiTip {
+  const t = tr(locale);
+  return { target: "orcamento", mood: "dica", title: t("tips.requests.quote.title"), text: t("tips.requests.quote.text") };
+}

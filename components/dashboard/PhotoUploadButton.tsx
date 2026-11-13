@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { UploadKind } from "@/hooks/usePhotoUpload";
 
 type Props = {
@@ -14,9 +15,10 @@ type Props = {
 
 /** File picker styled as a button; the label keeps it keyboard- and screen-reader-friendly. */
 export function PhotoUploadButton({ kind, label, busy, progress, onFiles, primary = false }: Props) {
+  const t = useTranslations("dashboard.photos");
   return (
     <label className={`btn btn-sm ${primary ? "" : "btn-o"} cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}>
-      {busy ? (progress && progress.total > 1 ? `A carregar ${progress.done} de ${progress.total}…` : "A carregar…") : label}
+      {busy ? (progress && progress.total > 1 ? t("uploadingN", { done: progress.done, total: progress.total }) : t("uploading")) : label}
       <input
         type="file"
         accept="image/*"

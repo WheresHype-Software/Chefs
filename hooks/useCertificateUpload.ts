@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/lib/i18n/navigation";
 import { useState } from "react";
 import { addCertificate } from "@/app/dashboard/actions/certificates";
@@ -16,30 +17,29 @@ const MAX_BYTES = 10 * 1024 * 1024;
  * "<user id>/" (only the chef and the team can open it), then a server action registers it.
  */
 export function useCertificateUpload(userId: string | null) {
+  const t = useTranslations("dashboard.title.upload");
   const router = useRouter();
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<FormMessageValue | null>(null);
 
   async function send(title: string, file: File | null): Promise<boolean> {
     setMessage(null);
-    if (!title.trim()) return fail("Indique o nome do certificado.");
-    if (!file) return fail("Escolha o ficheiro do certificado.");
+    if (!title.trim()) return fail(t("needName"));
+    if (!file) return fail(t("needFile"));
     const ext = TYPES[file.type];
-    if (!ext) return fail("Use um PDF, JPG ou PNG.");
-    if (file.size > MAX_BYTES) return fail("O ficheiro tem mais de 10 MB.");
+    if (!ext) return fail(t("fileType"));
+    if (file.size > MAX_BYTES) return fail(t("tooBig"));
     if (!userId || !hasSupabase) {
-      setMessage({ ok: true, text: "Modo de demonstração: o certificado não é guardado." });
+      setMessage({ ok: true, text: t("demo") });
       return true;
     }
     setSending(true);
     const path = `${userId}/cert-${crypto.randomUUID()}.${ext}`;
     const { error } = await createClient().storage.from("chef-docs").upload(path, file, { contentType: file.type });
-    const result = error
-      ? { ok: false as const, error: "Não foi possível enviar o ficheiro. Tente de novo." }
-      : await callAction(() => addCertificate(title, path));
+    const result = error ? { ok: false as const, error: t("failed") } : await callAction(() => addCertificate(title, path));
     setSending(false);
     if (!result.ok) return fail(result.error);
-    setMessage({ ok: true, text: "Certificado enviado. A equipa responde por email." });
+    setMessage({ ok: true, text: t("sent") });
     router.refresh();
     return true;
   }
