@@ -1,1 +1,34 @@
-{}
+{
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "continue": "Continue",
+    "send": "Send",
+    "sending": "Sending…",
+    "edit": "Edit",
+    "delete": "Delete",
+    "remove": "Remove",
+    "add": "Add",
+    "retry": "Try again",
+    "copy": "Copy",
+    "copied": "Copied",
+    "seeMore": "See more",
+    "seeAll": "See all",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "states": {
+    "loading": "Loading…",
+    "required": "required",
+    "optional": "optional",
+    "new": "New"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again in a moment.",
+    "network": "No connection. Check your internet and try again."
+  }
+}

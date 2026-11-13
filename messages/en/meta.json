@@ -3,5 +3,9 @@
     "title": "Ao Lume · private chefs and home cooking near you",
     "template": "%s · Ao Lume",
     "description": "Find private chefs and home cooks near you in Portugal: dinners at home, weekly meal prep, pastries, delivery and events. Request without an account and pay only once the chef accepts."
+  },
+  "crumbs": {
+    "chefsIn": "Chefs in {city}",
+    "chefsInPortugal": "Chefs in Portugal"
   }
 }

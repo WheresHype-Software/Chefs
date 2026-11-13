@@ -1,7 +1,7 @@
 "use client";
 
-import { Link } from "@/lib/i18n/navigation";
-import { usePathname } from "@/lib/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/lib/i18n/navigation";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 
 export type MenuLink = { href: string; label: string; badge?: number };
@@ -27,6 +27,7 @@ export function MobileMenu({ links, brand, actions, alert = false }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const path = usePathname();
+  const t = useTranslations("nav.menu");
 
   // Navigating away closes the menu.
   useEffect(() => {
@@ -52,7 +53,7 @@ export function MobileMenu({ links, brand, actions, alert = false }: Props) {
         aria-expanded={open}
         className="relative -mr-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-ink hover:bg-paper md:hidden"
       >
-        <span className="sr-only">Abrir menu</span>
+        <span className="sr-only">{t("open")}</span>
         <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
           <path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
@@ -75,7 +76,7 @@ export function MobileMenu({ links, brand, actions, alert = false }: Props) {
               onClick={() => dialog.current?.close()}
               className="-mr-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-ink hover:bg-paper"
             >
-              <span className="sr-only">Fechar menu</span>
+              <span className="sr-only">{t("close")}</span>
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>

@@ -5,7 +5,8 @@ import type { Crumb } from "@/components/seo/Breadcrumbs";
 import { DEFAULT_LOCALE, LOCALE_TAG, LOCALES, localizePath, type Locale } from "./i18n/routing";
 import { nearestCity } from "./cities";
 import { siteUrl } from "./env";
-import { fromPrice, titledName } from "./format";
+import { fromPriceLabel, titledName } from "./format";
+import { getTranslator } from "./i18n/translator";
 import type { ChefCard, ChefProfile } from "./types";
 
 const SITE_NAME = "Ao Lume";
@@ -38,32 +39,33 @@ export function siteJsonLd(locale: Locale = DEFAULT_LOCALE) {
   ];
 }
 
-export function breadcrumbJsonLd(items: Crumb[]) {
+/** Crumb hrefs are unprefixed ("/chef/x"); the JSON-LD gets the full URL in the page's language. */
+export function breadcrumbJsonLd(items: Crumb[], locale: Locale = DEFAULT_LOCALE) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: items.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: siteUrl(c.href) })),
+    itemListElement: items.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: siteUrl(localizePath(c.href, locale)) })),
   };
 }
 
 /** Ao Lume › Chefs em <nearest city> (or Portugal) › Chef <name>. */
-export function chefBreadcrumbs(chef: ChefCard): Crumb[] {
+export function chefBreadcrumbs(chef: ChefCard, locale: Locale = DEFAULT_LOCALE): Crumb[] {
+  const t = getTranslator(locale, "meta.crumbs");
   const city = nearestCity(chef);
   return [
     { name: SITE_NAME, href: "/" },
-    city ? { name: `Chefs em ${city.name}`, href: `/chefs/${city.slug}` } : { name: "Chefs em Portugal", href: "/procurar" },
-    { name: titledName(chef), href: `/chef/${chef.slug}` },
+    city ? { name: t("chefsIn", { city: city.name }), href: `/chefs/${city.slug}` } : { name: t("chefsInPortugal"), href: "/procurar" },
+    { name: titledName(chef, locale), href: `/chef/${chef.slug}` },
   ];
 }
 
-export function chefJsonLd(chef: ChefProfile) {
-  const url = siteUrl(`/chef/${chef.slug}`);
-  const price = fromPrice(chef.offers);
+export function chefJsonLd(chef: ChefProfile, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(`/chef/${chef.slug}`, locale));
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "@id": url,
-    name: titledName(chef),
+    name: titledName(chef, locale),
     url,
     description: chef.bio ?? chef.headline ?? undefined,
     image: [chef.portrait, chef.cover, ...chef.gallery.map((g) => g.url)].filter(Boolean).slice(0, 6),
@@ -73,7 +75,7 @@ export function chefJsonLd(chef: ChefProfile) {
       geoMidpoint: { "@type": "GeoCoordinates", latitude: chef.lat, longitude: chef.lng },
       geoRadius: Number(chef.radiusKm) * 1000,
     },
-    priceRange: price === "orçamento" ? "Sob orçamento" : `Desde ${price}`,
+    priceRange: fromPriceLabel(chef.offers, locale),
     knowsLanguage: chef.languages.length ? chef.languages : ["pt"],
     makesOffer: chef.offers.map((o) => ({
       "@type": "Offer",
@@ -104,10 +106,10 @@ export function chefJsonLd(chef: ChefProfile) {
 }
 
 /** A city page's chefs, in order, for search engines. */
-export function chefListJsonLd(chefs: ChefCard[]) {
+export function chefListJsonLd(chefs: ChefCard[], locale: Locale = DEFAULT_LOCALE) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: chefs.map((c, i) => ({ "@type": "ListItem", position: i + 1, url: siteUrl(`/chef/${c.slug}`), name: titledName(c) })),
+    itemListElement: chefs.map((c, i) => ({ "@type": "ListItem", position: i + 1, url: siteUrl(localizePath(`/chef/${c.slug}`, locale)), name: titledName(c, locale) })),
   };
 }

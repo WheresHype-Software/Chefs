@@ -3,5 +3,9 @@
     "title": "Ao Lume · chefs privados e comida caseira perto de si",
     "template": "%s · Ao Lume",
     "description": "Encontre chefs privados e cozinheiros caseiros perto de si: jantares em casa, marmitas da semana, pastelaria, entregas e eventos. Peça sem criar conta e pague só depois de o chef aceitar."
+  },
+  "crumbs": {
+    "chefsIn": "Chefs em {city}",
+    "chefsInPortugal": "Chefs em Portugal"
   }
 }

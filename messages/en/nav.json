@@ -1,1 +1,42 @@
-{}
+{
+  "main": "Main",
+  "homeLabel": "Ao Lume, home page",
+  "forChefs": "for chefs",
+  "createProfile": "Create profile",
+  "signIn": "Sign in",
+  "createChefProfile": "Create a chef profile",
+  "imClient": "I'm a client",
+  "imChef": "I'm a chef",
+  "links": {
+    "search": "Find chefs",
+    "howItWorks": "How it works",
+    "trackRequest": "Track a request",
+    "tool": "Tools",
+    "marketing": "Marketing",
+    "faq": "FAQ"
+  },
+  "language": {
+    "label": "Language",
+    "switchTo": "Switch to {language}"
+  },
+  "footer": {
+    "tagline": "We bring together people who love good food and people who know how to cook. The rest happens at your table.",
+    "forClients": "For clients",
+    "clients": "Clients",
+    "search": "Find chefs",
+    "howItWorks": "How it works",
+    "trackRequest": "Track a request",
+    "signIn": "Sign in",
+    "support": "Help",
+    "forChefs": "For chefs",
+    "chefs": "Chefs",
+    "aoLumeForChefs": "Ao Lume for chefs",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "complaintsBook": "Complaints Book (Livro de Reclamações)"
+  },
+  "menu": {
+    "open": "Open menu",
+    "close": "Close menu"
+  }
+}

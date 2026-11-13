@@ -1,1 +1,20 @@
-{}
+{
+  "tier": { "professional": "Diz ser chef profissional", "home": "Cozinha em casa" },
+  "title": { "chef": "Chef", "cook": "Cozinheiro", "cookFemale": "Cozinheira" },
+  "service": { "home": "Chef em casa", "delivery": "Entrega", "pickup": "Levantamento", "events": "Eventos", "meal_prep": "Marmitas" },
+  "mode": { "home": "Em sua casa", "delivery": "Entrega", "pickup": "Levantamento" },
+  "status": {
+    "requested": "Pedido enviado",
+    "accepted": "Aceite pelo chef",
+    "change_proposed": "Alteração proposta",
+    "declined": "Recusado",
+    "confirmed": "Confirmado",
+    "completed": "Concluído",
+    "cancelled": "Cancelado",
+    "expired": "Expirado"
+  },
+  "price": { "quote": "Sob orçamento", "quoteShort": "orçamento", "from": "Desde {price}", "per": "{price} / {unit}" },
+  "rating": { "new": "Novo" },
+  "units": { "people": "Pessoas", "meals": "Refeições", "units": "Unidades" },
+  "unit": { "pessoa": "pessoa", "pessoas": "pessoas", "refeição": "refeição", "refeições": "refeições", "pack": "pack", "unidade": "unidade", "unidades": "unidades", "evento": "evento", "dúzia": "dúzia", "bolo": "bolo", "kg": "kg", "caixa": "caixa" }
+}

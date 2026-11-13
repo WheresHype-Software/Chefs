@@ -1,1 +1,34 @@
-{}
+{
+  "actions": {
+    "save": "Guardar",
+    "saving": "A guardar…",
+    "saved": "Guardado",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "send": "Enviar",
+    "sending": "A enviar…",
+    "edit": "Editar",
+    "delete": "Apagar",
+    "remove": "Remover",
+    "add": "Adicionar",
+    "retry": "Tentar de novo",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "seeMore": "Ver mais",
+    "seeAll": "Ver tudo",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "states": {
+    "loading": "A carregar…",
+    "required": "obrigatório",
+    "optional": "opcional",
+    "new": "Novo"
+  },
+  "errors": {
+    "generic": "Algo correu mal. Tente de novo dentro de momentos.",
+    "network": "Sem ligação. Verifique a internet e tente de novo."
+  }
+}
