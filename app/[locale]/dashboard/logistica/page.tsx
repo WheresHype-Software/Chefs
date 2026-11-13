@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { DayItems } from "@/components/dashboard/DayItems";
@@ -5,9 +6,11 @@ import { LogisticsSettings } from "@/components/dashboard/LogisticsSettings";
 import { getBookings, getLogistics, requireChef } from "@/lib/dashboard";
 import { isoDay, longDay, parseDay } from "@/lib/format";
 
-const WD = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-
 export default async function Logistica({ searchParams }: PageProps<"/[locale]/dashboard/logistica">) {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.logistics");
+  const wd = await getTranslations("dashboard.weekdays");
+  const WD = [wd("sun"), wd("mon"), wd("tue"), wd("wed"), wd("thu"), wd("fri"), wd("sat")];
   const { dia } = await searchParams;
   const chef = await requireChef();
   const today = isoDay(new Date());
@@ -27,26 +30,26 @@ export default async function Logistica({ searchParams }: PageProps<"/[locale]/d
     getLogistics(),
   ]);
   const items = bookings.filter((b) => b.date === selected).sort((a, b) => (a.time_label ?? "").localeCompare(b.time_label ?? ""));
-  const count = (t: string) => items.filter((i) => i.fulfilment_mode === t).length;
+  const count = (type: string) => items.filter((i) => i.fulfilment_mode === type).length;
   const km = items.reduce((a, i) => a + Number(i.distance_km ?? 0), 0);
   const parts = [
-    count("pickup") && `${count("pickup")} ${count("pickup") > 1 ? "levantamentos" : "levantamento"}`,
-    count("delivery") && `${count("delivery")} ${count("delivery") > 1 ? "entregas" : "entrega"}`,
-    count("home") && `${count("home")} em casa do cliente`,
+    count("pickup") && t("pickups", { count: count("pickup") }),
+    count("delivery") && t("deliveries", { count: count("delivery") }),
+    count("home") && t("atHome", { count: count("home") }),
   ].filter(Boolean);
 
   return (
     <div className="flex flex-col gap-[26px]">
-      <PageHeader title="Deslocações, entregas e levantamentos" />
+      <PageHeader title={t("title")} />
 
-      <nav aria-label="Semana" className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
+      <nav aria-label={t("weekLabel")} className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
         {week.map((d) => {
           const n = bookings.filter((b) => b.date === d).length;
           return (
             <Link key={d} href={`?dia=${d}`} className="week-day" aria-current={d === selected ? "date" : undefined} scroll={false}>
               <span className="lab opacity-75">{WD[parseDay(d).getDay()]}</span>
               <span className="d text-[22px] leading-[1.1]">{parseDay(d).getDate()}</span>
-              <span className="text-[11px] opacity-75">{n ? `${n} ${n > 1 ? "serviços" : "serviço"}` : "livre"}</span>
+              <span className="text-[11px] opacity-75">{t("dayCount", { count: n })}</span>
             </Link>
           );
         })}
@@ -55,9 +58,11 @@ export default async function Logistica({ searchParams }: PageProps<"/[locale]/d
       <div className="flex flex-wrap items-start gap-6">
         <section className="flex min-w-0 flex-[3_1_480px] flex-col gap-3.5">
           <div className="box flex flex-wrap items-baseline gap-x-7 gap-y-2.5 px-5 py-[18px]">
-            <span className="d text-2xl">{longDay(selected)}</span>
+            <span className="d text-2xl">{longDay(selected, locale)}</span>
             <span className="num text-sm text-muted">
-              {items.length ? parts.join(" · ") + (km ? ` · ${km.toFixed(1).replace(".", ",")} km a conduzir` : "") : "Sem serviços"}
+              {items.length
+                ? parts.join(" · ") + (km ? ` · ${t("kmToDrive", { km: km.toFixed(1).replace(".", locale === "pt" ? "," : ".") })}` : "")
+                : t("noServices")}
             </span>
           </div>
           <DayItems key={selected} items={items} kitchenArea={chef.area_name ?? ""} />

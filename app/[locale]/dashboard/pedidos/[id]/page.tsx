@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { DetailList, type DetailRow } from "@/components/ui/DetailList";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,9 +11,12 @@ import { ReviewReply } from "@/components/dashboard/ReviewReply";
 import { RequestActions } from "@/components/dashboard/RequestActions";
 import { getBookingView } from "@/lib/bookings";
 import { getBooking, quoteMinimum } from "@/lib/dashboard";
-import { dayLabel, MODE_LABEL, STATUS_LABEL } from "@/lib/format";
+import { dayLabel, modeLabel, statusLabel } from "@/lib/format";
 
 export default async function PedidoDetalhe({ params }: PageProps<"/[locale]/dashboard/pedidos/[id]">) {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.request");
+  const td = await getTranslations("dashboard");
   const { id } = await params;
   const b = await getBooking(id);
   if (!b) notFound();
@@ -20,19 +24,19 @@ export default async function PedidoDetalhe({ params }: PageProps<"/[locale]/das
   const needsPrice = b.estimate == null && b.quoted_price == null;
   const isPickup = b.fulfilment_mode === "pickup";
   const details: (DetailRow | false)[] = [
-    ["Serviço", `${b.offer_title} · ${MODE_LABEL[b.fulfilment_mode]}`],
-    ["Data", `${dayLabel(b.date)}${b.time_label ? ` · ${b.time_label}` : ""}`],
-    ["Pessoas / unidades", String(b.guests)],
-    isPickup ? ["Código de levantamento", b.pickup_code ?? "Gerado ao aceitar"] : ["Morada", b.address ?? "—"],
-    !!b.distance_km && ["Distância", `${String(b.distance_km).replace(".", ",")} km`],
+    [t("service"), `${b.offer_title} · ${modeLabel(b.fulfilment_mode, locale)}`],
+    [t("date"), `${dayLabel(b.date, locale)}${b.time_label ? ` · ${b.time_label}` : ""}`],
+    [t("guests"), String(b.guests)],
+    isPickup ? [t("pickupCode"), b.pickup_code ?? t("pickupCodePending")] : [t("address"), b.address ?? "—"],
+    !!b.distance_km && [t("distance"), t("km", { km: String(b.distance_km).replace(".", locale === "pt" ? "," : ".") })],
   ];
 
   return (
     <div className="flex flex-col gap-6">
       <Link href="/dashboard/pedidos" className="text-sm">
-        ← Pedidos
+        {t("back")}
       </Link>
-      <PageHeader meta={`${b.ref} · ${STATUS_LABEL[b.status]}`} title={b.client?.name ?? "Cliente"} />
+      <PageHeader meta={`${b.ref} · ${statusLabel(b.status, locale)}`} title={b.client?.name ?? td("client")} />
       <div className="flex flex-wrap items-start gap-6">
         <section className="box flex min-w-0 flex-[1_1_320px] flex-col gap-4 p-6">
           <DetailList items={details} />
@@ -51,10 +55,10 @@ export default async function PedidoDetalhe({ params }: PageProps<"/[locale]/das
         <div className="flex min-w-0 flex-[2_1_480px] flex-col gap-6">
           <BookingMoney booking={b} />
           {view?.review && (
-            <BookingReview review={view.review} title="Avaliação do cliente" replySlot={<ReviewReply id={view.review.id} />} />
+            <BookingReview review={view.review} title={t("clientReview")} replySlot={<ReviewReply id={view.review.id} />} />
           )}
           {view && (
-            <BookingChat key={b.id} view={{ ...view, viewer: "chef" }} title={b.client?.name ?? "Cliente"} subtitle={b.client?.email} />
+            <BookingChat key={b.id} view={{ ...view, viewer: "chef" }} title={b.client?.name ?? td("client")} subtitle={b.client?.email} />
           )}
         </div>
       </div>

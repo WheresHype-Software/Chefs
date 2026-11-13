@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { LegalAcceptanceCard } from "@/components/dashboard/LegalAcceptanceCard";
@@ -13,7 +14,6 @@ import { onboardingTips } from "@/lib/onboarding-tips";
 import { requiredDepositPercent } from "@/lib/money";
 import { getSettings, moneyRules } from "@/lib/settings";
 
-const STEPS = ["Criar perfil", "Verificação", "Enviar para revisão"] as const;
 const href = (step: number) => `/dashboard/comecar?passo=${step}`;
 
 /**
@@ -25,6 +25,9 @@ const href = (step: number) => `/dashboard/comecar?passo=${step}`;
  * sent. Offers and open days come after, from the first-steps list on the overview.
  */
 export default async function Comecar({ searchParams }: PageProps<"/[locale]/dashboard/comecar">) {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.onboarding");
+  const STEPS = [t("steps.profile"), t("steps.verification"), t("steps.review")] as const;
   const session = await getSession();
   const chef = await getMyChef();
   if (chef && chef.status !== "draft" && chef.status !== "rejected") return redirectLocalized("/dashboard");
@@ -46,22 +49,25 @@ export default async function Comecar({ searchParams }: PageProps<"/[locale]/das
   const toAccept = [...(legal.terms ? [] : ["terms" as const]), ...(legal.contract ? [] : ["chef_contract" as const])];
 
   const reviewItems = [
-    { label: "Termos e contrato aceites", done: toAccept.length === 0, href: href(3) },
-    { label: "Instagram ou site", done: social, href: href(1) },
-    { label: "Fotografia de perfil", done: count("portrait") > 0, href: href(2) },
-    { label: "Selfie de verificação", done: count("selfie") > 0, href: href(2) },
-    { label: `Fotos de pratos (${Math.min(count("gallery"), 3)}/3)`, done: count("gallery") >= 3, href: href(2) },
+    { label: t("items.terms"), done: toAccept.length === 0, href: href(3) },
+    { label: t("items.social"), done: social, href: href(1) },
+    { label: t("items.portrait"), done: count("portrait") > 0, href: href(2) },
+    { label: t("items.selfie"), done: count("selfie") > 0, href: href(2) },
+    { label: t("items.dishes", { count: Math.min(count("gallery"), 3) }), done: count("gallery") >= 3, href: href(2) },
   ];
-  const lumi = onboardingTips({
-    step,
-    rejected: chef?.status === "rejected",
-    hasProfile: Boolean(chef),
-    social,
-    portrait: count("portrait") > 0,
-    selfie: count("selfie") > 0,
-    dishes: count("gallery"),
-    ready: reviewItems.every((i) => i.done),
-  });
+  const lumi = onboardingTips(
+    {
+      step,
+      rejected: chef?.status === "rejected",
+      hasProfile: Boolean(chef),
+      social,
+      portrait: count("portrait") > 0,
+      selfie: count("selfie") > 0,
+      dishes: count("gallery"),
+      ready: reviewItems.every((i) => i.done),
+    },
+    locale,
+  );
 
   const settings = await getSettings();
   const minDeposit = settings.paymentsEnabled ? requiredDepositPercent(moneyRules(settings)) : 0;
@@ -69,11 +75,11 @@ export default async function Comecar({ searchParams }: PageProps<"/[locale]/das
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={chef?.status === "rejected" ? "Reveja o seu perfil" : "Crie o seu perfil de chef"}
-        description="Três passos, uns dez minutos. Pode parar quando quiser: o que guardar fica guardado e volta aqui quando entrar."
+        title={chef?.status === "rejected" ? t("titleRejected") : t("title")}
+        description={t("description")}
       />
 
-      <nav aria-label="Passos">
+      <nav aria-label={t("stepsLabel")}>
         <ol className="m-0 grid list-none grid-cols-3 gap-2 p-0">
           {STEPS.map((label, i) => {
             const n = i + 1;
@@ -120,23 +126,24 @@ export default async function Comecar({ searchParams }: PageProps<"/[locale]/das
               <div data-lumi="continuar" className="box flex flex-wrap items-center justify-between gap-4 p-5">
                 <span className="text-sm text-muted">
                   {photosDone
-                    ? "Fotografias prontas."
-                    : `Falta: ${[
-                        count("portrait") === 0 && "fotografia de perfil",
-                        count("selfie") === 0 && "selfie de verificação",
-                        count("gallery") < 3 &&
-                          `${3 - count("gallery")} ${3 - count("gallery") === 1 ? "foto de prato" : "fotos de pratos"}`,
-                      ]
-                        .filter(Boolean)
-                        .join(", ")}.`}
+                    ? t("photosReady")
+                    : t("missing", {
+                        items: [
+                          count("portrait") === 0 && t("missingPortrait"),
+                          count("selfie") === 0 && t("missingSelfie"),
+                          count("gallery") < 3 && t("missingDishes", { count: 3 - count("gallery") }),
+                        ]
+                          .filter(Boolean)
+                          .join(", "),
+                      })}
                 </span>
                 {photosDone ? (
                   <Link href={href(3)} className="btn no-underline">
-                    Continuar
+                    {t("continue")}
                   </Link>
                 ) : (
                   <span className="btn opacity-50" aria-disabled="true">
-                    Continuar
+                    {t("continue")}
                   </span>
                 )}
               </div>
@@ -148,11 +155,7 @@ export default async function Comecar({ searchParams }: PageProps<"/[locale]/das
               <LumiSlot name="enviar" />
               {toAccept.length > 0 && (
                 <div className="max-w-[640px]">
-                  <LegalAcceptanceCard
-                    kinds={toAccept}
-                    context="onboarding"
-                    intro="Antes de o perfil seguir para revisão, precisamos da sua aceitação. O contrato diz, entre outras coisas, que o serviço, a segurança alimentar e as licenças são da sua responsabilidade."
-                  />
+                  <LegalAcceptanceCard kinds={toAccept} context="onboarding" intro={t("legalIntro")} />
                 </div>
               )}
               <OnboardingSubmit notes={chef.status === "rejected" ? chef.verification_notes : null} items={reviewItems} />

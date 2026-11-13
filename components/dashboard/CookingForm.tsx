@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useTransition } from "react";
 import { addCuisine, saveCooking } from "@/app/dashboard/actions/cooking";
 import { LumiSlot } from "@/components/dashboard/LumiCoach";
@@ -9,16 +10,11 @@ import { Switch } from "@/components/ui/Switch";
 import { useServerAction } from "@/hooks/useServerAction";
 import { useToggleList } from "@/hooks/useToggleList";
 import { MAX_CATEGORIES } from "@/lib/constants";
-import { SERVICE_LABEL } from "@/lib/format";
+import { serviceLabel } from "@/lib/format";
+import { type Locale } from "@/lib/i18n/routing";
 import type { ServiceType } from "@/lib/types";
 
-const SERVICES: [ServiceType, string][] = [
-  ["home", "Cozinha e serve em casa do cliente"],
-  ["delivery", "Leva os pratos à morada do cliente"],
-  ["pickup", "O cliente recolhe na sua cozinha"],
-  ["events", "Grupos grandes, sob orçamento"],
-  ["meal_prep", "Refeições para a semana"],
-];
+const SERVICE_KEYS: ServiceType[] = ["home", "delivery", "pickup", "events", "meal_prep"];
 
 type Option = { id: number; name: string };
 
@@ -30,6 +26,9 @@ type Props = {
 };
 
 export function CookingForm({ categories: initialCategories, diets, mine, preview }: Props) {
+  const t = useTranslations("dashboard.cooking");
+  const locale = useLocale() as Locale;
+  const SERVICES: [ServiceType, string][] = SERVICE_KEYS.map((k) => [k, t(`services.${k}`)]);
   const [categories, setCategories] = useState(initialCategories);
   const [draft, setDraft] = useState("");
   const [adding, startAdding] = useTransition();
@@ -37,12 +36,12 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
   const cats = useToggleList(mine.categories, MAX_CATEGORIES);
   const chosenDiets = useToggleList(mine.diets);
   const services = useToggleList(mine.services);
-  const { run, pending, message } = useServerAction(saveCooking, { successMessage: "Guardado." });
+  const { run, pending, message } = useServerAction(saveCooking, { successMessage: t("saved") });
   const catLine =
     cats.items
       .map((id) => categories.find((c) => c.id === id)?.name)
       .filter(Boolean)
-      .join(" · ") || "Sem categoria";
+      .join(" · ") || t("noCategory");
 
   return (
     <div className="flex flex-wrap items-start gap-6">
@@ -50,12 +49,10 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
         <LumiSlot name="categorias" />
         <section data-lumi="categorias" className="box flex flex-col gap-3.5 p-6">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="d m-0 text-2xl font-normal">Categorias de cozinha</h2>
-            <span className="lab text-muted">
-              {cats.items.length} de {MAX_CATEGORIES}
-            </span>
+            <h2 className="d m-0 text-2xl font-normal">{t("categoriesTitle")}</h2>
+            <span className="lab text-muted">{t("categoriesCount", { count: cats.items.length, max: MAX_CATEGORIES })}</span>
           </div>
-          <span className="text-sm text-muted">Escolha até {MAX_CATEGORIES}. Os clientes filtram a pesquisa por estas categorias.</span>
+          <span className="text-sm text-muted">{t("chooseUpTo", { max: MAX_CATEGORIES })}</span>
           <div className="flex flex-wrap gap-1.5">
             {categories.map((c) => (
               <Chip key={c.id} pressed={cats.has(c.id)} disabled={!cats.has(c.id) && !cats.canAdd} onClick={() => cats.toggle(c.id)}>
@@ -80,7 +77,7 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
             }}
           >
             <label htmlFor="outra-cozinha" className="text-sm font-semibold">
-              A sua cozinha não está na lista?
+              {t("notListed")}
             </label>
             <div className="flex flex-wrap gap-2">
               <input
@@ -88,11 +85,11 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
                 value={draft}
                 maxLength={40}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="Por exemplo: Açoriana"
+                placeholder={t("addPlaceholder")}
                 className="min-w-0 flex-[1_1_200px]"
               />
               <button type="submit" className="btn btn-o btn-sm" disabled={adding || draft.trim().length < 3}>
-                {adding ? "A acrescentar…" : "Acrescentar"}
+                {adding ? t("adding") : t("add")}
               </button>
             </div>
             {addError ? (
@@ -100,27 +97,27 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
                 {addError}
               </span>
             ) : (
-              <span className="hint">Fica escolhida de imediato, se ainda não tiver cinco. Depois, guarde as alterações.</span>
+              <span className="hint">{t("addHint")}</span>
             )}
           </form>
         </section>
 
         <LumiSlot name="servicos" />
         <section data-lumi="servicos" className="box flex flex-col gap-1 p-6">
-          <h2 className="d mb-2 mt-0 text-2xl font-normal">Serviços que oferece</h2>
+          <h2 className="d mb-2 mt-0 text-2xl font-normal">{t("servicesTitle")}</h2>
           {SERVICES.map(([key, description]) => (
             <div key={key} className="flex items-center justify-between gap-4 border-t border-line py-3.5">
               <span className="flex flex-col">
-                <strong className="font-semibold">{SERVICE_LABEL[key]}</strong>
+                <strong className="font-semibold">{serviceLabel(key, locale)}</strong>
                 <span className="text-[13px] text-muted">{description}</span>
               </span>
-              <Switch checked={services.has(key)} label={SERVICE_LABEL[key]} onChange={() => services.toggle(key)} />
+              <Switch checked={services.has(key)} label={serviceLabel(key, locale)} onChange={() => services.toggle(key)} />
             </div>
           ))}
         </section>
 
         <section className="box flex flex-col gap-3.5 p-6">
-          <h2 className="d m-0 text-2xl font-normal">Dietas que consegue fazer</h2>
+          <h2 className="d m-0 text-2xl font-normal">{t("diets")}</h2>
           <div className="flex flex-wrap gap-1.5">
             {diets.map((d) => (
               <Chip key={d.id} pressed={chosenDiets.has(d.id)} onClick={() => chosenDiets.toggle(d.id)}>
@@ -132,7 +129,7 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
       </div>
 
       <aside className="flex min-w-0 flex-[2_1_300px] flex-col gap-3.5">
-        <span className="lab text-muted">Como aparece na pesquisa</span>
+        <span className="lab text-muted">{t("preview")}</span>
         <div className="box flex gap-3.5 p-2.5">
           <span className="h-[150px] flex-[0_0_88px] rounded-[2px] bg-cobalt-soft" aria-hidden="true" />
           <span className="flex min-w-0 flex-col gap-[3px] py-1 pr-1">
@@ -141,15 +138,15 @@ export function CookingForm({ categories: initialCategories, diets, mine, previe
             <span className="text-[13px] text-muted">
               {catLine} · {preview.area}
             </span>
-            <span className="text-[13px] text-muted">{services.items.map((s) => SERVICE_LABEL[s]).join(" · ")}</span>
+            <span className="text-[13px] text-muted">{services.items.map((s) => serviceLabel(s, locale)).join(" · ")}</span>
             <span className="mt-auto text-[13px]">
-              <strong className="font-semibold">{preview.rating}</strong> · desde {preview.from}
+              {t.rich("previewPrice", { rating: preview.rating, from: preview.from, strong: (c) => <strong className="font-semibold">{c}</strong> })}
             </span>
           </span>
         </div>
-        <span className="text-[13px] text-muted">As alterações aparecem na pesquisa assim que guardar.</span>
+        <span className="text-[13px] text-muted">{t("previewNote")}</span>
         <button type="button" className="btn" disabled={pending} onClick={() => run(cats.items, chosenDiets.items, services.items)}>
-          Guardar alterações
+          {t("save")}
         </button>
         <FormMessage message={message} />
       </aside>

@@ -1,9 +1,12 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { acceptAgreement } from "@/app/dashboard/actions/billing";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { reflow } from "@/lib/acceptance-format";
+import { euro } from "@/lib/format";
+import { type Locale } from "@/lib/i18n/routing";
 import { useServerAction } from "@/hooks/useServerAction";
 
 type Props = {
@@ -21,23 +24,22 @@ type Props = {
  * a link — and the checkbox is never pre-ticked.
  */
 export function AgreementCard({ text, version, acceptedVersion, highlights, commissionPercent, commissionMin }: Props) {
+  const t = useTranslations("dashboard.billing.agreement");
+  const locale = useLocale() as Locale;
   const [checked, setChecked] = useState(false);
   const { run, pending, message } = useServerAction(acceptAgreement, {
-    successMessage: "Contrato aceite. Enviámos-lhe uma cópia por email.",
+    successMessage: t("accepted"),
   });
   const accepted = acceptedVersion != null && acceptedVersion >= version;
   const outdated = acceptedVersion != null && acceptedVersion < version;
-  const pct = String(commissionPercent).replace(".", ",");
-  const min = String(commissionMin).replace(".", ",");
+  const pct = String(commissionPercent).replace(".", locale === "pt" ? "," : ".");
+  const min = euro(commissionMin, locale);
 
   return (
     <section className="box flex flex-col gap-4 p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 className="d m-0 text-2xl font-normal">Contrato</h2>
-        <span className="lab text-muted">
-          versão {version}
-          {accepted && " · aceite"}
-        </span>
+        <h2 className="d m-0 text-2xl font-normal">{t("title")}</h2>
+        <span className="lab text-muted">{accepted ? t("versionAccepted", { version }) : t("version", { version })}</span>
       </div>
 
       <ul className="m-0 flex list-none flex-col gap-2 p-0 text-sm">
@@ -54,21 +56,15 @@ export function AgreementCard({ text, version, acceptedVersion, highlights, comm
             ·
           </span>
           <span>
-            Comissão em vigor: <strong className="num">{pct}%</strong> do valor da reserva, com um mínimo de{" "}
-            <strong className="num">{min} €</strong>, descontada ao sinal. Transferimos-lhe o restante depois do serviço concluído.
+            {t.rich("commission", { percent: pct, min, strong: (c) => <strong className="num">{c}</strong> })}
           </span>
         </li>
       </ul>
 
-      {outdated && (
-        <p className="m-0 border-l-2 border-line-2 pl-3 text-sm">
-          O contrato mudou desde que o aceitou (tinha a versão {acceptedVersion}). Leia e aceite a nova versão para continuarmos a
-          pagar-lhe.
-        </p>
-      )}
+      {outdated && <p className="m-0 border-l-2 border-line-2 pl-3 text-sm">{t("outdated", { version: acceptedVersion })}</p>}
 
       <details className="border-t border-line pt-4">
-        <summary className="lab cursor-pointer text-muted">Ler o contrato completo</summary>
+        <summary className="lab cursor-pointer text-muted">{t("readFull")}</summary>
         <pre className="m-0 mt-3 max-h-[380px] overflow-auto whitespace-pre-wrap font-sans text-sm leading-relaxed text-ink-3">
           {reflow(text)}
         </pre>
@@ -85,11 +81,11 @@ export function AgreementCard({ text, version, acceptedVersion, highlights, comm
           <label className="flex cursor-pointer items-start gap-2.5 text-sm">
             <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="mt-1" />
             {/* Word for word what lib/acceptance.ts stores as the consent for the contract. */}
-            <span>Li e aceito o Contrato de intermediação de pagamentos.</span>
+            <span>{t("consent")}</span>
           </label>
           <div className="flex flex-wrap items-center gap-4">
             <button className="btn" disabled={pending || !checked}>
-              {pending ? "A registar…" : "Aceitar contrato"}
+              {pending ? t("registering") : t("accept")}
             </button>
             <FormMessage message={message} />
           </div>

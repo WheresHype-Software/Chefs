@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { ChefTitleCard } from "@/components/dashboard/ChefTitleCard";
 import { CookingForm } from "@/components/dashboard/CookingForm";
 import { LumiCoach } from "@/components/dashboard/LumiCoach";
@@ -9,11 +10,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { getCooking, getMyCertificates, getMyChef, getMyTitleStatements, getMyPhotos, getOffers, getSession, lumiOn } from "@/lib/dashboard";
 import { chefTitle, euro, initials, rating } from "@/lib/format";
-import { COOKING_TIPS, PHOTO_TIPS } from "@/lib/lumi-tips";
+import { cookingTips, photoTips } from "@/lib/lumi-tips";
 import { requiredDepositPercent } from "@/lib/money";
 import { getSettings, moneyRules } from "@/lib/settings";
 
 export default async function Perfil() {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.profile");
+  const te = await getTranslations("enums");
   const session = await getSession();
   const chef = await getMyChef();
   // Creating the profile happens in the guided flow, which goes on to the photos and the review.
@@ -32,32 +36,32 @@ export default async function Perfil() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={chef ? "O seu perfil" : "Crie o seu perfil de chef"}
-        description={!chef && "Comece pelo essencial. Depois de guardar, carregue as fotos e envie para revisão."}
+        title={chef ? t("title") : t("createTitle")}
+        description={!chef && t("createDescription")}
       />
       {chef && (
         <PhotoZones
-          label="Secções do perfil"
+          label={t("zonesLabel")}
           zones={[
             {
               id: "dados",
-              label: "Perfil",
+              label: t("zones.profile"),
               done: Boolean(chef.socials.instagram || chef.socials.website),
-              status: chef.area_name ?? "Dados",
+              status: chef.area_name ?? t("zones.data"),
             },
             {
               id: "fotografias",
-              label: "Fotografias",
+              label: t("zones.photos"),
               done: photos.portrait > 0 && photos.gallery >= 3,
-              status: photos.gallery >= 3 ? `${photos.gallery} pratos` : `${photos.gallery} de 3 pratos`,
+              status: photos.gallery >= 3 ? t("zones.dishes", { count: photos.gallery }) : t("zones.dishesOf", { count: photos.gallery }),
             },
             {
               id: "cozinha",
-              label: "Cozinha",
+              label: t("zones.cooking"),
               done: Boolean(cooking?.mine.categories.length),
-              status: cooking?.mine.categories.length ? `${cooking.mine.categories.length} categorias` : "Em falta",
+              status: cooking?.mine.categories.length ? t("zones.categories", { count: cooking.mine.categories.length }) : t("zones.missing"),
             },
-            { id: "titulo", label: "Título", done: true, status: chefTitle(chef.badges) },
+            { id: "titulo", label: t("zones.title"), done: true, status: chefTitle(chef.badges, locale) },
           ]}
         />
       )}
@@ -68,9 +72,9 @@ export default async function Perfil() {
         <section id="fotografias" aria-labelledby="fotografias-titulo" className="flex scroll-mt-36 flex-col gap-3.5 md:scroll-mt-24">
           <div className="flex flex-col gap-1">
             <h2 id="fotografias-titulo" className="d m-0 text-[28px] font-normal">
-              Fotografias
+              {t("photosTitle")}
             </h2>
-            <p className="m-0 text-sm text-muted">A sua cara e a sua comida: é o que os clientes veem primeiro.</p>
+            <p className="m-0 text-sm text-muted">{t("photosText")}</p>
           </div>
           <PhotoManager
             photos={myPhotos}
@@ -85,18 +89,18 @@ export default async function Perfil() {
         <section id="cozinha" aria-labelledby="cozinha-titulo" className="flex scroll-mt-36 flex-col gap-3.5 md:scroll-mt-24">
           <div className="flex flex-col gap-1">
             <h2 id="cozinha-titulo" className="d m-0 text-[28px] font-normal">
-              Cozinha e serviços
+              {t("cookingTitle")}
             </h2>
-            <p className="m-0 text-sm text-muted">O que cozinha e como trabalha. Aparece no seu perfil e serve de filtro na pesquisa.</p>
+            <p className="m-0 text-sm text-muted">{t("cookingText")}</p>
           </div>
           <CookingForm
             {...cooking}
             preview={{
               name: chef.display_name,
-              tier: chefTitle(chef.badges),
+              tier: chefTitle(chef.badges, locale),
               area: chef.area_name ?? "",
-              rating: rating(chef.rating_avg, chef.review_count),
-              from: prices.length ? euro(Math.min(...prices)) : "orçamento",
+              rating: rating(chef.rating_avg, chef.review_count, locale),
+              from: prices.length ? euro(Math.min(...prices), locale) : te("price.quoteShort"),
             }}
           />
         </section>
@@ -113,7 +117,7 @@ export default async function Perfil() {
         </div>
       )}
       {!session.demo && <LumiSetting on={!session.lumiOff} />}
-      {lumi === "on" && <LumiCoach tips={[...PHOTO_TIPS, ...COOKING_TIPS]} inline followScroll />}
+      {lumi === "on" && <LumiCoach tips={[...photoTips(locale), ...cookingTips(locale)]} inline followScroll />}
     </div>
   );
 }

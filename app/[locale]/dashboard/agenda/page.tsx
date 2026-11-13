@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AgendaGrid } from "@/components/dashboard/AgendaGrid";
@@ -7,6 +8,8 @@ import { isoDay, monthLabel } from "@/lib/format";
 import { agendaTips } from "@/lib/lumi-tips";
 
 export default async function Agenda({ searchParams }: PageProps<"/[locale]/dashboard/agenda">) {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.agenda");
   const { mes } = await searchParams;
   const now = new Date();
   const [y, m] =
@@ -22,7 +25,7 @@ export default async function Agenda({ searchParams }: PageProps<"/[locale]/dash
     lumiOn(),
     getWeeklyDays(),
   ]);
-  const tips = agendaTips(progress.openDays);
+  const tips = agendaTips(progress.openDays, locale);
   const shift = (delta: number) => {
     const d = new Date(year, month + delta, 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -31,15 +34,15 @@ export default async function Agenda({ searchParams }: PageProps<"/[locale]/dash
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Disponibilidade"
-        description="Os dias em que aceita pedidos. Os clientes só veem e pedem os dias abertos."
+        title={t("title")}
+        description={t("description")}
         actions={
           <div className="flex items-center gap-2">
-            <Link href={`?mes=${shift(-1)}`} className="ctl no-underline" aria-label="Mês anterior">
+            <Link href={`?mes=${shift(-1)}`} className="ctl no-underline" aria-label={t("prevMonth")}>
               ‹
             </Link>
-            <span className="d min-w-44 text-center text-xl italic">{monthLabel(year, month)}</span>
-            <Link href={`?mes=${shift(1)}`} className="ctl no-underline" aria-label="Mês seguinte">
+            <span className="d min-w-44 text-center text-xl italic">{monthLabel(year, month, locale)}</span>
+            <Link href={`?mes=${shift(1)}`} className="ctl no-underline" aria-label={t("nextMonth")}>
               ›
             </Link>
           </div>
@@ -47,10 +50,10 @@ export default async function Agenda({ searchParams }: PageProps<"/[locale]/dash
       />
       {progress.openDays === 0 && (
         <div role="status" className="flex flex-col gap-1.5 rounded-[10px] border border-cobalt/30 bg-cobalt-soft p-5">
-          <span className="d text-xl">Ainda não abriu nenhum dia.</span>
+          <span className="d text-xl">{t("noDaysTitle")}</span>
           <span className="text-[15px] text-ink-3">
-            Escolha os seus dias fixos, que ficam abertos todas as semanas, ou toque em cada dia do calendário.
-            {progress.activeOffers === 0 && " Lembre-se de criar também uma oferta, em Ofertas."}
+            {t("noDaysText")}
+            {progress.activeOffers === 0 && ` ${t("noOffersToo")}`}
           </span>
         </div>
       )}

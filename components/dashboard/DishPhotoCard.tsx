@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { updatePhotoCaption } from "@/app/dashboard/actions/photos";
 import { Photo } from "@/components/ui/Photo";
@@ -12,17 +13,18 @@ const CAPTION_MAX = 160;
 
 /** Caption editor; saves when the field loses focus and the text changed. */
 function CaptionField({ photo, onSaved }: { photo: ChefPhoto; onSaved: (r: ActionResult) => void }) {
+  const t = useTranslations("dashboard.photos.dish");
   const [text, setText] = useState(photo.caption ?? "");
   const [saved, setSaved] = useState(photo.caption ?? "");
   const [pending, start] = useTransition();
   return (
     <label className="flex flex-col gap-1">
-      <span className="sr-only">Descrição do prato</span>
+      <span className="sr-only">{t("captionLabel")}</span>
       <textarea
         rows={2}
         maxLength={CAPTION_MAX}
         value={text}
-        placeholder="O que é este prato? Ex.: Arroz de pato à antiga"
+        placeholder={t("captionPlaceholder")}
         onChange={(e) => setText(e.target.value)}
         onBlur={() => {
           if (text.trim() === saved.trim()) return;
@@ -36,12 +38,12 @@ function CaptionField({ photo, onSaved }: { photo: ChefPhoto; onSaved: (r: Actio
       />
       <span className="text-xs text-muted" aria-live="polite">
         {pending
-          ? "A guardar…"
+          ? t("saving")
           : text.trim() !== saved.trim()
-            ? "Por guardar"
+            ? t("unsaved")
             : saved
-              ? "Guardado"
-              : `${CAPTION_MAX - text.length} caracteres`}
+              ? t("saved")
+              : t("charsLeft", { count: CAPTION_MAX - text.length })}
       </span>
     </label>
   );
@@ -59,17 +61,18 @@ type Props = {
 
 /** One dish photo: the picture, its caption and the order/cover/delete controls. */
 export function DishPhotoCard({ photo, index, isLast, onMove, onDelete, onCaptionSaved }: Props) {
+  const t = useTranslations("dashboard.photos.dish");
   return (
     <li className="box flex flex-col overflow-hidden">
       <div className="relative aspect-[4/3] bg-paper">
         <Photo
           photo={photo.url}
-          alt={photo.caption ?? "Prato"}
+          alt={photo.caption ?? t("alt")}
           sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
           className="h-full w-full"
         />
         {index === 0 && (
-          <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[13px] font-semibold text-ink">Capa</span>
+          <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[13px] font-semibold text-ink">{t("cover")}</span>
         )}
       </div>
       <div className="flex flex-col gap-3 p-4">
@@ -77,23 +80,23 @@ export function DishPhotoCard({ photo, index, isLast, onMove, onDelete, onCaptio
         <div className="flex flex-wrap items-center gap-1.5">
           {index > 0 && (
             <button type="button" className="btn btn-sm btn-o" onClick={() => onMove("first")}>
-              Usar como capa
+              {t("useAsCover")}
             </button>
           )}
-          <button type="button" className="ctl !h-10 !w-10" aria-label="Mover para trás" disabled={index === 0} onClick={() => onMove(-1)}>
+          <button type="button" className="ctl !h-10 !w-10" aria-label={t("moveBack")} disabled={index === 0} onClick={() => onMove(-1)}>
             ←
           </button>
-          <button type="button" className="ctl !h-10 !w-10" aria-label="Mover para a frente" disabled={isLast} onClick={() => onMove(1)}>
+          <button type="button" className="ctl !h-10 !w-10" aria-label={t("moveForward")} disabled={isLast} onClick={() => onMove(1)}>
             →
           </button>
           <button
             type="button"
             className="ml-auto cursor-pointer border-0 bg-transparent px-1 py-2 text-sm font-semibold text-danger"
             onClick={() => {
-              if (window.confirm("Apagar esta fotografia?")) onDelete();
+              if (window.confirm(t("confirmDelete"))) onDelete();
             }}
           >
-            Apagar
+            {t("delete")}
           </button>
         </div>
       </div>

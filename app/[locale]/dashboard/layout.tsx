@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { Wordmark } from "@/components/SiteChrome";
@@ -10,9 +11,15 @@ import { dashboardNav } from "@/lib/dashboard-nav";
 import { getSettings } from "@/lib/settings";
 import { chefTitle } from "@/lib/format";
 
-export const metadata: Metadata = { title: "Painel", robots: { index: false } };
+export async function generateMetadata({ params }: LayoutProps<"/[locale]/dashboard">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: locale as "pt" | "en", namespace: "dashboard.meta" });
+  return { title: t("title"), robots: { index: false } };
+}
 
 export default async function DashboardLayout({ children }: LayoutProps<"/[locale]/dashboard">) {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard");
   const session = await getSession();
   // The chef dashboard is for chefs and admins; clients have their own area.
   if (session.role === "client") return redirectLocalized("/conta");
@@ -26,11 +33,12 @@ export default async function DashboardLayout({ children }: LayoutProps<"/[local
   const nav = dashboardNav(paymentsEnabled);
 
   const brand = (
-    <Link href="/" className="no-underline" aria-label="Ao Lume, página inicial">
+    <Link href="/" className="no-underline" aria-label={t("layout.homeLabel")}>
       <Wordmark />
     </Link>
   );
-  const status = chef && chef.status !== "approved" ? `Perfil ${chef.status === "pending" ? "em revisão" : "ainda não publicado"}` : null;
+  const status = chef && chef.status !== "approved" ? t("layout.status", { status: chef.status }) : null;
+  const navLabels = nav.map((l) => ({ href: l.href, label: t(`nav.${l.key}`) }));
 
   return (
     <div className="flex min-h-screen flex-col bg-paper text-[15px] md:flex-row md:items-stretch">
@@ -40,27 +48,27 @@ export default async function DashboardLayout({ children }: LayoutProps<"/[local
         <MobileMenu
           brand={brand}
           alert={pending > 0}
-          links={nav.map((l) => ({ ...l, badge: l.href === "/dashboard/pedidos" ? pending : undefined }))}
+          links={navLabels.map((l) => ({ ...l, badge: l.href === "/dashboard/pedidos" ? pending : undefined }))}
           actions={
             <>
               {chef?.status === "approved" && (
                 <Link href={`/chef/${chef.slug}`} className="btn btn-o w-full">
-                  Ver perfil público
+                  {t("layout.publicProfile")}
                 </Link>
               )}
               {session.role === "admin" && (
                 <Link href="/admin" className="btn btn-o w-full">
-                  Administração
+                  {t("layout.admin")}
                 </Link>
               )}
               {chef && (
                 <span className="text-sm text-muted">
-                  {chef.display_name} · {chefTitle(chef.badges)}
+                  {chef.display_name} · {chefTitle(chef.badges, locale)}
                   {status ? ` · ${status}` : ""}
                 </span>
               )}
               {session.demo ? (
-                <span className="text-sm text-muted">Modo de demonstração: dados de exemplo, nada é guardado.</span>
+                <span className="text-sm text-muted">{t("layout.demo")}</span>
               ) : (
                 <SignOutButton block />
               )}
@@ -70,23 +78,23 @@ export default async function DashboardLayout({ children }: LayoutProps<"/[local
       </header>
 
       <nav
-        aria-label="Painel"
+        aria-label={t("layout.navLabel")}
         className="box-border hidden flex-[0_0_250px] md:sticky md:top-0 md:h-screen md:overflow-y-auto flex-col gap-0.5 border-r border-line bg-white px-4 py-6 md:flex"
       >
         <div className="flex items-baseline justify-between px-3.5 pb-5">
           {brand}
-          <span className="lab text-muted">{session.role === "admin" ? "Admin" : "Chef"}</span>
+          <span className="lab text-muted">{session.role === "admin" ? t("layout.roleAdmin") : t("layout.roleChef")}</span>
         </div>
-        <SideNav pending={pending} links={nav} />
+        <SideNav pending={pending} links={navLabels} />
         {chef && (
           <div className="mt-auto flex flex-col gap-1 border-t border-line px-3.5 pt-[18px]">
             <span className="d text-xl">{chef.display_name}</span>
             <span className="text-[13px] text-muted">
-              {chefTitle(chef.badges)} · {chef.area_name}
+              {chefTitle(chef.badges, locale)} · {chef.area_name}
             </span>
             {chef.status === "approved" ? (
               <Link href={`/chef/${chef.slug}`} className="mt-1.5 text-[13px]">
-                Ver perfil público →
+                {t("layout.publicProfileLink")}
               </Link>
             ) : (
               <span className="mt-1.5 text-[13px] text-muted">{status}</span>
@@ -96,13 +104,13 @@ export default async function DashboardLayout({ children }: LayoutProps<"/[local
         )}
         {session.role === "admin" && (
           <Link href="/admin" className="side-link mt-2 border-t border-line pt-4">
-            Administração →
+            {t("layout.adminLink")}
           </Link>
         )}
         {!chef && !session.demo && <SignOutButton className="mt-auto self-start px-3.5 text-[13px]" />}
         {session.demo && (
           <span className="mx-3.5 mt-4 rounded-[2px] bg-paper px-3 py-2 text-xs text-muted">
-            Modo de demonstração: dados de exemplo, nada é guardado.
+            {t("layout.demo")}
           </span>
         )}
       </nav>

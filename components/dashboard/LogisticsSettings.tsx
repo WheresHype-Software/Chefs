@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 import { saveLogistics } from "@/app/dashboard/actions/logistics";
 import { ToggleChipList, type ToggleItem } from "@/components/dashboard/ToggleChipList";
@@ -51,21 +52,22 @@ function SettingRow({ label, children }: { label: string; children: ReactNode })
 }
 
 export function LogisticsSettings({ initial, zones: initialZones, slots: initialSlots, area }: Props) {
+  const t = useTranslations("dashboard.logistics.settings");
   const [settings, setSettings] = useState(initial);
   const [zones, setZones] = useState(initialZones);
   const [slots, setSlots] = useState(initialSlots);
   // Free text while typing; split into windows only when saving.
   const [windows, setWindows] = useState(initial.delivery_windows.join(", "));
-  const { run, pending, message } = useServerAction(saveLogistics, { successMessage: "Guardado." });
+  const { run, pending, message } = useServerAction(saveLogistics, { successMessage: t("saved") });
   const set = <K extends keyof Logistics>(key: K, value: Logistics[K]) => setSettings((s) => ({ ...s, [key]: value }));
   const s = settings;
 
   return (
     <aside className="flex min-w-0 flex-[2_1_320px] flex-col gap-3.5">
-      <ToggleCard title="Em casa do cliente" enabled={s.home_enabled} onToggle={(v) => set("home_enabled", v)}>
+      <ToggleCard title={t("homeTitle")} enabled={s.home_enabled} onToggle={(v) => set("home_enabled", v)}>
         <label className="flex flex-col gap-1.5">
           <span className="flex justify-between">
-            <span className="lab text-muted">Raio de deslocação</span>
+            <span className="lab text-muted">{t("radius")}</span>
             <span className="num text-sm font-semibold">{s.travel_radius_km} km</span>
           </span>
           <input
@@ -78,16 +80,14 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
           />
         </label>
         {/* Travel fees and arrival time are agreed with each client for now; the saved values are kept. */}
-        <span className="text-[13px] text-muted">
-          Aparece a clientes até {s.travel_radius_km} km de {area}. A deslocação e a hora de chegada combinam-se com cada cliente.
-        </span>
+        <span className="text-[13px] text-muted">{t("radiusNote", { km: s.travel_radius_km, area })}</span>
       </ToggleCard>
 
-      <ToggleCard title="Entregas" enabled={s.delivery_enabled} onToggle={(v) => set("delivery_enabled", v)}>
-        <span className="lab text-muted">Zonas</span>
-        <ToggleChipList items={zones} onChange={setZones} addLabel="Nova zona" addPlaceholder="+ freguesia" />
+      <ToggleCard title={t("deliveries")} enabled={s.delivery_enabled} onToggle={(v) => set("delivery_enabled", v)}>
+        <span className="lab text-muted">{t("zones")}</span>
+        <ToggleChipList items={zones} onChange={setZones} addLabel={t("newZone")} addPlaceholder={t("zonePlaceholder")} />
         <div className="flex flex-col border-t border-line">
-          <SettingRow label="Janelas">
+          <SettingRow label={t("windows")}>
             <input
               className="w-full min-w-0 max-w-44 border-0 border-b border-line-3 bg-transparent py-1 text-right text-sm outline-none focus:border-ink"
               value={windows}
@@ -95,10 +95,10 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
               placeholder="12:00-14:00, 19:00-21:00"
             />
           </SettingRow>
-          <SettingRow label="Taxa (€)">
+          <SettingRow label={t("fee")}>
             <NumberInput className={numberInput} decimal min={0} value={s.delivery_fee} onChange={(v) => set("delivery_fee", v)} />
           </SettingRow>
-          <SettingRow label="Grátis acima de (€)">
+          <SettingRow label={t("freeOver")}>
             <NumberInput
               className={numberInput}
               decimal
@@ -107,27 +107,24 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
               onChange={(v) => set("free_delivery_over", v)}
             />
           </SettingRow>
-          <SettingRow label="Quem entrega">
+          <SettingRow label={t("whoDelivers")}>
             <select
               value={s.delivered_by}
               onChange={(e) => set("delivered_by", e.target.value as Logistics["delivered_by"])}
               className="border-0 bg-transparent text-right text-sm"
             >
-              <option value="chef">Eu</option>
-              <option value="courier">Estafeta</option>
+              <option value="chef">{t("me")}</option>
+              <option value="courier">{t("courier")}</option>
             </select>
           </SettingRow>
         </div>
       </ToggleCard>
 
-      <ToggleCard title="Levantamento" enabled={s.pickup_enabled} onToggle={(v) => set("pickup_enabled", v)}>
+      <ToggleCard title={t("pickup")} enabled={s.pickup_enabled} onToggle={(v) => set("pickup_enabled", v)}>
         {/* The kitchen address isn't asked for here for now: the chef gives it to the client when the order is ready. */}
-        <span className="lab text-muted">Horários</span>
-        <ToggleChipList items={slots} onChange={setSlots} addLabel="Novo horário" addPlaceholder="+ 09:00–10:00" />
-        <span className="text-[13px] text-muted">
-          A morada combina-se com o cliente quando a encomenda estiver pronta. Cada levantamento tem um código de 4 dígitos para confirmar a
-          entrega.
-        </span>
+        <span className="lab text-muted">{t("hours")}</span>
+        <ToggleChipList items={slots} onChange={setSlots} addLabel={t("newSlot")} addPlaceholder="+ 09:00–10:00" />
+        <span className="text-[13px] text-muted">{t("pickupNote")}</span>
       </ToggleCard>
 
       <button
@@ -142,7 +139,7 @@ export function LogisticsSettings({ initial, zones: initialZones, slots: initial
           )
         }
       >
-        {pending ? "A guardar…" : "Guardar logística"}
+        {pending ? t("saving") : t("save")}
       </button>
       <FormMessage message={message} />
     </aside>

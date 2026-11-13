@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { saveProfile } from "@/app/dashboard/actions/profile";
 import type { Place } from "@/components/AddressSearch";
@@ -43,6 +44,7 @@ type Options = {
 
 /** State and save rules of the profile form: fields, the base-area search and its geocoding fallback. */
 export function useProfileForm(chef: MyChef | null, { onSaved, requireSocial }: Options = {}) {
+  const t = useTranslations("dashboard.profile");
   const [form, setForm] = useState(() => initialForm(chef));
   const [areaQuery, setAreaQuery] = useState(chef?.area_name ?? "");
   const [place, setPlace] = useState<Place | null>(
@@ -51,7 +53,7 @@ export function useProfileForm(chef: MyChef | null, { onSaved, requireSocial }: 
   const [locating, setLocating] = useState(false);
   const { run, pending, message, setMessage } = useServerAction(saveProfile, {
     // In onboarding the save is silent: the next step appearing is the confirmation.
-    successMessage: onSaved ? undefined : "Perfil guardado.",
+    successMessage: onSaved ? undefined : t("saved"),
     onSuccess: onSaved,
   });
   const set = <K extends keyof ProfileFormValues>(key: K, value: ProfileFormValues[K]) => setForm((f) => ({ ...f, [key]: value }));
@@ -69,10 +71,7 @@ export function useProfileForm(chef: MyChef | null, { onSaved, requireSocial }: 
 
   async function save() {
     if (requireSocial && !form.instagram.trim() && !form.website.trim()) {
-      setMessage({
-        ok: false,
-        text: "Indique o Instagram ou o site. Basta um, e serve só para a equipa ver o seu trabalho antes de aprovar.",
-      });
+      setMessage({ ok: false, text: t("needSocial") });
       return;
     }
     // Typed a zone without picking a suggestion: look it up instead of refusing.
@@ -84,7 +83,7 @@ export function useProfileForm(chef: MyChef | null, { onSaved, requireSocial }: 
       if (base) setPlace(base);
     }
     if (!base) {
-      setMessage({ ok: false, text: 'Não encontrámos essa zona. Escreva o bairro e a cidade, por exemplo "Alvalade, Lisboa".' });
+      setMessage({ ok: false, text: t("areaNotFound") });
       return;
     }
     run({

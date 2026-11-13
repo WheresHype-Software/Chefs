@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ActiveRow, HistoryRow } from "@/components/dashboard/BookingRows";
 import { LumiCoach } from "@/components/dashboard/LumiCoach";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getBookings, lumiOn, quoteMinimum, type DashBooking } from "@/lib/dashboard";
 import { isoDay } from "@/lib/format";
+import { quoteTip } from "@/lib/lumi-tips";
 
 type GroupProps = { title: string; hint?: string; items: DashBooking[]; empty?: ReactNode; minQuote?: number | null; lumiFor?: string };
 
@@ -31,6 +33,8 @@ function Group({ title, hint, items, empty, minQuote = null, lumiFor }: GroupPro
  * up. Finished bookings fold into a quiet, collapsed history so they never crowd the work.
  */
 export default async function Pedidos() {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard.requests");
   const now = new Date();
   const today = isoDay(now);
   const yesterday = isoDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
@@ -48,44 +52,32 @@ export default async function Pedidos() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title="Pedidos"
-        description={`${requests.length} por responder · ${upcoming.length} ${upcoming.length === 1 ? "reserva marcada" : "reservas marcadas"}`}
+        title={t("title")}
+        description={t("summary", { toAnswer: requests.length, count: upcoming.length })}
       />
 
       <Group
-        title="Por responder"
-        hint="Os pedidos expiram ao fim de 48 horas."
+        title={t("toAnswer")}
+        hint={t("toAnswerHint")}
         items={requests}
-        empty="Sem pedidos novos. Quando um cliente pedir, aparece aqui e recebe um email."
+        empty={t("toAnswerEmpty")}
         minQuote={minQuote}
         lumiFor={lumi === "on" ? unpriced?.id : undefined}
       />
-      <Group title="Por concluir" hint="Marque como concluída: o cliente recebe o pedido de avaliação." items={toComplete} />
-      <Group title="Próximas reservas" items={upcoming} empty="Sem reservas marcadas." />
+      <Group title={t("toComplete")} hint={t("toCompleteHint")} items={toComplete} />
+      <Group title={t("upcoming")} items={upcoming} empty={t("upcomingEmpty")} />
 
-      {lumi === "on" && unpriced && (
-        <LumiCoach
-          inline
-          tips={[
-            {
-              target: "orcamento",
-              mood: "dica",
-              title: "Este pedido é sob orçamento",
-              text: "O cliente espera o seu preço. Leia as notas, carregue em «Enviar orçamento» e indique o valor total. Se o cliente aceitar, paga o sinal na app e a data fica garantida.",
-            },
-          ]}
-        />
-      )}
+      {lumi === "on" && unpriced && <LumiCoach inline tips={[quoteTip(locale)]} />}
 
       {history.length > 0 && (
         <details className="group rounded-[12px] border border-line bg-paper">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
             <span className="text-[16px] font-bold">
-              Histórico <span className="font-normal text-muted">· {history.length}</span>
+              {t("history")} <span className="font-normal text-muted">· {history.length}</span>
             </span>
             <span className="text-[14px] text-muted">
-              <span className="group-open:hidden">Mostrar concluídos, recusados e cancelados</span>
-              <span className="hidden group-open:inline">Esconder</span>
+              <span className="group-open:hidden">{t("showHistory")}</span>
+              <span className="hidden group-open:inline">{t("hideHistory")}</span>
             </span>
           </summary>
           <ul className="m-0 list-none border-t border-line px-3 pb-2 pt-1">

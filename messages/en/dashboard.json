@@ -1,1 +1,909 @@
-{}
+{
+  "meta": {
+    "title": "Dashboard",
+    "confirmIban": "Confirm IBAN",
+    "payments": "Payments",
+    "billing": "Invoicing and payments"
+  },
+  "client": "Client",
+  "nav": {
+    "overview": "Overview",
+    "requests": "Requests",
+    "logistics": "Logistics",
+    "availability": "Availability",
+    "offers": "Offers",
+    "reviews": "Reviews",
+    "payments": "Payments",
+    "billing": "Invoicing",
+    "profile": "Profile"
+  },
+  "weekdays": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "layout": {
+    "homeLabel": "Ao Lume, home page",
+    "navLabel": "Dashboard",
+    "publicProfile": "View public profile",
+    "publicProfileLink": "View public profile →",
+    "admin": "Admin",
+    "adminLink": "Admin →",
+    "roleAdmin": "Admin",
+    "roleChef": "Chef",
+    "status": "Profile {status, select, pending {under review} other {not published yet}}",
+    "demo": "Demo mode: sample data, nothing is saved.",
+    "loading": "Loading",
+    "backToDashboard": "Back to the dashboard"
+  },
+  "home": {
+    "contractTitle": "There is a new version of the contract",
+    "termsTitle": "The terms have been updated",
+    "contractIntro": "Please read and accept it to keep using Ao Lume. Among other things, the contract says that the service, food safety and licences are your responsibility, and that this acceptance counts as your signature.",
+    "termsIntro": "Please read the updated terms and accept them to keep using Ao Lume.",
+    "hello": "Hello, {name}",
+    "stats": {
+      "toAnswer": "Requests to answer",
+      "thisWeek": "Services this week",
+      "deliveries": "Deliveries",
+      "rating": "Rating"
+    },
+    "money": {
+      "title": "Money",
+      "seePayments": "View payments",
+      "owedByUs": "Due from us",
+      "clientsOwe": "Clients owe you",
+      "paidByUs": "Received from us this year",
+      "paidByClients": "Received from clients this year",
+      "awaitingDeposit": "{count, plural, one {# booking is} other {# bookings are}} waiting for the deposit.",
+      "restToConfirm": "{count, plural, one {# booking needs} other {# bookings need}} you to confirm whether the client has paid you the rest."
+    },
+    "newRequests": "New requests",
+    "seeAll": "See all →",
+    "reply": "Reply",
+    "busiest": "{day} is your busiest day",
+    "busiestServices": "{count, plural, one {# service} other {# services}}: {list}",
+    "seeDayLogistics": "See the day's logistics"
+  },
+  "onboarding": {
+    "steps": {
+      "profile": "Create profile",
+      "verification": "Verification",
+      "review": "Send for review"
+    },
+    "stepsLabel": "Steps",
+    "items": {
+      "terms": "Terms and contract accepted",
+      "social": "Instagram or website",
+      "portrait": "Profile photo",
+      "selfie": "Verification selfie",
+      "dishes": "Dish photos ({count}/3)"
+    },
+    "titleRejected": "Review your profile",
+    "title": "Create your chef profile",
+    "description": "Three steps, about ten minutes. You can stop whenever you like: whatever you save stays saved, and you come back here when you sign in.",
+    "photosReady": "Photos ready.",
+    "missing": "Still needed: {items}.",
+    "missingPortrait": "profile photo",
+    "missingSelfie": "verification selfie",
+    "missingDishes": "{count, plural, one {# dish photo} other {# dish photos}}",
+    "continue": "Continue",
+    "legalIntro": "Before your profile goes for review, we need your acceptance. Among other things, the contract says that the service, food safety and licences are your responsibility."
+  },
+  "offers": {
+    "title": "Menus, boxes and orders",
+    "description": "Fixed price, per person or on request. Each offer says where it is served: at the client's home, delivered or picked up.",
+    "inactive": "inactive",
+    "meta": "{min}–{max} · book {hours} h ahead · {slots}",
+    "created": "Offer created.",
+    "openDaysNote": "You have {count, plural, one {# open day} other {# open days}} in Availability: clients can already request this offer on those days.",
+    "noOpenDaysNote": "Now open the days you can cook, in Availability. Clients can only request a booking on open days.",
+    "seeAvailability": "See availability",
+    "openDays": "Open days",
+    "close": "Close",
+    "edit": "Edit",
+    "empty": "You don't have any offers yet. Create your first: a menu, a box, an order. Then open the days you can cook, in Availability.",
+    "newOffer": "New offer",
+    "form": {
+      "editOffer": "Edit offer",
+      "newOffer": "New offer",
+      "title": "Title",
+      "titlePlaceholder": "Minho-style dinner",
+      "description": "Description",
+      "descriptionPlaceholder": "Dishes, courses, what's included",
+      "where": "Where",
+      "modeHome": "At the client's home",
+      "modeDelivery": "Delivery",
+      "modePickup": "Pick-up",
+      "price": "Price",
+      "perPerson": "Per person / unit",
+      "fixed": "Fixed",
+      "quote": "On request",
+      "value": "Amount (€)",
+      "unit": "Unit",
+      "unitPlaceholder": "person, meal, cake",
+      "min": "Minimum",
+      "max": "Maximum",
+      "noLimit": "No limit",
+      "leadTime": "Notice (hours)",
+      "visible": "Visible on your profile and in search",
+      "save": "Save",
+      "close": "Close",
+      "confirmDelete": "Delete this offer?",
+      "delete": "Delete"
+    },
+    "slots": {
+      "legend": "Times you can serve",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "other": "Other",
+      "remove": "Remove {time}",
+      "otherTime": "Another time",
+      "add": "Add",
+      "none": "With no times chosen, clients can request 13:00 or 20:00.",
+      "max": "Maximum of {max} times.",
+      "chosen": "{count, plural, one {# time chosen} other {# times chosen}}: {list}."
+    }
+  },
+  "confirmIban": {
+    "title": "Confirm your new IBAN",
+    "incomplete": "This link is incomplete. Open the email we sent you and press the confirmation button, or <link>request the change again</link>.",
+    "confirming": "Confirming…",
+    "backToBilling": "Back to invoicing",
+    "done": "Done: we'll now pay you into the new account. For security, payments are held for 72 hours and the team checks the account before the first transfer.",
+    "seeBilling": "View invoicing"
+  },
+  "reviews": {
+    "title": "What your clients say",
+    "description": "Only clients with a completed booking can leave a review. You can reply once to each review, and report abusive ones: the team decides.",
+    "empty": "No reviews yet. The review request is sent 24 hours after each completed booking.",
+    "quote": "“{text}”",
+    "noComment": "Rated without leaving a comment.",
+    "seeRequest": "View request →",
+    "yourReply": "Your reply:",
+    "reply": {
+      "published": "Reply published.",
+      "reported": "Report sent to the team.",
+      "reportPrompt": "Why is this review abusive?",
+      "reply": "Reply",
+      "report": "Report",
+      "label": "Public reply (you can only reply once)",
+      "publish": "Publish reply",
+      "cancel": "Cancel"
+    }
+  },
+  "request": {
+    "back": "← Requests",
+    "service": "Service",
+    "date": "Date",
+    "guests": "People / units",
+    "pickupCode": "Pick-up code",
+    "pickupCodePending": "Generated when you accept",
+    "address": "Address",
+    "distance": "Distance",
+    "km": "{km} km",
+    "clientReview": "Client's review"
+  },
+  "requests": {
+    "title": "Requests",
+    "summary": "{toAnswer} to answer · {count, plural, one {# booking scheduled} other {# bookings scheduled}}",
+    "toAnswer": "To answer",
+    "toAnswerHint": "Requests expire after 48 hours.",
+    "toAnswerEmpty": "No new requests. When a client sends one, it shows up here and you get an email.",
+    "toComplete": "To complete",
+    "toCompleteHint": "Mark it as completed: the client gets the review request.",
+    "upcoming": "Upcoming bookings",
+    "upcomingEmpty": "No bookings scheduled.",
+    "history": "History",
+    "showHistory": "Show completed, declined and cancelled",
+    "hideHistory": "Hide",
+    "row": {
+      "answerIn": "Reply within {hours} h",
+      "guests": "{count, plural, one {# person} other {# people}}",
+      "quote": "Quote {amount}",
+      "needsQuote": "On request · your price is missing",
+      "open": "Open request and chat →"
+    },
+    "actions": {
+      "sendQuote": "Send quote",
+      "accept": "Accept",
+      "proposeChange": "Propose a change",
+      "decline": "Decline",
+      "confirmsItself": "The booking confirms itself as soon as the deposit comes in. You don't need to do anything.",
+      "depositReceived": "Deposit received · confirm",
+      "markCompleted": "Mark as completed",
+      "completableFrom": "You can mark it as completed from {date}",
+      "confirmCancel": "Cancel this booking? The client will be notified.",
+      "cancel": "Cancel",
+      "declineReason": "Reason (the client sees this message)",
+      "declinePlaceholder": "I already have an event that day",
+      "declineRequest": "Decline request",
+      "quoteIntro": "The client is waiting for your price. Check the request notes and enter the total price for the service. If the client accepts, they pay the deposit in the app and the date is secured.",
+      "totalValue": "Total price (€)",
+      "minimum": "Minimum {amount}",
+      "otherDate": "Another date (optional)",
+      "timeOptional": "Time (optional)",
+      "sendQuoteToClient": "Send quote to the client",
+      "newDate": "New date",
+      "time": "Time",
+      "quoteValue": "Quote (€)",
+      "optional": "Optional",
+      "sendProposal": "Send proposal"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "greeting": "{hasName, select, yes {Hello {name}!} other {Hello!}} I'm from Ao Lume{hasRef, select, yes {, about booking {ref}} other {}}."
+  },
+  "money": {
+    "title": "Money",
+    "saved": "Saved.",
+    "deposit": {
+      "not_required": "No deposit",
+      "due": "Waiting for the client",
+      "pending": "Being paid now",
+      "paid": "Paid",
+      "overdue": "Deadline passed",
+      "refunded": "Refunded",
+      "partially_refunded": "Partly refunded"
+    },
+    "estimated": "Estimated price: {amount}. The amounts are fixed when you accept the request.",
+    "toQuote": "Price still to be quoted. The amounts are fixed when you accept the request.",
+    "serviceValue": "Service price",
+    "viaAoLume": "Through Ao Lume",
+    "clientDeposit": "Client's deposit",
+    "commission": "Ao Lume commission",
+    "youGet": "You receive from us",
+    "youWillGet": "You'll receive from us",
+    "depositPaid": "Deposit paid {when}. We transfer it once the service is completed.",
+    "transferAfter": "We transfer it once the client has paid and the service is completed.",
+    "direct": "Directly with you",
+    "receivedFromClient": "Received from the client",
+    "clientOwes": "The client still owes you",
+    "markedReceived": "Marked as received {when}.",
+    "notReceived": "I haven't received it after all",
+    "howMuch": "How much you received",
+    "howMuchHint": "Just for your own records. We don't charge or transfer it.",
+    "saving": "Saving…",
+    "markReceived": "Mark as received",
+    "cancel": "Cancel",
+    "clientPaidRest": "The client has paid me the rest"
+  },
+  "agenda": {
+    "title": "Availability",
+    "description": "The days you take requests. Clients only see and request open days.",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "noDaysTitle": "You haven't opened any days yet.",
+    "noDaysText": "Choose your regular days, which stay open every week, or tap each day in the calendar.",
+    "noOffersToo": "Remember to create an offer too, in Offers.",
+    "dayState": {
+      "open": "open",
+      "closed": "closed",
+      "booked": "booked",
+      "past": "past"
+    },
+    "dayLabel": "{day} {month}: {state}",
+    "legendOpen": "Open",
+    "legendClosed": "Closed",
+    "legendBooked": "Booked",
+    "presets": {
+      "everyDay": "Every day",
+      "weekends": "Weekends",
+      "weekdays": "Weekdays"
+    },
+    "weeklySaved": "Regular days saved.",
+    "monthOpened": "Days opened in {month}.",
+    "openCount": "{count, plural, one {# open day} other {# open days}}",
+    "howItWorks": "How it works",
+    "green": "<b>Green</b>: open day, clients can request a booking.",
+    "white": "<b>White</b>: closed day, no one can request.",
+    "blue": "<b>Blue</b>: you already have a booking that day.",
+    "tapHint": "Tap a day to open or close it; it's saved straight away. Closing a regular day closes only that day, and opening another day opens only that one.",
+    "weeklyTitle": "Regular days",
+    "weeklyText": "The days of the week you usually cook. They stay open every week, with no end date.",
+    "quickPicks": "Quick picks",
+    "weekdaysLabel": "Days of the week",
+    "clearWeekly": "Stop having regular days",
+    "saveWeekly": "Save regular days",
+    "openMonthOnly": "Open in {month} only",
+    "weeklySummary": "Open every week: {days}. For a day off or holidays, close that day in the calendar.",
+    "noWeekly": "No regular days yet: only the days you open in the calendar are open."
+  },
+  "logistics": {
+    "title": "Travel, deliveries and pick-ups",
+    "weekLabel": "Week",
+    "dayCount": "{count, plural, =0 {free} one {# service} other {# services}}",
+    "pickups": "{count, plural, one {# pick-up} other {# pick-ups}}",
+    "deliveries": "{count, plural, one {# delivery} other {# deliveries}}",
+    "atHome": "{count} at the client's home",
+    "kmToDrive": "{km} km to drive",
+    "noServices": "No services",
+    "day": {
+      "typeHome": "At the client's home",
+      "typeDelivery": "Delivery",
+      "typePickup": "Pick-up",
+      "filterLabel": "Type",
+      "all": "All",
+      "home": "At home",
+      "delivery": "Deliveries",
+      "pickup": "Pick-ups",
+      "freeDay": "Free day",
+      "freeDayText": "No services booked. You can close this day in Availability.",
+      "pickedUp": "Picked up",
+      "delivered": "Delivered",
+      "done": "Completed",
+      "depositReceived": "Deposit received",
+      "awaitingDeposit": "Awaiting deposit",
+      "place": "Place",
+      "clientAddress": "Client's address",
+      "atKitchen": "At your kitchen · {area}",
+      "pickupCode": "Pick-up code",
+      "distance": "Distance",
+      "openMaps": "Open in Maps",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "message": "Message",
+      "undo": "Undo",
+      "markPickedUp": "Mark as picked up",
+      "markDelivered": "Mark as delivered",
+      "markDone": "Mark as completed"
+    },
+    "settings": {
+      "saved": "Saved.",
+      "homeTitle": "At the client's home",
+      "radius": "Travel radius",
+      "radiusNote": "You're shown to clients up to {km} km from {area}. Travel and arrival time are agreed with each client.",
+      "deliveries": "Deliveries",
+      "zones": "Areas",
+      "newZone": "New area",
+      "zonePlaceholder": "+ parish",
+      "windows": "Time windows",
+      "fee": "Fee (€)",
+      "freeOver": "Free over (€)",
+      "whoDelivers": "Who delivers",
+      "me": "Me",
+      "courier": "Courier",
+      "pickup": "Pick-up",
+      "hours": "Times",
+      "newSlot": "New time",
+      "pickupNote": "The address is agreed with the client when the order is ready. Each pick-up has a 4-digit code to confirm the handover.",
+      "saving": "Saving…",
+      "save": "Save logistics"
+    }
+  },
+  "payments": {
+    "title": "Payments",
+    "description": "The client pays the deposit in the app. After each completed service, we transfer that deposit to you minus our commission.",
+    "status": {
+      "due": "To be paid",
+      "held": "Held",
+      "batched": "Being transferred",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "missingTitle": "Your invoicing details are missing",
+    "missingText": "Without your tax details, a verified IBAN and the accepted contract we can't transfer anything to you. The money waits for you; it isn't lost.",
+    "complete": "Complete now",
+    "stats": {
+      "balance": "Balance in your favour",
+      "due": "Ready to transfer",
+      "waiting": "Still on hold",
+      "paidThisYear": "Paid this year"
+    },
+    "movements": "Transactions",
+    "empty": "No payments yet. They appear here after your first completed service.",
+    "adjustment": "Adjustment",
+    "expected": "expected {date}",
+    "held": "Held: {reason}",
+    "documents": {
+      "title": "Documents",
+      "empty": "No documents yet. You get one with each payment.",
+      "intro": "Keep them for your accounts: each one shows what you received and what was kept as commission.",
+      "void": "void",
+      "download": "Download"
+    }
+  },
+  "billing": {
+    "title": "Invoicing and payments",
+    "description": "The client pays the deposit in the app. Once the service is completed, we transfer that deposit to you minus our commission, with a document that explains the calculation.",
+    "steps": {
+      "fiscal": "Tax details complete",
+      "dac7": "Details required by law (DAC7)",
+      "iban": "IBAN provided",
+      "ibanPending": "There's a change waiting for confirmation in your email.",
+      "ibanVerified": "IBAN verified by the team",
+      "ibanVerifiedNote": "We check new accounts before the first payment.",
+      "contract": "Contract accepted"
+    },
+    "missing": "{count, plural, =0 {You're all set to get paid} one {One thing left} other {# things left}}",
+    "onHold": "Payments are held for security after the IBAN change. They go back to normal automatically.",
+    "blocked": "Your payments are suspended. Get in touch so we can sort it out.",
+    "blockedWithReason": "Your payments are suspended ({reason}). Get in touch so we can sort it out.",
+    "form": {
+      "saved": "Details saved.",
+      "title": "Your tax details",
+      "intro": "These are the details shown on the document you receive with each payment. Only you and our team can see them.",
+      "entityType": "You work as",
+      "individual": "Individual",
+      "company": "Company",
+      "companyName": "Registered company name",
+      "fullName": "Full name",
+      "nif": "Tax number (NIF)",
+      "nifHint": "Nine digits. We check the control digit.",
+      "vat": "VAT scheme",
+      "vatHint": "If in doubt, it's the one your accountant chose when you registered your activity.",
+      "vatExempt": "Exempt (article 53)",
+      "vatNormal": "Standard scheme",
+      "address": "Tax address",
+      "postalCode": "Postcode",
+      "city": "Town/city",
+      "legendCompany": "Company registration · required by law (DAC7)",
+      "legendBirth": "Birth details · required by law (DAC7)",
+      "dac7Text": "Since we started handling payments, we're required to report these details to the Portuguese Tax Authority once a year, along with the amounts you received. We always tell you what was reported.",
+      "regNumber": "Company registration number",
+      "birthDate": "Date of birth",
+      "birthPlace": "Place of birth",
+      "saving": "Saving…",
+      "save": "Save tax details"
+    },
+    "iban": {
+      "requested": "We've sent you an email to confirm. Your current account doesn't change until then.",
+      "title": "Where you get paid",
+      "intro": "The account we transfer your money to after each service. We store it encrypted and never show it in full.",
+      "current": "Current account",
+      "notGiven": "Not provided",
+      "holder": "Holder",
+      "status": "Status",
+      "verified": "Verified",
+      "awaiting": "Awaiting verification by the team",
+      "pendingChange": "There's a change waiting for confirmation (account ending in {last4}). Open the link we sent you by email. Until you confirm, we keep paying into the current account.",
+      "change": "Change IBAN",
+      "give": "Add IBAN",
+      "iban": "IBAN",
+      "invalid": "This doesn't check out yet. Check the digits.",
+      "holderLabel": "Account holder",
+      "holderHint": "Must be the account holder, as registered with the bank.",
+      "bic": "BIC / SWIFT",
+      "bicHint": "Optional. Only for accounts outside Portugal.",
+      "security": "For security: we email you to confirm the change, we notify the previous address, and payments are held for 72 hours after the change.",
+      "sending": "Sending…",
+      "send": "Send confirmation",
+      "cancel": "Cancel"
+    },
+    "agreement": {
+      "accepted": "Contract accepted. We've emailed you a copy.",
+      "title": "Contract",
+      "version": "version {version}",
+      "versionAccepted": "version {version} · accepted",
+      "commission": "Current commission: <strong>{percent}%</strong> of the booking value, with a minimum of <strong>{min}</strong>, deducted from the deposit. We transfer the rest to you once the service is completed.",
+      "outdated": "The contract has changed since you accepted it (you had version {version}). Read and accept the new version so we can keep paying you.",
+      "readFull": "Read the full contract",
+      "consent": "I have read and accept the Payment Intermediation Contract.",
+      "registering": "Recording…",
+      "accept": "Accept contract"
+    }
+  },
+  "legal": {
+    "title": "Terms and contract",
+    "success": "Acceptance recorded. We've emailed you a copy.",
+    "acceptBoth": "I have read and accept the <terms>Terms and Conditions</terms> and the <contract>Payment Intermediation Contract</contract>.",
+    "acceptTerms": "I have read and accept the <terms>Terms and Conditions</terms>.",
+    "acceptContract": "I have read and accept the <contract>Payment Intermediation Contract</contract>.",
+    "registering": "Recording…",
+    "accept": "Accept"
+  },
+  "profile": {
+    "title": "Your profile",
+    "createTitle": "Create your chef profile",
+    "createDescription": "Start with the essentials. Once you've saved, upload your photos and send it for review.",
+    "zonesLabel": "Profile sections",
+    "zones": {
+      "profile": "Profile",
+      "data": "Details",
+      "photos": "Photos",
+      "dishes": "{count, plural, one {# dish} other {# dishes}}",
+      "dishesOf": "{count} of 3 dishes",
+      "cooking": "Cooking",
+      "categories": "{count, plural, one {# category} other {# categories}}",
+      "missing": "Missing",
+      "title": "Title"
+    },
+    "photosTitle": "Photos",
+    "photosText": "Your face and your food: it's what clients see first.",
+    "cookingTitle": "Cooking and services",
+    "cookingText": "What you cook and how you work. It appears on your profile and is used as a search filter.",
+    "saved": "Profile saved.",
+    "needSocial": "Add your Instagram or website. One is enough, and it's only so the team can see your work before approving you.",
+    "areaNotFound": "We couldn't find that area. Type the neighbourhood and the city, for example \"Alvalade, Lisboa\".",
+    "form": {
+      "instagram": "Instagram",
+      "instagramPlaceholder": "@your.profile",
+      "site": "Website",
+      "yourPage": "Your page",
+      "aboutYou": "About you",
+      "displayName": "Public name",
+      "link": "Link",
+      "slugPlaceholder": "your-name",
+      "appearAs": "How you want to appear",
+      "appearHint": "With a verified certificate, you'll appear as Chef.",
+      "cook": "Cook (male)",
+      "cookFemale": "Cook (female)",
+      "profileType": "Profile",
+      "homeCook": "Home cook",
+      "homeCookFemale": "Home cook",
+      "professional": "Cooking professional",
+      "headline": "A line for your profile",
+      "headlineHint": "Shown under your name. Up to 80 characters.",
+      "headlinePlaceholder": "Alentejo cooking for dinners at home",
+      "bio": "About you",
+      "bioPlaceholder": "Your story, what you cook, how you work.",
+      "baseArea": "Base area",
+      "areaPlaceholder": "Neighbourhood or parish",
+      "areaHint": "Clients see the area, never your address.",
+      "radius": "Service radius (km)",
+      "years": "Years of experience",
+      "deposit": "Deposit requested (%)",
+      "depositTooLow": "It must be at least {min}%.",
+      "depositHint": "The client pays it in the app. Minimum {min}%.",
+      "depositHintNoMin": "The client pays it in the app to confirm the booking.",
+      "socialLegend": "Instagram or website",
+      "oneOfTwo": "Either one is enough.",
+      "languages": "Languages you speak (optional)",
+      "languagesHint": "Shown on your profile, for clients who speak other languages.",
+      "locating": "Looking up the area…",
+      "continue": "Continue",
+      "save": "Save profile",
+      "create": "Create profile"
+    },
+    "verification": {
+      "sent": "Sent for review. We'll reply by email.",
+      "status": {
+        "draft": "draft",
+        "pending": "under review",
+        "approved": "approved",
+        "rejected": "changes requested",
+        "suspended": "suspended"
+      },
+      "title": "Verification",
+      "intro": "A profile photo, a verification selfie (private), your Instagram or website, and at least three dish photos. The team compares the selfie with the profile photo before the profile goes public.",
+      "done": "Done",
+      "missing": "Missing",
+      "manage": "Manage photos",
+      "saveFirst": "Save your profile first; then upload the photos.",
+      "statusLine": "Status: {status}",
+      "submit": "Send for review",
+      "terms": "By sending, you accept the terms for chefs: you're responsible for the legality, hygiene, taxes and payments of your service."
+    },
+    "submit": {
+      "title": "Send for review",
+      "intro": "The team compares the selfie with your profile photo and looks at your dishes. We reply by email, usually on the same working day. After that, your profile appears in search.",
+      "changesRequested": "We've asked for changes: {notes}",
+      "done": "Done",
+      "missing": "Missing →",
+      "sending": "Sending…",
+      "submit": "Send for review"
+    }
+  },
+  "cooking": {
+    "saved": "Saved.",
+    "services": {
+      "home": "Cooks and serves at the client's home",
+      "delivery": "Takes the food to the client's address",
+      "pickup": "The client collects from your kitchen",
+      "events": "Large groups, on request",
+      "meal_prep": "Meals for the week"
+    },
+    "noCategory": "No category",
+    "categoriesTitle": "Cuisine categories",
+    "categoriesCount": "{count} of {max}",
+    "chooseUpTo": "Choose up to {max}. Clients filter their search by these categories.",
+    "notListed": "Is your cuisine not on the list?",
+    "addPlaceholder": "For example: Azorean",
+    "adding": "Adding…",
+    "add": "Add",
+    "addHint": "It's selected straight away if you have fewer than five. Then save your changes.",
+    "servicesTitle": "Services you offer",
+    "diets": "Diets you can cater for",
+    "preview": "How you appear in search",
+    "previewPrice": "<strong>{rating}</strong> · from {from}",
+    "previewNote": "Changes appear in search as soon as you save.",
+    "save": "Save changes"
+  },
+  "title": {
+    "statementSent": "Thank you! The team will read your description and reply by email.",
+    "verifiedTitle": "Verified chef",
+    "verifiedText": "The team has confirmed your title. Clients see you as <strong>Chef {name}</strong>, with the “Verified chef” badge.",
+    "title": "Chef title",
+    "intro": "You currently appear as <strong>{current}</strong>. To become <strong>Chef {name}</strong>, with the “Verified chef” badge, send a certificate (cookery course, hospitality school, professional diploma). Don't have one? Tell us about your experience: years cooking, where you've cooked, whether you teach. The team reads every request.",
+    "inReview": "Being verified",
+    "statement": "Description of your experience",
+    "modeLabel": "How you want to request the title",
+    "haveCert": "I have a certificate",
+    "noCert": "I don't have a certificate",
+    "experience": "Your cooking experience",
+    "experienceHint": "Only the Ao Lume team reads this. It doesn't appear on your profile.",
+    "experiencePlaceholder": "I've been cooking for 20 years, I was a cook at the restaurant… Today I teach cookery at…",
+    "sending": "Sending…",
+    "sendToTeam": "Send to the team",
+    "certName": "Certificate name",
+    "certPlaceholder": "Cookery Course, Hospitality School",
+    "file": "File",
+    "fileHint": "PDF, JPG or PNG up to 10 MB. Only the Ao Lume team can open it.",
+    "sendCert": "Send certificate",
+    "upload": {
+      "needName": "Enter the certificate's name.",
+      "needFile": "Choose the certificate file.",
+      "fileType": "Use a PDF, JPG or PNG.",
+      "tooBig": "The file is larger than 10 MB.",
+      "demo": "Demo mode: the certificate isn't saved.",
+      "failed": "We couldn't upload the file. Please try again.",
+      "sent": "Certificate sent. The team will reply by email."
+    }
+  },
+  "photos": {
+    "portraitAlt": "Your profile photo",
+    "portraitTitle": "Profile photo",
+    "portraitText": "A photo of you, with your face visible. It's the one clients see on your public profile.",
+    "changePortrait": "Change photo",
+    "uploadPortrait": "Upload photo",
+    "selfieSteps": {
+      "take": "Take a selfie now, facing the camera, with your face clearly visible and good light. No sunglasses or filters.",
+      "compare": "The team compares it with your profile photo to confirm it's the same person.",
+      "retake": "If it isn't clear, we'll ask you for another by email. You can replace it here whenever you like.",
+      "deleted": "When your profile is approved, the selfie is deleted. It isn't kept."
+    },
+    "selfieAlt": "Your verification selfie",
+    "verified": "Verified",
+    "noSelfie": "No selfie yet",
+    "selfieTitle": "Verification selfie",
+    "private": "Private · only the team sees it",
+    "selfieDeleted": "Your identity has been confirmed and the selfie has already been deleted. You don't need to do anything else.",
+    "retakeSelfie": "Take another selfie",
+    "takeSelfie": "Take selfie",
+    "zonesLabel": "Photo sections",
+    "zones": {
+      "profile": "Profile",
+      "done": "Done",
+      "missing": "Missing",
+      "verification": "Verification",
+      "verified": "Verified",
+      "sent": "Sent",
+      "dishes": "Dishes",
+      "dishesCount": "{count, plural, one {# photo} other {# photos}}",
+      "dishesOf": "{count} of 3"
+    },
+    "dishesTitle": "Dishes · {count}",
+    "dishesText": "Show what you cook and say what each dish is. The first photo is the cover in search results. You need at least three to send your profile for review.",
+    "addPhotos": "Add photos",
+    "emptyTitle": "No dish photos yet",
+    "emptyText": "Good photos, in natural light, are what most makes a client request a booking.",
+    "uploading": "Uploading…",
+    "uploadingN": "Uploading {done} of {total}…",
+    "dish": {
+      "captionLabel": "Dish description",
+      "captionPlaceholder": "What is this dish? E.g. Traditional duck rice",
+      "saving": "Saving…",
+      "unsaved": "Not saved",
+      "saved": "Saved",
+      "charsLeft": "{count} characters",
+      "alt": "Dish",
+      "cover": "Cover",
+      "useAsCover": "Use as cover",
+      "moveBack": "Move back",
+      "moveForward": "Move forward",
+      "confirmDelete": "Delete this photo?",
+      "delete": "Delete"
+    },
+    "upload": {
+      "demo": "Demo mode: photos aren't saved.",
+      "selfieFailed": "The selfie wasn't uploaded. Use a JPG or PNG photo, or take it with the camera.",
+      "failed": "{count, plural, one {One photo wasn't uploaded} other {# photos weren't uploaded}}. Use JPG, PNG or WEBP.",
+      "selfieSent": "Selfie sent. Only the team can see it.",
+      "uploaded": "{count, plural, one {Photo uploaded.} other {# photos uploaded.}}"
+    }
+  },
+  "setup": {
+    "photos": {
+      "title": "Photos",
+      "text": "A photo of you and at least three of your dishes, with descriptions.",
+      "action": "Upload photos"
+    },
+    "offer": {
+      "title": "Create an offer",
+      "text": "A menu, a box or an order, with a price. It's what clients book.",
+      "action": "Create offer"
+    },
+    "days": {
+      "title": "Open the days you can cook",
+      "text": "Clients can only request a booking on the days you open. You can open the days of the week you usually cook right now.",
+      "action": "Open days"
+    },
+    "review": {
+      "title": "Send for review",
+      "text": "The team checks the photos and your profile goes public.",
+      "textRejected": "We've asked for changes: {notes}",
+      "seeEmail": "see the email we sent you.",
+      "action": "Send for review",
+      "actionRejected": "Review and resend"
+    },
+    "billing": {
+      "title": "Invoicing details",
+      "text": "Legal name, tax number (NIF), tax address, IBAN and the contract. Without these we can collect the deposit for you, but we can't transfer it to you.",
+      "action": "Fill in invoicing"
+    },
+    "headingWaiting": "Your profile is under review",
+    "headingOnlyBilling": "We need your invoicing details to pay you",
+    "headingApproved": "Almost ready to take bookings",
+    "heading": "First steps",
+    "progress": "{done} of {total}",
+    "waitingText": "The team will reply by email. Meanwhile, you can fine-tune your offers and availability.",
+    "onlyBillingText": "You can already take requests. The deposit clients pay is held for you. We just can't transfer it until we have your tax details, your IBAN and the accepted contract. Nothing is lost: it waits for you.",
+    "srDone": ": done",
+    "srNext": ": next step",
+    "open": "Open"
+  },
+  "lumi": {
+    "label": "Lumi's help",
+    "hideGroup": "Hide Lumi's help",
+    "hideQuestion": "Hide Lumi's help?",
+    "justNow": "Just for now",
+    "never": "Never show again",
+    "explain": "“Just for now” brings her back on your next visit. “Never show again” applies to every page; you can turn her back on whenever you like.",
+    "cancel": "Cancel",
+    "turnOff": "Stop showing Lumi's help",
+    "activating": "Turning on…",
+    "show": "Show Lumi's help",
+    "settingTitle": "Lumi's help",
+    "settingText": "Short tips on the dashboard pages until you finish the first steps. You can turn her off at any time."
+  },
+  "tips": {
+    "onboarding": {
+      "rejected": {
+        "title": "A few points to review",
+        "text": "The team left notes in the last step. Just fix those points and send it again."
+      },
+      "resume": {
+        "title": "Pick up where you left off",
+        "text": "The details you saved are still here. Your public name is how clients know you on Ao Lume: your own name or the name you cook under."
+      },
+      "welcome": {
+        "title": "Welcome to Ao Lume",
+        "text": "I'm Lumi and I'll guide you, field by field. Your public name is how clients know you on Ao Lume: your own name or the name you cook under."
+      },
+      "link": {
+        "title": "Your page's address",
+        "text": "It's the link to your profile, easy to find and to share with clients. It's created from your public name; go for something short and simple."
+      },
+      "appear": {
+        "title": "How you want to appear",
+        "text": "It sets the title on your public profile: cook. With a verified certificate, you'll appear as Chef."
+      },
+      "profile": {
+        "title": "Profile type",
+        "text": "It's shown on your public profile, next to your name: home cook or cooking professional. Choose what best describes your experience."
+      },
+      "headline": {
+        "title": "A line about you",
+        "text": "A quick description of your cooking, which clients read just below your name. For example: Alentejo cooking for dinners at home."
+      },
+      "bio": {
+        "title": "Your story in the kitchen",
+        "text": "Tell how you started, where you learnt, what you like to cook and how you work. It's what introduces the person who'll be cooking in the client's home."
+      },
+      "area": {
+        "title": "Where you work",
+        "text": "Enter the area where you want to cook for your clients. Clients only see the area, never your address."
+      },
+      "radius": {
+        "title": "How far you travel",
+        "text": "The distance, in kilometres from your area, you're willing to travel for a service."
+      },
+      "social": {
+        "title": "Instagram or website",
+        "text": "It's only so the team can see that you really cook: dishes you've made, events, clients. It doesn't need to be a professional page or have lots of followers; a personal account with photos of your food is enough."
+      },
+      "portrait": {
+        "title": "Profile photo",
+        "done": "Photo uploaded. You can change it whenever you like.",
+        "todo": "It's public: the picture clients see before welcoming you into their home. Go for a sharp photo, facing the camera, in good light."
+      },
+      "selfie": {
+        "title": "Verification selfie",
+        "done": "Selfie received. Only the team sees it and it's deleted after approval.",
+        "todo": "It's private and only the team has access. It confirms the profile photo is you, and it's deleted after approval."
+      },
+      "dishes": {
+        "title": "Dish photos",
+        "needThree": "You need at least three. They're what most influences a booking request: favour natural light and the dish in focus.",
+        "missing": "{count} more to go. They're what most influences a booking request: favour natural light and the dish in focus.",
+        "enough": "You have enough photos. The first is the cover in search results; you can reorder them."
+      },
+      "continue": {
+        "title": "Photos done",
+        "text": "You can move on to the last step and send your profile for review."
+      },
+      "ready": {
+        "title": "Profile ready for review",
+        "text": "The team reviews every profile, usually on the same working day. Your tax number (NIF) and IBAN are only asked for before the first payment."
+      },
+      "notReady": {
+        "title": "Some things are still missing",
+        "text": "Select “Missing” on each item to complete it. Everything you've saved is kept."
+      }
+    },
+    "agenda": {
+      "weekly": {
+        "title": "Your regular days",
+        "text": "Choose the days of the week you usually cook and save: they stay open every week, without having to come back every month."
+      },
+      "calendar": {
+        "title": "Your open days",
+        "text": "Tap a day to open or close it, for example for a day off or an extra day; it's saved straight away. Clients can only request on open days."
+      }
+    },
+    "offers": {
+      "first": {
+        "title": "Create your first offer",
+        "text": "An offer is what clients book: a menu, a box or an order. Start with one, with a clear title and the price."
+      },
+      "list": {
+        "title": "Your offers",
+        "text": "You can have several, for different occasions. Untick “Visible on your profile” on the ones you can't do for now."
+      },
+      "title": {
+        "title": "Title and description",
+        "text": "A title that says what it is, and in the description the dishes and what's included. It's what helps the client decide."
+      },
+      "where": {
+        "title": "Where it's served",
+        "text": "At the client's home, delivered to their address or picked up from your kitchen. Each offer has its own mode."
+      },
+      "price": {
+        "title": "How you charge",
+        "text": "Per person or unit, a fixed amount, or on request when every booking is different, for example for events."
+      },
+      "hours": {
+        "title": "Times",
+        "text": "Tap the times you can serve. When requesting, the client picks one of them."
+      },
+      "leadTime": {
+        "title": "Notice",
+        "text": "How many hours' notice you need to receive a request. Clients can't request with less notice than that."
+      }
+    },
+    "cooking": {
+      "categories": {
+        "title": "Cuisine categories",
+        "text": "Choose up to five: they're how clients find you in search. If your cuisine isn't on the list, you can add it."
+      },
+      "services": {
+        "title": "Services you offer",
+        "text": "Only turn on what you actually do. Services appear on your profile and clients filter their search by them."
+      }
+    },
+    "photos": {
+      "portrait": {
+        "title": "Your photo",
+        "text": "Sharp, facing the camera, in good light. It's the first thing a client sees before welcoming you into their home."
+      },
+      "dishes": {
+        "title": "Your dishes",
+        "text": "Say what each dish is and put them in order: the first photo is the cover in search results."
+      }
+    },
+    "requests": {
+      "quote": {
+        "title": "This request needs a quote",
+        "text": "The client is waiting for your price. Read the notes, press “Send quote” and enter the total price. If the client accepts, they pay the deposit in the app and the date is secured."
+      }
+    }
+  }
+}

@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { Field } from "@/components/ui/Field";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { useServerAction } from "@/hooks/useServerAction";
 import { chefUpdateBooking } from "@/lib/bookings";
-import { dayLabel, isoDay } from "@/lib/format";
+import { dayLabel, euro, isoDay } from "@/lib/format";
+import { type Locale } from "@/lib/i18n/routing";
 import type { BookingStatus, DepositStatus } from "@/lib/types";
 
 type Panel = null | "decline" | "propose";
@@ -29,6 +31,8 @@ export function RequestActions({
   /** Smallest quote the signal can carry the minimum commission on (payments on). */
   minQuote?: number | null;
 }) {
+  const t = useTranslations("dashboard.requests.actions");
+  const locale = useLocale() as Locale;
   const awaitingDeposit = depositStatus === "due" || depositStatus === "pending" || depositStatus === "overdue";
   const [panel, setPanel] = useState<Panel>(null);
   const [reason, setReason] = useState("");
@@ -55,20 +59,20 @@ export function RequestActions({
           <>
             {needsPrice ? (
               <button type="button" className="btn btn-sm" disabled={pending} onClick={() => toggle("propose")}>
-                Enviar orçamento
+                {t("sendQuote")}
               </button>
             ) : (
               <>
                 <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "accepted" })}>
-                  Aceitar
+                  {t("accept")}
                 </button>
                 <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => toggle("propose")}>
-                  Propor alteração
+                  {t("proposeChange")}
                 </button>
               </>
             )}
             <button type="button" className="btn btn-sm btn-o" disabled={pending} onClick={() => toggle("decline")}>
-              Recusar
+              {t("decline")}
             </button>
           </>
         )}
@@ -76,39 +80,37 @@ export function RequestActions({
             pagamento entrar. Mostrar o botão era convidar o chef a carregar e levar um erro. */}
         {status === "accepted" &&
           (awaitingDeposit ? (
-            <span className="order-last w-full text-[13px] text-muted">
-              A reserva confirma-se sozinha assim que o sinal entrar. Não é preciso fazer nada.
-            </span>
+            <span className="order-last w-full text-[13px] text-muted">{t("confirmsItself")}</span>
           ) : (
             <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "confirmed" })}>
-              Sinal recebido · confirmar
+              {t("depositReceived")}
             </button>
           ))}
         {status === "confirmed" &&
           // Completing unlocks the client's review, so it waits for the service day.
           (date <= isoDay(new Date()) ? (
             <button type="button" className="btn btn-sm" disabled={pending} onClick={() => run(id, { status: "completed" })}>
-              Marcar concluída
+              {t("markCompleted")}
             </button>
           ) : (
-            <span className="order-last w-full text-[13px] text-muted">Pode marcar como concluída a partir de {dayLabel(date)}</span>
+            <span className="order-last w-full text-[13px] text-muted">{t("completableFrom", { date: dayLabel(date, locale) })}</span>
           ))}
         {(status === "accepted" || status === "confirmed" || status === "change_proposed") && (
           <button
             type="button"
             className="btn btn-sm btn-o !border-line-2 !text-danger"
             disabled={pending}
-            onClick={() => confirm("Cancelar esta reserva? O cliente é avisado.") && run(id, { status: "cancelled" })}
+            onClick={() => confirm(t("confirmCancel")) && run(id, { status: "cancelled" })}
           >
-            Cancelar
+            {t("cancel")}
           </button>
         )}
       </div>
 
       {panel === "decline" && (
         <div className="flex flex-col gap-3 rounded-[2px] bg-paper p-4">
-          <Field label="Motivo (o cliente vê esta mensagem)">
-            <input value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} placeholder="Já tenho um evento nesse dia" />
+          <Field label={t("declineReason")}>
+            <input value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} placeholder={t("declinePlaceholder")} />
           </Field>
           <button
             type="button"
@@ -116,19 +118,16 @@ export function RequestActions({
             disabled={pending}
             onClick={() => run(id, { status: "declined", decline_reason: reason || undefined })}
           >
-            Recusar pedido
+            {t("declineRequest")}
           </button>
         </div>
       )}
 
       {panel === "propose" && needsPrice && (
         <div className="flex flex-col gap-3 rounded-[2px] bg-paper p-4">
-          <p className="m-0 text-sm text-ink-3">
-            O cliente espera o seu preço. Veja as notas do pedido e indique o valor total do serviço. Se o cliente aceitar, paga o sinal na
-            app e a data fica garantida.
-          </p>
+          <p className="m-0 text-sm text-ink-3">{t("quoteIntro")}</p>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(140px,100%),1fr))] gap-3.5">
-            <Field label="Valor total (€)" hint={minQuote ? `Mínimo ${minQuote} €` : undefined}>
+            <Field label={t("totalValue")} hint={minQuote ? t("minimum", { amount: euro(minQuote, locale) }) : undefined}>
               <input
                 inputMode="decimal"
                 required
@@ -138,15 +137,15 @@ export function RequestActions({
                 placeholder="250"
               />
             </Field>
-            <Field label="Outra data (opcional)">
+            <Field label={t("otherDate")}>
               <input type="date" value={proposal.date} onChange={(e) => setProposal((p) => ({ ...p, date: e.target.value }))} />
             </Field>
-            <Field label="Hora (opcional)">
+            <Field label={t("timeOptional")}>
               <input value={proposal.time} onChange={(e) => setProposal((p) => ({ ...p, time: e.target.value }))} placeholder="20:00" />
             </Field>
           </div>
           <button type="button" className="btn btn-sm self-start" disabled={pending || !priceOk} onClick={sendProposal}>
-            Enviar orçamento ao cliente
+            {t("sendQuoteToClient")}
           </button>
         </div>
       )}
@@ -154,18 +153,18 @@ export function RequestActions({
       {panel === "propose" && !needsPrice && (
         <div className="flex flex-col gap-3 rounded-[2px] bg-paper p-4">
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(140px,100%),1fr))] gap-3.5">
-            <Field label="Nova data">
+            <Field label={t("newDate")}>
               <input type="date" value={proposal.date} onChange={(e) => setProposal((p) => ({ ...p, date: e.target.value }))} />
             </Field>
-            <Field label="Hora">
+            <Field label={t("time")}>
               <input value={proposal.time} onChange={(e) => setProposal((p) => ({ ...p, time: e.target.value }))} placeholder="20:00" />
             </Field>
-            <Field label="Orçamento (€)">
+            <Field label={t("quoteValue")}>
               <input
                 inputMode="decimal"
                 value={proposal.price}
                 onChange={(e) => setProposal((p) => ({ ...p, price: e.target.value }))}
-                placeholder="Opcional"
+                placeholder={t("optional")}
               />
             </Field>
           </div>
@@ -175,7 +174,7 @@ export function RequestActions({
             disabled={pending || (!proposal.date && !proposal.time && !proposal.price)}
             onClick={sendProposal}
           >
-            Enviar proposta
+            {t("sendProposal")}
           </button>
         </div>
       )}
