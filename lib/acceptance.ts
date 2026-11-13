@@ -5,6 +5,9 @@ import { sha256 } from "./crypto";
 import { sendEmail } from "./email";
 import { renderEmail, type EmailDoc } from "./email-template";
 import { lisbonStamp } from "./acceptance-format";
+import { localeOfProfile } from "./i18n/recipient";
+import { type Locale } from "./i18n/routing";
+import { getTranslator } from "./i18n/translator";
 import { createAdminClient } from "./supabase/admin";
 import { createClient } from "./supabase/server";
 import { TERMS_TITLE, TERMS_UPDATED, termsText } from "./terms";
@@ -115,8 +118,14 @@ export async function recordAcceptance(who: Who, kinds: readonly LegalKind[], co
 
   try {
     const accepted = texts.filter((t) => fresh.some((r) => r.kind === t.kind));
-    const { html, text } = renderEmail(acceptanceEmail(accepted, context, acceptedAt, who.name, kinds.includes("chef_contract")));
-    const subject = context === "signup" ? "A sua conta no Ao Lume está criada" : "Registámos a sua aceitação";
+    // The person's own language: the account's stored locale (set from the sign-up form).
+    const locale = await localeOfProfile(who.userId);
+    const e = getTranslator(locale, "emails");
+    const { html, text } = renderEmail(
+      acceptanceEmail(accepted, context, acceptedAt, who.name, kinds.includes("chef_contract"), locale),
+      locale,
+    );
+    const subject = context === "signup" ? e("acceptance.signup.subject") : e("acceptance.receipt.subject");
     if (await sendEmail({ to: who.email, subject, text, html })) {
       await admin
         .from("legal_acceptances")
@@ -133,32 +142,46 @@ export async function recordAcceptance(who: Who, kinds: readonly LegalKind[], co
 }
 
 /** The welcome email at sign-up, or a short receipt later; both end with what was accepted. */
-function acceptanceEmail(texts: LegalText[], context: AcceptanceContext, acceptedAt: string, name: string | null, chef: boolean): EmailDoc {
-  const what = texts.map((t) => (t.kind === "terms" ? `os ${t.title} (versão de ${t.version})` : `o ${t.title} (versão ${t.version})`));
-  const list = what.length > 1 ? `${what.slice(0, -1).join(", ")} e ${what.at(-1)}` : what[0];
+function acceptanceEmail(
+  texts: LegalText[],
+  context: AcceptanceContext,
+  acceptedAt: string,
+  name: string | null,
+  chef: boolean,
+  locale: Locale,
+): EmailDoc {
+  const e = getTranslator(locale, "emails");
+  // Document names in the recipient's language (the archived text stays Portuguese; the links
+  // below open the exact version accepted, which is what is legally binding).
+  const title = (t: LegalText) => (t.kind === "terms" ? e("acceptance.termsTitle") : e("acceptance.contractTitle"));
+  const what = texts.map((t) =>
+    t.kind === "terms"
+      ? e("acceptance.termsItem", { title: title(t), version: t.version })
+      : e("acceptance.contractItem", { title: title(t), version: t.version }),
+  );
+  const list = what.length > 1 ? what.slice(0, -1).join(", ") + e("acceptance.and") + what.at(-1) : what[0]!;
   const when = lisbonStamp(acceptedAt);
   // Short links at the foot; each opens the exact version accepted, not the current one.
   const links = texts.map((t) => ({
-    label: t.kind === "terms" ? `${t.title} aceites` : `${t.title} aceite`,
+    label: t.kind === "terms" ? e("acceptance.termsLink", { title: title(t) }) : e("acceptance.contractLink", { title: title(t) }),
     href: `/arquivo/${t.sha256}`,
   }));
-  const hello = name ? `Olá, ${name.split(" ")[0]}.` : "Olá.";
+  const hello = name ? e("acceptance.helloName", { name: name.split(" ")[0] ?? name }) : e("acceptance.hello");
 
   if (context === "signup") {
+    const who = chef ? "chef" : "client";
     return {
-      preheader: chef ? "O próximo passo é criar o seu perfil de chef." : "Já pode procurar chefs perto de si.",
-      heading: chef ? "A sua conta de chef está criada" : "Bem-vindo ao Ao Lume",
-      lead: chef
-        ? `${hello} O próximo passo é criar o seu perfil: três passos, uns dez minutos, e a equipa revê-o antes de ficar público.`
-        : `${hello} A sua conta está criada. Já pode procurar chefs perto de si e fazer o seu primeiro pedido.`,
-      cta: chef ? { label: "Criar o meu perfil", href: "/dashboard/comecar" } : { label: "Procurar chefs", href: "/" },
+      preheader: e(`acceptance.signup.${who}.preheader`),
+      heading: e(`acceptance.signup.${who}.heading`),
+      lead: e(`acceptance.signup.${who}.lead`, { hello }),
+      cta: { label: e(`acceptance.signup.${who}.cta`), href: chef ? "/dashboard/comecar" : "/" },
       footLinks: links,
     };
   }
   return {
-    preheader: `Aceitou ${list}.`,
-    heading: "Registámos a sua aceitação",
-    lead: `${hello} A ${when}, aceitou ${list}. Guarde este email: as ligações abaixo abrem o texto exato que aceitou, que pode guardar e imprimir.`,
+    preheader: e("acceptance.receipt.preheader", { list }),
+    heading: e("acceptance.receipt.heading"),
+    lead: e("acceptance.receipt.lead", { hello, when, list }),
     footLinks: links,
   };
 }

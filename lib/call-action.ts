@@ -1,8 +1,13 @@
-import { GENERIC_ERROR } from "./result";
-
-const OFFLINE = "Sem ligação à internet. Verifique a ligação e tente de novo.";
+import errorsEn from "@/messages/en/errors.json";
+import errorsPt from "@/messages/pt/errors.json";
 
 type Failure = { ok: false; error: string };
+
+/** The page's language from <html lang> ("pt-PT", "en-GB"): this runs outside React, without hooks. */
+function pageErrors(): { generic: string; offline: string } {
+  const lang = typeof document !== "undefined" ? document.documentElement.lang.toLowerCase() : "";
+  return lang.startsWith("en") ? errorsEn : errorsPt;
+}
 
 /**
  * Calls a server action from the browser. Actions return failures as values, but a dropped
@@ -14,6 +19,7 @@ export async function callAction<T extends { ok: boolean }>(action: () => Promis
     return await action();
   } catch (err) {
     console.error("[action]", err);
-    return { ok: false, error: typeof navigator !== "undefined" && !navigator.onLine ? OFFLINE : GENERIC_ERROR };
+    const e = pageErrors();
+    return { ok: false, error: typeof navigator !== "undefined" && !navigator.onLine ? e.offline : e.generic };
   }
 }

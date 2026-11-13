@@ -1,1 +1,213 @@
-{}
+{
+  "generic": "Something went wrong. Please try again in a moment.",
+  "offline": "No internet connection. Check your connection and try again.",
+  "invalidRequest": "Invalid request.",
+  "invalidData": "Invalid details.",
+  "invalidDocument": "Invalid document.",
+  "invalidIban": "That IBAN is not valid. Check the digits with your bank.",
+  "form": {
+    "check": "Please check the details in the form.",
+    "checkField": "Please check the “{label}” field."
+  },
+  "booking": {
+    "fields": {
+      "offerId": "Choose an offer.",
+      "date": "Choose a day on the calendar.",
+      "time": "Choose a time.",
+      "guests": "People",
+      "name": "Enter your name.",
+      "email": "That email address does not look right.",
+      "phone": "Enter a mobile number.",
+      "address": "Address",
+      "notes": "Notes for the chef"
+    },
+    "rpc": {
+      "invalid_email": "That email address does not look right.",
+      "phone_required": "Enter a mobile number.",
+      "offer_not_found": "This offer is no longer available.",
+      "chef_not_available": "This chef is not available at the moment.",
+      "guests_out_of_range": "The number of people is outside what the chef accepts for this offer.",
+      "too_late_for_this_date": "There is no longer time to prepare for this date. Choose a later day.",
+      "date_not_available": "That day is no longer free. Choose another.",
+      "address_required": "Enter the address.",
+      "outside_service_area": "The address is outside this chef's service area.",
+      "too_many_requests": "You have sent a lot of requests in the last hour. Please try again later.",
+      "cannot_book_own_offer": "You cannot book your own offer. To test it, use a private window and a different email address."
+    },
+    "sendFailed": "We could not send the request. Please try again in a moment.",
+    "lookup": {
+      "invalidEmail": "That email address does not look right.",
+      "refRequired": "Enter the request number.",
+      "tooManyAttempts": "Too many attempts. Please try again in an hour.",
+      "searchFailed": "We could not look up the request. Please try again in a moment.",
+      "notFound": "We could not find a request with that number and email address."
+    },
+    "invalidMessage": "Invalid message.",
+    "notFound": "Booking not found.",
+    "conversationNotFound": "Conversation not found.",
+    "messageFailed": "We could not send the message.",
+    "clientActionFailed": "We could not complete this. Refresh the page and try again.",
+    "quoteFirst": "This request is for a quote: send your quote first.",
+    "quoteRequired": "Enter the amount of the quote.",
+    "completeFromServiceDay": "You can only mark it as completed from the day of the service.",
+    "quoteTooLow": "The quote is too low for the deposit to cover the minimum commission. Enter a higher amount.",
+    "stateChanged": "This request has already changed status. Refresh the page to see its current status.",
+    "updateFailed": "We could not update the booking. Please try again.",
+    "requestNotFound": "We could not find this request. Refresh the page.",
+    "invalidReview": "Invalid review.",
+    "reviewFailed": "We could not publish the review."
+  },
+  "deposit": {
+    "tooManyAttempts": "Too many attempts. Wait a few minutes and try again.",
+    "cardOnlyLive": "Card payment only works on the live site. Use MB WAY or a Multibanco reference.",
+    "mbwayPhone": "Enter a Portuguese mobile number linked to MB WAY.",
+    "notAllowed": "We cannot open this request here.",
+    "notAwaiting": "This booking is no longer waiting for the deposit. Refresh the page.",
+    "nothingToPay": "This booking has no deposit to pay.",
+    "startFailed": "We could not start the payment. Please try again.",
+    "startFailedShort": "We could not start the payment.",
+    "providerFailed": "We could not start the payment. Please try again in a moment.",
+    "unavailable": "Payments are not available yet. Please try again later.",
+    "alreadyPaid": "This payment has already been made.",
+    "cancelFailed": "We could not cancel. Refresh the page.",
+    "cannotStore": "We cannot record your details right now. Please try again later.",
+    "refundInProgress": "This refund is already being processed.",
+    "saveFailed": "We could not save your details. Please try again."
+  },
+  "support": {
+    "fields": {
+      "name": "Enter your name.",
+      "email": "That email address does not look right.",
+      "subject": "Write a subject.",
+      "body": "Write your message with some detail.",
+      "website": "We could not send the message."
+    },
+    "tooMany": "We have received several messages from you. Please give us a little time to reply.",
+    "sendFailed": "We could not send the message. Please try again in a moment."
+  },
+  "dashboard": {
+    "noChef": "First create your chef profile, under Profile.",
+    "saveFailed": "We could not save. Please try again.",
+    "agenda": {
+      "invalidDate": "Invalid date",
+      "dayFailed": "We could not update this day. Please try again.",
+      "weeklyFailed": "We could not save your regular days. Please try again.",
+      "openFailed": "We could not open those days. Please try again.",
+      "fulfilledFailed": "We could not update the service. Please try again."
+    },
+    "billing": {
+      "fields": {
+        "legal_name": "Full legal name",
+        "nif": "NIF (tax number)",
+        "address_line": "Tax address",
+        "postal_code": "Enter the postcode in the format 0000-000.",
+        "city": "Town or city",
+        "birth_date": "Date of birth",
+        "birth_place": "Place of birth",
+        "company_reg_number": "Company registration number"
+      },
+      "invalidNif": "That NIF is not valid. Check the nine digits.",
+      "postalCode": "Enter the postcode in the format 0000-000.",
+      "birthRequired": "Date and place of birth are required: the law obliges us to report them to the Portuguese Tax Authority.",
+      "companyRegRequired": "Enter the company's registration number.",
+      "ibanFields": {
+        "iban": "IBAN",
+        "holder": "Account holder"
+      },
+      "cannotStoreBank": "The platform is not yet ready to store bank details. We will be in touch.",
+      "invalidLink": "Invalid link. Request the change again.",
+      "linkExpired": "The link has expired. Request the change again.",
+      "noPendingChange": "There is no change waiting to be confirmed."
+    },
+    "certificates": {
+      "titleRequired": "Enter the name of the certificate (for example, Cookery Course).",
+      "saveFailed": "We could not save the certificate. Please try again.",
+      "statementTooShort": "Tell us a little more: at least one or two sentences about your experience.",
+      "statementFailed": "We could not send your description. Please try again."
+    },
+    "cooking": {
+      "badName": "Write the name of the cuisine, between 3 and 40 characters.",
+      "tooMany": "You have already added three new cuisines. For more, get in touch with us.",
+      "addFailed": "We could not add the cuisine. Please try again.",
+      "maxCategories": "Choose up to {max} categories."
+    },
+    "legal": {
+      "signInFirst": "Sign in to your account first.",
+      "acceptFailed": "We could not record your acceptance. Please try again in a moment."
+    },
+    "logistics": {
+      "fields": {
+        "travel_radius_km": "Travel radius",
+        "free_distance_km": "Free up to (km)",
+        "fee_per_km": "After that, per km",
+        "arrival_minutes_before": "Arrival before the service",
+        "delivery_windows": "Time windows",
+        "delivery_fee": "Delivery fee",
+        "free_delivery_over": "Free over",
+        "kitchen_address": "Kitchen address"
+      },
+      "saveFailed": "We could not save the logistics. Please try again.",
+      "partialSave": "Part of the logistics was not saved. Please try again."
+    },
+    "lumi": {
+      "saveFailed": "We could not save the preference."
+    },
+    "money": {
+      "onlyConfirmed": "Only once the booking is confirmed.",
+      "notYours": "This booking is not yours."
+    },
+    "offers": {
+      "fields": {
+        "title": "Offer name",
+        "description": "Description",
+        "price": "Price",
+        "unit_label": "Unit",
+        "min_guests": "Minimum",
+        "max_guests": "Maximum",
+        "lead_time_hours": "Notice",
+        "time_slots": "Times"
+      },
+      "priceRequired": "Enter the price.",
+      "saveFailed": "We could not save the offer. Please try again.",
+      "deleteFailed": "We could not delete the offer. Please try again."
+    },
+    "photos": {
+      "invalid": "Invalid photo.",
+      "saveFailed": "We could not save the photo. Please try again.",
+      "selfieFailed": "We could not save the selfie. Please try again.",
+      "captionFailed": "We could not save the caption. Please try again.",
+      "deleteFailed": "We could not delete the photo. Please try again.",
+      "moveFailed": "We could not change the order. Please try again."
+    },
+    "profile": {
+      "fields": {
+        "display_name": "Public name",
+        "slug": "The link can only contain letters, numbers and hyphens.",
+        "headline": "Introduction line",
+        "bio": "About you",
+        "area_name": "Home area",
+        "service_radius_km": "Service radius",
+        "instagram": "Instagram",
+        "website": "Website",
+        "years_experience": "Years of experience",
+        "deposit_percent": "Deposit requested"
+      },
+      "depositMin": "The deposit must be at least {min}%: that is what covers our {commission}% commission and still leaves you something to receive.",
+      "instagram": "Instagram: write just the username, for example @your.profile, or paste the link to the profile.",
+      "clientAccount": "This is a client account. To have a chef profile, create a chef account.",
+      "slugTaken": "That link is already in use. Choose another.",
+      "saveFailed": "We could not save the profile. Please try again.",
+      "noPortrait": "The profile photo is missing.",
+      "noSelfie": "The verification selfie is missing, under Photos.",
+      "needDishes": "Upload at least three photos of dishes.",
+      "needLink": "Add your Instagram or website.",
+      "acceptFirst": "Accept the terms and the contract before sending for review.",
+      "submitFailed": "We could not send it for review. Please try again."
+    },
+    "reviews": {
+      "replyRequired": "Write your reply.",
+      "replyFailed": "We could not publish the reply. You can only reply once to each review.",
+      "reportFailed": "We could not send the report. Please try again."
+    }
+  }
+}
