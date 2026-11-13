@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { redirectLocalized } from "@/lib/i18n/server";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { SiteFooter, Wordmark } from "@/components/SiteChrome";
@@ -48,12 +49,18 @@ export default async function ContaLayout({ children }: LayoutProps<"/[locale]/c
                 {t("admin")}
               </Link>
             )}
+            <LanguageSwitch persist={!session.demo} className="ml-1 text-[13px] text-ink-2" linkClassName="rounded-md px-1.5 py-1 text-ink-2 hover:bg-paper" />
             {!session.demo && <SignOutButton className="ml-2 px-3 py-2 text-[15px] font-medium" />}
           </nav>
           <MobileMenu
             brand={brand}
             links={session.role === "admin" ? [...links, { href: "/admin", label: t("admin") }] : links}
-            actions={!session.demo && <SignOutButton block />}
+            actions={
+              <>
+                {!session.demo && <SignOutButton block />}
+                <LanguageSwitch variant="long" persist={!session.demo} className="mt-2 gap-4 text-[16px]" linkClassName="py-1 text-ink" />
+              </>
+            }
           />
         </div>
       </header>

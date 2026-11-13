@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { getLocale } from "next-intl/server";
-import { toDbLocale, type Locale } from "@/lib/i18n/routing";
+import { isLocale, toDbLocale, type Locale } from "@/lib/i18n/routing";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { z } from "zod";
 import { recordAcceptance } from "@/lib/acceptance";
@@ -65,4 +65,18 @@ export async function signUpWithTerms(input: Omit<z.infer<typeof SignUpInput>, "
     if (!recorded) console.error(`[auth] acceptance not recorded for ${user.id}`);
   }
   return { ok: true, session: Boolean(data.session) };
+}
+
+/**
+ * A signed-in person switched language: their account keeps it, so the emails we send them
+ * (requests, deposits, payouts) follow. Signed out, or anything unexpected: nothing to do.
+ */
+export async function saveMyLocale(locale: string): Promise<void> {
+  if (!hasSupabase || !isLocale(locale)) return;
+  const sb = await createClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return;
+  await sb.from("profiles").update({ locale: toDbLocale(locale) }).eq("id", user.id);
 }

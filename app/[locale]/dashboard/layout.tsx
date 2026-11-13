@@ -4,6 +4,7 @@ import { Link } from "@/lib/i18n/navigation";
 import { redirectLocalized } from "@/lib/i18n/server";
 import { Wordmark } from "@/components/SiteChrome";
 import { SideNav } from "@/components/dashboard/SideNav";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import { MobileMenu } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getBookings, getMyChef, getSession } from "@/lib/dashboard";
@@ -72,6 +73,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/[local
               ) : (
                 <SignOutButton block />
               )}
+              <LanguageSwitch variant="long" persist={!session.demo} className="mt-2 gap-4 text-[16px]" linkClassName="py-1 text-ink" />
             </>
           }
         />
@@ -108,6 +110,12 @@ export default async function DashboardLayout({ children }: LayoutProps<"/[local
           </Link>
         )}
         {!chef && !session.demo && <SignOutButton className="mt-auto self-start px-3.5 text-[13px]" />}
+        <LanguageSwitch
+          variant="long"
+          persist={!session.demo}
+          className={`${chef ? "mt-4" : "mt-3"} gap-3 px-3.5 text-[13px]`}
+          linkClassName="text-muted hover:text-ink"
+        />
         {session.demo && (
           <span className="mx-3.5 mt-4 rounded-[2px] bg-paper px-3 py-2 text-xs text-muted">
             {t("layout.demo")}

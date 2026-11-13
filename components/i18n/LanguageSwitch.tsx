@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import type { MouseEvent } from "react";
+import { saveMyLocale } from "@/app/auth/actions";
 import { usePathname, useRouter } from "@/lib/i18n/navigation";
 import { LOCALE_NAME, LOCALES, localizePath, type Locale } from "@/lib/i18n/routing";
 
@@ -10,6 +11,8 @@ type Props = {
   variant?: "short" | "long";
   className?: string;
   linkClassName?: string;
+  /** Signed-in areas (dashboard, account): also save the choice on the account, for emails. */
+  persist?: boolean;
 };
 
 /**
@@ -17,7 +20,7 @@ type Props = {
  * locale Link would point at /pt/… and redirect), so it works without JS and for crawlers; with
  * JS, the click also keeps the query string (search filters, ?chef=1).
  */
-export function LanguageSwitch({ variant = "short", className = "", linkClassName = "" }: Props) {
+export function LanguageSwitch({ variant = "short", className = "", linkClassName = "", persist = false }: Props) {
   const t = useTranslations("nav.language");
   const locale = useLocale() as Locale;
   const pathname = usePathname();
@@ -26,6 +29,7 @@ export function LanguageSwitch({ variant = "short", className = "", linkClassNam
   function go(e: MouseEvent<HTMLAnchorElement>, to: Locale) {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
+    if (persist) void saveMyLocale(to).catch(() => {});
     router.replace(`${pathname}${window.location.search}${window.location.hash}`, { locale: to });
   }
 
