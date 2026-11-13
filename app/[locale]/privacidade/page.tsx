@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalPage, type LegalSection } from "@/components/LegalPage";
 import { SITE_DOMAIN } from "@/lib/constants";
+import { DEFAULT_LOCALE, routing } from "@/lib/i18n/routing";
 import { COMPANY, EMAIL } from "@/lib/legal";
+import { LEGAL_UPDATED_EN } from "@/lib/legal.en";
+import { PRIVACY_INTRO_EN, PRIVACY_SECTIONS_EN, PRIVACY_TITLE_EN } from "@/lib/privacy.en";
+import { alternates } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Política de privacidade",
-  description: "Como o Ao Lume trata os seus dados pessoais, nos termos do RGPD: que dados, para quê, com quem e os seus direitos.",
-  alternates: { canonical: "/privacidade" },
-};
+export async function generateMetadata({ params }: PageProps<"/[locale]/privacidade">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+  const t = await getTranslations({ locale, namespace: "legal.meta.privacy" });
+  return { title: t("title"), description: t("description"), alternates: alternates("/privacidade", locale) };
+}
 
 const SECTIONS: LegalSection[] = [
   {
@@ -270,9 +277,19 @@ const SECTIONS: LegalSection[] = [
   },
 ];
 
-export default function Privacidade() {
+/**
+ * The Portuguese policy below is the binding one; the English page shows a courtesy translation
+ * (lib/privacy.en.tsx) under a notice saying so.
+ */
+export default async function Privacidade({ params }: PageProps<"/[locale]/privacidade">) {
+  const { locale } = await params;
+  if (hasLocale(routing.locales, locale)) setRequestLocale(locale);
+  if (locale !== DEFAULT_LOCALE) {
+    return <LegalPage path="/privacidade" title={PRIVACY_TITLE_EN} updated={LEGAL_UPDATED_EN} intro={PRIVACY_INTRO_EN} sections={PRIVACY_SECTIONS_EN} />;
+  }
   return (
     <LegalPage
+      path="/privacidade"
       title="Política de privacidade"
       intro={
         <p>
