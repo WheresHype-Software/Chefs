@@ -1,1 +1,306 @@
-{}
+{
+  "meta": {
+    "title": "Para chefs",
+    "descriptionPaymentsOn": "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. O cliente paga o sinal na app; pagamos-te depois do serviço.",
+    "descriptionPaymentsOff": "Montra, pedidos, agenda e avaliações para chefs privados e cozinheiros caseiros. Sem mensalidades e sem comissões."
+  },
+  "createProfile": "Criar o meu perfil",
+  "hero": {
+    "title": "Viva da sua<br></br><accent>cozinha.</accent>",
+    "lead": "Montra, clientes novos, pedidos, agenda e avaliações, num só sítio. Jantares em casa, eventos, marmitas, bolos ou salgados: escolhe o que faz, quando e por quanto.",
+    "seeTool": "Ver a ferramenta",
+    "footnotePaymentsOn": "Cada perfil é revisto pela equipa · o sinal é pago na app",
+    "footnotePaymentsOff": "Cada perfil é revisto pela equipa · sem mensalidades e sem comissões",
+    "imageAlt": "O painel do chef no telemóvel: pedidos por responder, serviços da semana, avaliação média e os pedidos novos a aguardar resposta.",
+    "imageCaption": "Ecrã da aplicação, com dados de demonstração."
+  },
+  "promises": {
+    "depositInApp": "O sinal é pago na app",
+    "youDecide": "Decide o menu, os dias e o preço",
+    "quickProfile": "Perfil criado em poucos minutos"
+  },
+  "tool": {
+    "title": "Tudo o que um pedido precisa, num só sítio.",
+    "tabsLabel": "Funcionalidades",
+    "caption": "Ecrãs da aplicação, com dados de demonstração.",
+    "tabs": {
+      "page": {
+        "label": "Página",
+        "alt": "O topo da página pública de uma chef: cinco fotografias de pratos, o nome, as marcas de verificação e a caixa de pedir reserva.",
+        "title": "A sua montra, pronta a partilhar",
+        "text": "Fotos, menus, preços e avaliações num link curto que cabe na bio do Instagram.",
+        "points": {
+          "a": "Link próprio: {link}",
+          "b": "Preço fixo, por pessoa ou sob orçamento",
+          "c": "Pagamento e cancelamento visíveis para o cliente"
+        }
+      },
+      "requests": {
+        "label": "Pedidos",
+        "alt": "A lista de pedidos no telemóvel, cada um com data, pessoas, valor e os botões de aceitar, propor alteração ou recusar.",
+        "title": "Aceitar, recusar ou propor outra data",
+        "text": "Cada pedido chega com data, número de pessoas, morada e restrições. Responde com um toque.",
+        "points": {
+          "a": "Os pedidos expiram em 48 horas",
+          "b": "Reserva concluída automaticamente no dia seguinte",
+          "c": "Avisos por email, e mais tarde por WhatsApp"
+        }
+      },
+      "calendar": {
+        "label": "Agenda",
+        "alt": "O calendário de disponibilidade no telemóvel, com dias abertos a verde, fechados a branco e com reserva a azul.",
+        "title": "Só recebe pedidos quando pode",
+        "text": "Marque os dias livres, bloqueie férias e defina até onde se desloca. Só aparece a clientes dentro da sua área.",
+        "points": {
+          "a": "Dias livres, reservados e bloqueados",
+          "b": "Raio de serviço em km ou locais específicos",
+          "c": "Abra de uma vez os dias da semana em que cozinha"
+        }
+      },
+      "chat": {
+        "label": "Conversa",
+        "alt": "A conversa de uma reserva no telemóvel, com as mensagens do cliente e do chef e a caixa de escrita.",
+        "title": "Tudo combinado num só sítio",
+        "text": "Menu, alergias, sinal e hora de chegada ficam na conversa da reserva.",
+        "points": {
+          "a": "Uma conversa por reserva",
+          "b": "Partilha de fotos e menus",
+          "c": "Histórico sempre disponível"
+        }
+      },
+      "reviews": {
+        "label": "Avaliações",
+        "alt": "As avaliações recebidas no telemóvel, com estrelas, o nome do cliente e a resposta do chef.",
+        "title": "A reputação fica consigo",
+        "text": "Só quem concluiu uma reserva avalia. Responde uma vez a cada avaliação e denuncia as abusivas.",
+        "points": {
+          "a": "Só de clientes com reserva concluída",
+          "b": "Uma resposta pública sua por avaliação",
+          "c": "Média e total visíveis no seu perfil"
+        }
+      }
+    }
+  },
+  "zone": {
+    "title": "Chegue primeiro à sua zona.",
+    "lead": "O Ao Lume abre zona a zona. Em cada área, os primeiros perfis aprovados são os que recebem os pedidos e os que acumulam as primeiras avaliações.",
+    "position": {
+      "title": "Posição na sua área",
+      "text": "Cada chef define o raio onde trabalha e aparece a quem procura dentro dele. A maior parte das zonas do país ainda não tem um único chef aprovado."
+    },
+    "reputation": {
+      "title": "Reputação leva tempo",
+      "text": "As avaliações só chegam a quem já recebeu reservas. Quem começa primeiro constrói a reputação que decide as escolhas dos clientes seguintes."
+    },
+    "launch": {
+      "title": "Sem custo no lançamento",
+      "text": "Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Qualquer alteração às condições é comunicada com 15 dias de antecedência."
+    }
+  },
+  "demo": {
+    "title": "Experimente: assim chega uma reserva.",
+    "lead": "Os clientes encontram-no no Ao Lume ou pelo seu link, escolhem um menu e um dia livre e enviam o pedido. Faça de chef e leve este pedido de exemplo até ao fim.",
+    "steps": {
+      "arrives": {
+        "title": "Chega um pedido",
+        "text": "O cliente escolhe o menu, o dia livre e escreve o que precisa. Recebe-o por email e no painel."
+      },
+      "accept": {
+        "title": "Aceita ou propõe outra data",
+        "text": "Tem 48 horas para responder. O cliente vê a resposta na página do pedido."
+      },
+      "chat": {
+        "title": "Combinam no chat",
+        "text": "Uma conversa por reserva: alergias, horários, morada. Tudo fica registado."
+      },
+      "deposit": {
+        "title": "O cliente paga o sinal",
+        "text": "O cliente paga o sinal na app e a data fica marcada na agenda. O resto do valor combina consigo, no dia."
+      },
+      "review": {
+        "title": "Recebe a avaliação",
+        "text": "Depois do serviço, o cliente avalia. Só quem reservou pode avaliar, e pode responder."
+      }
+    },
+    "status": {
+      "new": "Novo pedido",
+      "accepted": "Aceite",
+      "confirmed": "Confirmada",
+      "completed": "Concluída"
+    },
+    "currentStep": "(passo atual)",
+    "panelLabel": "Exemplo interativo · o seu painel",
+    "restart": "Recomeçar",
+    "requestSummary": "Jantar em casa · 6 pessoas · sábado, 20:00",
+    "clientMessage": "É o aniversário da minha mãe. Uma pessoa é vegetariana.",
+    "chefReply": "Combinado! Faço um arroz de cogumelos para ela. O sinal de {deposit} é pago aqui na app.",
+    "clientPaid": "Perfeito, já enviei.",
+    "confirmedNote": "Reserva confirmada · sábado na agenda",
+    "reviewText": "«A minha mãe adorou. Tratou de tudo, até da loiça.»",
+    "accept": "Aceitar",
+    "proposeDate": "Propor outra data",
+    "openChat": "Abrir o chat",
+    "depositReceived": "Sinal recebido · confirmar",
+    "markCompleted": "Marcar concluída",
+    "done": "Assim corre uma reserva no Ao Lume."
+  },
+  "compare": {
+    "title": "Menos mensagens. Mais tempo na cozinha.",
+    "today": {
+      "title": "Hoje",
+      "lead": "O negócio espalhado por três aplicações."
+    },
+    "withUs": {
+      "title": "Com Ao Lume",
+      "lead": "Tudo onde o pedido acontece."
+    },
+    "rows": {
+      "requests": {
+        "topic": "Pedidos",
+        "today": "Um formulário que poucos preenchem até ao fim.",
+        "withUs": "Uma página com menus, preços e reserva."
+      },
+      "conversations": {
+        "topic": "Conversas",
+        "today": "Instagram, WhatsApp e SMS, tudo misturado.",
+        "withUs": "Um chat por reserva, com tudo registado."
+      },
+      "calendar": {
+        "topic": "Agenda",
+        "today": "Datas num caderno, ou de memória.",
+        "withUs": "Um calendário que mostra só os dias livres."
+      },
+      "trust": {
+        "topic": "Confiança",
+        "today": "Clientes novos sem avaliações reais para ler.",
+        "withUs": "Avaliações de quem concluiu uma reserva."
+      }
+    }
+  },
+  "tools": {
+    "title": "O essencial de quem cozinha por conta própria.",
+    "lead": "Jantares em casa, eventos, marmitas da semana, bolos e salgados ou encomendas de época: tudo o que precisa para receber e organizar pedidos já está incluído.",
+    "items": {
+      "calendar": { "title": "Calendário", "text": "Dias livres, bloqueios e área de serviço." },
+      "chat": { "title": "Chat com clientes", "text": "Uma conversa por reserva, sem perder mensagens." },
+      "menus": { "title": "Menus e preços", "text": "Preço fixo, por pessoa ou sob orçamento." },
+      "cancellation": { "title": "Cancelamento", "text": "Flexível, moderado, rígido ou à sua medida." },
+      "categories": { "title": "Categorias de cozinha", "text": "Até três, para os clientes o encontrarem nos filtros." },
+      "travel": { "title": "Deslocações e entregas", "text": "Raio, zonas, taxas e o percurso do dia." },
+      "pickup": { "title": "Levantamentos", "text": "Horários na sua cozinha e código de confirmação." },
+      "reviews": { "title": "Avaliações verificadas", "text": "Só de quem reservou, com a sua resposta pública." }
+    }
+  },
+  "marketing": {
+    "title": "Mais clientes, sem pagar anúncios.",
+    "lead": "Cada cliente satisfeito e cada partilha no Instagram trazem o próximo. Nós damos-lhe as peças.",
+    "slugPlaceholder": "o-seu-nome",
+    "tiles": {
+      "link": { "title": "Um link para a bio", "text": "Substitui o formulário e o “manda mensagem”." },
+      "share": { "title": "Kit de partilha", "text": "Código QR, imagens para stories e cartões com as suas melhores avaliações." },
+      "near": { "title": "Perto de quem procura", "text": "Clientes da sua zona encontram-no sem saberem o seu nome." },
+      "star": { "title": "Avaliações verificadas", "text": "Só quem concluiu uma reserva avalia, e pode responder a cada uma." },
+      "seal": {
+        "title": "Título de Chef verificado",
+        "text": "Envie um certificado de cozinha e apareça como Chef, com o selo ao lado do nome."
+      },
+      "season": { "title": "Encomendas de época", "text": "Bolo-rei, folar, sardinhadas de junho: abra pré-encomendas com data limite." }
+    },
+    "path": {
+      "title": "O seu percurso",
+      "lead": "Recebe pedidos desde o dia em que for aprovado. O título de Chef vem depois, se tiver formação em cozinha.",
+      "cook": {
+        "label": "Passo 1 · à entrada",
+        "title": "Cozinheiro",
+        "text": "Todos começam aqui. A página fica pública depois da revisão da equipa e os pedidos entram desde o primeiro dia."
+      },
+      "chef": {
+        "label": "Passo 2 · com certificado",
+        "title": "Chef",
+        "text": "Envie um certificado de cozinha no painel. Depois de verificado, passa a aparecer como Chef, com o selo ao lado do nome em todas as pesquisas."
+      }
+    }
+  },
+  "pricing": {
+    "badge": "Sem mensalidades",
+    "title": "Só paga por cada<br></br>serviço garantido.",
+    "earlyNote": "<strong>Aos primeiros chefs não cobramos nada.</strong> Enquanto estivermos a começar, o pagamento é combinado diretamente consigo e não fica cá comissão nenhuma. É assim que vai funcionar quando ligarmos os pagamentos, e quem já cá estiver é avisado com pelo menos 30 dias.",
+    "text": "Nada por criar a página, nada por aparecer nas pesquisas, nada por receber pedidos. Quando o cliente paga o sinal, a data fica garantida e fica também a nossa comissão de {pct}% do valor da reserva, descontada a esse sinal. Sem reserva, não há nada a pagar.",
+    "benefits": {
+      "noChasing": {
+        "title": "Deixa de andar atrás de quem marca e desaparece",
+        "text": "O sinal confirma a data. Sem sinal, não há reserva."
+      },
+      "noAsking": {
+        "title": "Não tem de pedir dinheiro a ninguém",
+        "text": "O pedido do sinal parte de nós, não de si."
+      },
+      "yourMoney": {
+        "title": "O dinheiro é seu desde o primeiro minuto",
+        "text": "Recebemo-lo em seu nome e entregamo-lo depois do serviço concluído."
+      }
+    }
+  },
+  "calculator": {
+    "pricePerPerson": "Cobra por pessoa",
+    "guests": "Pessoas à mesa",
+    "perMonth": "Serviços por mês",
+    "yearLabel": "Num ano, fica para si",
+    "yearDetail": "{count, plural, =1 {# serviço} other {# serviços}} por mês, de {amount} cada.",
+    "keeps": "Fica consigo <b>{amount}</b>",
+    "aoLume": "Ao Lume <b>{amount}</b>",
+    "depositNote": "Em cada serviço, o cliente paga <b>{deposit}</b> de sinal aqui para confirmar a data. Os outros <b>{rest}</b> combina-os consigo, como sempre.",
+    "points": {
+      "noMonthly": "Sem mensalidade",
+      "noPerRequest": "Sem custo por pedido",
+      "payWhenPaid": "Só paga quando recebe"
+    }
+  },
+  "signup": {
+    "title": "Criar o perfil leva poucos minutos.",
+    "steps": {
+      "account": { "title": "Crie a conta", "text": "Nome, email e uma palavra-passe. Poucos minutos." },
+      "work": { "title": "Mostre o seu trabalho", "text": "Uma fotografia sua, o Instagram ou site, e três fotos de pratos." },
+      "approval": { "title": "Aprovação", "text": "A nossa equipa revê cada perfil antes de ficar público." },
+      "share": { "title": "Partilhe o link", "text": "Ponha {link} na bio e receba pedidos." }
+    }
+  },
+  "faq": {
+    "title": "Perguntas",
+    "cost": {
+      "q": "Quanto custa?",
+      "aPaymentsOn": "Criar o perfil, aparecer nas pesquisas e receber pedidos não tem custo. Só cobramos quando ganha: uma comissão de {pct}% sobre o valor da reserva, descontada ao sinal que o cliente paga na app. A percentagem em vigor está sempre no seu painel, e qualquer alteração é avisada com pelo menos 30 dias.",
+      "aPaymentsOff": "Hoje, nada: criar o perfil, aparecer nas pesquisas, receber pedidos e combinar o serviço não têm custo nenhum, e não cobramos comissão. Mais à frente passará a haver uma comissão por cada reserva garantida, sempre descontada ao que o cliente paga e nunca cobrada a si à parte. Quem já cá estiver é avisado com pelo menos 30 dias."
+    },
+    "payout": {
+      "q": "Como recebo o pagamento?",
+      "aPaymentsOn": "O sinal é pago pelo cliente na app e fica à sua ordem. Depois de concluir o serviço, transferimo-lo para o seu IBAN já com a comissão descontada, acompanhado de um documento com os seus dados fiscais, o sinal recebido, a comissão e o valor transferido. O restante valor do serviço continua a ser combinado e pago diretamente entre si e o cliente.",
+      "aPaymentsOff": "Diretamente do cliente, como combinarem entre os dois: o Ao Lume não toca no dinheiro. A app serve para o encontrar, organizar o pedido e guardar a conversa."
+    },
+    "chefCancels": {
+      "q": "E se eu cancelar depois de aceitar?",
+      "aPaymentsOn": "O sinal é devolvido por inteiro ao cliente e não cobramos comissão nenhuma. Cancelamentos repetidos são tidos em conta na sua conta.",
+      "aPaymentsOff": "Avise o cliente pela página da reserva, para ficar registo. Cancelamentos repetidos são tidos em conta na sua conta."
+    },
+    "data": {
+      "q": "Que dados preciso de dar?",
+      "aPaymentsOn": "Nome legal, NIF, morada fiscal e IBAN, em Painel → Faturação. A lei obriga-nos também a comunicar à Autoridade Tributária, uma vez por ano, quanto recebeu através da plataforma (DAC7), e dizemos-lhe sempre o que foi comunicado.",
+      "aPaymentsOff": "Só o que aparece no perfil: quem é, onde cozinha e o que faz. Enquanto o pagamento for combinado diretamente consigo, não lhe pedimos NIF nem IBAN."
+    },
+    "homeCook": {
+      "q": "Sou cozinheiro caseiro. Posso entrar?",
+      "a": "Sim. Todos começam como Cozinheiro e são revistos pela nossa equipa antes de aparecerem nas pesquisas. Quem tem formação em cozinha envia o certificado e passa a aparecer como Chef."
+    },
+    "licences": {
+      "q": "Preciso de licenças?",
+      "a": "Cada chef é responsável pelas regras da sua atividade, como a formação em HACCP e a declaração de atividade nas Finanças. Vamos publicar um guia para ajudar."
+    },
+    "clientCancels": {
+      "q": "E se um cliente cancelar?",
+      "a": "Define a sua política de cancelamento: flexível, moderada, rígida ou à sua medida. O cliente vê-a antes de pedir."
+    }
+  },
+  "closing": {
+    "title": "Vista a jaleca.<br></br><accent>O resto é connosco.</accent>"
+  }
+}
