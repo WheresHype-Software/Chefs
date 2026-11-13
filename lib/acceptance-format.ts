@@ -2,6 +2,7 @@
 const DAY = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", day: "numeric", month: "long", year: "numeric" });
 const TIME = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 const SHORT_TIME = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", hour: "2-digit", minute: "2-digit" });
+const DAY_EN = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Lisbon", day: "numeric", month: "long", year: "numeric" });
 
 /**
  * A legal text laid out for reading. The contract is written with a line break every hundred or
@@ -25,10 +26,10 @@ export function reflow(text: string): string {
     .join("\n\n");
 }
 
-/** "10 de novembro de 2026 às 21:44" */
-export function lisbonStamp(iso: string): string {
+/** "10 de novembro de 2026 às 21:44"; in English (for page UI only), "10 November 2026 at 21:44". */
+export function lisbonStamp(iso: string, locale: "pt" | "en" = "pt"): string {
   const d = new Date(iso);
-  return `${DAY.format(d)} às ${SHORT_TIME.format(d)}`;
+  return locale === "en" ? `${DAY_EN.format(d)} at ${SHORT_TIME.format(d)}` : `${DAY.format(d)} às ${SHORT_TIME.format(d)}`;
 }
 
 /** "10 de novembro de 2026, 21:44:07 (hora de Lisboa)" */
