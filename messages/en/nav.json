@@ -38,5 +38,6 @@
   "menu": {
     "open": "Open menu",
     "close": "Close menu"
-  }
+  },
+  "signOut": "Sign out"
 }

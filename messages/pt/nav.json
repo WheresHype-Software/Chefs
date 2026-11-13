@@ -38,5 +38,6 @@
   "menu": {
     "open": "Abrir menu",
     "close": "Fechar menu"
-  }
+  },
+  "signOut": "Sair"
 }
