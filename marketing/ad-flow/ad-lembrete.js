@@ -214,7 +214,11 @@ h1{font-weight:900;letter-spacing:-.035em;line-height:1.04;text-shadow:0 4px 30p
 .stp{display:flex;gap:22px;align-items:center;font-size:${isStory ? 42 : 34}px;font-weight:600;line-height:1.2;opacity:.35}
 .stp i{flex:none;width:${isStory ? 62 : 50}px;height:${isStory ? 62 : 50}px;border-radius:50%;background:#fff;color:#12306e;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900}
 .stp b{font-weight:800;color:#fff}.stp.on{opacity:1}.stp.on i{background:#f0b429;color:#142033}
-.pill{position:absolute;background:#fff;color:#142033;font-weight:800;font-size:${isStory ? 30 : 24}px;padding:14px 24px;border-radius:999px;box-shadow:0 16px 40px rgba(4,12,35,.45);opacity:0;z-index:7;white-space:nowrap}
+.pill{position:absolute;width:${isStory ? 232 : 200}px;background:#142033;color:#fff;font-weight:800;font-size:${isStory ? 30 : 25}px;line-height:1.15;padding:18px 20px;border-radius:22px;border:3px solid #f0b429;box-shadow:0 16px 40px rgba(4,12,35,.45);opacity:0;z-index:7}
+.pill small{display:block;font-size:.62em;font-weight:700;color:#f0b429;letter-spacing:.08em;margin-bottom:6px}
+.pill.l{right:calc(100% + 26px)}.pill.r{left:calc(100% + 26px)}
+.pill.l::after,.pill.r::after{content:'';position:absolute;top:50%;width:20px;height:3px;background:#f0b429}
+.pill.l::after{right:-26px}.pill.r::after{left:-26px}
 .url{flex:1;min-width:0;background:#eef2f8;border-radius:10px;padding:9px 12px;font-size:14.5px;font-weight:600;color:#142033;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cpy{flex:none;background:#1d4aa1;color:#fff;font-weight:700;font-size:14px;padding:9px 12px;border-radius:10px}
 #phone{position:absolute;left:${pleft}px;top:${g.phone.top}px;width:${pw}px;height:${ph}px;border-radius:${Math.round(pw * 0.13)}px;background:#0a0f1c;padding:${bz}px;box-shadow:0 40px 90px rgba(4,12,35,.55),0 0 0 3px #2b3446 inset,0 0 0 1.5px #5a6478;will-change:transform}
@@ -240,7 +244,7 @@ ${APPCSS}
 ${scenes}
 <div id="phone"><div id="scr"><div id="sb"><span>9:41</span><svg height="${Math.round(sb * .32)}" viewBox="0 0 64 22"><rect x="0" y="14" width="5" height="8" rx="1" fill="#142033"/><rect x="8" y="10" width="5" height="12" rx="1" fill="#142033"/><rect x="16" y="6" width="5" height="16" rx="1" fill="#142033"/><rect x="24" y="2" width="5" height="20" rx="1" fill="#142033"/><rect x="36" y="3" width="24" height="17" rx="4" fill="none" stroke="#142033" stroke-width="2"/><rect x="39" y="6" width="17" height="11" rx="2" fill="#142033"/><rect x="61" y="9" width="2.5" height="5" rx="1" fill="#142033"/></svg></div><div id="island"></div>
 <div id="app">${APP()}</div></div>
-<div id="toast"><i>✓</i>Link copiado</div><div id="demo">Exemplo</div><div id="bigurl"><span>aolume.com/chef/</span><b>o-teu-nome</b></div><div class="pill" id="p1" style="left:-70px;top:${Math.round(ph * .22)}px">Bio do Instagram</div><div class="pill" id="p2" style="right:-80px;top:${Math.round(ph * .42)}px">Estado do WhatsApp</div><div class="pill" id="p3" style="left:-60px;top:${Math.round(ph * .62)}px">Grupos de Facebook</div></div>
+<div id="toast"><i>✓</i>Link copiado</div><div id="demo">Exemplo</div><div id="bigurl"><span>aolume.com/chef/</span><b>o-teu-nome</b></div><div class="pill l" id="p1" style="top:${Math.round(ph * .2)}px"><small>PARTILHA NA</small>Bio do Instagram</div><div class="pill r" id="p2" style="top:${Math.round(ph * .42)}px"><small>PARTILHA NO</small>Estado do WhatsApp</div><div class="pill l" id="p3" style="top:${Math.round(ph * .64)}px"><small>PARTILHA NOS</small>Grupos de Facebook</div></div>
 <div id="bn" class="abs" style="left:${isStory ? 90 : 64}px;right:${isStory ? 90 : 64}px;top:${g.bn.top}px;bottom:${g.bn.top}px;display:flex;flex-direction:column;justify-content:center">
   <div id="bn-k" style="opacity:0"><span class="k" style="font-size:${isStory ? 30 : 24}px">SEM COMPLICAÇÕES</span></div>
   <h1 id="bn-h1" style="margin-top:${isStory ? 24 : 16}px;font-size:${g.bn.h1}px;opacity:0">Comer bem, sem ir para a cozinha.</h1>
@@ -297,7 +301,7 @@ function app(t){
   for(const [id,a] of [['pg-ch1',.35],['pg-ch2',.5]]){const k=ramp(Lp,a,.35);$(id).style.opacity=k;$(id).style.display='inline-block';$(id).style.transform='translateY('+(1-k)*12+'px)';}
   press('cpy',Lp,2.6); $('cpy').textContent=Lp>2.7?'Copiado ✓':'Copiar'; $('url').style.background=Lp>2.6&&Lp<3.6?'#dfe8fb':'#eef2f8';
   for(let i=0;i<3;i++){ const on=Lp>=[0.2,2.4,4.2][i]; const el=$('stp-'+i); el.classList.toggle('on',on); }
-  for(let i=1;i<=3;i++){ const k=t>=S.page[0]?ramp(Lp,4.3+i*.35,.35):0; $('p'+i).style.opacity=k; $('p'+i).style.transform='translateY('+(1-k)*30+'px) scale('+(.8+.2*k)+') rotate('+[-4,3,-2][i-1]+'deg)'; }
+  for(let i=1;i<=3;i++){ const k=t>=S.page[0]?ramp(Lp,4.3+i*.35,.35):0; $('p'+i).style.opacity=k; $('p'+i).style.transform='translateX('+(1-k)*(i===2?-40:40)+'px) scale('+(.85+.15*k)+')'; }
   // reserva
   $('bk').style.display=inBook?'block':'none';
   $('bk-dim').style.opacity=ramp(Lb,0,.35);
