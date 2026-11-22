@@ -11,7 +11,7 @@ import { SITE_DOMAIN } from "@/lib/constants";
 import { publicEnv } from "@/lib/env";
 import { ICONS } from "@/components/chef/icons";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
-import { COMPANY, COMPLAINTS_BOOK_URL, EMAIL } from "@/lib/legal";
+import { COMPLAINTS_BOOK_URL, EMAIL } from "@/lib/legal";
 
 /** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
 export function Wordmark({ suffix, animated = false }: { suffix?: string; animated?: boolean }) {
@@ -195,9 +195,8 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
       </div>
       <div className="border-t border-white/15">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-5 text-[14px] text-[#c9d6ee] md:px-8">
-          <span>
-            © {new Date().getFullYear()} Ao Lume · {COMPANY.name} · NIF {COMPANY.nif}
-          </span>
+          {/* The company's name and NIF are in the Terms, one click away under "Termos". */}
+          <span>© {new Date().getFullYear()} Ao Lume</span>
           <span className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {/* Required on Portuguese sites, visibly (DL 74/2017). */}
             <a href={COMPLAINTS_BOOK_URL} target="_blank" rel="noopener noreferrer" className="text-[#c9d6ee] underline hover:text-white">

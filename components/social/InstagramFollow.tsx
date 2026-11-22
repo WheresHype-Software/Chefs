@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { ICONS } from "@/components/chef/icons";
 import { Photo } from "@/components/ui/Photo";
@@ -25,7 +26,7 @@ export function InstagramFollow({ audience }: { audience: "clients" | "chefs" })
             rel="noopener noreferrer"
             className="lab flex items-center gap-2 self-start text-cobalt no-underline hover:text-cobalt-deep"
           >
-            {ICONS.instagram}@{INSTAGRAM_HANDLE}
+            <span className="al-ig-ring">{ICONS.instagram}</span>@{INSTAGRAM_HANDLE}
           </a>
           <h2 id={`instagram-${audience}`} className="d m-0 text-[clamp(30px,4.4vw,52px)] leading-[1.02]">
             {t("title")}
@@ -33,7 +34,7 @@ export function InstagramFollow({ audience }: { audience: "clients" | "chefs" })
           <p className="m-0 max-w-[520px] text-[17px] leading-relaxed text-ink-3">
             {t.rich("text", { handle: () => <strong className="text-ink">@{INSTAGRAM_HANDLE}</strong> })}
           </p>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn gap-2 self-start">
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn al-ig-btn gap-2 self-start">
             {ICONS.instagram}
             {tc("follow")}
           </a>
@@ -43,16 +44,18 @@ export function InstagramFollow({ audience }: { audience: "clients" | "chefs" })
           target="_blank"
           rel="noopener noreferrer"
           aria-label={tc("open", { handle: INSTAGRAM_HANDLE })}
-          className="al-rv grid min-w-0 flex-[1_1_320px] grid-cols-2 gap-2 sm:gap-3"
+          className="al-ig-grid grid min-w-0 flex-[1_1_320px] grid-cols-2 gap-2 sm:gap-3"
         >
           {GRID.map((photo, i) => (
-            <Photo
-              key={photo.id}
-              photo={photo}
-              alt=""
-              sizes="(min-width: 768px) 280px, 45vw"
-              className={`aspect-square w-full rounded-[10px] object-cover ${i % 2 ? "translate-y-4 sm:translate-y-6" : ""}`}
-            />
+            // Each tile rises in on its own beat, then drifts gently; on hover it opens up like a post.
+            <span key={photo.id} className="al-ig-tile al-rv" style={{ "--rv-delay": `${i * 6}%`, "--ig-i": i } as CSSProperties}>
+              <span className="al-ig-drift">
+                <Photo photo={photo} alt="" sizes="(min-width: 768px) 280px, 45vw" className="aspect-square w-full object-cover" />
+                <span className="al-ig-over" aria-hidden="true">
+                  {ICONS.instagram}
+                </span>
+              </span>
+            </span>
           ))}
         </a>
       </div>

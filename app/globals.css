@@ -677,6 +677,123 @@ html:has(.menu-sheet[open]) {
   }
 }
 
+/* Instagram invitation: tiles rise in one after another (al-rv), then drift on their own beat;
+   hovering a tile zooms the dish and shows the Instagram mark. The button catches a light sweep. */
+.al-ig-tile {
+  display: block;
+}
+/* "top", not transform: the reveal animates transform and would cancel the offset. */
+.al-ig-tile:nth-child(even) {
+  position: relative;
+  top: 18px;
+}
+.al-ig-drift {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px -22px rgb(20 32 51 / 0.45);
+  animation: al-ig-drift 6s ease-in-out infinite;
+  animation-delay: calc(var(--ig-i, 0) * -1.5s);
+}
+.al-ig-drift img {
+  transition: transform 0.6s var(--ease-out);
+}
+.al-ig-over {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgb(18 48 110 / 0.45);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.al-ig-over svg {
+  width: 40px;
+  height: 40px;
+  transform: scale(0.7);
+  transition: transform 0.35s var(--ease-out);
+}
+.al-ig-grid:hover .al-ig-drift img,
+.al-ig-grid:focus-visible .al-ig-drift img {
+  transform: scale(1.03);
+}
+.al-ig-tile:hover .al-ig-drift img {
+  transform: scale(1.1);
+}
+.al-ig-tile:hover .al-ig-over {
+  opacity: 1;
+}
+.al-ig-tile:hover .al-ig-over svg {
+  transform: scale(1);
+}
+@keyframes al-ig-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.6deg);
+  }
+}
+.al-ig-ring {
+  position: relative;
+  display: inline-flex;
+}
+.al-ig-ring::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 9px;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: al-ig-ring 2.4s ease-out infinite;
+}
+@keyframes al-ig-ring {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+.al-ig-btn {
+  position: relative;
+  overflow: hidden;
+}
+.al-ig-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: al-ig-sweep 3.6s ease-in-out 1s infinite;
+}
+@keyframes al-ig-sweep {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .al-ig-drift,
+  .al-ig-ring::after,
+  .al-ig-btn::after {
+    animation: none !important;
+  }
+  .al-ig-drift img,
+  .al-ig-over svg {
+    transition: none;
+  }
+}
+
 /* MapLibre chef pins (search results map; the parked home map reuses them) */
 .al-pin {
   display: flex;
