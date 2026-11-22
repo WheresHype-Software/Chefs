@@ -41,5 +41,17 @@
     "bowl": "Refeição saudável numa taça",
     "salad": "Salada fresca da época",
     "spread": "Refeição colorida vista de cima"
+  },
+  "instagram": {
+    "follow": "Seguir no Instagram",
+    "open": "Abrir @{handle} no Instagram",
+    "clients": {
+      "title": "Fome de inspiração?",
+      "text": "Pratos, chefs novos e ideias para o próximo jantar. Segue <handle></handle> no Instagram."
+    },
+    "chefs": {
+      "title": "Os teus pratos também no nosso Instagram.",
+      "text": "Marca <handle></handle> quando publicares os teus pratos: partilhamos o trabalho dos chefs do Ao Lume nas nossas stories e publicações."
+    }
   }
 }

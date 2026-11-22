@@ -17,6 +17,7 @@ import { VerifiedIcon } from "@/components/ui/VerifiedIcon";
 import { revealDelay } from "@/lib/motion";
 import { getPublicSettings } from "@/lib/settings";
 import { DEFAULT_LOCALE, routing } from "@/lib/i18n/routing";
+import { InstagramFollow } from "@/components/social/InstagramFollow";
 import { alternates } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/para-chefs">): Promise<Metadata> {
@@ -194,17 +195,13 @@ export default async function ParaChefs({ params }: PageProps<"/[locale]/para-ch
               <span className="inline-flex w-fit items-center gap-2 bg-yolk-soft px-3 py-1.5 text-[14px] font-semibold text-ink">
                 {t("pricing.badge")}
               </span>
-              <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">
-                {t.rich("pricing.title", { br })}
-              </h2>
+              <h2 className="d m-0 text-[clamp(32px,6vw,68px)] leading-none">{t.rich("pricing.title", { br })}</h2>
               {!paymentsOn && (
                 <p className="m-0 max-w-[520px] border-l-[3px] border-yolk bg-yolk-soft px-4 py-3 text-[15px] text-ink">
                   {t.rich("pricing.earlyNote", { strong: (c) => <strong>{c}</strong> })}
                 </p>
               )}
-              <p className="m-0 max-w-[520px] text-lg text-ink-3">
-                {t("pricing.text", { pct })}
-              </p>
+              <p className="m-0 max-w-[520px] text-lg text-ink-3">{t("pricing.text", { pct })}</p>
             </div>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
               {BENEFITS.map((key, i) => (
@@ -256,6 +253,8 @@ export default async function ParaChefs({ params }: PageProps<"/[locale]/para-ch
           </ol>
         </div>
       </section>
+
+      <InstagramFollow audience="chefs" />
 
       <section id="perguntas" className="scroll-mt-16 bg-paper">
         <div className="mx-auto flex max-w-[1280px] flex-wrap gap-12 px-5 py-14 md:px-10 md:py-[120px]">

@@ -41,5 +41,17 @@
     "bowl": "A healthy meal in a bowl",
     "salad": "A fresh seasonal salad",
     "spread": "A colourful meal seen from above"
+  },
+  "instagram": {
+    "follow": "Follow on Instagram",
+    "open": "Open @{handle} on Instagram",
+    "clients": {
+      "title": "Hungry for ideas?",
+      "text": "Dishes, new chefs and ideas for your next dinner. Follow <handle></handle> on Instagram."
+    },
+    "chefs": {
+      "title": "Your dishes on our Instagram too.",
+      "text": "Tag <handle></handle> when you post your dishes: we share the work of Ao Lume chefs in our stories and posts."
+    }
   }
 }

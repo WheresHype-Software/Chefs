@@ -9,6 +9,8 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { PanToss } from "@/components/brand/PanToss";
 import { SITE_DOMAIN } from "@/lib/constants";
 import { publicEnv } from "@/lib/env";
+import { ICONS } from "@/components/chef/icons";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/social";
 import { COMPANY, COMPLAINTS_BOOK_URL, EMAIL } from "@/lib/legal";
 
 /** The logo; `animated` (public site header) is the pan tossing the letters, elsewhere it stays still. */
@@ -92,7 +94,10 @@ export function SiteHeader({ chefs = false }: { chefs?: boolean }) {
             ))}
             <AudienceSwitch {...other} toChef={!chefs} />
           </nav>
-          <LanguageSwitch className="hidden text-[13px] text-ink-2 md:flex" linkClassName="rounded-md px-1.5 py-1 text-ink-2 hover:bg-paper" />
+          <LanguageSwitch
+            className="hidden text-[13px] text-ink-2 md:flex"
+            linkClassName="rounded-md px-1.5 py-1 text-ink-2 hover:bg-paper"
+          />
           <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-line md:block lg:mx-2" />
           {chefs && (
             <Link href={secondary.href} className="btn btn-o btn-sm hidden md:inline-flex">
@@ -146,6 +151,14 @@ export function SiteFooter({ chefs = false }: { chefs?: boolean }) {
           <p className="m-0 max-w-[36ch] text-[15px] text-[#c9d6ee]">{t("tagline")}</p>
           <a href={`mailto:${EMAIL.support}`} className="text-[15px] text-[#c9d6ee] no-underline hover:text-white">
             {EMAIL.support}
+          </a>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-[15px] text-[#c9d6ee] no-underline hover:text-white"
+          >
+            {ICONS.instagram}@{INSTAGRAM_HANDLE}
           </a>
         </div>
         <nav aria-label={t("forClients")} className="flex flex-col text-[15px]">

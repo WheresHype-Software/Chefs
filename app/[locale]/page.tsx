@@ -1,5 +1,6 @@
 import { ChefsCta } from "@/components/home/ChefsCta";
 import { ClientFaq } from "@/components/home/ClientFaq";
+import { InstagramFollow } from "@/components/social/InstagramFollow";
 import { getPublicSettings } from "@/lib/settings";
 import { HeroWall } from "@/components/home/HeroWall";
 import { HowItWorks } from "@/components/home/HowItWorks";
@@ -34,6 +35,7 @@ export default async function Home() {
         {chefs.length > 0 && <NearbyChefs chefs={chefs} featured={featured} />}
         <TrustPoints />
         <ClientFaq paymentsOn={paymentsOn} />
+        <InstagramFollow audience="clients" />
         <ChefsCta />
       </main>
       <SiteFooter />

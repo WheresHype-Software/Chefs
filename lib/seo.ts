@@ -7,6 +7,7 @@ import { nearestCity } from "./cities";
 import { siteUrl } from "./env";
 import { fromPriceLabel, titledName } from "./format";
 import { getTranslator } from "./i18n/translator";
+import { INSTAGRAM_URL } from "@/lib/social";
 import type { ChefCard, ChefProfile } from "./types";
 
 const SITE_NAME = "Ao Lume";
@@ -23,7 +24,14 @@ export function alternates(path: string, locale: Locale): NonNullable<Metadata["
 
 export function siteJsonLd(locale: Locale = DEFAULT_LOCALE) {
   return [
-    { "@context": "https://schema.org", "@type": "Organization", name: SITE_NAME, url: siteUrl("/"), logo: siteUrl("/email/logo.png") },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: siteUrl("/"),
+      logo: siteUrl("/email/logo.png"),
+      sameAs: [INSTAGRAM_URL],
+    },
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -44,7 +52,12 @@ export function breadcrumbJsonLd(items: Crumb[], locale: Locale = DEFAULT_LOCALE
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: items.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: siteUrl(localizePath(c.href, locale)) })),
+    itemListElement: items.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: siteUrl(localizePath(c.href, locale)),
+    })),
   };
 }
 
@@ -110,6 +123,11 @@ export function chefListJsonLd(chefs: ChefCard[], locale: Locale = DEFAULT_LOCAL
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: chefs.map((c, i) => ({ "@type": "ListItem", position: i + 1, url: siteUrl(localizePath(`/chef/${c.slug}`, locale)), name: titledName(c, locale) })),
+    itemListElement: chefs.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: siteUrl(localizePath(`/chef/${c.slug}`, locale)),
+      name: titledName(c, locale),
+    })),
   };
 }
