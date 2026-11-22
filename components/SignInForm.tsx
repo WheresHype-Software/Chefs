@@ -108,8 +108,11 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
         const d = destination(afterSignup, locale);
         const res = await signUpWithTerms({ name, email, password, asChef, next: localizePath(d.path, d.locale), accepted });
         if (!res.ok) throw new Error(res.error);
-        // Ads measurement: no-op unless the visitor accepted cookies.
-        trackPixel("CompleteRegistration", { content_name: asChef ? "chef" : "client" });
+        // Ads measurement, chefs only, once the server has created the account (not on the click,
+        // not for an address that already had one). No-op unless the visitor accepted cookies.
+        if (asChef && res.createdId) {
+          trackPixel("CompleteRegistration", { content_name: "chef_signup", status: true }, `chef_signup_${res.createdId}`);
+        }
         if (res.session) go(afterSignup);
         else setMsg({ ok: true, text: t("confirmEmail", { email }) });
       }
@@ -156,9 +159,7 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
                 asChef ? "bg-ink text-white" : "bg-cobalt-soft text-cobalt-deep"
               }`}
             >
-              <span className="font-semibold">
-                {asChef ? t("role.chef") : t("role.client")}
-              </span>
+              <span className="font-semibold">{asChef ? t("role.chef") : t("role.client")}</span>
               <button
                 type="button"
                 onClick={() => setRole(null)}
@@ -219,9 +220,7 @@ export function SignInForm({ next, asChef: chefDoor, startOnSignup = false }: Pr
               </span>
             </label>
           )}
-          {mode === "recover" && (
-            <p className="m-0 text-sm text-muted">{t("recoverHint")}</p>
-          )}
+          {mode === "recover" && <p className="m-0 text-sm text-muted">{t("recoverHint")}</p>}
           <button type="submit" className="btn" disabled={busy || (mode === "signup" && !accepted)}>
             {busy
               ? t("busy")

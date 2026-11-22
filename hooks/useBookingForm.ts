@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { requestBooking } from "@/app/actions";
 import { callAction } from "@/lib/call-action";
+import { readConsent } from "@/lib/consent";
+import { trackPixel } from "@/lib/meta-pixel";
 import type { Place } from "@/components/AddressSearch";
 import { useMonthCalendar, type MonthCalendarData } from "@/hooks/useMonthCalendar";
 import type { ChefCard } from "@/lib/types";
@@ -86,11 +88,25 @@ export function useBookingForm(
           phone: contact.phone,
           notes: contact.notes || undefined,
           ...(needsAddress ? { address, lat: place?.lat, lng: place?.lng } : {}),
+          // Lets the server keep the Meta browser ids for the payment event; only with consent.
+          adConsent: readConsent() === "granted",
         }),
       );
-      if (result.ok)
+      if (result.ok) {
         setSent({ id: result.bookingId, ref: result.ref, link: result.link, privateLink: result.privateLink, emailed: result.emailed });
-      else setError(result.error);
+        // Ads measurement, once per request (the eventID guards against a refresh of the sent screen).
+        if (result.bookingId !== "demo") {
+          trackPixel(
+            "Schedule",
+            {
+              ...(estimate != null ? { value: estimate, currency: "EUR" } : {}),
+              content_name: offer.mode,
+              content_ids: [chef.id],
+            },
+            `order_${result.bookingId}`,
+          );
+        }
+      } else setError(result.error);
     });
     return true;
   }

@@ -20,6 +20,7 @@ import { fromPrice, rating, titledName } from "@/lib/format";
 import type { Locale } from "@/lib/i18n/routing";
 import { alternates, breadcrumbJsonLd, chefBreadcrumbs, chefJsonLd } from "@/lib/seo";
 import type { ChefProfile } from "@/lib/types";
+import { PixelEvent } from "@/components/analytics/PixelEvent";
 import { paymentsLive } from "@/lib/settings";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/chef/[slug]">): Promise<Metadata> {
@@ -27,7 +28,11 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/chef/[sl
   const chef = await getChefProfile(slug, locale as Locale);
   if (!chef) return {};
   const t = await getTranslations({ locale: locale as Locale, namespace: "chef.meta" });
-  const title = t("title", { name: titledName(chef, locale as Locale), headline: chef.headline ?? t("defaultHeadline"), area: chef.area ?? "" });
+  const title = t("title", {
+    name: titledName(chef, locale as Locale),
+    headline: chef.headline ?? t("defaultHeadline"),
+    area: chef.area ?? "",
+  });
   return {
     title,
     description: chef.bio ?? undefined,
@@ -111,6 +116,7 @@ export default async function ChefPage({ params, searchParams }: PageProps<"/[lo
       )}
       <SiteFooter />
       <JsonLd data={[chefJsonLd(chef, locale as Locale), breadcrumbJsonLd(crumbs, locale as Locale)]} />
+      <PixelEvent event="ViewContent" params={{ content_ids: [chef.slug], content_type: "chef" }} eventId={`view_${chef.slug}`} />
     </div>
   );
 }

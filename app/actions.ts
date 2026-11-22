@@ -2,7 +2,7 @@
 
 import { announceBooking } from "@/lib/notify/discord";
 import { getLocale } from "next-intl/server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { z } from "zod";
 import { bookingTokenCookieName, bookingTokenCookieOptions } from "@/lib/booking-token";
 import { sendEmail, siteUrl } from "@/lib/email";
@@ -16,6 +16,7 @@ import { failInvalid } from "@/lib/result";
 import { createAnonClient, createClient, hasSupabase } from "@/lib/supabase/server";
 import { longDay, titledName } from "@/lib/format";
 import { paymentsLive } from "@/lib/settings";
+import { rememberAdSignals } from "@/lib/meta-capi";
 
 const BookingInput = z.object({
   offerId: z.string().min(1),
@@ -29,6 +30,8 @@ const BookingInput = z.object({
   lat: z.number().optional(),
   lng: z.number().optional(),
   notes: z.string().trim().max(2000).optional(),
+  /** The visitor accepted marketing cookies on this browser (see lib/meta-capi). */
+  adConsent: z.boolean().optional(),
 });
 
 /** Fields with a label (or a whole sentence ending in ".") in errors.booking.fields. */
@@ -109,6 +112,16 @@ export async function requestBooking(input: z.infer<typeof BookingInput>): Promi
   }
 
   const r = data as { bookingId: string; ref: string; token: string; chefName: string };
+  if (b.adConsent) {
+    const jar = await cookies();
+    const h = await headers();
+    await rememberAdSignals(r.bookingId, {
+      fbp: jar.get("_fbp")?.value ?? null,
+      fbc: jar.get("_fbc")?.value ?? null,
+      ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip"),
+      userAgent: h.get("user-agent"),
+    });
+  }
   // Every later email about this client's bookings goes out in the language they booked in.
   await rememberClientLocale(b.email, locale);
   const { data: offer } = await sb.from("offers").select("title, fulfilment_mode, chefs(badges)").eq("id", b.offerId).maybeSingle();
@@ -179,7 +192,10 @@ async function rememberClientLocale(email: string, locale: Locale): Promise<void
     if (error) throw error;
     const accounts = ((data ?? []) as { profile_id: string | null }[]).flatMap((c) => (c.profile_id ? [c.profile_id] : []));
     if (accounts.length) {
-      const { error: accountError } = await admin.from("profiles").update({ locale: toDbLocale(locale) }).in("id", accounts);
+      const { error: accountError } = await admin
+        .from("profiles")
+        .update({ locale: toDbLocale(locale) })
+        .in("id", accounts);
       if (accountError) throw accountError;
     }
   } catch (err) {
@@ -190,7 +206,11 @@ async function rememberClientLocale(email: string, locale: Locale): Promise<void
 async function notifyChef(bookingId: string, ref: string, b: z.infer<typeof BookingInput>) {
   const admin = createAdminClient();
   if (!admin) return;
-  const { data } = await admin.from("bookings").select("offer_title, chefs(display_name, profiles(email, locale))").eq("id", bookingId).single();
+  const { data } = await admin
+    .from("bookings")
+    .select("offer_title, chefs(display_name, profiles(email, locale))")
+    .eq("id", bookingId)
+    .single();
   const chef = data?.chefs as unknown as { display_name: string; profiles: { email: string; locale: string | null } | null } | null;
   if (!chef?.profiles?.email) return;
   // The chef's language, not the client's.
@@ -229,7 +249,10 @@ export async function findGuestBooking(input: z.infer<typeof LookupInput>): Prom
   const t = await requestTranslator("errors");
   const parsed = LookupInput.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.path[0] === "email" ? t("booking.lookup.invalidEmail") : t("booking.lookup.refRequired") };
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.path[0] === "email" ? t("booking.lookup.invalidEmail") : t("booking.lookup.refRequired"),
+    };
   }
   if (!hasSupabase) return { ok: true, link: "/reserva/demo" };
   // People type "1027-0482", "al 1027 0482" or "AL-1027-0482": normalise to the stored form.

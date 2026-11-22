@@ -8,7 +8,8 @@ export type Consent = "granted" | "denied" | null;
 const KEY = "aolume-consent";
 const listeners = new Set<() => void>();
 
-function read(): Consent {
+/** The stored answer, read outside React (the pixel helpers check it before every call). */
+export function readConsent(): Consent {
   try {
     const v = window.localStorage.getItem(KEY);
     return v === "granted" || v === "denied" ? v : null;
@@ -34,7 +35,7 @@ export function useConsent(): Consent | "unknown" {
       listeners.add(onChange);
       return () => listeners.delete(onChange);
     },
-    read,
+    readConsent,
     () => "unknown",
   );
 }

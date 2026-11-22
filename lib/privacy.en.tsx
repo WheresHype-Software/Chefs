@@ -56,12 +56,12 @@ export const PRIVACY_SECTIONS_EN: LegalSection[] = [
           been made.
         </p>
         <p>
-          <strong>Technical data:</strong> IP address and access logs, needed for the security of the service, and the cookies described
-          in <a href="#cookies">Cookies and storage on your device</a>.
+          <strong>Technical data:</strong> IP address and access logs, needed for the security of the service, and the cookies described in{" "}
+          <a href="#cookies">Cookies and storage on your device</a>.
         </p>
         <p>
-          <strong>Allergies and dietary restrictions:</strong> only if you state them in the notes to your request. They are health data:
-          we process them on the basis of your explicit consent, solely so that the chef can prepare the service safely.
+          <strong>Allergies and dietary restrictions:</strong> only if you state them in the notes to your request. They are health data: we
+          process them on the basis of your explicit consent, solely so that the chef can prepare the service safely.
         </p>
       </>
     ),
@@ -72,21 +72,20 @@ export const PRIVACY_SECTIONS_EN: LegalSection[] = [
     body: (
       <ul>
         <li>
-          <strong>Managing requests and bookings</strong>, the conversation with the chef and the emails about the request: performance of
-          a contract (Article 6(1)(b) GDPR (RGPD)).
+          <strong>Managing requests and bookings</strong>, the conversation with the chef and the emails about the request: performance of a
+          contract (Article 6(1)(b) GDPR (RGPD)).
         </li>
         <li>
           <strong>Accounts and chef profiles</strong>, including publishing the profile: performance of a contract.
         </li>
         <li>
-          <strong>Receiving the deposit, deducting the commission and paying the chef</strong>, including the payment documents:
-          performance of a contract (Article 6(1)(b) GDPR (RGPD)).
+          <strong>Receiving the deposit, deducting the commission and paying the chef</strong>, including the payment documents: performance
+          of a contract (Article 6(1)(b) GDPR (RGPD)).
         </li>
         <li>
           <strong>Complying with tax and accounting obligations</strong> and reporting annually to the Portuguese Tax and Customs Authority
-          (Autoridade Tributária) the chefs&apos; data and amounts required by Decreto-Lei n.º 20/2022 (DAC7): legal obligation (point
-          (c)). These data cannot be erased on request while the legal retention period lasts, and we inform each chef of what has been
-          reported.
+          (Autoridade Tributária) the chefs&apos; data and amounts required by Decreto-Lei n.º 20/2022 (DAC7): legal obligation (point (c)).
+          These data cannot be erased on request while the legal retention period lasts, and we inform each chef of what has been reported.
         </li>
         <li>
           <strong>Preventing fraud</strong> in payments, in particular checking changes of IBAN: legitimate interest (point (f)) in not
@@ -124,9 +123,9 @@ export const PRIVACY_SECTIONS_EN: LegalSection[] = [
           telephone number, email, area, what you cook, whether you already sell and, if you provide it, your Instagram or Facebook link.
         </p>
         <p>
-          We use these data only to contact you, explain Ao Lume and help you create your profile, because that is what you asked for
-          (steps prior to entering into a contract, Article 6(1)(b) GDPR (RGPD)). The advert forms belong to Meta Platforms Ireland, which
-          passes the data on to us.
+          We use these data only to contact you, explain Ao Lume and help you create your profile, because that is what you asked for (steps
+          prior to entering into a contract, Article 6(1)(b) GDPR (RGPD)). The advert forms belong to Meta Platforms Ireland, which passes
+          the data on to us.
         </p>
         <p>
           If you create a profile, the data are then processed as account data. If you do not go ahead, we delete them within 12 months of
@@ -158,6 +157,11 @@ export const PRIVACY_SECTIONS_EN: LegalSection[] = [
           site, with your IP address and the cookie identifier, so that we can measure our adverts. For that collection we are joint
           controllers with Meta, which then processes the data as a controller in its own right. Without your permission, the pixel does not
           load and nothing is shared.
+        </p>
+        <p>
+          If you accepted and then pay the deposit for a booking, our server also tells Meta that the payment was made, with the amount,
+          your email and phone number encoded (SHA-256 hash, so Meta does not receive them in plain text) and the cookie identifiers stored
+          with the request, so we know whether the advert worked. Those identifiers are deleted as soon as this is sent.
         </p>
         <p>We do not sell personal data. We only share it for advertising if you accept the cookie notice.</p>
       </>
@@ -212,8 +216,8 @@ export const PRIVACY_SECTIONS_EN: LegalSection[] = [
     body: (
       <>
         <p>
-          You may request access to your data, its rectification or erasure, restriction of processing and portability, object to
-          processing based on legitimate interest and withdraw your consent at any time, without affecting processing already carried out.
+          You may request access to your data, its rectification or erasure, restriction of processing and portability, object to processing
+          based on legitimate interest and withdraw your consent at any time, without affecting processing already carried out.
         </p>
         <p>
           To exercise these rights, write to <a href={`mailto:${EMAIL.privacy}`}>{EMAIL.privacy}</a>. We reply within one month. You also

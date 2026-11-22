@@ -55,7 +55,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           <JsonLd data={siteJsonLd(locale)} />
           {publicEnv.metaPixelId && (
             <>
-              <MetaPixel id={publicEnv.metaPixelId} />
+              <MetaPixel />
               <CookieBanner />
             </>
           )}

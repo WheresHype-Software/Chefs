@@ -11,6 +11,7 @@ import { dayLabel, serviceLabel } from "@/lib/format";
 import type { Locale } from "@/lib/i18n/routing";
 import { searchChefs } from "@/lib/search";
 import { parseSearchQuery, searchHref, type SearchQuery } from "@/lib/search-params";
+import { PixelEvent } from "@/components/analytics/PixelEvent";
 import { alternates } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/procurar">): Promise<Metadata> {
@@ -55,6 +56,13 @@ export default async function ProcurarPage({ params, searchParams }: PageProps<"
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
+      {(q.where || q.service !== "all") && (
+        <PixelEvent
+          event="Search"
+          params={{ search_string: q.where, content_category: q.service }}
+          eventId={`search_${q.where}|${q.service}|${q.cuisine ?? ""}|${q.date ?? ""}`}
+        />
+      )}
       <main className="flex-1">
         <section className="border-b border-line bg-paper">
           <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-5 pb-6 pt-8 md:px-8 md:pt-10">

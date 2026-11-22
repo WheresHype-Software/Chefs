@@ -154,6 +154,11 @@ const SECTIONS: LegalSection[] = [
           o endereço IP e o identificador do cookie, para medirmos os nossos anúncios. Nessa recolha somos responsáveis conjuntos com a
           Meta, que depois trata os dados como responsável própria. Sem a sua autorização, o pixel não chega a carregar e nada é comunicado.
         </p>
+        <p>
+          Se tiver aceitado e pagar o sinal de uma reserva, o nosso servidor comunica também à Meta que o pagamento foi feito, com o valor,
+          o seu email e telefone codificados (hash SHA-256, a Meta não os recebe em claro) e os identificadores do cookie guardados no
+          pedido, para sabermos se o anúncio resultou. Esses identificadores são apagados logo que o envio é feito.
+        </p>
         <p>Não vendemos dados pessoais. Só os partilhamos para publicidade se aceitar o aviso de cookies.</p>
       </>
     ),
@@ -285,7 +290,15 @@ export default async function Privacidade({ params }: PageProps<"/[locale]/priva
   const { locale } = await params;
   if (hasLocale(routing.locales, locale)) setRequestLocale(locale);
   if (locale !== DEFAULT_LOCALE) {
-    return <LegalPage path="/privacidade" title={PRIVACY_TITLE_EN} updated={LEGAL_UPDATED_EN} intro={PRIVACY_INTRO_EN} sections={PRIVACY_SECTIONS_EN} />;
+    return (
+      <LegalPage
+        path="/privacidade"
+        title={PRIVACY_TITLE_EN}
+        updated={LEGAL_UPDATED_EN}
+        intro={PRIVACY_INTRO_EN}
+        sections={PRIVACY_SECTIONS_EN}
+      />
+    );
   }
   return (
     <LegalPage

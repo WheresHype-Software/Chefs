@@ -40,6 +40,10 @@ export const serverEnv = {
     chefReview: process.env.DISCORD_WEBHOOK_CHEF_REVIEW,
     booking: process.env.DISCORD_WEBHOOK_BOOKING,
   },
+  /** Meta Conversions API (Events Manager → dataset → Settings). Unset = no server events. */
+  metaCapiToken: process.env.META_CAPI_TOKEN,
+  /** Events Manager → Test events code, only while testing; sends server events there. */
+  metaTestEventCode: process.env.META_TEST_EVENT_CODE,
 } as const;
 
 /** True when the EuPago client has what it needs. Checked before any payment action. */

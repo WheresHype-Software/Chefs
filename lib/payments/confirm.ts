@@ -6,6 +6,7 @@ import { clientLocaleFrom, profileLocaleFrom } from "../i18n/recipient";
 import { DEFAULT_LOCALE, localizePath, type Locale } from "../i18n/routing";
 import { getTranslator } from "../i18n/translator";
 import { createAdminClient } from "../supabase/admin";
+import { sendPurchase } from "../meta-capi";
 import { eupago } from "./eupago";
 import type { ProviderStatus } from "./types";
 
@@ -110,7 +111,11 @@ export async function syncPayment(payment: PaymentRow, trigger: "webhook" | "pol
       if (mismatch) await alertAdmin(payment, mismatch);
       return { changed: false, status: "paid", paymentId: payment.id, mismatch };
     }
-    if (data === true) await announcePaid(payment.booking_id);
+    if (data === true) {
+      await announcePaid(payment.booking_id);
+      // Ads measurement for the payment; does nothing without the client's consent or a token.
+      await sendPurchase(payment.booking_id);
+    }
     return { changed: data === true, status: "paid", paymentId: payment.id };
   }
 
@@ -175,7 +180,8 @@ export async function announceReference(args: {
     [e("facts.reference"), args.reference],
     [e("facts.amount"), euro(args.amount, locale)],
   ];
-  if (args.expiresAt) facts.push([e("facts.payBy"), new Date(args.expiresAt).toLocaleDateString(locale === "pt" ? "pt-PT" : "en-GB", { dateStyle: "long" })]);
+  if (args.expiresAt)
+    facts.push([e("facts.payBy"), new Date(args.expiresAt).toLocaleDateString(locale === "pt" ? "pt-PT" : "en-GB", { dateStyle: "long" })]);
 
   const doc = renderEmail(
     {
@@ -263,7 +269,8 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
   if (total > 0) facts.push([e("facts.serviceValue"), euro(total, locale)]);
   facts.push([e("depositDue.payNow"), euro(deposit, locale)]);
   if (total > 0 && rest > 0) facts.push([e("depositDue.rest"), euro(rest, locale)]);
-  if (deadline) facts.push([e("facts.payBy"), deadline.toLocaleString(locale === "pt" ? "pt-PT" : "en-GB", { dateStyle: "long", timeStyle: "short" })]);
+  if (deadline)
+    facts.push([e("facts.payBy"), deadline.toLocaleString(locale === "pt" ? "pt-PT" : "en-GB", { dateStyle: "long", timeStyle: "short" })]);
 
   const chefName = booking.chefs?.display_name;
   const doc = renderEmail(
@@ -277,9 +284,12 @@ export async function announceDepositDue(bookingId: string): Promise<void> {
     },
     locale,
   );
-  await sendEmail({ to: booking.clients.email, subject: e("depositDue.subject", { ref: booking.ref }), text: doc.text, html: doc.html }).catch(
-    (err) => console.error("[payments] deposit due email:", err),
-  );
+  await sendEmail({
+    to: booking.clients.email,
+    subject: e("depositDue.subject", { ref: booking.ref }),
+    text: doc.text,
+    html: doc.html,
+  }).catch((err) => console.error("[payments] deposit due email:", err));
 }
 
 async function announcePaid(bookingId: string): Promise<void> {
@@ -341,8 +351,8 @@ async function announcePaid(bookingId: string): Promise<void> {
       },
       locale,
     );
-    await sendEmail({ to: clientEmail, subject: e("paid.client.subject", { ref: booking.ref }), text: doc.text, html: doc.html }).catch((err) =>
-      console.error("[payments] client email:", err),
+    await sendEmail({ to: clientEmail, subject: e("paid.client.subject", { ref: booking.ref }), text: doc.text, html: doc.html }).catch(
+      (err) => console.error("[payments] client email:", err),
     );
   }
 

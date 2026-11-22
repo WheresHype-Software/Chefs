@@ -24,7 +24,8 @@ const SignUpInput = z.object({
   accepted: z.literal(true),
 });
 
-export type SignUpResult = { ok: true; session: boolean } | { ok: false; error: string };
+/** `createdId` is the new account's id, only when this call really created one (for ad measurement). */
+export type SignUpResult = { ok: true; session: boolean; createdId: string | null } | { ok: false; error: string };
 
 /**
  * Creates the account and records, in the same request, that the person accepted the terms (and,
@@ -58,13 +59,14 @@ export async function signUpWithTerms(input: Omit<z.infer<typeof SignUpInput>, "
   // With email confirmation on, an address that already has an account comes back as a user with
   // no identities, so as not to reveal that it exists. There is nothing to record for it.
   const user = data.user;
-  if (user && (user.identities?.length ?? 0) > 0) {
+  const created = Boolean(user && (user.identities?.length ?? 0) > 0);
+  if (user && created) {
     const recorded = await recordAcceptance({ userId: user.id, email, name }, asChef ? ["terms", "chef_contract"] : ["terms"], "signup");
     // The account exists either way. A chef whose acceptance did not land is asked again before
     // the profile goes to review; nobody is locked out by a failed insert.
     if (!recorded) console.error(`[auth] acceptance not recorded for ${user.id}`);
   }
-  return { ok: true, session: Boolean(data.session) };
+  return { ok: true, session: Boolean(data.session), createdId: created && user ? user.id : null };
 }
 
 /**
@@ -78,5 +80,8 @@ export async function saveMyLocale(locale: string): Promise<void> {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) return;
-  await sb.from("profiles").update({ locale: toDbLocale(locale) }).eq("id", user.id);
+  await sb
+    .from("profiles")
+    .update({ locale: toDbLocale(locale) })
+    .eq("id", user.id);
 }
